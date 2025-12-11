@@ -19,11 +19,14 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.2.0.5
+- **Version:** 0.2.0.6
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.2.0.6 - Cache Busting
+- Version erhöht für CSS Cache Refresh
 
 ### 0.2.0.5 - ZIP Script Improvement
 - Script verschiebt ALLE alten ZIPs ins Archiv (nicht nur gleiche Version)
