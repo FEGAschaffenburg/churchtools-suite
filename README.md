@@ -19,11 +19,17 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.2.0.3
+- **Version:** 0.2.0.4
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.2.0.4 - Enhanced Design
+- Gradient Header wie im alten Plugin
+- Verbesserte Cards mit Hover-Effekten
+- Modernere Tab-Navigation
+- Schönere Farben und Abstände
 
 ### 0.2.0.3 - Login mit Benutzername/Passwort
 - Settings: Benutzername (E-Mail) und Passwort statt API Token
