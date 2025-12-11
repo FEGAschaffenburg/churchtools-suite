@@ -19,11 +19,22 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.2.2.1
+- **Version:** 0.2.3.0
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.2.3.0 - Boxed Layout & Kompaktes Design
+- Boxed Layout statt volle Breite
+- Kompakteres, klareres Design
+- 3-Spalten-Grid für Cards
+- Reduzierte Paddings und Margins
+- Einfachere Buttons ohne Schatten
+- Kleinere Stat-Numbers (36px)
+- System-Card in Grid integriert
+- Max-Width 700px für Einzelkarten
+- Saubere, übersichtliche Optik
 
 ### 0.2.2.1 - Design-Verfeinerungen
 - Verfeinerte Typografie (größere Überschriften, bessere Schriftgewichte)

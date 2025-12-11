@@ -1,9 +1,9 @@
 /**
  * ChurchTools Suite Admin CSS
- * Design orientiert am Original-Plugin
+ * Boxed Layout - Kompaktes Design
  *
  * @package ChurchTools_Suite
- * @since   0.2.2.0
+ * @since   0.2.3.0
  */
 
 /* === Reset & Base === */
@@ -13,47 +13,39 @@
 
 .cts-wrap {
 	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-	background: #f0f0f1;
-	margin: 20px 0 0 -20px;
+	background: transparent;
+	margin: 0;
 	padding: 0;
-	min-height: calc(100vh - 32px);
 }
 
 /* === Header === */
 .cts-header {
 	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-	margin: 0 0 0 -20px;
-	padding: 30px 40px;
-	box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+	margin: 0 0 20px 0;
+	padding: 20px 25px;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 	color: #fff;
 }
 
 .cts-header h1 {
 	display: flex;
 	align-items: center;
-	gap: 15px;
+	gap: 12px;
 	margin: 0;
 	color: #fff;
-	font-size: 23px;
+	font-size: 20px;
 	font-weight: 400;
-	line-height: 1.3;
+	line-height: 1.4;
 }
 
 .cts-header h1 span {
-	font-size: 32px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 40px;
-	height: 40px;
-	background: rgba(255, 255, 255, 0.2);
-	border-radius: 8px;
+	font-size: 26px;
 }
 
 .cts-subtitle {
-	margin: 10px 0 0;
-	color: rgba(255, 255, 255, 0.92);
-	font-size: 14px;
+	margin: 6px 0 0;
+	color: rgba(255, 255, 255, 0.9);
+	font-size: 13px;
 	font-weight: 300;
 	line-height: 1.5;
 }
@@ -62,78 +54,72 @@
 .cts-tabs {
 	background: #fff;
 	border-bottom: 1px solid #c3c4c7;
-	margin: 0 0 0 -20px;
-	padding: 0 30px;
-	box-shadow: none;
+	margin: 0 0 20px 0;
+	padding: 0 15px;
+	box-shadow: 0 1px 1px rgba(0,0,0,0.04);
 	display: flex;
-	gap: 8px;
+	gap: 4px;
 }
 
 .cts-tab {
 	display: inline-flex;
 	align-items: center;
-	gap: 8px;
-	padding: 12px 18px;
-	font-size: 14px;
+	gap: 6px;
+	padding: 10px 14px;
+	font-size: 13px;
 	font-weight: 400;
 	border: none;
-	border-bottom: 3px solid transparent;
+	border-bottom: 2px solid transparent;
 	background: transparent;
 	margin: 0;
 	color: #646970;
 	text-decoration: none;
 	cursor: pointer;
-	transition: all 0.2s ease;
-	position: relative;
+	transition: all 0.15s ease;
 }
 
 .cts-tab span {
-	font-size: 18px;
+	font-size: 16px;
 	line-height: 1;
-	opacity: 0.8;
 }
 
 .cts-tab.active {
 	border-bottom-color: #2271b1;
-	color: #2271b1;
-	font-weight: 500;
-}
-
-.cts-tab.active span {
-	opacity: 1;
+	color: #1d2327;
+	font-weight: 600;
 }
 
 .cts-tab:hover:not(.active) {
-	color: #2271b1;
-	background: rgba(34, 113, 177, 0.04);
+	color: #1d2327;
+	background: rgba(0,0,0,0.03);
 }
 
 .cts-tab:focus {
-	outline: 2px solid #2271b1;
-	outline-offset: -2px;
-	box-shado30px 40px;
-	background: #f0f0f1;
-	margin-left: -20px;
+	outline: 1px solid #2271b1;
+	outline-offset: -1px;
+}
+
+/* === Content Area === */
+.cts-tab-content {
+	padding: 0;
+	background: transparent;
 }
 
 /* === Section Header === */
 .cts-section-header {
-	margin-bottom: 28px;
+	margin-bottom: 20px;
+	padding-bottom: 15px;
+	border-bottom: 1px solid #dcdcde;
 }
 
 .cts-section-header h2 {
-	font-size: 23px;
+	font-size: 20px;
 	font-weight: 400;
 	color: #1d2327;
-	margin: 0 0 8px;
-	line-height: 1.3;
+	margin: 0 0 6px;
+	line-height: 1.4;
 }
 
-.cts-section-description {
-	color: #646970;
-	font-size: 14px;
-	margin: 0;
-	line-height: 1.6
 .cts-section-description {
 	color: #646970;
 	font-size: 13px;
@@ -142,79 +128,93 @@
 }
 
 /* === Grid === */
-.cts-gr4px;
-	margin-bottom: 24px;
+.cts-grid {
+	display: grid;
+	gap: 16px;
+	margin-bottom: 20px;
 }
 
 .cts-grid-3 {
-	grid-template-columns: repeat(auto-fit, minmax(30
-.cts-grid-3 {
-	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 1280px) {
+	.cts-grid-3 {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media (max-width: 900px) {
+	.cts-grid-3 {
+		grid-template-columns: 1fr;
+	}
 }
 
 /* === Cards === */
 .cts-card {
-	background: #ff0;
-	box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-	transition: box-shadow 0.2s ease, transform 0.2s ease;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 0;
+	box-shadow: 0 1px 1px rgba(0,0,0,0.04);
+	transition: box-shadow 0.15s ease;
 	overflow: hidden;
 }
 
 .cts-card:hover {
-	box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-	transform: translateY(-2px);
+	box-shadow: 0 2px 4px rgba(0,0,0,0.08);
 }
 
 .cts-card-header {
-	padding: 18px 24px;
+	padding: 14px 18px;
 	border-bottom: 1px solid #dcdcde;
 	display: flex;
 	align-items: center;
-	gap: 12px;
-	background: #fafafa;
+	gap: 10px;
 }
 
 .cts-card-header .cts-card-icon {
-	font-size: 28px;
+	font-size: 24px;
 	line-height: 1;
 	margin: 0;
-	opacity: 0.85;
 }
 
 .cts-card-header h3 {
 	margin: 0;
-	font-size: 15px;
+	font-size: 14px;
 	font-weight: 600;
 	color: #1d2327;
 	line-height: 1.4;
 }
 
 .cts-card-body {
-	padding: 24px;
-	min-height: 100px;
+	padding: 18px;
+	min-height: 90px;
 }
 
 .cts-card-footer {
-	padding: 14px 24px;
+	padding: 12px 18px;
 	background: #f6f7f7;
 	border-top: 1px solid #dcdcde;
 	display: flex;
-	justify-content: flex-start
-	background: #f6f7f7;
-	border-top: 1px solid #f0f0f1;
-}10px;
-	font-size: 14px;
+	justify-content: flex-start;
+}
+
+/* === Status Indicator === */
+.cts-status {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 13px;
 	font-weight: 500;
-	margin: 0 0 10px;
+	margin: 0 0 8px;
 }
 
 .cts-status-indicator {
 	display: inline-block;
-	width: 12px;
-	height: 12px;
+	width: 10px;
+	height: 10px;
 	border-radius: 50%;
 	flex-shrink: 0;
-	box-shadow: 0 0 0 2px rgba(0,0,0,0.08);
 }
 
 .cts-status-success {
@@ -223,7 +223,6 @@
 
 .cts-status-success .cts-status-indicator {
 	background: #00a32a;
-	box-shadow: 0 0 0 2px rgba(0, 163, 42, 0.15);
 }
 
 .cts-status-error {
@@ -232,7 +231,6 @@
 
 .cts-status-error .cts-status-indicator {
 	background: #d63638;
-	box-shadow: 0 0 0 2px rgba(214, 54, 56, 0.15);
 }
 
 .cts-status-inactive {
@@ -241,27 +239,19 @@
 
 .cts-status-inactive .cts-status-indicator {
 	background: #8c8f94;
-	box-shadow: 0 0 0 2px rgba(140, 143, 148, 0.15);
 }
 
 .cts-card-detail {
 	color: #646970;
-	font-size: 14px;
+	font-size: 13px;
 	margin: 0;
-	line-height: 1.6
-48px;
-	font-weight: 300;
-	color: #2271b1;
-	margin: 0 0 8px;
-	line-height: 1;
-	letter-spacing: -1px
 	line-height: 1.5;
 }
 
 /* === Stat Number === */
 .cts-stat-number {
-	font-size: 32px;
-	font-weight: 600;
+	font-size: 36px;
+	font-weight: 400;
 	color: #1d2327;
 	margin: 0 0 6px;
 	line-height: 1;
@@ -269,7 +259,8 @@
 
 /* === System Card === */
 .cts-system-card {
-	max-width: 800px;
+	grid-column: 1 / -1;
+	max-width: 500px;
 }
 
 .cts-system-table {
@@ -278,7 +269,7 @@
 }
 
 .cts-system-table tr:not(:last-child) {
-	border-bottom: 1px solid #f0f0f1;
+	border-bottom: 1px solid #dcdcde;
 }
 
 .cts-system-table td {
@@ -289,89 +280,78 @@
 .cts-system-table td:first-child {
 	color: #646970;
 	width: 40%;
-}8px;
-	padding: 8px 16px;
+}
+
+.cts-system-table td:last-child {
+	color: #1d2327;
+	font-weight: 600;
+}
+
+/* === Buttons === */
+.cts-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	padding: 6px 12px;
 	font-size: 13px;
 	font-weight: 400;
 	border-radius: 3px;
 	border: 1px solid;
 	cursor: pointer;
 	text-decoration: none;
-	transition: all 0.2s ease;
+	transition: all 0.15s ease;
 	font-family: inherit;
-	line-height: 1.5;
-	white-space: nowrap;
+	line-height: 1.4;
 }
 
 .cts-button-primary {
 	background: #2271b1;
 	border-color: #2271b1;
 	color: #fff;
-	box-shadow: 0 1px 0 #2271b1;
 }
 
 .cts-button-primary:hover {
 	background: #135e96;
 	border-color: #135e96;
 	color: #fff;
-	box-shadow: 0 1px 0 #135e96;
-	transform: translateY(-1px);
 }
 
 .cts-button-secondary {
-	background: #fff;
+	background: #f6f7f7;
 	border-color: #2271b1;
 	color: #2271b1;
-	box-shadow: 0 1px 0 rgba(34, 113, 177, 0.3);
 }
 
 .cts-button-secondary:hover {
-	background: #f0f6fc;
+	background: #f0f0f1;
 	border-color: #135e96;
 	color: #135e96;
-	box-shadow: 0 1px 0 rgba(19, 94, 150, 0.4);
 }
 
-.cts-button:active {
-	transform: translateY(1px);
-	box-shadow: none
-	color: #2271b1;
+.cts-button svg,
+.cts-button span {
+	font-size: 13px;
 }
-4px;
-	max-width: 800px;
+
+/* === Quick Start === */
+.cts-quick-start {
+	margin-top: 20px;
+	grid-column: 1 / -1;
+	max-width: 600px;
 }
 
 .cts-quick-start h3 {
 	margin: 0;
-	padding: 18px 24px;
-	font-size: 15px;
+	padding: 14px 18px;
+	font-size: 14px;
 	font-weight: 600;
 	border-bottom: 1px solid #dcdcde;
-	background: #fafafa;
 }
 
 .cts-quick-start ol {
 	margin: 0;
-	padding: 24px 24px 24px 48px;
-}
-
-.cts-quick-start li {
-	margin-bottom: 12px;
-	line-height: 1.7;
-	font-size: 14px;
-	color: #50575e;
-}
-
-.cts-quick-start a {
-	color: #2271b1;
-	text-decoration: none;
-	font-weight: 500
-	border-bottom: 1px solid #f0f0f1;
-}
-
-.cts-quick-start ol {
-	margin: 0;
-	padding: 20px 20px 20px 45px;
+	padding: 18px 18px 18px 40px;
 }
 
 .cts-quick-start li {
@@ -393,7 +373,7 @@
 
 /* === Form Elements === */
 .cts-settings .cts-card {
-	max-width: 800px;
+	max-width: 700px;
 }
 
 .cts-form-table {
@@ -458,7 +438,7 @@
 
 /* === Sync === */
 .cts-sync .cts-card {
-	max-width: 800px;
+	max-width: 700px;
 }
 
 .cts-progress-bar {
@@ -490,8 +470,8 @@
 
 /* === Debug === */
 .cts-debug .cts-card {
-	max-width: 800px;
-	margin-bottom: 20px;
+	max-width: 700px;
+	margin-bottom: 16px;
 }
 
 .cts-debug-table {
@@ -572,50 +552,39 @@
 
 /* === Responsive === */
 @media (max-width: 782px) {
-	.cts-wrap {
-		margin-left: 0;
-	}
-	
 	.cts-header {
 		padding: 16px 20px;
+		margin: 0 0 15px 0;
 	}
 	
 	.cts-header h1 {
-		font-size: 20px;
+		font-size: 18px;
 	}
 	
 	.cts-header h1 span {
-		font-size: 24px;
+		font-size: 22px;
 	}
 	
 	.cts-tabs {
 		padding: 0 10px;
+		margin: 0 0 15px 0;
 		flex-wrap: wrap;
-		overflow-x: auto;
 	}
 	
 	.cts-tab {
-		padding: 12px 12px;
+		padding: 8px 12px;
 		font-size: 12px;
-	}
-	
-	.cts-tab-content {
-		padding: 16px 20px;
-	}
-	
-	.cts-grid-3 {
-		grid-template-columns: 1fr;
 	}
 	
 	.cts-form-table th,
 	.cts-form-table td {
 		display: block;
 		width: 100%;
-		padding: 10px 0;
+		padding: 8px 0;
 	}
 	
 	.cts-form-table th {
-		padding-bottom: 5px;
+		padding-bottom: 4px;
 	}
 	
 	.cts-form-input,
