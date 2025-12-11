@@ -19,11 +19,16 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.2.0.0
+- **Version:** 0.2.0.1
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.2.0.1 - Code Cleanup
+- Alle "repro-" Präfixe entfernt
+- CSS-Klassen bereinigt: .cts-* statt .repro-ct-suite-*
+- Package-Namen aktualisiert
 
 ### 0.2.0.0 - Modern Admin UI
 - Clean & Modern Admin Design

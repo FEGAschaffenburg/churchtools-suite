@@ -1,12 +1,12 @@
 /**
- * Modal Styles für Debug-Seite
+ * Modal Styles
  * 
- * @package Repro_CT_Suite
- * @version 0.9.5.3
+ * @package ChurchTools_Suite
+ * @since 0.2.0.1
  */
 
 /* Modal Overlay */
-.repro-ct-suite-modal {
+.cts-modal {
 	display: none;
 	position: fixed;
 	z-index: 100000;
@@ -20,7 +20,7 @@
 }
 
 /* Modal Content */
-.repro-ct-suite-modal-content {
+.cts-modal-content {
 	background-color: #ffffff;
 	margin: 2% auto;
 	padding: 0;
@@ -48,7 +48,7 @@
 }
 
 /* Modal Header */
-.repro-ct-suite-modal-header {
+.cts-modal-header {
 	padding: 20px 24px;
 	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 	color: white;
@@ -58,7 +58,7 @@
 	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.repro-ct-suite-modal-header h2 {
+.cts-modal-header h2 {
 	margin: 0;
 	font-size: 20px;
 	font-weight: 600;
@@ -66,7 +66,7 @@
 }
 
 /* Close Button */
-.repro-ct-suite-modal-close {
+.cts-modal-close {
 	color: rgba(255, 255, 255, 0.9);
 	font-size: 32px;
 	font-weight: 300;
@@ -77,14 +77,14 @@
 	margin: -10px -10px -10px 0;
 }
 
-.repro-ct-suite-modal-close:hover,
-.repro-ct-suite-modal-close:focus {
+.cts-modal-close:hover,
+.cts-modal-close:focus {
 	color: #ffffff;
 	transform: rotate(90deg);
 }
 
 /* Modal Body */
-.repro-ct-suite-modal-body {
+.cts-modal-body {
 	padding: 24px;
 	overflow-y: auto;
 	max-height: calc(90vh - 100px);
@@ -92,21 +92,21 @@
 
 /* Responsive */
 @media screen and (max-width: 768px) {
-	.repro-ct-suite-modal-content {
+	.cts-modal-content {
 		width: 95%;
 		margin: 5% auto;
 		max-height: 90vh;
 	}
 	
-	.repro-ct-suite-modal-header {
+	.cts-modal-header {
 		padding: 16px 20px;
 	}
 	
-	.repro-ct-suite-modal-header h2 {
+	.cts-modal-header h2 {
 		font-size: 18px;
 	}
 	
-	.repro-ct-suite-modal-body {
+	.cts-modal-body {
 		padding: 16px 20px;
 	}
 }
