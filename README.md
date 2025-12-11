@@ -19,11 +19,18 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.3.2.0
+- **Version:** 0.3.3.0
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.3.3.0 - Calendars Repository
+- Calendars Repository mit upsert_by_calendar_id
+- get_selected() für ausgewählte Kalender
+- get_selected_ids() und get_selected_calendar_ids()
+- set_selected() und update_selected() für Bulk-Operationen
+- is_selected-Flag bleibt bei Updates erhalten (User-Einstellung)
 
 ### 0.3.2.0 - Repository Base-Klasse
 - Abstrakte Basis-Klasse für alle Repositories
