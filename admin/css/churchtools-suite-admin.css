@@ -173,9 +173,9 @@
 
 .cts-status-error .cts-status-dot {
 	background: #dc3232;
-}
-
-/* === Stats === */
+}42px;
+	font-weight: 700;
+	color: #667ee== */
 .cts-stat-number {
 	font-size: 32px;
 	font-weight: 700;

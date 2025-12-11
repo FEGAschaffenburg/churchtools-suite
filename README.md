@@ -19,11 +19,15 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.2.0.4
+- **Version:** 0.2.0.5
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.2.0.5 - ZIP Script Improvement
+- Script verschiebt ALLE alten ZIPs ins Archiv (nicht nur gleiche Version)
+- Bessere Archivierung vor neuer ZIP-Erstellung
 
 ### 0.2.0.4 - Enhanced Design
 - Gradient Header wie im alten Plugin

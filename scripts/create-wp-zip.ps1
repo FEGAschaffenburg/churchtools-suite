@@ -14,15 +14,18 @@ Write-Host "=== ChurchTools Suite ZIP Creator ===" -ForegroundColor Cyan
 Write-Host "Version: $Version"
 Write-Host ""
 
-# Archive old ZIP if exists
-if (Test-Path $OutputZip) {
+# Archive ALL old ZIPs
+$oldZips = Get-ChildItem -Path "C:\privat" -Filter "churchtools-suite-*.zip" -ErrorAction SilentlyContinue
+if ($oldZips) {
     if (-not (Test-Path $ArchiveDir)) {
         New-Item -ItemType Directory -Path $ArchiveDir -Force | Out-Null
     }
     $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
-    $archiveFile = Join-Path $ArchiveDir "churchtools-suite-$Version-$timestamp.zip"
-    Move-Item -Path $OutputZip -Destination $archiveFile -Force
-    Write-Host "Archived old ZIP: churchtools-suite-$Version.zip -> archiv\churchtools-suite-$Version-$timestamp.zip" -ForegroundColor Yellow
+    foreach ($zip in $oldZips) {
+        $archiveFile = Join-Path $ArchiveDir ($zip.Name -replace '\.zip$', "-$timestamp.zip")
+        Move-Item -Path $zip.FullName -Destination $archiveFile -Force
+        Write-Host "Archived: $($zip.Name) -> archiv\$($archiveFile | Split-Path -Leaf)" -ForegroundColor Yellow
+    }
 }
 
 # Cleanup temp
