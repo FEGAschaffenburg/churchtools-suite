@@ -51,6 +51,7 @@ class ChurchTools_Suite {
 		$this->loader->add_action( 'admin_enqueue_scripts', $admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'admin_menu', $admin, 'add_plugin_admin_menu' );
+		$this->loader->add_action( 'init', $admin, 'register_ajax_handlers' );
 	}
 	
 	/**

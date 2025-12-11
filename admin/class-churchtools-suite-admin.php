@@ -102,4 +102,43 @@ class ChurchTools_Suite_Admin {
 		$screen = get_current_screen();
 		return $screen && strpos( $screen->id, 'churchtools-suite' ) !== false;
 	}
+	
+	/**
+	 * Register AJAX handlers
+	 */
+	public function register_ajax_handlers(): void {
+		add_action( 'wp_ajax_cts_test_connection', [ $this, 'ajax_test_connection' ] );
+	}
+	
+	/**
+	 * AJAX Handler: Test ChurchTools Connection
+	 */
+	public function ajax_test_connection(): void {
+		// Check nonce
+		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
+		
+		// Check permissions
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [
+				'message' => 'Keine Berechtigung.'
+			] );
+		}
+		
+		// Load CT Client
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-ct-client.php';
+		
+		$client = new ChurchTools_Suite_CT_Client();
+		$result = $client->test_connection();
+		
+		if ( $result['success'] ) {
+			wp_send_json_success( [
+				'message' => $result['message'],
+				'user_info' => $result['user_info'] ?? null
+			] );
+		} else {
+			wp_send_json_error( [
+				'message' => $result['message']
+			] );
+		}
+	}
 }

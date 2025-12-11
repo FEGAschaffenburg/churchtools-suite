@@ -20,6 +20,7 @@
 		initTabs();
 		initSyncButton();
 		initForms();
+		initTestConnection();
 	}
 
 	/**
@@ -129,6 +130,80 @@
 					e.preventDefault();
 					alert('Bitte füllen Sie alle erforderlichen Felder aus.');
 				}
+			});
+		});
+	}
+
+	/**
+	 * Test Connection Button
+	 */
+	function initTestConnection() {
+		const testButton = document.getElementById('cts-test-connection');
+		if (!testButton) return;
+
+		testButton.addEventListener('click', function() {
+			const resultDiv = document.getElementById('cts-connection-result');
+			
+			if (resultDiv) {
+				resultDiv.style.display = 'none';
+				resultDiv.innerHTML = '';
+			}
+			
+			testButton.disabled = true;
+			const originalText = testButton.innerHTML;
+			testButton.innerHTML = '<span>⏳</span> Teste Verbindung...';
+
+			fetch(churchtoolsSuite.ajaxUrl, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+				body: new URLSearchParams({
+					action: 'cts_test_connection',
+					nonce: churchtoolsSuite.nonce
+				})
+			})
+			.then(response => response.json())
+			.then(data => {
+				if (resultDiv) {
+					resultDiv.style.display = 'block';
+					
+					if (data.success) {
+						let message = data.data.message || 'Verbindung erfolgreich!';
+						
+						// User-Info anzeigen wenn verfügbar
+						if (data.data.user_info) {
+							const user = data.data.user_info;
+							message += '<br><br><strong>Eingeloggt als:</strong><br>';
+							if (user.firstName && user.lastName) {
+								message += user.firstName + ' ' + user.lastName;
+							}
+							if (user.email) {
+								message += ' (' + user.email + ')';
+							}
+						}
+						
+						resultDiv.innerHTML = '<div class="cts-notice cts-notice-success"><p>' + 
+							message + 
+							'</p></div>';
+					} else {
+						resultDiv.innerHTML = '<div class="cts-notice cts-notice-error"><p>' + 
+							(data.data.message || 'Verbindung fehlgeschlagen!') + 
+							'</p></div>';
+					}
+				}
+			})
+			.catch(error => {
+				if (resultDiv) {
+					resultDiv.style.display = 'block';
+					resultDiv.innerHTML = '<div class="cts-notice cts-notice-error"><p>Fehler: ' + 
+						error.message + 
+						'</p></div>';
+				}
+			})
+			.finally(() => {
+				testButton.disabled = false;
+				testButton.innerHTML = originalText;
 			});
 		});
 	}

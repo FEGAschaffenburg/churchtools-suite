@@ -248,6 +248,13 @@
 	line-height: 1.5;
 }
 
+.cts-card-meta {
+	color: #8c8f94;
+	font-size: 12px;
+	margin: 8px 0 0;
+	line-height: 1.4;
+}
+
 /* === Stat Number === */
 .cts-stat-number {
 	font-size: 36px;

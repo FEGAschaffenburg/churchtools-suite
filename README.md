@@ -19,11 +19,20 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.2.3.1
+- **Version:** 0.3.0.0
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.3.0.0 - ChurchTools Login & API Client
+- ChurchTools API Client Klasse implementiert
+- Login mit Username/Passwort und Token-Speicherung
+- Verbindung testen Button in Einstellungen
+- Dashboard zeigt echten Verbindungsstatus
+- Token wird in WordPress-Options gespeichert
+- Automatisches Re-Login bei 401 Errors
+- User-Info nach erfolgreichem Login anzeigen
 
 ### 0.2.3.1 - Tenant-Name Eingabe
 - Nur Tenant-Name statt vollständiger URL

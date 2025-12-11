@@ -14,7 +14,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 $ct_url = get_option( 'churchtools_suite_ct_url', '' );
 $ct_username = get_option( 'churchtools_suite_ct_username', '' );
 $ct_password = get_option( 'churchtools_suite_ct_password', '' );
+$ct_token = get_option( 'churchtools_suite_ct_token', '' );
+$ct_last_login = get_option( 'churchtools_suite_ct_last_login', '' );
 $is_configured = ! empty( $ct_url ) && ! empty( $ct_username ) && ! empty( $ct_password );
+$is_connected = ! empty( $ct_token );
 
 // Statistiken
 global $wpdb;
@@ -41,17 +44,28 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 				<h3><?php esc_html_e( 'ChurchTools', 'churchtools-suite' ); ?></h3>
 			</div>
 			<div class="cts-card-body">
-				<?php if ( $is_configured ) : ?>
+				<?php if ( $is_connected ) : ?>
 					<p class="cts-status cts-status-success">
 						<span class="cts-status-indicator"></span>
 						<?php esc_html_e( 'Verbunden', 'churchtools-suite' ); ?>
 					</p>
 					<p class="cts-card-detail"><?php echo esc_html( parse_url( $ct_url, PHP_URL_HOST ) ?: $ct_url ); ?></p>
+					<?php if ( $ct_last_login ) : ?>
+						<p class="cts-card-meta"><?php echo esc_html( sprintf( __( 'Letzter Login: %s', 'churchtools-suite' ), date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $ct_last_login ) ) ) ); ?></p>
+					<?php endif; ?>
+				<?php elseif ( $is_configured ) : ?>
+					<p class="cts-status cts-status-inactive">
+						<span class="cts-status-indicator"></span>
+						<?php esc_html_e( 'Konfiguriert', 'churchtools-suite' ); ?>
+					</p>
+					<p class="cts-card-detail"><?php echo esc_html( parse_url( $ct_url, PHP_URL_HOST ) ?: $ct_url ); ?></p>
+					<p class="cts-card-meta"><?php esc_html_e( 'Verbindung noch nicht getestet', 'churchtools-suite' ); ?></p>
 				<?php else : ?>
 					<p class="cts-status cts-status-error">
 						<span class="cts-status-indicator"></span>
 						<?php esc_html_e( 'Nicht konfiguriert', 'churchtools-suite' ); ?>
 					</p>
+					<p class="cts-card-detail"><?php esc_html_e( 'Bitte ChurchTools-Zugangsdaten eingeben', 'churchtools-suite' ); ?></p>
 				<?php endif; ?>
 			</div>
 			<div class="cts-card-footer">

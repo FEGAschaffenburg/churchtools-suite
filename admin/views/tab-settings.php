@@ -99,7 +99,13 @@ $ct_password = get_option( 'churchtools_suite_ct_password', '' );
 				<span>💾</span>
 				<?php esc_html_e( 'Einstellungen speichern', 'churchtools-suite' ); ?>
 			</button>
+			<button type="button" id="cts-test-connection" class="cts-button cts-button-secondary">
+				<span>🔌</span>
+				<?php esc_html_e( 'Verbindung testen', 'churchtools-suite' ); ?>
+			</button>
 		</div>
 	</form>
+	
+	<div id="cts-connection-result" style="display: none; margin-top: 20px;"></div>
 
 </div>
