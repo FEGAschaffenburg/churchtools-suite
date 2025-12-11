@@ -18,7 +18,7 @@ class ChurchTools_Suite_Deactivator {
 	 * - Clears scheduled cron jobs
 	 * - Flushes rewrite rules
 	 */
-	public static function deactivate() {
+	public static function deactivate(): void {
 		wp_clear_scheduled_hook( 'churchtools_suite_sync_cron' );
 		flush_rewrite_rules();
 	}

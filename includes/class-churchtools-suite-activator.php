@@ -19,7 +19,7 @@ class ChurchTools_Suite_Activator {
 	 * - Sets default options
 	 * - Flushes rewrite rules
 	 */
-	public static function activate() {
+	public static function activate(): void {
 		self::create_tables();
 		self::set_default_options();
 		flush_rewrite_rules();
@@ -28,7 +28,7 @@ class ChurchTools_Suite_Activator {
 	/**
 	 * Create database tables
 	 */
-	private static function create_tables() {
+	private static function create_tables(): void {
 		global $wpdb;
 		
 		$charset_collate = $wpdb->get_charset_collate();
@@ -116,7 +116,7 @@ class ChurchTools_Suite_Activator {
 	/**
 	 * Set default options
 	 */
-	private static function set_default_options() {
+	private static function set_default_options(): void {
 		$defaults = [
 			'churchtools_suite_version' => CHURCHTOOLS_SUITE_VERSION,
 			'churchtools_suite_auto_sync_enabled' => 0,
