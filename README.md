@@ -19,11 +19,20 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.3.3.0
+- **Version:** 0.3.4.0
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.3.4.0 - Calendar Sync Service
+- Calendar Sync Service für Kalender-Synchronisation
+- sync_calendars() lädt alle Kalender aus ChurchTools
+- import_calendar() speichert einzelne Kalender mit upsert
+- fetch_calendar() für einzelne Kalender
+- is_sync_needed() prüft ob Sync nötig (>1h alt)
+- Neue Kalender: is_selected = is_public (Standard)
+- Sync-Zeitstempel wird in Options gespeichert
 
 ### 0.3.3.0 - Calendars Repository
 - Calendars Repository mit upsert_by_calendar_id
