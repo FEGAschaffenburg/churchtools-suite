@@ -92,22 +92,56 @@ class ChurchTools_Suite_CT_Client {
             $error_message = 'Login fehlgeschlagen (HTTP ' . $status_code . ')';
             if (isset($data['message'])) {
                 $error_message .= ': ' . $data['message'];
+            } elseif (isset($data['error'])) {
+                $error_message .= ': ' . $data['error'];
             }
             return [
                 'success' => false,
-                'message' => $error_message
+                'message' => $error_message,
+                'debug' => [
+                    'status' => $status_code,
+                    'body' => $body
+                ]
             ];
         }
         
-        // Extract token from response
-        if (empty($data['data']['token'])) {
+        // Check for JSON decode error
+        if (json_last_error() !== JSON_ERROR_NONE) {
             return [
                 'success' => false,
-                'message' => 'Kein Token in der Antwort erhalten.'
+                'message' => 'Ungültige API-Antwort: ' . json_last_error_msg(),
+                'debug' => [
+                    'body' => substr($body, 0, 500)
+                ]
             ];
         }
         
-        $this->token = $data['data']['token'];
+        // Extract token from response - try different response structures
+        $token = null;
+        
+        // Structure 1: { "data": { "token": "..." } }
+        if (isset($data['data']['token'])) {
+            $token = $data['data']['token'];
+        }
+        // Structure 2: { "token": "..." }
+        elseif (isset($data['token'])) {
+            $token = $data['token'];
+        }
+        
+        if (empty($token)) {
+            return [
+                'success' => false,
+                'message' => 'Kein Token in der Antwort erhalten. Response-Struktur: ' . 
+                    implode(', ', array_keys($data)),
+                'debug' => [
+                    'response_keys' => array_keys($data),
+                    'has_data' => isset($data['data']),
+                    'data_keys' => isset($data['data']) ? array_keys($data['data']) : []
+                ]
+            ];
+        }
+        
+        $this->token = $token;
         
         // Save token to database
         update_option('churchtools_suite_ct_token', $this->token);
