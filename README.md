@@ -19,11 +19,18 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.2.1.0
+- **Version:** 0.2.1.1
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.2.1.1 - Cleanup
+- Gelöscht: Shortcode-Manager CSS/JS
+- Gelöscht: Gutenberg-Block JS
+- Gelöscht: Debug JS (nicht mehr benötigt)
+- Gelöscht: Backup-Dateien
+- Nur noch essenzielle Dateien: churchtools-suite-admin.css/js, churchtools-suite-modal.css
 
 ### 0.2.1.0 - Eigenständiges Design
 - Komplett eigenes CSS ohne WordPress-Abhängigkeiten
