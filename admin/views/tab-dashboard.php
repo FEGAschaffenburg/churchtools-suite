@@ -12,8 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Status prüfen
 $ct_url = get_option( 'churchtools_suite_ct_url', '' );
-$ct_token = get_option( 'churchtools_suite_ct_token', '' );
-$is_configured = ! empty( $ct_url ) && ! empty( $ct_token );
+$ct_username = get_option( 'churchtools_suite_ct_username', '' );
+$ct_password = get_option( 'churchtools_suite_ct_password', '' );
+$is_configured = ! empty( $ct_url ) && ! empty( $ct_username ) && ! empty( $ct_password );
 
 // Statistiken
 global $wpdb;

@@ -19,11 +19,15 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.2.0.1
+- **Version:** 0.2.0.3
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.2.0.3 - Login mit Benutzername/Passwort
+- Settings: Benutzername (E-Mail) und Passwort statt API Token
+- Kompatibel mit alter Plugin-Logik
 
 ### 0.2.0.1 - Code Cleanup
 - Alle "repro-" Präfixe entfernt
