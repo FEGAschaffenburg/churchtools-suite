@@ -1,70 +1,63 @@
 <?php
 /**
- * Main Admin Page Template
+ * Main Admin Page
  *
  * @package ChurchTools_Suite
- * @since   0.1.0
+ * @since   0.2.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+$active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'dashboard';
 ?>
 
-<div class="wrap churchtools-suite-admin-wrapper">
+<div class="wrap cts-wrap">
 	
-	<!-- Header -->
-	<div class="churchtools-suite-header">
+	<div class="cts-header">
 		<h1>
 			<span class="dashicons dashicons-calendar-alt"></span>
-			<?php echo esc_html( get_admin_page_title() ); ?>
+			<?php esc_html_e( 'ChurchTools Suite', 'churchtools-suite' ); ?>
 		</h1>
-		<p><?php esc_html_e( 'Professionelle ChurchTools-Integration für WordPress', 'churchtools-suite' ); ?></p>
+		<p class="cts-subtitle"><?php esc_html_e( 'WordPress Integration für ChurchTools', 'churchtools-suite' ); ?></p>
 	</div>
-	
-	<!-- Tab Navigation -->
+
 	<nav class="nav-tab-wrapper">
-		<a href="?page=churchtools-suite&tab=dashboard" 
-		   class="nav-tab <?php echo $active_tab === 'dashboard' ? 'nav-tab-active' : ''; ?>">
+		<a href="?page=churchtools-suite&tab=dashboard" class="nav-tab <?php echo $active_tab === 'dashboard' ? 'nav-tab-active' : ''; ?>">
 			<span class="dashicons dashicons-dashboard"></span>
 			<?php esc_html_e( 'Dashboard', 'churchtools-suite' ); ?>
 		</a>
-		<a href="?page=churchtools-suite&tab=settings" 
-		   class="nav-tab <?php echo $active_tab === 'settings' ? 'nav-tab-active' : ''; ?>">
+		<a href="?page=churchtools-suite&tab=settings" class="nav-tab <?php echo $active_tab === 'settings' ? 'nav-tab-active' : ''; ?>">
 			<span class="dashicons dashicons-admin-settings"></span>
 			<?php esc_html_e( 'Einstellungen', 'churchtools-suite' ); ?>
 		</a>
-		<a href="?page=churchtools-suite&tab=sync" 
-		   class="nav-tab <?php echo $active_tab === 'sync' ? 'nav-tab-active' : ''; ?>">
+		<a href="?page=churchtools-suite&tab=sync" class="nav-tab <?php echo $active_tab === 'sync' ? 'nav-tab-active' : ''; ?>">
 			<span class="dashicons dashicons-update"></span>
-			<?php esc_html_e( 'Synchronisation', 'churchtools-suite' ); ?>
+			<?php esc_html_e( 'Sync', 'churchtools-suite' ); ?>
 		</a>
-		<a href="?page=churchtools-suite&tab=debug" 
-		   class="nav-tab <?php echo $active_tab === 'debug' ? 'nav-tab-active' : ''; ?>">
+		<a href="?page=churchtools-suite&tab=debug" class="nav-tab <?php echo $active_tab === 'debug' ? 'nav-tab-active' : ''; ?>">
 			<span class="dashicons dashicons-admin-tools"></span>
 			<?php esc_html_e( 'Debug', 'churchtools-suite' ); ?>
 		</a>
 	</nav>
-	
-	<!-- Tab Content -->
-	<div class="churchtools-suite-tab-content">
-		<?php
-		switch ( $active_tab ) {
-			case 'settings':
-				include_once CHURCHTOOLS_SUITE_PATH . 'admin/views/tab-settings.php';
-				break;
-			case 'sync':
-				include_once CHURCHTOOLS_SUITE_PATH . 'admin/views/tab-sync.php';
-				break;
-			case 'debug':
-				include_once CHURCHTOOLS_SUITE_PATH . 'admin/views/tab-debug.php';
-				break;
-			case 'dashboard':
-			default:
-				include_once CHURCHTOOLS_SUITE_PATH . 'admin/views/tab-dashboard.php';
-				break;
-		}
-		?>
-	</div>
-	
+
+	<?php
+	switch ( $active_tab ) {
+		case 'settings':
+			include __DIR__ . '/tab-settings.php';
+			break;
+		case 'sync':
+			include __DIR__ . '/tab-sync.php';
+			break;
+		case 'debug':
+			include __DIR__ . '/tab-debug.php';
+			break;
+		case 'dashboard':
+		default:
+			include __DIR__ . '/tab-dashboard.php';
+			break;
+	}
+	?>
+
 </div>

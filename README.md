@@ -19,11 +19,19 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.1.0.0
+- **Version:** 0.2.0.0
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.2.0.0 - Modern Admin UI
+- Clean & Modern Admin Design
+- Dashboard mit Status Cards
+- Settings-Formular
+- Sync-Interface mit Progress
+- Debug-Informationen
+- Responsive Grid Layout
 
 ### 0.1.0.0 - Initial Development
 - Projektstart mit sauberer Code-Basis
