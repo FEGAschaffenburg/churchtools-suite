@@ -1,0 +1,112 @@
+/**
+ * Modal Styles für Debug-Seite
+ * 
+ * @package Repro_CT_Suite
+ * @version 0.9.5.3
+ */
+
+/* Modal Overlay */
+.repro-ct-suite-modal {
+	display: none;
+	position: fixed;
+	z-index: 100000;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background-color: rgba(0, 0, 0, 0.6);
+	backdrop-filter: blur(4px);
+}
+
+/* Modal Content */
+.repro-ct-suite-modal-content {
+	background-color: #ffffff;
+	margin: 2% auto;
+	padding: 0;
+	border: none;
+	border-radius: 8px;
+	width: 90%;
+	max-width: 1200px;
+	max-height: 90vh;
+	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+	animation: modalFadeIn 0.3s ease;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+}
+
+@keyframes modalFadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(-20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* Modal Header */
+.repro-ct-suite-modal-header {
+	padding: 20px 24px;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.repro-ct-suite-modal-header h2 {
+	margin: 0;
+	font-size: 20px;
+	font-weight: 600;
+	color: white;
+}
+
+/* Close Button */
+.repro-ct-suite-modal-close {
+	color: rgba(255, 255, 255, 0.9);
+	font-size: 32px;
+	font-weight: 300;
+	line-height: 1;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	padding: 0 10px;
+	margin: -10px -10px -10px 0;
+}
+
+.repro-ct-suite-modal-close:hover,
+.repro-ct-suite-modal-close:focus {
+	color: #ffffff;
+	transform: rotate(90deg);
+}
+
+/* Modal Body */
+.repro-ct-suite-modal-body {
+	padding: 24px;
+	overflow-y: auto;
+	max-height: calc(90vh - 100px);
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+	.repro-ct-suite-modal-content {
+		width: 95%;
+		margin: 5% auto;
+		max-height: 90vh;
+	}
+	
+	.repro-ct-suite-modal-header {
+		padding: 16px 20px;
+	}
+	
+	.repro-ct-suite-modal-header h2 {
+		font-size: 18px;
+	}
+	
+	.repro-ct-suite-modal-body {
+		padding: 16px 20px;
+	}
+}
