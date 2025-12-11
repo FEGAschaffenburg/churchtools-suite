@@ -19,13 +19,13 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.1.0
+- **Version:** 0.1.0.0
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
 
-### 0.1.0 - Initial Development
+### 0.1.0.0 - Initial Development
 - Projektstart mit sauberer Code-Basis
 - PHP 8.0+ mit modernen Features (Union Types, Named Arguments)
 
