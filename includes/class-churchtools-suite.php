@@ -30,6 +30,7 @@ class ChurchTools_Suite {
 		$this->load_dependencies();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
+		$this->define_cron_hooks();
 	}
 	
 	/**
@@ -59,6 +60,15 @@ class ChurchTools_Suite {
 	 */
 	private function define_public_hooks(): void {
 		// Public functionality will be added later
+	}
+	
+	/**
+	 * Register cron hooks
+	 */
+	private function define_cron_hooks(): void {
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-cron.php';
+		
+		add_action( 'churchtools_suite_session_keepalive', [ 'ChurchTools_Suite_Cron', 'session_keepalive' ] );
 	}
 	
 	/**

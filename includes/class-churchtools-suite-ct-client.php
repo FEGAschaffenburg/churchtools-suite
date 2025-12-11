@@ -215,8 +215,8 @@ class ChurchTools_Suite_CT_Client {
      * @return array|WP_Error Response data or error
      */
     public function api_request($endpoint, $method = 'GET', $data = []) {
-        // Check if we have cookies
-        if (empty($this->cookies)) {
+        // Check if we have valid cookies, re-login if expired
+        if (!$this->is_authenticated()) {
             $login_result = $this->login();
             if (!$login_result['success']) {
                 return new WP_Error('no_cookies', $login_result['message']);
@@ -287,12 +287,27 @@ class ChurchTools_Suite_CT_Client {
     }
     
     /**
-     * Check if client is authenticated
+     * Check if client is authenticated and cookies are still valid
      *
      * @return bool
      */
     public function is_authenticated() {
-        return !empty($this->cookies);
+        if (empty($this->cookies)) {
+            return false;
+        }
+        
+        // Check if any cookie has expired
+        $now = time();
+        foreach ($this->cookies as $cookie) {
+            if (isset($cookie['expires']) && !empty($cookie['expires'])) {
+                // If expires is set and in the past, cookies are expired
+                if ($cookie['expires'] < $now) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
     }
     
     /**

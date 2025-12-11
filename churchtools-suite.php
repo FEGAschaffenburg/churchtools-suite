@@ -3,7 +3,7 @@
  * Plugin Name:       ChurchTools Suite
  * Plugin URI:        https://github.com/FEGAschaffenburg/churchtools-suite
  * Description:       Professionelle ChurchTools-Integration für WordPress. Synchronisiert Events und Termine aus ChurchTools.
- * Version:           0.3.0.0
+ * Version:           0.3.1.0
  * Requires at least: 6.0
  * Requires PHP:      8.0
  * Author:            FEG Aschaffenburg
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Plugin constants
-define( 'CHURCHTOOLS_SUITE_VERSION', '0.3.0.0' );
+define( 'CHURCHTOOLS_SUITE_VERSION', '0.3.1.0' );
 define( 'CHURCHTOOLS_SUITE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CHURCHTOOLS_SUITE_URL', plugin_dir_url( __FILE__ ) );
 define( 'CHURCHTOOLS_SUITE_BASENAME', plugin_basename( __FILE__ ) );

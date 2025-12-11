@@ -17,12 +17,22 @@ class ChurchTools_Suite_Activator {
 	 * 
 	 * - Creates database tables
 	 * - Sets default options
+	 * - Schedules cron jobs
 	 * - Flushes rewrite rules
 	 */
 	public static function activate(): void {
 		self::create_tables();
 		self::set_default_options();
+		self::schedule_cron_jobs();
 		flush_rewrite_rules();
+	}
+	
+	/**
+	 * Schedule cron jobs
+	 */
+	private static function schedule_cron_jobs(): void {
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-cron.php';
+		ChurchTools_Suite_Cron::schedule_jobs();
 	}
 	
 	/**

@@ -19,11 +19,19 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.3.0.0
+- **Version:** 0.3.1.0
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.3.1.0 - Cookie-Management & Session Keep-Alive
+- Cookie-Ablauf-Prüfung implementiert
+- Automatisches Re-Login bei abgelaufenen Cookies
+- Stündlicher Cron-Job für Session Keep-Alive
+- whoami API-Call hält Session aktiv
+- is_authenticated() prüft Cookie-Expires-Datum
+- Error-Logging für Cron-Jobs
 
 ### 0.3.0.0 - ChurchTools Login & API Client
 - ChurchTools API Client Klasse implementiert

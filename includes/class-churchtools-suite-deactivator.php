@@ -19,7 +19,8 @@ class ChurchTools_Suite_Deactivator {
 	 * - Flushes rewrite rules
 	 */
 	public static function deactivate(): void {
-		wp_clear_scheduled_hook( 'churchtools_suite_sync_cron' );
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-cron.php';
+		ChurchTools_Suite_Cron::clear_jobs();
 		flush_rewrite_rules();
 	}
 }
