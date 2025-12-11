@@ -27,8 +27,8 @@ $last_sync = get_option( 'churchtools_suite_last_sync', 0 );
 		<?php endif; ?>
 		
 		<p>
-			<button type="button" id="cts-sync-now" class="button button-primary">
-				<span class="dashicons dashicons-update"></span>
+			<button type="button" id="cts-sync-now" class="cts-button cts-button-primary">
+				<span>🔄</span>
 				<?php esc_html_e( 'Jetzt synchronisieren', 'churchtools-suite' ); ?>
 			</button>
 		</p>

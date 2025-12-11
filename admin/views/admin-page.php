@@ -17,30 +17,30 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'dashboard'
 	
 	<div class="cts-header">
 		<h1>
-			<span class="dashicons dashicons-calendar-alt"></span>
+			<span>📅</span>
 			<?php esc_html_e( 'ChurchTools Suite', 'churchtools-suite' ); ?>
 		</h1>
 		<p class="cts-subtitle"><?php esc_html_e( 'WordPress Integration für ChurchTools', 'churchtools-suite' ); ?></p>
 	</div>
 
-	<nav class="nav-tab-wrapper">
-		<a href="?page=churchtools-suite&tab=dashboard" class="nav-tab <?php echo $active_tab === 'dashboard' ? 'nav-tab-active' : ''; ?>">
-			<span class="dashicons dashicons-dashboard"></span>
+	<div class="cts-tabs">
+		<a href="?page=churchtools-suite&tab=dashboard" class="cts-tab <?php echo $active_tab === 'dashboard' ? 'active' : ''; ?>">
+			<span>📊</span>
 			<?php esc_html_e( 'Dashboard', 'churchtools-suite' ); ?>
 		</a>
-		<a href="?page=churchtools-suite&tab=settings" class="nav-tab <?php echo $active_tab === 'settings' ? 'nav-tab-active' : ''; ?>">
-			<span class="dashicons dashicons-admin-settings"></span>
+		<a href="?page=churchtools-suite&tab=settings" class="cts-tab <?php echo $active_tab === 'settings' ? 'active' : ''; ?>">
+			<span>⚙️</span>
 			<?php esc_html_e( 'Einstellungen', 'churchtools-suite' ); ?>
 		</a>
-		<a href="?page=churchtools-suite&tab=sync" class="nav-tab <?php echo $active_tab === 'sync' ? 'nav-tab-active' : ''; ?>">
-			<span class="dashicons dashicons-update"></span>
+		<a href="?page=churchtools-suite&tab=sync" class="cts-tab <?php echo $active_tab === 'sync' ? 'active' : ''; ?>">
+			<span>🔄</span>
 			<?php esc_html_e( 'Sync', 'churchtools-suite' ); ?>
 		</a>
-		<a href="?page=churchtools-suite&tab=debug" class="nav-tab <?php echo $active_tab === 'debug' ? 'nav-tab-active' : ''; ?>">
-			<span class="dashicons dashicons-admin-tools"></span>
+		<a href="?page=churchtools-suite&tab=debug" class="cts-tab <?php echo $active_tab === 'debug' ? 'active' : ''; ?>">
+			<span>🔧</span>
 			<?php esc_html_e( 'Debug', 'churchtools-suite' ); ?>
 		</a>
-	</nav>
+	</div>
 
 	<?php
 	switch ( $active_tab ) {

@@ -19,11 +19,19 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.2.0.6
+- **Version:** 0.2.1.0
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.2.1.0 - Eigenständiges Design
+- Komplett eigenes CSS ohne WordPress-Abhängigkeiten
+- Vanilla JavaScript statt jQuery
+- Emoji-Icons statt Dashicons
+- Eigene Form-Styles und Tabellen
+- Responsive Design
+- Bessere Accessibility
 
 ### 0.2.0.6 - Cache Busting
 - Version erhöht für CSS Cache Refresh

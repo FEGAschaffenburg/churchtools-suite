@@ -1,18 +1,25 @@
 /**
  * ChurchTools Suite Admin CSS
- * Modern Design with Gradient Header
+ * Eigenständiges Design ohne WordPress-Abhängigkeiten
  *
  * @package ChurchTools_Suite
- * @since   0.2.0.4
+ * @since   0.2.1.0
  */
 
-/* === Header === */
-.cts-wrap {
-	background: #f0f0f1;
-	margin-left: -20px;
-	padding: 0 20px 20px;
+/* === Reset & Base === */
+.cts-wrap * {
+	box-sizing: border-box;
 }
 
+.cts-wrap {
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+	background: #f0f0f1;
+	margin: 20px 0 0 -20px;
+	padding: 0 20px 20px;
+	min-height: calc(100vh - 32px);
+}
+
+/* === Header === */
 .cts-header {
 	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 	margin: 0 -20px 25px;
@@ -29,13 +36,14 @@
 	color: #fff;
 	font-size: 28px;
 	font-weight: 600;
+	line-height: 1.2;
 }
 
-.cts-header h1 .dashicons {
-	font-size: 36px;
+.cts-header h1 svg,
+.cts-header h1 .cts-icon {
 	width: 36px;
 	height: 36px;
-	color: #fff;
+	fill: #fff;
 }
 
 .cts-subtitle {
@@ -43,6 +51,7 @@
 	color: rgba(255, 255, 255, 0.9);
 	font-size: 15px;
 	font-weight: 400;
+	line-height: 1.4;
 }
 
 /* === Tabs === */
@@ -199,9 +208,106 @@
 	line-height: 1.6;
 }
 
+/* === Form Elements === */
+.cts-form-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.cts-form-table tr {
+	border-bottom: 1px solid #f0f0f1;
+}
+
+.cts-form-table th {
+	padding: 20px 10px 20px 0;
+	text-align: left;
+	font-weight: 600;
+	color: #1d2327;
+	width: 200px;
+	vertical-align: top;
+	padding-top: 24px;
+}
+
+.cts-form-table td {
+	padding: 20px 0;
+}
+
+.cts-form-input,
+.cts-form-select,
+.cts-form-textarea {
+	width: 100%;
+	max-width: 500px;
+	padding: 8px 12px;
+	border: 1px solid #8c8f94;
+	border-radius: 4px;
+	font-size: 14px;
+	font-family: inherit;
+	transition: border-color 0.2s ease;
+}
+
+.cts-form-input:focus,
+.cts-form-select:focus,
+.cts-form-textarea:focus {
+	outline: none;
+	border-color: #667eea;
+	box-shadow: 0 0 0 1px #667eea;
+}
+
+.cts-form-description {
+	display: block;
+	margin: 8px 0 0;
+	color: #646970;
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+.cts-button {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 20px;
+	font-size: 14px;
+	font-weight: 500;
+	border-radius: 4px;
+	border: none;
+	cursor: pointer;
+	text-decoration: none;
+	transition: all 0.2s ease;
+	font-family: inherit;
+}
+
+.cts-button-primary {
+	background: #667eea;
+	color: #fff;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.cts-button-primary:hover {
+	background: #5568d3;
+	transform: translateY(-1px);
+	box-shadow: 0 3px 8px rgba(102, 126, 234, 0.3);
+}
+
+.cts-button-primary:active {
+	transform: translateY(0);
+}
+
+.cts-button svg,
+.cts-button .cts-icon {
+	width: 16px;
+	height: 16px;
+	fill: currentColor;
+}
+
 /* === Settings === */
 .cts-settings .cts-card {
 	max-width: 800px;
+}
+
+.cts-settings .cts-submit {
+	margin-top: 20px;
+	padding-top: 20px;
+	border-top: 1px solid #f0f0f1;
 }
 
 /* === Sync === */
@@ -250,13 +356,111 @@
 	margin-bottom: 20px;
 }
 
-.cts-debug table.widefat {
+.cts-debug-table {
+	width: 100%;
+	border-collapse: collapse;
 	margin-top: 12px;
 }
 
-.cts-debug table td:first-child {
+.cts-debug-table tr {
+	border-bottom: 1px solid #f0f0f1;
+}
+Notice Messages === */
+.cts-notice {
+	padding: 12px 16px;
+	margin: 0 0 20px;
+	border-left: 4px solid;
+	border-radius: 4px;
+	background: #fff;
+}
+
+.cts-notice-success {
+	border-left-color: #46b450;
+	background: #ecf7ed;
+	color: #1e4620;
+}
+
+.cts-notice-error {
+	border-left-color: #dc3232;
+	background: #f9e9e9;
+	color: #5a2020;
+}
+
+.cts-notice-info {
+	border-left-color: #667eea;
+	background: #f0f2ff;
+	color: #2c3e7a;
+}
+
+.cts-notice p {
+	margin: 0;
+	font-size: 14px;
+	line-height: 1.5;
+}
+
+/* === Responsive === */
+@media (max-width: 782px) {
+	.cts-wrap {
+		margin-left: 0;
+		padding: 0 10px 20px;
+	}
+	
+	.cts-header {
+		margin: 0 -10px 20px;
+		padding: 20px;
+	}
+	
+	.cts-header h1 {
+		font-size: 22px;
+	}
+	
+	.cts-tabs {
+		margin: 0 -10px 20px;
+		padding: 0 10px;
+		flex-wrap: wrap;
+	}
+	
+	.cts-tab {
+		padding: 10px 15px;
+		font-size: 13px;
+	}
+	
+	.cts-grid-3 {
+		grid-template-columns: 1fr;
+	}
+	
+	.cts-form-table th,
+	.cts-form-table td {
+		display: block;
+		width: 100%;
+		padding: 10px 0;
+	}
+	
+	.cts-form-table th {
+		padding-bottom: 5px;
+	}
+	
+	.cts-form-input,
+	.cts-form-select,
+	.cts-form-textarea {
+		max-width: 100%
+
+.cts-debug-table td:first-child {
 	font-weight: 600;
 	width: 30%;
+	color: #1d2327;
+}
+
+.cts-debug-table td:last-child {
+	color: #50575e;
+}
+
+.cts-debug-table code {
+	background: #f6f7f7;
+	padding: 2px 6px;
+	border-radius: 3px;
+	font-size: 13px;
+	color: #d63638;
 }
 
 /* === Responsive === */

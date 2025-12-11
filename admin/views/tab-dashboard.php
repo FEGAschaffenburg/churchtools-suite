@@ -31,7 +31,7 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 		<!-- ChurchTools Verbindung -->
 		<div class="cts-card">
 			<div class="cts-card-icon">
-				<span class="dashicons dashicons-cloud"></span>
+				<span>☁️</span>
 			</div>
 			<div class="cts-card-content">
 				<h3><?php esc_html_e( 'ChurchTools', 'churchtools-suite' ); ?></h3>
@@ -52,7 +52,7 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 		<!-- Events -->
 		<div class="cts-card">
 			<div class="cts-card-icon">
-				<span class="dashicons dashicons-calendar-alt"></span>
+				<span>📅</span>
 			</div>
 			<div class="cts-card-content">
 				<h3><?php esc_html_e( 'Events', 'churchtools-suite' ); ?></h3>
@@ -63,7 +63,7 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 		<!-- Kalender -->
 		<div class="cts-card">
 			<div class="cts-card-icon">
-				<span class="dashicons dashicons-list-view"></span>
+				<span>📋</span>
 			</div>
 			<div class="cts-card-content">
 				<h3><?php esc_html_e( 'Kalender', 'churchtools-suite' ); ?></h3>
