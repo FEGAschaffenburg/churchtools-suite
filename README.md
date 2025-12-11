@@ -19,11 +19,23 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.3.4.0
+- **Version:** 0.3.5.0
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.3.5.0 - Admin UI Kalender-Tab
+- Neuer Tab "Kalender" im Admin-Bereich
+- "Kalender synchronisieren" Button mit AJAX
+- Kalender-Übersicht mit Tabelle (Name, ID, Sichtbarkeit, Farbe)
+- Checkboxen für Kalenderauswahl (is_selected)
+- "Alle auswählen" Checkbox
+- "Auswahl speichern" mit AJAX
+- Letzte Sync-Zeit wird angezeigt
+- Seite lädt nach erfolgreicher Sync neu
+- AJAX Handler: ajax_sync_calendars, ajax_save_calendar_selection
+- JavaScript für alle Interaktionen ohne jQuery
 
 ### 0.3.4.0 - Calendar Sync Service
 - Calendar Sync Service für Kalender-Synchronisation

@@ -108,6 +108,8 @@ class ChurchTools_Suite_Admin {
 	 */
 	public function register_ajax_handlers(): void {
 		add_action( 'wp_ajax_cts_test_connection', [ $this, 'ajax_test_connection' ] );
+		add_action( 'wp_ajax_cts_sync_calendars', [ $this, 'ajax_sync_calendars' ] );
+		add_action( 'wp_ajax_cts_save_calendar_selection', [ $this, 'ajax_save_calendar_selection' ] );
 	}
 	
 	/**
@@ -140,5 +142,93 @@ class ChurchTools_Suite_Admin {
 				'message' => $result['message']
 			] );
 		}
+	}
+	
+	/**
+	 * AJAX Handler: Sync Calendars from ChurchTools
+	 */
+	public function ajax_sync_calendars(): void {
+		// Check nonce
+		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
+		
+		// Check permissions
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [
+				'message' => __( 'Keine Berechtigung.', 'churchtools-suite' )
+			] );
+		}
+		
+		// Load dependencies
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-ct-client.php';
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-repository-base.php';
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-calendars-repository.php';
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/services/class-churchtools-suite-calendar-sync-service.php';
+		
+		$client = new ChurchTools_Suite_CT_Client();
+		$calendars_repo = new ChurchTools_Suite_Calendars_Repository();
+		$sync_service = new ChurchTools_Suite_Calendar_Sync_Service( $client, $calendars_repo );
+		
+		$result = $sync_service->sync_calendars();
+		
+		if ( is_wp_error( $result ) ) {
+			wp_send_json_error( [
+				'message' => $result->get_error_message()
+			] );
+		}
+		
+		wp_send_json_success( [
+			'message' => sprintf(
+				__( 'Synchronisation erfolgreich! %d Kalender gefunden, %d neu, %d aktualisiert, %d Fehler.', 'churchtools-suite' ),
+				$result['total'],
+				$result['inserted'],
+				$result['updated'],
+				$result['errors']
+			),
+			'stats' => $result
+		] );
+	}
+	
+	/**
+	 * AJAX Handler: Save Calendar Selection
+	 */
+	public function ajax_save_calendar_selection(): void {
+		// Check nonce
+		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
+		
+		// Check permissions
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [
+				'message' => __( 'Keine Berechtigung.', 'churchtools-suite' )
+			] );
+		}
+		
+		// Get selected calendar IDs
+		$selected_ids = isset( $_POST['selected_ids'] ) ? array_map( 'intval', $_POST['selected_ids'] ) : [];
+		
+		// Load repository
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-repository-base.php';
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-calendars-repository.php';
+		
+		$calendars_repo = new ChurchTools_Suite_Calendars_Repository();
+		$result = $calendars_repo->update_selected( $selected_ids );
+		
+		if ( ! $result ) {
+			wp_send_json_error( [
+				'message' => __( 'Fehler beim Speichern der Auswahl.', 'churchtools-suite' )
+			] );
+		}
+		
+		$selected_count = count( $selected_ids );
+		$total_count = $calendars_repo->count();
+		
+		wp_send_json_success( [
+			'message' => sprintf(
+				__( 'Auswahl gespeichert: %d von %d Kalendern ausgewählt.', 'churchtools-suite' ),
+				$selected_count,
+				$total_count
+			),
+			'selected_count' => $selected_count,
+			'total_count' => $total_count
+		] );
 	}
 }
