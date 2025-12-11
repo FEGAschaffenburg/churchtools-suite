@@ -29,9 +29,9 @@ class ChurchTools_Suite_CT_Client {
     private $password;
     
     /**
-     * Authentication token
+     * Session cookies
      */
-    private $token;
+    private $cookies;
     
     /**
      * Constructor
@@ -40,7 +40,7 @@ class ChurchTools_Suite_CT_Client {
         $this->url = get_option('churchtools_suite_ct_url', '');
         $this->username = get_option('churchtools_suite_ct_username', '');
         $this->password = get_option('churchtools_suite_ct_password', '');
-        $this->token = get_option('churchtools_suite_ct_token', '');
+        $this->cookies = get_option('churchtools_suite_ct_cookies', []);
     }
     
     /**
@@ -90,67 +90,51 @@ class ChurchTools_Suite_CT_Client {
         // Check status code
         if ($status_code !== 200) {
             $error_message = 'Login fehlgeschlagen (HTTP ' . $status_code . ')';
-            if (isset($data['message'])) {
+            if (isset($data['data']['message'])) {
+                $error_message .= ': ' . $data['data']['message'];
+            } elseif (isset($data['message'])) {
                 $error_message .= ': ' . $data['message'];
-            } elseif (isset($data['error'])) {
-                $error_message .= ': ' . $data['error'];
             }
             return [
                 'success' => false,
-                'message' => $error_message,
-                'debug' => [
-                    'status' => $status_code,
-                    'body' => $body
-                ]
+                'message' => $error_message
             ];
         }
         
-        // Check for JSON decode error
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        // Check login success
+        if (!isset($data['data']['status']) || $data['data']['status'] !== 'success') {
             return [
                 'success' => false,
-                'message' => 'Ungültige API-Antwort: ' . json_last_error_msg(),
-                'debug' => [
-                    'body' => substr($body, 0, 500)
-                ]
+                'message' => 'Login fehlgeschlagen: ' . ($data['data']['message'] ?? 'Unbekannter Fehler')
             ];
         }
         
-        // Extract token from response - try different response structures
-        $token = null;
+        // Extract cookies from response
+        $cookies = wp_remote_retrieve_cookies($response);
         
-        // Structure 1: { "data": { "token": "..." } }
-        if (isset($data['data']['token'])) {
-            $token = $data['data']['token'];
-        }
-        // Structure 2: { "token": "..." }
-        elseif (isset($data['token'])) {
-            $token = $data['token'];
-        }
-        
-        if (empty($token)) {
-            $data_keys = isset($data['data']) && is_array($data['data']) ? array_keys($data['data']) : [];
-            $error_msg = 'Kein Token in der Antwort erhalten.<br><br>';
-            $error_msg .= '<strong>Response-Struktur:</strong><br>';
-            $error_msg .= 'Top-Level Keys: ' . implode(', ', array_keys($data)) . '<br>';
-            if (!empty($data_keys)) {
-                $error_msg .= 'data Keys: ' . implode(', ', $data_keys) . '<br>';
-            }
-            $error_msg .= '<br><strong>Vollständige Response:</strong><br>';
-            $error_msg .= '<pre style="background:#f0f0f0;padding:10px;overflow:auto;max-height:300px;">' . 
-                esc_html(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) . 
-                '</pre>';
-            
+        if (empty($cookies)) {
             return [
                 'success' => false,
-                'message' => $error_msg
+                'message' => 'Keine Session-Cookies erhalten.'
             ];
         }
         
-        $this->token = $token;
+        // Convert WP_Http_Cookie objects to array for storage
+        $cookie_array = [];
+        foreach ($cookies as $cookie) {
+            $cookie_array[] = [
+                'name' => $cookie->name,
+                'value' => $cookie->value,
+                'expires' => $cookie->expires,
+                'path' => $cookie->path,
+                'domain' => $cookie->domain
+            ];
+        }
         
-        // Save token to database
-        update_option('churchtools_suite_ct_token', $this->token);
+        $this->cookies = $cookie_array;
+        
+        // Save cookies to database
+        update_option('churchtools_suite_ct_cookies', $this->cookies);
         
         // Save user info if available
         if (!empty($data['data']['personId'])) {
@@ -163,7 +147,7 @@ class ChurchTools_Suite_CT_Client {
         return [
             'success' => true,
             'message' => 'Erfolgreich mit ChurchTools verbunden.',
-            'token' => $this->token
+            'person_id' => $data['data']['personId'] ?? null
         ];
     }
     
@@ -183,10 +167,11 @@ class ChurchTools_Suite_CT_Client {
         // Test API access by fetching whoami
         $whoami_url = trailingslashit($this->url) . 'api/whoami';
         
+        // Prepare cookies for request
+        $wp_cookies = $this->prepare_cookies_for_request();
+        
         $response = wp_remote_get($whoami_url, [
-            'headers' => [
-                'Authorization' => 'Login ' . $this->token
-            ],
+            'cookies' => $wp_cookies,
             'timeout' => 30
         ]);
         
@@ -230,24 +215,27 @@ class ChurchTools_Suite_CT_Client {
      * @return array|WP_Error Response data or error
      */
     public function api_request($endpoint, $method = 'GET', $data = []) {
-        // Check if we have a token
-        if (empty($this->token)) {
+        // Check if we have cookies
+        if (empty($this->cookies)) {
             $login_result = $this->login();
             if (!$login_result['success']) {
-                return new WP_Error('no_token', $login_result['message']);
+                return new WP_Error('no_cookies', $login_result['message']);
             }
         }
         
         // Build URL
         $url = trailingslashit($this->url) . 'api/' . ltrim($endpoint, '/');
         
+        // Prepare cookies for request
+        $wp_cookies = $this->prepare_cookies_for_request();
+        
         // Prepare request arguments
         $args = [
             'method' => strtoupper($method),
             'headers' => [
-                'Authorization' => 'Login ' . $this->token,
                 'Content-Type' => 'application/json'
             ],
+            'cookies' => $wp_cookies,
             'timeout' => 30
         ];
         
@@ -272,8 +260,8 @@ class ChurchTools_Suite_CT_Client {
         if ($status_code === 401) {
             $login_result = $this->login();
             if ($login_result['success']) {
-                // Retry request with new token
-                $args['headers']['Authorization'] = 'Login ' . $this->token;
+                // Retry request with new cookies
+                $args['cookies'] = $this->prepare_cookies_for_request();
                 $response = wp_remote_request($url, $args);
                 
                 if (is_wp_error($response)) {
@@ -304,24 +292,45 @@ class ChurchTools_Suite_CT_Client {
      * @return bool
      */
     public function is_authenticated() {
-        return !empty($this->token);
+        return !empty($this->cookies);
     }
     
     /**
-     * Get current token
+     * Get current cookies
      *
-     * @return string
+     * @return array
      */
-    public function get_token() {
-        return $this->token;
+    public function get_cookies() {
+        return $this->cookies;
+    }
+    
+    /**
+     * Prepare cookies for WP HTTP request
+     *
+     * @return array Array of WP_Http_Cookie objects
+     */
+    private function prepare_cookies_for_request() {
+        $wp_cookies = [];
+        
+        foreach ($this->cookies as $cookie) {
+            $wp_cookies[] = new WP_Http_Cookie([
+                'name' => $cookie['name'],
+                'value' => $cookie['value'],
+                'expires' => $cookie['expires'] ?? null,
+                'path' => $cookie['path'] ?? '/',
+                'domain' => $cookie['domain'] ?? ''
+            ]);
+        }
+        
+        return $wp_cookies;
     }
     
     /**
      * Clear authentication
      */
     public function logout() {
-        $this->token = '';
-        delete_option('churchtools_suite_ct_token');
+        $this->cookies = [];
+        delete_option('churchtools_suite_ct_cookies');
         delete_option('churchtools_suite_ct_person_id');
         delete_option('churchtools_suite_ct_user_info');
         delete_option('churchtools_suite_ct_last_login');

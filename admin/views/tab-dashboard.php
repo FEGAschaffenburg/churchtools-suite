@@ -14,10 +14,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 $ct_url = get_option( 'churchtools_suite_ct_url', '' );
 $ct_username = get_option( 'churchtools_suite_ct_username', '' );
 $ct_password = get_option( 'churchtools_suite_ct_password', '' );
-$ct_token = get_option( 'churchtools_suite_ct_token', '' );
+$ct_cookies = get_option( 'churchtools_suite_ct_cookies', [] );
 $ct_last_login = get_option( 'churchtools_suite_ct_last_login', '' );
 $is_configured = ! empty( $ct_url ) && ! empty( $ct_username ) && ! empty( $ct_password );
-$is_connected = ! empty( $ct_token );
+$is_connected = ! empty( $ct_cookies );
 
 // Statistiken
 global $wpdb;
