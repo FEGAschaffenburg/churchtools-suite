@@ -15,19 +15,19 @@ class ChurchTools_Suite_Admin {
 	/**
 	 * Plugin version
 	 */
-	private string $version;
+	private $version;
 	
 	/**
 	 * Initialize admin area
 	 */
-	public function __construct( string $version ) {
+	public function __construct( $version ) {
 		$this->version = $version;
 	}
 	
 	/**
 	 * Enqueue admin styles
 	 */
-	public function enqueue_styles(): void {
+	public function enqueue_styles() {
 		// Only load on plugin pages
 		if ( ! $this->is_plugin_page() ) {
 			return;
@@ -44,7 +44,7 @@ class ChurchTools_Suite_Admin {
 	/**
 	 * Enqueue admin scripts
 	 */
-	public function enqueue_scripts(): void {
+	public function enqueue_scripts() {
 		// Only load on plugin pages
 		if ( ! $this->is_plugin_page() ) {
 			return;
@@ -72,7 +72,7 @@ class ChurchTools_Suite_Admin {
 	/**
 	 * Add plugin admin menu
 	 */
-	public function add_plugin_admin_menu(): void {
+	public function add_plugin_admin_menu() {
 		add_menu_page(
 			__( 'ChurchTools Suite', 'churchtools-suite' ),
 			__( 'ChurchTools', 'churchtools-suite' ),
@@ -87,7 +87,7 @@ class ChurchTools_Suite_Admin {
 	/**
 	 * Display main admin page
 	 */
-	public function display_admin_page(): void {
+	public function display_admin_page() {
 		// Get active tab
 		$active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'dashboard';
 		
@@ -98,7 +98,7 @@ class ChurchTools_Suite_Admin {
 	/**
 	 * Check if current page is a plugin page
 	 */
-	private function is_plugin_page(): bool {
+	private function is_plugin_page() {
 		$screen = get_current_screen();
 		return $screen && strpos( $screen->id, 'churchtools-suite' ) !== false;
 	}

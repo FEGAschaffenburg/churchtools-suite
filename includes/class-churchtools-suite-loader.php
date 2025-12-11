@@ -15,17 +15,17 @@ class ChurchTools_Suite_Loader {
 	/**
 	 * Actions to be registered
 	 */
-	protected array $actions = [];
+	protected $actions = [];
 	
 	/**
 	 * Filters to be registered
 	 */
-	protected array $filters = [];
+	protected $filters = [];
 	
 	/**
 	 * Add an action
 	 */
-	public function add_action( string $hook, object $component, string $callback, int $priority = 10, int $accepted_args = 1 ): void {
+	public function add_action( $hook, $component, $callback, $priority = 10, $accepted_args = 1 ) {
 		$this->actions[] = [
 			'hook'          => $hook,
 			'component'     => $component,
@@ -38,7 +38,7 @@ class ChurchTools_Suite_Loader {
 	/**
 	 * Add a filter
 	 */
-	public function add_filter( string $hook, object $component, string $callback, int $priority = 10, int $accepted_args = 1 ): void {
+	public function add_filter( $hook, $component, $callback, $priority = 10, $accepted_args = 1 ) {
 		$this->filters[] = [
 			'hook'          => $hook,
 			'component'     => $component,
@@ -51,7 +51,7 @@ class ChurchTools_Suite_Loader {
 	/**
 	 * Register all hooks
 	 */
-	public function run(): void {
+	public function run() {
 		foreach ( $this->filters as $hook ) {
 			add_filter(
 				$hook['hook'],
