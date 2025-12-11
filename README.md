@@ -19,11 +19,17 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.2.3.0
+- **Version:** 0.2.3.1
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.2.3.1 - Tenant-Name Eingabe
+- Nur Tenant-Name statt vollständiger URL
+- Eingabefeld zeigt: https://[tenant].church.tools
+- Automatische URL-Generierung
+- Vereinfachte Konfiguration
 
 ### 0.2.3.0 - Boxed Layout & Kompaktes Design
 - Boxed Layout statt volle Breite

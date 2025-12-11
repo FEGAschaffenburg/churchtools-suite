@@ -12,13 +12,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Formular verarbeiten
 if ( isset( $_POST['cts_save_settings'] ) && check_admin_referer( 'cts_settings' ) ) {
-	update_option( 'churchtools_suite_ct_url', sanitize_text_field( $_POST['ct_url'] ?? '' ) );
+	$tenant = sanitize_text_field( $_POST['ct_tenant'] ?? '' );
+	// Vollständige URL aus Tenant-Namen erstellen
+	$full_url = ! empty( $tenant ) ? 'https://' . $tenant . '.church.tools' : '';
+	
+	update_option( 'churchtools_suite_ct_url', $full_url );
 	update_option( 'churchtools_suite_ct_username', sanitize_email( $_POST['ct_username'] ?? '' ) );
 	update_option( 'churchtools_suite_ct_password', sanitize_text_field( $_POST['ct_password'] ?? '' ) );
 	echo '<div class="cts-notice cts-notice-success"><p>' . esc_html__( 'Einstellungen gespeichert.', 'churchtools-suite' ) . '</p></div>';
 }
 
 $ct_url = get_option( 'churchtools_suite_ct_url', '' );
+// Tenant-Namen aus URL extrahieren
+$ct_tenant = '';
+if ( ! empty( $ct_url ) ) {
+	$parsed = parse_url( $ct_url );
+	if ( isset( $parsed['host'] ) ) {
+		$ct_tenant = str_replace( '.church.tools', '', $parsed['host'] );
+	}
+}
 $ct_username = get_option( 'churchtools_suite_ct_username', '' );
 $ct_password = get_option( 'churchtools_suite_ct_password', '' );
 ?>
@@ -34,16 +46,21 @@ $ct_password = get_option( 'churchtools_suite_ct_password', '' );
 			<table class="cts-form-table">
 				<tr>
 					<th scope="row">
-						<label for="ct_url"><?php esc_html_e( 'ChurchTools URL', 'churchtools-suite' ); ?></label>
+						<label for="ct_tenant"><?php esc_html_e( 'ChurchTools Tenant', 'churchtools-suite' ); ?></label>
 					</th>
 					<td>
-						<input type="url" 
-							   id="ct_url" 
-							   name="ct_url" 
-							   value="<?php echo esc_attr( $ct_url ); ?>" 
-							   class="cts-form-input"
-							   placeholder="https://ihre-gemeinde.church.tools">
-						<span class="cts-form-description"><?php esc_html_e( 'Vollständige URL zu Ihrer ChurchTools-Instanz', 'churchtools-suite' ); ?></span>
+						<div style="display: flex; align-items: center; gap: 8px; max-width: 450px;">
+							<span style="color: #646970; font-size: 13px; white-space: nowrap;">https://</span>
+							<input type="text" 
+								   id="ct_tenant" 
+								   name="ct_tenant" 
+								   value="<?php echo esc_attr( $ct_tenant ); ?>" 
+								   class="cts-form-input"
+								   style="max-width: none; flex: 1;"
+								   placeholder="ihre-gemeinde">
+							<span style="color: #646970; font-size: 13px; white-space: nowrap;">.church.tools</span>
+						</div>
+						<span class="cts-form-description"><?php esc_html_e( 'Nur der Name Ihrer ChurchTools-Instanz (ohne https:// und .church.tools)', 'churchtools-suite' ); ?></span>
 					</td>
 				</tr>
 				<tr>
