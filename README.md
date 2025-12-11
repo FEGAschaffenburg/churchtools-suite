@@ -19,11 +19,21 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.3.1.0
+- **Version:** 0.3.2.0
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.3.2.0 - Repository Base-Klasse
+- Abstrakte Basis-Klasse für alle Repositories
+- CRUD-Operationen: get_by_id, insert, update_by_id, delete_by_id
+- get_all mit Order und Limit
+- get_where für flexible WHERE-Queries
+- Automatische Timestamps (created_at, updated_at)
+- count, exists, delete_all, truncate Helfer
+- Zentrale Fehlerbehandlung mit get_last_error
+- Grundlage für Calendars, Events, Services Repositories
 
 ### 0.3.1.0 - Cookie-Management & Session Keep-Alive
 - Cookie-Ablauf-Prüfung implementiert
