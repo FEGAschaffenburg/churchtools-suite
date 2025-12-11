@@ -19,11 +19,21 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.2.2.0
+- **Version:** 0.2.2.1
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.2.2.1 - Design-Verfeinerungen
+- Verfeinerte Typografie (größere Überschriften, bessere Schriftgewichte)
+- Verbesserte Card-Shadows und Hover-Effekte
+- Größere Status-Indikatoren mit Glow-Effekt
+- Optimierte Button-Styles mit Schatten
+- Besseres Spacing (Grid, Padding, Margins)
+- Icon-Hintergrund im Header
+- Stat-Numbers in Blau mit 48px Größe
+- Subtile Animationen
 
 ### 0.2.2.0 - Design wie Original-Plugin
 - Dashboard mit Section-Header und Beschreibung
