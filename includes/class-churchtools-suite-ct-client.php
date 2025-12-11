@@ -129,15 +129,21 @@ class ChurchTools_Suite_CT_Client {
         }
         
         if (empty($token)) {
+            $data_keys = isset($data['data']) && is_array($data['data']) ? array_keys($data['data']) : [];
+            $error_msg = 'Kein Token in der Antwort erhalten.<br><br>';
+            $error_msg .= '<strong>Response-Struktur:</strong><br>';
+            $error_msg .= 'Top-Level Keys: ' . implode(', ', array_keys($data)) . '<br>';
+            if (!empty($data_keys)) {
+                $error_msg .= 'data Keys: ' . implode(', ', $data_keys) . '<br>';
+            }
+            $error_msg .= '<br><strong>Vollständige Response:</strong><br>';
+            $error_msg .= '<pre style="background:#f0f0f0;padding:10px;overflow:auto;max-height:300px;">' . 
+                esc_html(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) . 
+                '</pre>';
+            
             return [
                 'success' => false,
-                'message' => 'Kein Token in der Antwort erhalten. Response-Struktur: ' . 
-                    implode(', ', array_keys($data)),
-                'debug' => [
-                    'response_keys' => array_keys($data),
-                    'has_data' => isset($data['data']),
-                    'data_keys' => isset($data['data']) ? array_keys($data['data']) : []
-                ]
+                'message' => $error_msg
             ];
         }
         
