@@ -19,11 +19,20 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.2.1.1
+- **Version:** 0.2.2.0
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.2.2.0 - Design wie Original-Plugin
+- Dashboard mit Section-Header und Beschreibung
+- Cards mit Header, Body, Footer-Struktur
+- System-Info-Card auf Dashboard
+- Status-Indikatoren (grün/rot/grau)
+- Buttons im Original-WordPress-Style
+- Komplett überarbeitetes CSS (540 Zeilen)
+- Design orientiert am alten repro-ct-suite Plugin
 
 ### 0.2.1.1 - Cleanup
 - Gelöscht: Shortcode-Manager CSS/JS

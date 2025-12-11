@@ -25,52 +25,115 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 
 <div class="cts-dashboard">
 	
+	<!-- Dashboard Header -->
+	<div class="cts-section-header">
+		<h2><?php esc_html_e( 'Dashboard', 'churchtools-suite' ); ?></h2>
+		<p class="cts-section-description"><?php esc_html_e( 'Übersicht über den aktuellen Status der ChurchTools-Integration.', 'churchtools-suite' ); ?></p>
+	</div>
+	
 	<!-- Status Cards -->
 	<div class="cts-grid cts-grid-3">
 		
 		<!-- ChurchTools Verbindung -->
 		<div class="cts-card">
-			<div class="cts-card-icon">
-				<span>☁️</span>
-			</div>
-			<div class="cts-card-content">
+			<div class="cts-card-header">
+				<span class="cts-card-icon">☁️</span>
 				<h3><?php esc_html_e( 'ChurchTools', 'churchtools-suite' ); ?></h3>
+			</div>
+			<div class="cts-card-body">
 				<?php if ( $is_configured ) : ?>
 					<p class="cts-status cts-status-success">
-						<span class="cts-status-dot"></span>
+						<span class="cts-status-indicator"></span>
 						<?php esc_html_e( 'Verbunden', 'churchtools-suite' ); ?>
 					</p>
+					<p class="cts-card-detail"><?php echo esc_html( parse_url( $ct_url, PHP_URL_HOST ) ?: $ct_url ); ?></p>
 				<?php else : ?>
 					<p class="cts-status cts-status-error">
-						<span class="cts-status-dot"></span>
+						<span class="cts-status-indicator"></span>
 						<?php esc_html_e( 'Nicht konfiguriert', 'churchtools-suite' ); ?>
 					</p>
 				<?php endif; ?>
 			</div>
+			<div class="cts-card-footer">
+				<a href="?page=churchtools-suite&tab=settings" class="cts-button cts-button-secondary">
+					<?php esc_html_e( 'Einstellungen', 'churchtools-suite' ); ?>
+				</a>
+			</div>
 		</div>
 
-		<!-- Events -->
+		<!-- Automatischer Sync -->
 		<div class="cts-card">
-			<div class="cts-card-icon">
-				<span>📅</span>
+			<div class="cts-card-header">
+				<span class="cts-card-icon">🔄</span>
+				<h3><?php esc_html_e( 'Automatischer Sync', 'churchtools-suite' ); ?></h3>
 			</div>
-			<div class="cts-card-content">
-				<h3><?php esc_html_e( 'Events', 'churchtools-suite' ); ?></h3>
+			<div class="cts-card-body">
+				<p class="cts-status cts-status-inactive">
+					<span class="cts-status-indicator"></span>
+					<?php esc_html_e( 'Deaktiviert', 'churchtools-suite' ); ?>
+				</p>
+				<p class="cts-card-detail"><?php esc_html_e( 'Automatische Synchronisation ist ausgeschaltet', 'churchtools-suite' ); ?></p>
+			</div>
+			<div class="cts-card-footer">
+				<a href="?page=churchtools-suite&tab=sync" class="cts-button cts-button-secondary">
+					<?php esc_html_e( 'Konfigurieren', 'churchtools-suite' ); ?>
+				</a>
+			</div>
+		</div>
+
+		<!-- Synchronisation -->
+		<div class="cts-card">
+			<div class="cts-card-header">
+				<span class="cts-card-icon">📅</span>
+				<h3><?php esc_html_e( 'Synchronisation', 'churchtools-suite' ); ?></h3>
+			</div>
+			<div class="cts-card-body">
 				<p class="cts-stat-number"><?php echo esc_html( $events_count ); ?></p>
+				<p class="cts-card-detail">
+					<?php
+					printf(
+						esc_html__( 'Termine gesamt, %s Kalender ausgewählt', 'churchtools-suite' ),
+						esc_html( $calendars_count )
+					);
+					?>
+				</p>
+			</div>
+			<div class="cts-card-footer">
+				<a href="?page=churchtools-suite&tab=sync" class="cts-button cts-button-secondary">
+					<?php esc_html_e( 'Termine anzeigen', 'churchtools-suite' ); ?>
+				</a>
 			</div>
 		</div>
 
-		<!-- Kalender -->
-		<div class="cts-card">
-			<div class="cts-card-icon">
-				<span>📋</span>
-			</div>
-			<div class="cts-card-content">
-				<h3><?php esc_html_e( 'Kalender', 'churchtools-suite' ); ?></h3>
-				<p class="cts-stat-number"><?php echo esc_html( $calendars_count ); ?></p>
-			</div>
-		</div>
+	</div>
 
+	<!-- System Info -->
+	<div class="cts-card cts-system-card">
+		<div class="cts-card-header">
+			<span class="cts-card-icon">ℹ️</span>
+			<h3><?php esc_html_e( 'System', 'churchtools-suite' ); ?></h3>
+		</div>
+		<div class="cts-card-body">
+			<table class="cts-system-table">
+				<tr>
+					<td><?php esc_html_e( 'Plugin-Version', 'churchtools-suite' ); ?></td>
+					<td><strong><?php echo esc_html( CHURCHTOOLS_SUITE_VERSION ); ?></strong></td>
+				</tr>
+				<tr>
+					<td><?php esc_html_e( 'WordPress-Version', 'churchtools-suite' ); ?></td>
+					<td><strong><?php echo esc_html( get_bloginfo( 'version' ) ); ?></strong></td>
+				</tr>
+				<tr>
+					<td><?php esc_html_e( 'PHP-Version', 'churchtools-suite' ); ?></td>
+					<td><strong><?php echo esc_html( PHP_VERSION ); ?></strong></td>
+				</tr>
+			</table>
+		</div>
+		<div class="cts-card-footer">
+			<a href="?page=churchtools-suite&tab=debug" class="cts-button cts-button-secondary">
+				<?php esc_html_e( 'Update-Info', 'churchtools-suite' ); ?>
+			</a>
+		</div>
 	</div>
 
 	<!-- Quick Start -->
