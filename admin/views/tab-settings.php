@@ -19,6 +19,11 @@ if ( isset( $_POST['cts_save_settings'] ) && check_admin_referer( 'cts_settings'
 	update_option( 'churchtools_suite_ct_url', $full_url );
 	update_option( 'churchtools_suite_ct_username', sanitize_email( $_POST['ct_username'] ?? '' ) );
 	update_option( 'churchtools_suite_ct_password', sanitize_text_field( $_POST['ct_password'] ?? '' ) );
+	
+	// Sync-Einstellungen
+	update_option( 'churchtools_suite_sync_days_past', absint( $_POST['sync_days_past'] ?? 7 ) );
+	update_option( 'churchtools_suite_sync_days_future', absint( $_POST['sync_days_future'] ?? 90 ) );
+	
 	echo '<div class="cts-notice cts-notice-success"><p>' . esc_html__( 'Einstellungen gespeichert.', 'churchtools-suite' ) . '</p></div>';
 }
 
@@ -33,6 +38,8 @@ if ( ! empty( $ct_url ) ) {
 }
 $ct_username = get_option( 'churchtools_suite_ct_username', '' );
 $ct_password = get_option( 'churchtools_suite_ct_password', '' );
+$sync_days_past = get_option( 'churchtools_suite_sync_days_past', 7 );
+$sync_days_future = get_option( 'churchtools_suite_sync_days_future', 90 );
 ?>
 
 <div class="cts-settings">
@@ -92,6 +99,52 @@ $ct_password = get_option( 'churchtools_suite_ct_password', '' );
 					</td>
 				</tr>
 			</table>
+		</div>
+		
+		<div class="cts-card" style="margin-top: 20px;">
+			<h3><?php esc_html_e( 'Synchronisations-Einstellungen', 'churchtools-suite' ); ?></h3>
+			
+			<table class="cts-form-table">
+				<tr>
+					<th scope="row">
+						<label for="sync_days_past"><?php esc_html_e( 'Vergangene Tage', 'churchtools-suite' ); ?></label>
+					</th>
+					<td>
+						<input type="number" 
+							   id="sync_days_past" 
+							   name="sync_days_past" 
+							   value="<?php echo esc_attr( $sync_days_past ); ?" 
+							   class="cts-form-input"
+							   min="0"
+							   max="365"
+							   style="max-width: 120px;">
+						<span class="cts-form-description"><?php esc_html_e( 'Wie viele Tage in der Vergangenheit sollen synchronisiert werden? (Standard: 7)', 'churchtools-suite' ); ?></span>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="sync_days_future"><?php esc_html_e( 'Zukünftige Tage', 'churchtools-suite' ); ?></label>
+					</th>
+					<td>
+						<input type="number" 
+							   id="sync_days_future" 
+							   name="sync_days_future" 
+							   value="<?php echo esc_attr( $sync_days_future ); ?" 
+							   class="cts-form-input"
+							   min="1"
+							   max="730"
+							   style="max-width: 120px;">
+						<span class="cts-form-description"><?php esc_html_e( 'Wie viele Tage in der Zukunft sollen synchronisiert werden? (Standard: 90)', 'churchtools-suite' ); ?></span>
+					</td>
+				</tr>
+			</table>
+			
+			<div class="cts-info" style="margin-top: 15px; padding: 12px; background: #f0f6fc; border-left: 4px solid #0073aa;">
+				<p style="margin: 0;">
+					<strong>ℹ️ Hinweis:</strong> 
+					<?php esc_html_e( 'Diese Einstellungen bestimmen, welcher Zeitraum bei der Synchronisation von Terminen berücksichtigt wird. Ein größerer Zeitraum bedeutet mehr Termine, aber auch längere Sync-Zeiten.', 'churchtools-suite' ); ?>
+				</p>
+			</div>
 		</div>
 
 		<div class="cts-submit">

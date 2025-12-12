@@ -57,8 +57,18 @@ $last_sync = get_option('churchtools_suite_calendars_last_sync', null);
 			<h2>📅 <?php esc_html_e('Termine synchronisieren', 'churchtools-suite'); ?></h2>
 		</div>
 		<div class="cts-card-body">
+			<?php
+			$days_past = get_option('churchtools_suite_sync_days_past', 7);
+			$days_future = get_option('churchtools_suite_sync_days_future', 90);
+			?>
 			<p class="description">
-				<?php esc_html_e('Lädt Termine und Events aus den ausgewählten Kalendern. Termine ohne Event verwenden Appointmentdaten, Termine mit Events die Eventdaten (1:X).', 'churchtools-suite'); ?>
+				<?php 
+				printf(
+					esc_html__('Lädt Termine und Events aus den ausgewählten Kalendern. Zeitraum: %d Tage zurück bis %d Tage voraus. Termine ohne Event verwenden Appointmentdaten, Termine mit Events die Eventdaten (1:X).', 'churchtools-suite'),
+					$days_past,
+					$days_future
+				);
+				?>
 			</p>
 			
 			<?php

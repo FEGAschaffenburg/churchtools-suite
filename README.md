@@ -19,11 +19,18 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.3.7.0
+- **Version:** 0.3.7.1
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.3.7.1 - Konfigurierbare Sync-Zeiträume
+- Neue Einstellungen: Vergangene Tage (Standard: 7)
+- Neue Einstellungen: Zukünftige Tage (Standard: 90)
+- Zeitraum-Vorgaben werden automatisch beim Sync verwendet
+- Anzeige des konfigurierten Zeitraums im Kalender-Tab
+- Validierung: Min/Max-Werte für Zeiträume
 
 ### 0.3.7.0 - Event Sync Service
 - ChurchTools_Suite_Event_Sync_Service implementiert

@@ -64,11 +64,14 @@ class ChurchTools_Suite_Event_Sync_Service {
      * @return array|WP_Error Statistics array or WP_Error on failure
      */
     public function sync_events(array $args = []): array {
-        $defaults = [
-            'calendar_ids' => [],
-            'from' => date('Y-m-d', current_time('timestamp') - 7 * DAY_IN_SECONDS),
-            'to' => date('Y-m-d', current_time('timestamp') + 90 * DAY_IN_SECONDS),
-        ];
+		// Get sync range from settings
+		$days_past = get_option('churchtools_suite_sync_days_past', 7);
+		$days_future = get_option('churchtools_suite_sync_days_future', 90);
+		
+		$defaults = [
+			'calendar_ids' => [],
+			'from' => date('Y-m-d', current_time('timestamp') - absint($days_past) * DAY_IN_SECONDS),
+			'to' => date('Y-m-d', current_time('timestamp') + absint($days_future) * DAY_IN_SECONDS),
         $args = wp_parse_args($args, $defaults);
         
         // If no calendar_ids provided, use selected calendars
