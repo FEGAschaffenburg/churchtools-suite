@@ -192,8 +192,9 @@ class ChurchTools_Suite_Event_Sync_Service {
         // Phase 1: Process events
         foreach ($events as $event) {
             // Collect appointment IDs for Phase 2
-            if (isset($event['appointment']['id'])) {
-                $imported_appointment_ids[] = $event['appointment']['id'];
+            // API structure: event.appointmentId (not event.appointment.id)
+            if (isset($event['appointmentId']) && $event['appointmentId']) {
+                $imported_appointment_ids[] = (string) $event['appointmentId'];
             }
             
             $result = $this->process_event($event, $calendar_id);
@@ -216,11 +217,12 @@ class ChurchTools_Suite_Event_Sync_Service {
         }
         
         error_log(sprintf(
-            'ChurchTools Suite Event Sync: Calendar %s - Phase 1 complete - %d inserted, %d updated, %d skipped',
+            'ChurchTools Suite Event Sync: Calendar %s - Phase 1 complete - %d inserted, %d updated, %d skipped, %d appointment_ids collected',
             $calendar_id,
             $stats['events_inserted'],
             $stats['events_updated'],
-            $stats['events_skipped']
+            $stats['events_skipped'],
+            count($imported_appointment_ids)
         ));
         
         // Phase 2: Process standalone appointments
@@ -267,6 +269,15 @@ class ChurchTools_Suite_Event_Sync_Service {
             'events_skipped' => 0,
         ];
         
+        error_log(sprintf(
+            'ChurchTools Suite Event Sync: Calendar %s - Phase 2 start - %d appointments found, %d already imported in Phase 1',
+            $calendar_id,
+            count($appointments),
+            count($imported_appointment_ids)
+        ));
+        
+        $skipped_already_imported = 0;
+        
         foreach ($appointments as $appointment_data) {
             // Extract appointment from nested structure
             $appointment = isset($appointment_data['appointment']) ? $appointment_data['appointment'] : $appointment_data;
@@ -280,6 +291,7 @@ class ChurchTools_Suite_Event_Sync_Service {
             
             // Skip if already imported as event
             if (in_array($appointment_id, $imported_appointment_ids, true)) {
+                $skipped_already_imported++;
                 continue;
             }
             
@@ -301,6 +313,15 @@ class ChurchTools_Suite_Event_Sync_Service {
                 $stats['events_updated']++;
             }
         }
+        
+        error_log(sprintf(
+            'ChurchTools Suite Event Sync: Calendar %s - Phase 2 complete - %d inserted, %d updated, %d skipped, %d already imported in Phase 1',
+            $calendar_id,
+            $stats['events_inserted'],
+            $stats['events_updated'],
+            $stats['events_skipped'],
+            $skipped_already_imported
+        ));
         
         return $stats;
     }
@@ -382,7 +403,11 @@ class ChurchTools_Suite_Event_Sync_Service {
             return new WP_Error('missing_id', __('Event hat keine ID', 'churchtools-suite'));
         }
         
-        $appointment_id = $event['appointment']['id'] ?? $event['appointmentId'] ?? null;
+        // API structure: event.appointmentId (direct field, not nested)
+        $appointment_id = null;
+        if (isset($event['appointmentId']) && $event['appointmentId']) {
+            $appointment_id = (string) $event['appointmentId'];
+        }
         
         return [
             'event_id' => (string) $event['id'],

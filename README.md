@@ -19,11 +19,20 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.3.8.1
+- **Version:** 0.3.8.2
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.3.8.2 - KRITISCHER Bugfix: appointmentId Sammlung
+- **KRITISCH:** Fix appointmentId Sammlung in Phase 1
+- **KRITISCH:** API verwendet event.appointmentId (NICHT event.appointment.id)
+- Fix: Phase 2 überspringt jetzt korrekt bereits importierte Appointments
+- Fix: Keine Duplikate mehr bei Events mit Appointments
+- Debug: Phase 2 Logging - zeigt "already imported in Phase 1" Count
+- Debug: Phase 1 Logging - zeigt gesammelte appointment_ids
+- Basiert auf echter ChurchTools API-Struktur
 
 ### 0.3.8.1 - Bugfix Event Sync Phase 1
 - **Fix:** Erweiterte Kalender-Erkennung für Events (Phase 1)
