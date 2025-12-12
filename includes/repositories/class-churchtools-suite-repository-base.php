@@ -49,6 +49,13 @@ abstract class ChurchTools_Suite_Repository_Base {
     }
     
     /**
+     * Get full table name (for debugging)
+     */
+    public function get_table_name(): string {
+        return $this->table_name;
+    }
+    
+    /**
      * Get current timestamp in MySQL format (GMT)
      *
      * @return string MySQL datetime
