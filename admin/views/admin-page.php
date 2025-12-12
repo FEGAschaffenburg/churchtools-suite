@@ -36,6 +36,10 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'dashboard'
 			<span>🗓️</span>
 			<?php esc_html_e( 'Kalender', 'churchtools-suite' ); ?>
 		</a>
+		<a href="?page=churchtools-suite&tab=events" class="cts-tab <?php echo $active_tab === 'events' ? 'active' : ''; ?>">
+			<span>📋</span>
+			<?php esc_html_e( 'Termine', 'churchtools-suite' ); ?>
+		</a>
 		<a href="?page=churchtools-suite&tab=sync" class="cts-tab <?php echo $active_tab === 'sync' ? 'active' : ''; ?>">
 			<span>🔄</span>
 			<?php esc_html_e( 'Sync', 'churchtools-suite' ); ?>
@@ -53,6 +57,9 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'dashboard'
 			break;
 		case 'calendars':
 			include __DIR__ . '/tab-calendars.php';
+			break;
+		case 'events':
+			include __DIR__ . '/tab-events.php';
 			break;
 		case 'sync':
 			include __DIR__ . '/tab-sync.php';

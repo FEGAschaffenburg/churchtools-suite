@@ -24,6 +24,15 @@ if ( isset( $_POST['cts_save_settings'] ) && check_admin_referer( 'cts_settings'
 	update_option( 'churchtools_suite_sync_days_past', absint( $_POST['sync_days_past'] ?? 7 ) );
 	update_option( 'churchtools_suite_sync_days_future', absint( $_POST['sync_days_future'] ?? 90 ) );
 	
+	// Auto-Sync Einstellungen
+	$auto_sync_enabled = isset( $_POST['auto_sync_enabled'] ) ? 1 : 0;
+	update_option( 'churchtools_suite_auto_sync_enabled', $auto_sync_enabled );
+	update_option( 'churchtools_suite_auto_sync_interval', sanitize_text_field( $_POST['auto_sync_interval'] ?? 'hourly' ) );
+	
+	// Cron-Job aktualisieren
+	require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-cron.php';
+	ChurchTools_Suite_Cron::update_sync_schedule();
+	
 	echo '<div class="cts-notice cts-notice-success"><p>' . esc_html__( 'Einstellungen gespeichert.', 'churchtools-suite' ) . '</p></div>';
 }
 
@@ -40,6 +49,9 @@ $ct_username = get_option( 'churchtools_suite_ct_username', '' );
 $ct_password = get_option( 'churchtools_suite_ct_password', '' );
 $sync_days_past = get_option( 'churchtools_suite_sync_days_past', 7 );
 $sync_days_future = get_option( 'churchtools_suite_sync_days_future', 90 );
+$auto_sync_enabled = get_option( 'churchtools_suite_auto_sync_enabled', 0 );
+$auto_sync_interval = get_option( 'churchtools_suite_auto_sync_interval', 'hourly' );
+$last_auto_sync = get_option( 'churchtools_suite_last_auto_sync', '' );
 ?>
 
 <div class="cts-settings">
@@ -143,6 +155,66 @@ $sync_days_future = get_option( 'churchtools_suite_sync_days_future', 90 );
 				<p style="margin: 0;">
 					<strong>ℹ️ Hinweis:</strong> 
 					<?php esc_html_e( 'Diese Einstellungen bestimmen, welcher Zeitraum bei der Synchronisation von Terminen berücksichtigt wird. Ein größerer Zeitraum bedeutet mehr Termine, aber auch längere Sync-Zeiten.', 'churchtools-suite' ); ?>
+				</p>
+			</div>
+		</div>
+		
+		<div class="cts-card" style="margin-top: 20px;">
+			<h3><?php esc_html_e( 'Automatische Synchronisation', 'churchtools-suite' ); ?></h3>
+			
+			<table class="cts-form-table">
+				<tr>
+					<th scope="row">
+						<label for="auto_sync_enabled"><?php esc_html_e( 'Auto-Sync aktivieren', 'churchtools-suite' ); ?></label>
+					</th>
+					<td>
+						<label class="cts-toggle">
+							<input type="checkbox" 
+								   id="auto_sync_enabled" 
+								   name="auto_sync_enabled" 
+								   value="1" 
+								   <?php checked( $auto_sync_enabled, 1 ); ?>>
+							<span class="cts-toggle-slider"></span>
+						</label>
+						<span class="cts-form-description"><?php esc_html_e( 'Termine automatisch im Hintergrund synchronisieren', 'churchtools-suite' ); ?></span>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="auto_sync_interval"><?php esc_html_e( 'Synchronisations-Intervall', 'churchtools-suite' ); ?></label>
+					</th>
+					<td>
+						<select id="auto_sync_interval" 
+								name="auto_sync_interval" 
+								class="cts-form-input"
+								style="max-width: 250px;"
+								<?php disabled( ! $auto_sync_enabled ); ?>>
+							<option value="hourly" <?php selected( $auto_sync_interval, 'hourly' ); ?>><?php esc_html_e( 'Stündlich', 'churchtools-suite' ); ?></option>
+							<option value="twicedaily" <?php selected( $auto_sync_interval, 'twicedaily' ); ?>><?php esc_html_e( 'Zweimal täglich', 'churchtools-suite' ); ?></option>
+							<option value="daily" <?php selected( $auto_sync_interval, 'daily' ); ?>><?php esc_html_e( 'Täglich', 'churchtools-suite' ); ?></option>
+						</select>
+						<span class="cts-form-description"><?php esc_html_e( 'Wie oft sollen die Termine automatisch synchronisiert werden?', 'churchtools-suite' ); ?></span>
+					</td>
+				</tr>
+				<?php if ( ! empty( $last_auto_sync ) ) : ?>
+				<tr>
+					<th scope="row">
+						<?php esc_html_e( 'Letzte Auto-Sync', 'churchtools-suite' ); ?>
+					</th>
+					<td>
+						<span style="color: #50575e; font-weight: 500;">
+							<?php echo esc_html( date_i18n( 'd.m.Y H:i:s', strtotime( $last_auto_sync ) ) ); ?>
+						</span>
+						<span class="cts-form-description"><?php esc_html_e( 'Zeitpunkt der letzten automatischen Synchronisation', 'churchtools-suite' ); ?></span>
+					</td>
+				</tr>
+				<?php endif; ?>
+			</table>
+			
+			<div class="cts-info" style="margin-top: 15px; padding: 12px; background: #fff3cd; border-left: 4px solid #ffc107;">
+				<p style="margin: 0;">
+					<strong>⚡ Hinweis:</strong> 
+					<?php esc_html_e( 'Die automatische Synchronisation verwendet WordPress Cron-Jobs. Stellen Sie sicher, dass WP-Cron auf Ihrem Server aktiviert ist.', 'churchtools-suite' ); ?>
 				</p>
 			</div>
 		</div>

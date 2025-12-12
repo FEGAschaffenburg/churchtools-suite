@@ -19,11 +19,26 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.3.7.4
+- **Version:** 0.3.8.0
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.3.8.0 - Termine-Übersicht & Auto-Sync
+- **NEU:** Tab "Termine" mit kompletter Übersichtstabelle
+- **NEU:** Filter nach Datum und Kalender (von/bis)
+- **NEU:** Pagination (50 Termine pro Seite)
+- **NEU:** Automatische Synchronisation per Cron-Job
+- **NEU:** Auto-Sync Einstellungen (stündlich/täglich)
+- **NEU:** Auto-Sync Ein/Aus Toggle in Settings
+- Anzeige: Event-Typ (Event vs. Appointment)
+- Anzeige: Kalender-Badge mit Farbe
+- Anzeige: Ort, Datum, Zeit, Beschreibung
+- Cron: churchtools_suite_auto_sync Hook
+- UI: Moderne Tabelle mit Hover-Effekten
+- UI: Filter-Sektion mit aktiven Filtern
+- UI: Toggle-Switch für Auto-Sync
 
 ### 0.3.7.4 - Versioniertes Migrations-System
 - **NEU:** Automatisches Migrations-System mit DB-Versionierung

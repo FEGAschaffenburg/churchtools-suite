@@ -20,6 +20,9 @@ class ChurchTools_Suite_Cron {
         if (!wp_next_scheduled('churchtools_suite_session_keepalive')) {
             wp_schedule_event(time(), 'hourly', 'churchtools_suite_session_keepalive');
         }
+        
+        // Auto-Sync: Falls aktiviert, Schedule erstellen
+        self::update_sync_schedule();
     }
     
     /**
@@ -29,6 +32,30 @@ class ChurchTools_Suite_Cron {
         $timestamp = wp_next_scheduled('churchtools_suite_session_keepalive');
         if ($timestamp) {
             wp_unschedule_event($timestamp, 'churchtools_suite_session_keepalive');
+        }
+        
+        $timestamp = wp_next_scheduled('churchtools_suite_auto_sync');
+        if ($timestamp) {
+            wp_unschedule_event($timestamp, 'churchtools_suite_auto_sync');
+        }
+    }
+    
+    /**
+     * Update auto-sync schedule based on settings
+     */
+    public static function update_sync_schedule() {
+        $auto_sync_enabled = get_option('churchtools_suite_auto_sync_enabled', 0);
+        $interval = get_option('churchtools_suite_auto_sync_interval', 'hourly');
+        
+        // Clear existing schedule
+        $timestamp = wp_next_scheduled('churchtools_suite_auto_sync');
+        if ($timestamp) {
+            wp_unschedule_event($timestamp, 'churchtools_suite_auto_sync');
+        }
+        
+        // Schedule new job if enabled
+        if ($auto_sync_enabled) {
+            wp_schedule_event(time(), $interval, 'churchtools_suite_auto_sync');
         }
     }
     
@@ -69,6 +96,46 @@ class ChurchTools_Suite_Cron {
         } else {
             // Update last keepalive timestamp
             update_option('churchtools_suite_last_keepalive', current_time('mysql'));
+        }
+    }
+    
+    /**
+     * Auto-Sync: Synchronize events automatically
+     * 
+     * Wird in konfigurierbaren Intervallen ausgeführt
+     */
+    public static function auto_sync() {
+        // Nur ausführen wenn aktiviert
+        $auto_sync_enabled = get_option('churchtools_suite_auto_sync_enabled', 0);
+        if (!$auto_sync_enabled) {
+            return;
+        }
+        
+        // Event Sync Service laden
+        require_once CHURCHTOOLS_SUITE_PATH . 'includes/services/class-churchtools-suite-event-sync-service.php';
+        require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-ct-client.php';
+        require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-repository-base.php';
+        require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-events-repository.php';
+        require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-calendars-repository.php';
+        
+        $sync_service = new ChurchTools_Suite_Event_Sync_Service();
+        
+        // Sync ausführen
+        $result = $sync_service->sync_events();
+        
+        // Timestamp aktualisieren
+        update_option('churchtools_suite_last_auto_sync', current_time('mysql'));
+        
+        // Log result
+        if ($result['success']) {
+            error_log(sprintf(
+                'ChurchTools Suite Auto-Sync: %d neu, %d aktualisiert, %d übersprungen',
+                $result['inserted'],
+                $result['updated'],
+                $result['skipped']
+            ));
+        } else {
+            error_log('ChurchTools Suite Auto-Sync fehlgeschlagen: ' . $result['message']);
         }
     }
 }
