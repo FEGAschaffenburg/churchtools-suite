@@ -19,11 +19,16 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.3.5.2
+- **Version:** 0.3.5.3
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.3.5.3 - Bugfix
+- Fix: Tabellen-Schema korrigiert (calendar_id statt external_id)
+- Fix: name_translated und raw_payload Spalten hinzugefügt
+- WICHTIG: Plugin deaktivieren und neu aktivieren!
 
 ### 0.3.5.2 - Bugfix
 - Fix: AJAX Handler mit Try-Catch für bessere Fehlerbehandlung

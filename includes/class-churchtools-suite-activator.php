@@ -49,16 +49,18 @@ class ChurchTools_Suite_Activator {
 		// Calendars table
 		$sql[] = "CREATE TABLE IF NOT EXISTS {$prefix}calendars (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-			external_id varchar(100) NOT NULL,
+			calendar_id varchar(100) NOT NULL,
 			name varchar(255) NOT NULL,
+			name_translated varchar(255) DEFAULT NULL,
 			color varchar(20) DEFAULT NULL,
 			is_selected tinyint(1) DEFAULT 0,
 			is_public tinyint(1) DEFAULT 0,
 			sort_order int(11) DEFAULT 0,
+			raw_payload longtext DEFAULT NULL,
 			created_at datetime DEFAULT CURRENT_TIMESTAMP,
 			updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 			PRIMARY KEY (id),
-			UNIQUE KEY external_id (external_id),
+			UNIQUE KEY calendar_id (calendar_id),
 			KEY is_selected (is_selected)
 		) $charset_collate;";
 		
