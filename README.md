@@ -19,11 +19,15 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.3.5.0
+- **Version:** 0.3.5.1
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.3.5.1 - Bugfix
+- Fix: AJAX Handler werden jetzt direkt registriert (nicht mehr mit init Hook)
+- Behebt "Unexpected token '<'" Fehler bei AJAX-Aufrufen
 
 ### 0.3.5.0 - Admin UI Kalender-Tab
 - Neuer Tab "Kalender" im Admin-Bereich
