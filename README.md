@@ -19,11 +19,20 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.3.8.0
+- **Version:** 0.3.8.1
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.3.8.1 - Bugfix Event Sync Phase 1
+- **Fix:** Erweiterte Kalender-Erkennung für Events (Phase 1)
+- **Fix:** Prüfe exists_by_event_id VOR upsert (korrekte Statistik)
+- **Debug:** Erweiterte Logging für Event-Strukturen
+- **Debug:** Zeige Phase 1/2 Statistiken im error_log
+- Kalender-Filterung jetzt mit 8 Fallback-Checks
+- Unterstützt: appointments[].calendar, base.calendar, calendarId
+- WP_DEBUG: Loggt Event-Struktur für Analyse
 
 ### 0.3.8.0 - Termine-Übersicht & Auto-Sync
 - **NEU:** Tab "Termine" mit kompletter Übersichtstabelle

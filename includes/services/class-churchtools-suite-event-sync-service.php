@@ -182,6 +182,13 @@ class ChurchTools_Suite_Event_Sync_Service {
         
         $imported_appointment_ids = [];
         
+        // Debug log
+        error_log(sprintf(
+            'ChurchTools Suite Event Sync: Calendar %s - Phase 1 start - %d events to process',
+            $calendar_id,
+            count($events)
+        ));
+        
         // Phase 1: Process events
         foreach ($events as $event) {
             // Collect appointment IDs for Phase 2
@@ -192,6 +199,11 @@ class ChurchTools_Suite_Event_Sync_Service {
             $result = $this->process_event($event, $calendar_id);
             
             if (is_wp_error($result)) {
+                error_log(sprintf(
+                    'ChurchTools Suite Event Sync: Failed to process event %s: %s',
+                    $event['id'] ?? 'unknown',
+                    $result->get_error_message()
+                ));
                 $stats['events_skipped']++;
                 continue;
             }
@@ -202,6 +214,14 @@ class ChurchTools_Suite_Event_Sync_Service {
                 $stats['events_updated']++;
             }
         }
+        
+        error_log(sprintf(
+            'ChurchTools Suite Event Sync: Calendar %s - Phase 1 complete - %d inserted, %d updated, %d skipped',
+            $calendar_id,
+            $stats['events_inserted'],
+            $stats['events_updated'],
+            $stats['events_skipped']
+        ));
         
         // Phase 2: Process standalone appointments
         $appointments_result = $this->sync_phase2_appointments($calendar_id, $args, $imported_appointment_ids);
@@ -299,16 +319,17 @@ class ChurchTools_Suite_Event_Sync_Service {
             return $event_data;
         }
         
+        // Check if exists before upserting
+        $exists_before = $this->events_repo->exists_by_event_id($event_data['event_id']);
+        
         $event_id = $this->events_repo->upsert_by_event_id($event_data);
         
         if (!$event_id) {
             return new WP_Error('save_failed', __('Event konnte nicht gespeichert werden', 'churchtools-suite'));
         }
         
-        $exists = $this->events_repo->exists_by_event_id($event_data['event_id']);
-        
         return [
-            'action' => $exists ? 'updated' : 'inserted',
+            'action' => $exists_before ? 'updated' : 'inserted',
             'event_id' => $event_id,
         ];
     }
@@ -418,13 +439,26 @@ class ChurchTools_Suite_Event_Sync_Service {
      * @return bool
      */
     private function is_event_relevant_for_calendar(array $event, string $calendar_id): bool {
+        // Debug: Log event structure first time
+        static $logged = false;
+        if (!$logged && WP_DEBUG) {
+            error_log('ChurchTools Suite Event Structure: ' . print_r($event, true));
+            $logged = true;
+        }
+        
         // Check various possible calendar ID locations
         $checks = [
+            // Direct fields
             $event['calendar']['domainIdentifier'] ?? null,
             $event['calendar']['id'] ?? null,
             $event['calendarId'] ?? null,
+            // Appointment nested fields
             $event['appointment']['calendar']['domainIdentifier'] ?? null,
             $event['appointment']['calendar']['id'] ?? null,
+            $event['appointment']['calendarId'] ?? null,
+            // Base appointment fields
+            $event['appointment']['base']['calendar']['id'] ?? null,
+            $event['appointment']['base']['calendar']['domainIdentifier'] ?? null,
         ];
         
         foreach ($checks as $check) {
@@ -438,6 +472,16 @@ class ChurchTools_Suite_Event_Sync_Service {
             foreach ($event['calendars'] as $cal) {
                 $cal_id = $cal['domainIdentifier'] ?? $cal['id'] ?? null;
                 if ($cal_id && (string) $cal_id === (string) $calendar_id) {
+                    return true;
+                }
+            }
+        }
+        
+        // Check if event has appointments with calendars
+        if (isset($event['appointments']) && is_array($event['appointments'])) {
+            foreach ($event['appointments'] as $apt) {
+                $apt_cal_id = $apt['calendar']['domainIdentifier'] ?? $apt['calendar']['id'] ?? $apt['base']['calendar']['id'] ?? null;
+                if ($apt_cal_id && (string) $apt_cal_id === (string) $calendar_id) {
                     return true;
                 }
             }
