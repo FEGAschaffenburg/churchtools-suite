@@ -19,11 +19,21 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.3.7.2
+- **Version:** 0.3.7.3
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.3.7.3 - Automatische Datenbank-Migration
+- **WICHTIG:** Automatische Schema-Migration beim Aktivieren
+- Fix: Datenbank-Fehler "Unknown column 'event_id'"
+- Fix: Datenbank-Fehler "Unknown column 'appointment_id'"
+- Migriert automatisch: external_id → event_id
+- Fügt automatisch hinzu: appointment_id, raw_payload Spalten
+- Lösung: Plugin deaktivieren und neu aktivieren
+- MIGRATION-GUIDE.md mit manuellen Anweisungen
+- update-events-table.sql für manuelle Migration
 
 ### 0.3.7.2 - Bugfix & UI-Konsolidierung
 - Fix: Kritischer Syntax-Fehler in Event Sync Service (fehlende Array-Klammer)

@@ -19,12 +19,59 @@ class ChurchTools_Suite_Activator {
 	 * - Sets default options
 	 * - Schedules cron jobs
 	 * - Flushes rewrite rules
+	 * - Runs migrations
 	 */
 	public static function activate(): void {
+		self::migrate_database();
 		self::create_tables();
 		self::set_default_options();
 		self::schedule_cron_jobs();
 		flush_rewrite_rules();
+	}
+	
+	/**
+	 * Migrate database schema if needed
+	 */
+	private static function migrate_database(): void {
+		global $wpdb;
+		
+		$prefix = $wpdb->prefix . CHURCHTOOLS_SUITE_DB_PREFIX;
+		$events_table = $prefix . 'events';
+		
+		// Check if table exists
+		$table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$events_table}'");
+		
+		if (!$table_exists) {
+			// Table doesn't exist yet, will be created by create_tables()
+			return;
+		}
+		
+		// Check if old schema (external_id column exists)
+		$columns = $wpdb->get_results("SHOW COLUMNS FROM {$events_table}");
+		$column_names = array_column($columns, 'Field');
+		
+		$has_external_id = in_array('external_id', $column_names);
+		$has_event_id = in_array('event_id', $column_names);
+		$has_appointment_id = in_array('appointment_id', $column_names);
+		$has_raw_payload = in_array('raw_payload', $column_names);
+		
+		// Migration needed: Rename external_id to event_id and add missing columns
+		if ($has_external_id && !$has_event_id) {
+			$wpdb->query("ALTER TABLE {$events_table} CHANGE COLUMN `external_id` `event_id` varchar(100) NOT NULL");
+			$wpdb->query("ALTER TABLE {$events_table} DROP INDEX IF EXISTS `idx_external_id`");
+			$wpdb->query("ALTER TABLE {$events_table} ADD UNIQUE KEY `event_id` (`event_id`)");
+		}
+		
+		// Add appointment_id column if missing
+		if (!$has_appointment_id) {
+			$wpdb->query("ALTER TABLE {$events_table} ADD COLUMN `appointment_id` varchar(100) DEFAULT NULL AFTER `calendar_id`");
+			$wpdb->query("ALTER TABLE {$events_table} ADD KEY `appointment_id` (`appointment_id`)");
+		}
+		
+		// Add raw_payload column if missing
+		if (!$has_raw_payload) {
+			$wpdb->query("ALTER TABLE {$events_table} ADD COLUMN `raw_payload` longtext DEFAULT NULL AFTER `status`");
+		}
 	}
 	
 	/**
