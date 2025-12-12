@@ -19,11 +19,18 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.3.7.1
+- **Version:** 0.3.7.2
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.3.7.2 - Bugfix & UI-Konsolidierung
+- Fix: Kritischer Syntax-Fehler in Event Sync Service (fehlende Array-Klammer)
+- UI: Alle Sync-Funktionen im "Sync"-Tab konsolidiert
+- Kalender-Tab: Fokus auf Kalenderauswahl
+- Sync-Tab: Kalender-Sync, Termin-Sync und Hinweise an einem Ort
+- Bessere Validierung: Warnung wenn keine Kalender ausgewählt
 
 ### 0.3.7.1 - Konfigurierbare Sync-Zeiträume
 - Neue Einstellungen: Vergangene Tage (Standard: 7)

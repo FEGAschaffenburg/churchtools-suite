@@ -72,7 +72,8 @@ class ChurchTools_Suite_Event_Sync_Service {
 			'calendar_ids' => [],
 			'from' => date('Y-m-d', current_time('timestamp') - absint($days_past) * DAY_IN_SECONDS),
 			'to' => date('Y-m-d', current_time('timestamp') + absint($days_future) * DAY_IN_SECONDS),
-        $args = wp_parse_args($args, $defaults);
+		];
+		$args = wp_parse_args($args, $defaults);
         
         // If no calendar_ids provided, use selected calendars
         if (empty($args['calendar_ids'])) {
