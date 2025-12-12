@@ -23,6 +23,7 @@
 		initTestConnection();
 		initCalendarSync();
 		initCalendarSelection();
+		initEventSync();
 	}
 
 	/**
@@ -372,6 +373,71 @@
 					submitButton.disabled = false;
 					submitButton.innerHTML = originalText;
 				}
+			});
+		});
+	}
+
+	/**
+	 * Event Sync Button
+	 */
+	function initEventSync() {
+		const syncButton = document.getElementById('cts-sync-events-btn');
+		if (!syncButton) return;
+
+		syncButton.addEventListener('click', function() {
+			const resultDiv = document.getElementById('cts-sync-events-result');
+			
+			if (resultDiv) {
+				resultDiv.style.display = 'none';
+				resultDiv.innerHTML = '';
+			}
+			
+			syncButton.disabled = true;
+			const originalText = syncButton.innerHTML;
+			syncButton.innerHTML = '<span class="dashicons dashicons-calendar"></span> Synchronisiere...';
+
+			fetch(churchtoolsSuite.ajaxUrl, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+				body: new URLSearchParams({
+					action: 'cts_sync_events',
+					nonce: churchtoolsSuite.nonce
+				})
+			})
+			.then(response => response.json())
+			.then(data => {
+				if (resultDiv) {
+					resultDiv.style.display = 'block';
+					
+					if (data.success) {
+						resultDiv.innerHTML = '<div class="notice notice-success inline"><p>' + 
+							(data.data.message || 'Synchronisation erfolgreich!') + 
+							'</p></div>';
+						
+						// Seite neu laden nach erfolgreicher Sync
+						setTimeout(() => {
+							location.reload();
+						}, 1500);
+					} else {
+						resultDiv.innerHTML = '<div class="notice notice-error inline"><p>' + 
+							(data.data.message || 'Synchronisation fehlgeschlagen!') + 
+							'</p></div>';
+					}
+				}
+			})
+			.catch(error => {
+				if (resultDiv) {
+					resultDiv.style.display = 'block';
+					resultDiv.innerHTML = '<div class="notice notice-error inline"><p>Fehler: ' + 
+						error.message + 
+						'</p></div>';
+				}
+			})
+			.finally(() => {
+				syncButton.disabled = false;
+				syncButton.innerHTML = originalText;
 			});
 		});
 	}

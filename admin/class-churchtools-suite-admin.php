@@ -110,6 +110,7 @@ class ChurchTools_Suite_Admin {
 		add_action( 'wp_ajax_cts_test_connection', [ $this, 'ajax_test_connection' ] );
 		add_action( 'wp_ajax_cts_sync_calendars', [ $this, 'ajax_sync_calendars' ] );
 		add_action( 'wp_ajax_cts_save_calendar_selection', [ $this, 'ajax_save_calendar_selection' ] );
+		add_action( 'wp_ajax_cts_sync_events', [ $this, 'ajax_sync_events' ] );
 	}
 	
 	/**
@@ -240,6 +241,72 @@ class ChurchTools_Suite_Admin {
 				),
 				'selected_count' => $selected_count,
 				'total_count' => $total_count
+			] );
+		} catch ( Exception $e ) {
+			wp_send_json_error( [
+				'message' => __( 'Fehler: ', 'churchtools-suite' ) . $e->getMessage()
+			] );
+		}
+	}
+	
+	/**
+	 * AJAX Handler: Sync Events from ChurchTools
+	 */
+	public function ajax_sync_events(): void {
+		// Check nonce
+		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
+		
+		// Check permissions
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [
+				'message' => __( 'Keine Berechtigung.', 'churchtools-suite' )
+			] );
+			return;
+		}
+		
+		try {
+			// Load dependencies
+			require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-ct-client.php';
+			require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-repository-base.php';
+			require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-calendars-repository.php';
+			require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-events-repository.php';
+			require_once CHURCHTOOLS_SUITE_PATH . 'includes/services/class-churchtools-suite-event-sync-service.php';
+			
+			$client = new ChurchTools_Suite_CT_Client();
+			$calendars_repo = new ChurchTools_Suite_Calendars_Repository();
+			$events_repo = new ChurchTools_Suite_Events_Repository();
+			$sync_service = new ChurchTools_Suite_Event_Sync_Service( $client, $events_repo, $calendars_repo );
+			
+			// Optional: Custom date range from POST
+			$args = [];
+			if ( isset( $_POST['from'] ) ) {
+				$args['from'] = sanitize_text_field( $_POST['from'] );
+			}
+			if ( isset( $_POST['to'] ) ) {
+				$args['to'] = sanitize_text_field( $_POST['to'] );
+			}
+			
+			$result = $sync_service->sync_events( $args );
+			
+			if ( is_wp_error( $result ) ) {
+				wp_send_json_error( [
+					'message' => $result->get_error_message()
+				] );
+				return;
+			}
+			
+			wp_send_json_success( [
+				'message' => sprintf(
+					__( 'Synchronisation erfolgreich! %d Kalender verarbeitet, %d Events gefunden, %d Appointments gefunden, %d neu, %d aktualisiert, %d übersprungen, %d Fehler.', 'churchtools-suite' ),
+					$result['calendars_processed'],
+					$result['events_found'],
+					$result['appointments_found'],
+					$result['events_inserted'],
+					$result['events_updated'],
+					$result['events_skipped'],
+					$result['errors']
+				),
+				'stats' => $result
 			] );
 		} catch ( Exception $e ) {
 			wp_send_json_error( [

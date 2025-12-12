@@ -19,11 +19,24 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.3.6.0
+- **Version:** 0.3.7.0
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.3.7.0 - Event Sync Service
+- ChurchTools_Suite_Event_Sync_Service implementiert
+- 2-Phasen-Synchronisation:
+  - Phase 1: Events API - Events mit ihren Appointments (1:N)
+  - Phase 2: Appointments API - Standalone Appointments ohne Events
+- Appointments ohne Event nutzen Appointmentdaten
+- Appointments mit Events nutzen Eventdaten (1:X)
+- sync_events() mit konfigurierbarem Datumsbereich
+- Intelligente Kalender-Validierung (6 Fallbacks für Events, 3 für Appointments)
+- Duplikats-Prävention via appointment_id-Tracking
+- Admin UI: "Termine synchronisieren" Button im Kalender-Tab
+- AJAX Handler: cts_sync_events mit Statistiken
 
 ### 0.3.6.0 - Events Repository
 - ChurchTools_Suite_Events_Repository implementiert

@@ -51,6 +51,37 @@ $last_sync = get_option('churchtools_suite_calendars_last_sync', null);
 		</div>
 	</div>
 	
+	<!-- Sync Events Card -->
+	<div class="cts-card" style="margin-top: 20px;">
+		<div class="cts-card-header">
+			<h2>📅 <?php esc_html_e('Termine synchronisieren', 'churchtools-suite'); ?></h2>
+		</div>
+		<div class="cts-card-body">
+			<p class="description">
+				<?php esc_html_e('Lädt Termine und Events aus den ausgewählten Kalendern. Termine ohne Event verwenden Appointmentdaten, Termine mit Events die Eventdaten (1:X).', 'churchtools-suite'); ?>
+			</p>
+			
+			<?php
+			$events_last_sync = get_option('churchtools_suite_events_last_sync', null);
+			if ($events_last_sync):
+			?>
+			<p class="cts-info">
+				<strong><?php esc_html_e('Letzte Synchronisation:', 'churchtools-suite'); ?></strong>
+				<?php echo esc_html(get_date_from_gmt($events_last_sync, 'd.m.Y H:i')); ?> Uhr
+			</p>
+			<?php endif; ?>
+			
+			<div class="cts-button-group">
+				<button type="button" id="cts-sync-events-btn" class="button button-primary">
+					<span class="dashicons dashicons-calendar"></span>
+					<?php esc_html_e('Termine jetzt synchronisieren', 'churchtools-suite'); ?>
+				</button>
+			</div>
+			
+			<div id="cts-sync-events-result" style="margin-top: 15px;"></div>
+		</div>
+	</div>
+	
 	<!-- Calendar Selection Card -->
 	<div class="cts-card" style="margin-top: 20px;">
 		<div class="cts-card-header">
