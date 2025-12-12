@@ -19,11 +19,23 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.3.8.2
+- **Version:** 0.3.8.3
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.3.8.3 - WordPress Datum/Zeit-Formate
+- **NEU:** Verwendet WordPress-Einstellungen für Datum/Zeit-Formate
+- **Settings → General → Date Format** wird verwendet
+- **Settings → General → Time Format** wird verwendet
+- Tab Termine: Datum/Zeit aus WordPress-Einstellungen
+- Tab Sync: Letzte Sync-Timestamps aus WordPress-Einstellungen
+- Tab Settings: Letzte Auto-Sync aus WordPress-Einstellungen
+- Tab Dashboard: Letzter Login aus WordPress-Einstellungen
+- Filter-Anzeige: Datum aus WordPress-Einstellungen
+- Timezone-aware: Verwendet WordPress-Timezone
+- Dynamisch: Ändert sich automatisch mit WordPress-Einstellungen
 
 ### 0.3.8.2 - KRITISCHER Bugfix: appointmentId Sammlung
 - **KRITISCH:** Fix appointmentId Sammlung in Phase 1

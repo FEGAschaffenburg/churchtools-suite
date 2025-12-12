@@ -203,7 +203,7 @@ $last_auto_sync = get_option( 'churchtools_suite_last_auto_sync', '' );
 					</th>
 					<td>
 						<span style="color: #50575e; font-weight: 500;">
-							<?php echo esc_html( date_i18n( 'd.m.Y H:i:s', strtotime( $last_auto_sync ) ) ); ?>
+							<?php echo esc_html( date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $last_auto_sync ) ) ); ?>
 						</span>
 						<span class="cts-form-description"><?php esc_html_e( 'Zeitpunkt der letzten automatischen Synchronisation', 'churchtools-suite' ); ?></span>
 					</td>

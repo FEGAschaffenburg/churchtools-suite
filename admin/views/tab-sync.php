@@ -38,7 +38,7 @@ $days_future = get_option('churchtools_suite_sync_days_future', 90);
 			<?php if ($calendars_last_sync): ?>
 			<p class="cts-info">
 				<strong><?php esc_html_e('Letzte Synchronisation:', 'churchtools-suite'); ?></strong>
-				<?php echo esc_html(get_date_from_gmt($calendars_last_sync, 'd.m.Y H:i')); ?> Uhr
+				<?php echo esc_html(get_date_from_gmt($calendars_last_sync, get_option('date_format') . ' ' . get_option('time_format'))); ?>
 			</p>
 			<?php endif; ?>
 			
@@ -72,7 +72,7 @@ $days_future = get_option('churchtools_suite_sync_days_future', 90);
 			<?php if ($events_last_sync): ?>
 			<p class="cts-info">
 				<strong><?php esc_html_e('Letzte Synchronisation:', 'churchtools-suite'); ?></strong>
-				<?php echo esc_html(get_date_from_gmt($events_last_sync, 'd.m.Y H:i')); ?> Uhr
+				<?php echo esc_html(get_date_from_gmt($events_last_sync, get_option('date_format') . ' ' . get_option('time_format'))); ?>
 			</p>
 			<?php endif; ?>
 			

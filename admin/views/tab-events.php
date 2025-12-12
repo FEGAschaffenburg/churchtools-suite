@@ -134,10 +134,10 @@ $total_pages = ceil( $total / $limit );
 				<div class="cts-active-filters">
 					<strong>✓ <?php esc_html_e( 'Aktive Filter:', 'churchtools-suite' ); ?></strong>
 					<?php if ( ! empty( $from ) ) : ?>
-						<span><?php esc_html_e( 'Von:', 'churchtools-suite' ); ?> <strong><?php echo esc_html( date_i18n( 'd.m.Y', strtotime( $from ) ) ); ?></strong></span>
+						<span><?php esc_html_e( 'Von:', 'churchtools-suite' ); ?> <strong><?php echo esc_html( date_i18n( get_option( 'date_format' ), strtotime( $from ) ) ); ?></strong></span>
 					<?php endif; ?>
 					<?php if ( ! empty( $to ) ) : ?>
-						<span><?php esc_html_e( 'Bis:', 'churchtools-suite' ); ?> <strong><?php echo esc_html( date_i18n( 'd.m.Y', strtotime( $to ) ) ); ?></strong></span>
+						<span><?php esc_html_e( 'Bis:', 'churchtools-suite' ); ?> <strong><?php echo esc_html( date_i18n( get_option( 'date_format' ), strtotime( $to ) ) ); ?></strong></span>
 					<?php endif; ?>
 					<?php if ( ! empty( $calendar_filter ) ) : 
 						foreach ( $calendars as $cal ) {
@@ -192,14 +192,14 @@ $total_pages = ceil( $total / $limit );
 							<tr>
 								<td class="cts-event-date">
 									<div class="cts-event-date-primary">
-										<?php echo esc_html( date_i18n( 'D, d.m.Y', $start ) ); ?>
-									</div>
-									<?php if ( ! $is_all_day ) : ?>
-										<div class="cts-event-date-time">
-											<?php 
-											echo esc_html( date_i18n( 'H:i', $start ) ); 
-											if ( $end ) {
-												echo ' - ' . esc_html( date_i18n( 'H:i', $end ) );
+									<?php echo esc_html( date_i18n( get_option( 'date_format' ), $start ) ); ?>
+								</div>
+								<?php if ( ! $is_all_day ) : ?>
+									<div class="cts-event-date-time">
+										<?php 
+										echo esc_html( date_i18n( get_option( 'time_format' ), $start ) ); 
+										if ( $end ) {
+											echo ' - ' . esc_html( date_i18n( get_option( 'time_format' ), $end ) );
 											}
 											?>
 										</div>
