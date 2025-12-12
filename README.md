@@ -19,11 +19,18 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.3.8.3
+- **Version:** 0.3.8.4
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.3.8.4 - Fix Timezone-Konvertierung
+- **Fix:** Termine-Übersicht zeigt jetzt lokale Zeit statt UTC
+- Verwendet get_date_from_gmt() für UTC → Lokale Zeit Konvertierung
+- Berücksichtigt WordPress-Zeitzone (Settings → General → Timezone)
+- Start- und Enddatum werden korrekt in lokale Zeitzone umgerechnet
+- Beispiel: UTC 13:00 → Berlin 14:00 (im Winter) / 15:00 (im Sommer)
 
 ### 0.3.8.3 - WordPress Datum/Zeit-Formate
 - **NEU:** Verwendet WordPress-Einstellungen für Datum/Zeit-Formate

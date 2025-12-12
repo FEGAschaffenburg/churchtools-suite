@@ -179,8 +179,9 @@ $total_pages = ceil( $total / $limit );
 								}
 							}
 							
-							$start = strtotime( $event->start_datetime );
-							$end = $event->end_datetime ? strtotime( $event->end_datetime ) : null;
+							// Konvertiere UTC zu lokaler WordPress-Zeitzone
+							$start_local = get_date_from_gmt( $event->start_datetime );
+							$end_local = $event->end_datetime ? get_date_from_gmt( $event->end_datetime ) : null;
 							$is_all_day = (bool) $event->is_all_day;
 							
 							// Typ bestimmen (Event oder Appointment)
@@ -192,14 +193,14 @@ $total_pages = ceil( $total / $limit );
 							<tr>
 								<td class="cts-event-date">
 									<div class="cts-event-date-primary">
-									<?php echo esc_html( date_i18n( get_option( 'date_format' ), $start ) ); ?>
+									<?php echo esc_html( date_i18n( get_option( 'date_format' ), strtotime( $start_local ) ) ); ?>
 								</div>
 								<?php if ( ! $is_all_day ) : ?>
 									<div class="cts-event-date-time">
 										<?php 
-										echo esc_html( date_i18n( get_option( 'time_format' ), $start ) ); 
-										if ( $end ) {
-											echo ' - ' . esc_html( date_i18n( get_option( 'time_format' ), $end ) );
+										echo esc_html( date_i18n( get_option( 'time_format' ), strtotime( $start_local ) ) ); 
+										if ( $end_local ) {
+											echo ' - ' . esc_html( date_i18n( get_option( 'time_format' ), strtotime( $end_local ) ) );
 											}
 											?>
 										</div>
