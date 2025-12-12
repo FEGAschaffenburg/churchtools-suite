@@ -19,11 +19,16 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.3.5.1
+- **Version:** 0.3.5.2
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.3.5.2 - Bugfix
+- Fix: AJAX Handler mit Try-Catch für bessere Fehlerbehandlung
+- Fix: Return-Statements nach wp_send_json_error hinzugefügt
+- Bessere Fehlermeldungen bei AJAX-Aufrufen
 
 ### 0.3.5.1 - Bugfix
 - Fix: AJAX Handler werden jetzt direkt registriert (nicht mehr mit init Hook)
