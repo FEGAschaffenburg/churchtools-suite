@@ -28,6 +28,7 @@ class ChurchTools_Suite {
 	public function __construct() {
 		$this->version = CHURCHTOOLS_SUITE_VERSION;
 		$this->load_dependencies();
+		$this->run_migrations();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
 		$this->define_cron_hooks();
@@ -38,9 +39,20 @@ class ChurchTools_Suite {
 	 */
 	private function load_dependencies(): void {
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-loader.php';
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-migrations.php';
 		require_once CHURCHTOOLS_SUITE_PATH . 'admin/class-churchtools-suite-admin.php';
 		
 		$this->loader = new ChurchTools_Suite_Loader();
+	}
+	
+	/**
+	 * Run database migrations if needed
+	 * 
+	 * Checks current DB version and runs any pending migrations.
+	 * This runs on every plugin init but only executes migrations once.
+	 */
+	private function run_migrations(): void {
+		ChurchTools_Suite_Migrations::run_migrations();
 	}
 	
 	/**

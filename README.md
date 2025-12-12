@@ -19,11 +19,21 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.3.7.3
+- **Version:** 0.3.7.4
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.3.7.4 - Versioniertes Migrations-System
+- **NEU:** Automatisches Migrations-System mit DB-Versionierung
+- Migrationen laufen jetzt bei **jedem Plugin-Update** (nicht nur bei Aktivierung)
+- DB-Version wird in wp_options gespeichert (churchtools_suite_db_version)
+- Migrations-Klasse: class-churchtools-suite-migrations.php
+- Migration 1.0: Initiale Tabellen-Erstellung
+- Migration 1.1: Event Sync Schema (external_id → event_id, appointment_id, raw_payload)
+- Idempotent: Jede Migration kann mehrfach ausgeführt werden
+- Automatisch: Läuft bei jedem Plugin-Init
 
 ### 0.3.7.3 - Automatische Datenbank-Migration
 - **WICHTIG:** Automatische Schema-Migration beim Aktivieren
