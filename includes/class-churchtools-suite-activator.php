@@ -67,8 +67,9 @@ class ChurchTools_Suite_Activator {
 		// Events table
 		$sql[] = "CREATE TABLE IF NOT EXISTS {$prefix}events (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-			external_id varchar(100) NOT NULL,
+			event_id varchar(100) NOT NULL,
 			calendar_id varchar(100) DEFAULT NULL,
+			appointment_id varchar(100) DEFAULT NULL,
 			title varchar(500) NOT NULL,
 			description text,
 			start_datetime datetime NOT NULL,
@@ -76,11 +77,13 @@ class ChurchTools_Suite_Activator {
 			is_all_day tinyint(1) DEFAULT 0,
 			location_name varchar(255) DEFAULT NULL,
 			status varchar(50) DEFAULT NULL,
+			raw_payload longtext DEFAULT NULL,
 			created_at datetime DEFAULT CURRENT_TIMESTAMP,
 			updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 			PRIMARY KEY (id),
-			UNIQUE KEY external_id (external_id),
+			UNIQUE KEY event_id (event_id),
 			KEY calendar_id (calendar_id),
+			KEY appointment_id (appointment_id),
 			KEY start_datetime (start_datetime)
 		) $charset_collate;";
 		

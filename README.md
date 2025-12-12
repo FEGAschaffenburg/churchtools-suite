@@ -19,11 +19,21 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.3.5.3
+- **Version:** 0.3.6.0
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
 ## Changelog
+
+### 0.3.6.0 - Events Repository
+- ChurchTools_Suite_Events_Repository implementiert
+- upsert_by_event_id() für Insert/Update-Logik
+- get_by_event_id() und get_by_appointment_id()
+- get_by_calendar_id() für Kalender-Events
+- get_upcoming() für kommende Termine
+- get_in_range() für Datumsbereich-Abfragen
+- delete_older_than() für Aufräumen alter Termine
+- Tabellen-Schema: event_id, appointment_id, raw_payload
 
 ### 0.3.5.3 - Bugfix
 - Fix: Tabellen-Schema korrigiert (calendar_id statt external_id)
