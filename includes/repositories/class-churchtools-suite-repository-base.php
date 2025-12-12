@@ -38,12 +38,13 @@ abstract class ChurchTools_Suite_Repository_Base {
     /**
      * Constructor
      *
-     * @param string $table Table name without prefix (e.g., 'cts_calendars')
+     * @param string $table Table name without wp prefix but with plugin prefix (e.g., 'cts_calendars')
      */
     public function __construct(string $table) {
         global $wpdb;
         $this->db = $wpdb;
         $this->table = $table;
+        // Table already has plugin prefix, just add WordPress prefix
         $this->table_name = $wpdb->prefix . $table;
     }
     
