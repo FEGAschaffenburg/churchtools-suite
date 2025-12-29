@@ -25,12 +25,14 @@ $active_subtab = isset( $_GET['subtab'] ) ? sanitize_key( $_GET['subtab'] ) : 'e
 
 	<div class="cts-data">
 	
-	<!-- Sub-Navigation -->
-	<div class="cts-sub-tabs" style="margin-bottom: 20px; border-bottom: 1px solid #ddd;">
-		<a href="<?php echo esc_url( admin_url( 'admin.php?page=churchtools-suite-data&subtab=events' ) ); ?>" class="cts-sub-tab <?php echo $active_subtab === 'events' ? 'active' : ''; ?>">
+	<!-- Sub-Navigation (styled tabs like main header) -->
+	<div class="cts-tabs cts-tabs-small" style="margin-bottom:18px;">
+		<a href="<?php echo esc_url( admin_url( 'admin.php?page=churchtools-suite-data&subtab=events' ) ); ?>" class="cts-tab <?php echo $active_subtab === 'events' ? 'active' : ''; ?>">
+			<span>📅</span>
 			<?php esc_html_e( 'Termine', 'churchtools-suite' ); ?>
 		</a>
-		<a href="<?php echo esc_url( admin_url( 'admin.php?page=churchtools-suite-data&subtab=imported-services' ) ); ?>" class="cts-sub-tab <?php echo $active_subtab === 'imported-services' ? 'active' : ''; ?>">
+		<a href="<?php echo esc_url( admin_url( 'admin.php?page=churchtools-suite-data&subtab=imported-services' ) ); ?>" class="cts-tab <?php echo $active_subtab === 'imported-services' ? 'active' : ''; ?>">
+			<span>🧩</span>
 			<?php esc_html_e( 'Importierte Services', 'churchtools-suite' ); ?>
 		</a>
 	</div>

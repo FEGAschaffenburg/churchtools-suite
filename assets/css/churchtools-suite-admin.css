@@ -99,6 +99,18 @@
 	outline-offset: -1px;
 }
 
+/* Compact variant for internal subpages (Data page) */
+.cts-tabs-small {
+	padding-left: 8px;
+}
+.cts-tabs-small .cts-tab {
+	padding: 8px 10px;
+	font-size: 12px;
+}
+.cts-tabs-small .cts-tab span {
+	font-size: 14px;
+}
+
 /* === Sub-Tabs === */
 .cts-sub-tabs {
 	display: flex;
