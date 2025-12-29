@@ -29,6 +29,10 @@ class ChurchTools_Suite {
 		$this->version = CHURCHTOOLS_SUITE_VERSION;
 		$this->load_dependencies();
 		$this->init_logger(); // v0.9.2.3: Initialize logging system
+		// Initialize update checker (registers update transient hook)
+		if ( class_exists( 'ChurchTools_Suite_Update_Checker' ) ) {
+			ChurchTools_Suite_Update_Checker::init();
+		}
 		$this->run_migrations();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
@@ -75,9 +79,12 @@ class ChurchTools_Suite {
 
 		// Auto updater (checks GitHub releases and installs ZIP)
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-auto-updater.php';
+		// Update checker (injects GitHub release into WP update transient)
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-update-checker.php';
 		
 		$this->loader = new ChurchTools_Suite_Loader();
 	}
+
 	
 	/**
 	 * Initialize logging system (v0.9.2.3)
