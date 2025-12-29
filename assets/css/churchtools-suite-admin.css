@@ -404,6 +404,46 @@
 .cts-data .cts-header { margin-bottom: 12px; }
 .cts-data .cts-section-header { border-bottom: none; padding-bottom: 0; }
 
+/* Documentation layout */
+.cts-docs-container {
+	display: grid;
+	grid-template-columns: 260px 1fr;
+	gap: 20px;
+	align-items: start;
+}
+
+.cts-docs-sidebar .cts-card-body {
+	padding: 12px 14px;
+}
+.cts-docs-nav {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.cts-docs-nav li {
+	margin: 8px 0;
+}
+.cts-docs-nav li a {
+	color: #2271b1;
+	text-decoration: none;
+	display: block;
+	padding: 8px 10px;
+	border-radius: 4px;
+}
+.cts-docs-nav li.active a,
+.cts-docs-nav li a:hover {
+	background: #f0f6fb;
+	color: #135e96;
+}
+
+.cts-docs-main .cts-card-body {
+	padding: 18px;
+}
+.cts-doc-content h1, .cts-doc-content h2, .cts-doc-content h3 {
+	margin-top: 12px;
+}
+.cts-doc-content p { color: #333; }
+
 /* === Quick Start === */
 .cts-quick-start {
 	margin-top: 20px;
