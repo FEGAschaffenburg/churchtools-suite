@@ -13,7 +13,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 $active_subtab = isset( $_GET['subtab'] ) ? sanitize_key( $_GET['subtab'] ) : 'events';
 ?>
 
-<div class="cts-data">
+<div class="wrap cts-wrap">
+
+	<div class="cts-header">
+		<h1>
+			<span>📋</span>
+			<?php esc_html_e( 'Daten', 'churchtools-suite' ); ?>
+		</h1>
+		<p class="cts-subtitle"><?php esc_html_e( 'Verwalte importierte Termine und Services', 'churchtools-suite' ); ?></p>
+	</div>
+
+	<div class="cts-data">
 	
 	<!-- Sub-Navigation -->
 	<div class="cts-sub-tabs" style="margin-bottom: 20px; border-bottom: 1px solid #ddd;">
@@ -60,4 +70,6 @@ $active_subtab = isset( $_GET['subtab'] ) ? sanitize_key( $_GET['subtab'] ) : 'e
 	}
 	?>
 	
+</div>
+
 </div>

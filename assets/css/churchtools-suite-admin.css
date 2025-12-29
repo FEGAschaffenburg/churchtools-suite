@@ -377,6 +377,33 @@
 	font-size: 13px;
 }
 
+/* Loading state for buttons */
+.cts-button.loading {
+	position: relative;
+	pointer-events: none;
+	opacity: 0.9;
+}
+.cts-button.loading::after {
+	content: '';
+	position: absolute;
+	right: 10px;
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	border: 2px solid rgba(255,255,255,0.7);
+	border-top-color: rgba(255,255,255,0.15);
+	animation: cts-spin 0.8s linear infinite;
+}
+
+@keyframes cts-spin {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
+}
+
+/* Data header tweaks */
+.cts-data .cts-header { margin-bottom: 12px; }
+.cts-data .cts-section-header { border-bottom: none; padding-bottom: 0; }
+
 /* === Quick Start === */
 .cts-quick-start {
 	margin-top: 20px;

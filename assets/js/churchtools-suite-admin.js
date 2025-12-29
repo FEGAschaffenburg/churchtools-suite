@@ -122,6 +122,8 @@
 			const result = document.getElementById('cts-data-sync-result');
 			const originalText = dataBtn.innerHTML;
 			dataBtn.disabled = true;
+			dataBtn.classList.add('loading');
+			dataBtn.setAttribute('aria-busy', 'true');
 			dataBtn.innerHTML = '<span class="dashicons dashicons-update"></span> Synchronisiere...';
 			if (result) { result.style.display = 'none'; result.innerHTML = ''; }
 
@@ -135,7 +137,7 @@
 				if (result) result.style.display = 'block';
 				if (data.success) {
 					if (result) {
-						result.innerHTML = '<div class="cts-notice cts-notice-success"><p>' + (data.data.message || 'Manueller Sync erfolgreich') + '</p></div>';
+						result.innerHTML = '<div class="cts-notice cts-notice-success" role="status" aria-live="polite"><p>' + (data.data.message || 'Manueller Sync erfolgreich') + '</p></div>';
 					}
 					// If events filter form exists, submit it to refresh the list
 					const eventsForm = document.querySelector('.cts-events form.cts-filter-section');
@@ -144,15 +146,17 @@
 					}
 				} else {
 					if (result) {
-						result.innerHTML = '<div class="cts-notice cts-notice-error"><p>' + (data.data?.message || 'Sync fehlgeschlagen') + '</p></div>';
+						result.innerHTML = '<div class="cts-notice cts-notice-error" role="alert"><p>' + (data.data?.message || 'Sync fehlgeschlagen') + '</p></div>';
 					}
 				}
 			})
 			.catch(err => {
-				if (result) { result.style.display = 'block'; result.innerHTML = '<div class="cts-notice cts-notice-error"><p>Fehler: ' + err.message + '</p></div>'; }
+				if (result) { result.style.display = 'block'; result.innerHTML = '<div class="cts-notice cts-notice-error" role="alert"><p>Fehler: ' + err.message + '</p></div>'; }
 			})
 			.finally(() => {
 				dataBtn.disabled = false;
+				dataBtn.classList.remove('loading');
+				dataBtn.removeAttribute('aria-busy');
 				dataBtn.innerHTML = originalText;
 			});
 		});
