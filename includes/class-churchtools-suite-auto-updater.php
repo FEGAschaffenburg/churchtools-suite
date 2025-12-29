@@ -150,6 +150,29 @@ class ChurchTools_Suite_Auto_Updater {
         ];
     }
 
+    /**
+     * Public runner to start update now (used by admin manual trigger).
+     *
+     * @return array|WP_Error
+     */
+    public static function run_update_now() {
+        $info = self::get_latest_release_info();
+        if ( is_wp_error( $info ) ) {
+            return $info;
+        }
+
+        if ( empty( $info['is_update'] ) || empty( $info['zip_url'] ) ) {
+            return [ 'success' => false, 'message' => 'No update available' ];
+        }
+
+        try {
+            self::perform_update( $info['zip_url'], $info['tag_name'] );
+            return [ 'success' => true, 'message' => sprintf( 'Update auf %s gestartet', $info['tag_name'] ) ];
+        } catch ( Exception $e ) {
+            return new WP_Error( 'update_failed', $e->getMessage() );
+        }
+    }
+
     private static function perform_update( string $zip_url, string $tag ): void {
         if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
             ChurchTools_Suite_Logger::info( 'updater', sprintf( 'Updating to %s from %s', $tag, $zip_url ) );

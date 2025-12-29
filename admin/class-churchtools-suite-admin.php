@@ -188,6 +188,38 @@ class ChurchTools_Suite_Admin {
 		add_action( 'wp_ajax_cts_sync_events', [ $this, 'ajax_sync_events' ] );
 		add_action( 'wp_ajax_cts_trigger_manual_sync', [ $this, 'ajax_trigger_manual_sync' ] );
 		add_action( 'wp_ajax_cts_manual_update', [ $this, 'ajax_manual_update' ] );
+		add_action( 'wp_ajax_cts_run_update', [ $this, 'ajax_run_update' ] );
+
+			/**
+			 * AJAX Handler: Run update now (performs installation) — requires additional confirmation
+			 */
+			public function ajax_run_update() {
+				// Check nonce
+				check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
+
+				// Permission
+				if ( ! current_user_can( 'manage_options' ) ) {
+					wp_send_json_error( [ 'message' => __( 'Keine Berechtigung.', 'churchtools-suite' ) ] );
+					return;
+				}
+
+				try {
+					if ( ! class_exists( 'ChurchTools_Suite_Auto_Updater' ) ) {
+						require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-auto-updater.php';
+					}
+
+					$result = ChurchTools_Suite_Auto_Updater::run_update_now();
+
+					if ( is_wp_error( $result ) ) {
+						wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+						return;
+					}
+
+					wp_send_json_success( [ 'message' => $result['message'] ?? __( 'Update gestartet.', 'churchtools-suite' ) ] );
+				} catch ( Exception $e ) {
+					wp_send_json_error( [ 'message' => __( 'Fehler: ', 'churchtools-suite' ) . $e->getMessage() ] );
+				}
+			}
 		add_action( 'wp_ajax_cts_trigger_keepalive', [ $this, 'ajax_trigger_keepalive' ] );
 		add_action( 'wp_ajax_cts_reload_logs', [ $this, 'ajax_reload_logs' ] );
 		add_action( 'wp_ajax_cts_clear_logs', [ $this, 'ajax_clear_logs' ] );
