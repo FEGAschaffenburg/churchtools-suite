@@ -130,6 +130,10 @@ $shortcodes = [
 			<span id="cts-create-icon">➕</span>
 			<span id="cts-create-label"><?php esc_html_e( 'Neues Preset erstellen', 'churchtools-suite' ); ?></span>
 		</a>
+		<a href="#" class="cts-tab" data-tab="demo">
+			<span>🎯</span>
+			<?php esc_html_e( 'Demo & Live-Views', 'churchtools-suite' ); ?>
+		</a>
 	</div>
 	
 	<!-- Tab: Standard Shortcodes -->
@@ -372,6 +376,58 @@ $shortcodes = [
 					❌ <?php esc_html_e( 'Abbrechen', 'churchtools-suite' ); ?>
 				</button>
 				<span id="cts-save-result" style="margin-left: 12px;"></span>
+			</div>
+		</div>
+	</div>
+
+	<!-- Tab: Demo & Live Views -->
+	<div id="tab-demo" class="cts-tab-content" style="display: none;">
+		<div class="cts-card" style="margin-bottom: 20px;">
+			<div class="cts-card-header">
+				<span class="cts-card-icon">🎬</span>
+				<h3><?php esc_html_e( 'Live Demo (Ausgewählte Views)', 'churchtools-suite' ); ?></h3>
+			</div>
+			<div class="cts-card-body" style="padding: 0;">
+				<div style="display: flex; gap: 4px; padding: 12px; border-bottom: 1px solid #e5e7eb; background: #f9fafb; flex-wrap:wrap;">
+					<button type="button" class="cts-demo-tab active" data-tab="calendar">📅 Calendar</button>
+					<button type="button" class="cts-demo-tab" data-tab="list">📋 List</button>
+					<button type="button" class="cts-demo-tab" data-tab="grid">▦ Grid</button>
+				</div>
+				<div class="cts-demo-content" style="padding:16px;">
+					<div class="cts-demo-panel active" id="demo-calendar">
+						<div class="cts-demo-item">
+							<div class="cts-demo-item-header">
+								<h4>Monthly Modern</h4>
+								<code>[cts_calendar view="monthly-modern" limit="20"]</code>
+							</div>
+							<div class="cts-demo-item-preview">
+								<?php echo do_shortcode( '[cts_calendar view="monthly-modern" limit="20"]' ); ?>
+							</div>
+						</div>
+					</div>
+					<div class="cts-demo-panel" id="demo-list">
+						<div class="cts-demo-item">
+							<div class="cts-demo-item-header">
+								<h4>Classic List</h4>
+								<code>[cts_list view="classic" limit="10" show_services="true"]</code>
+							</div>
+							<div class="cts-demo-item-preview">
+								<?php echo do_shortcode( '[cts_list view="classic" limit="10" show_services="true"]' ); ?>
+							</div>
+						</div>
+					</div>
+					<div class="cts-demo-panel" id="demo-grid">
+						<div class="cts-demo-item">
+							<div class="cts-demo-item-header">
+								<h4>Simple Grid (3 Columns)</h4>
+								<code>[cts_grid view="simple" columns="3" limit="9"]</code>
+							</div>
+							<div class="cts-demo-item-preview">
+								<?php echo do_shortcode( '[cts_grid view="simple" columns="3" limit="9"]' ); ?>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>

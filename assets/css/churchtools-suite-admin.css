@@ -1241,6 +1241,14 @@
 	font-family: 'Courier New', monospace;
 }
 
+/* Demo panels used in Shortcode Manager -> Demo */
+.cts-demo-content { padding: 12px; }
+.cts-demo-panel { display: none; }
+.cts-demo-panel.active { display: block; }
+.cts-demo-item { margin-bottom: 24px; }
+.cts-demo-item-header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px; background:#f9fafb; border-left:4px solid #667eea; }
+.cts-demo-item-preview { padding:12px; background:#fff; border:1px solid #e5e7eb; border-radius:6px; min-height:120px; }
+
 .cts-demo-item-preview {
 	background: #f9fafb;
 	border: 1px solid #e5e7eb;
