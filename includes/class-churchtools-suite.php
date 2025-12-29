@@ -72,6 +72,9 @@ class ChurchTools_Suite {
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 			require_once CHURCHTOOLS_SUITE_PATH . 'includes/debug-blocks-shortcode.php';
 		}
+
+		// Auto updater (checks GitHub releases and installs ZIP)
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-auto-updater.php';
 		
 		$this->loader = new ChurchTools_Suite_Loader();
 	}
