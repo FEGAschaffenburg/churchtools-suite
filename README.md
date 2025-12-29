@@ -19,11 +19,150 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.3.8.4
+- **Version:** 0.8.0.2
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
 
+## Gutenberg Integration
+
+ChurchTools Suite unterstützt jetzt den Block-Editor (Gutenberg)!
+
+### Verfügbare Blocks
+
+- **ChurchTools Calendar** - Kalender-Ansichten (monthly-modern, monthly-clean, etc.)
+- **ChurchTools List** - Listen-Ansichten (classic, modern, minimal, fluent)
+- **ChurchTools Grid** - Raster-Ansichten (simple, modern, colorful)
+
+### Verwendung
+
+1. Block-Editor öffnen
+2. Block hinzufügen (+)
+3. Nach "ChurchTools" suchen
+4. Block auswählen
+5. Einstellungen in der Sidebar anpassen:
+   - View auswählen
+   - Kalender IDs eingeben (kommagetrennt)
+   - Limit setzen
+   - Spalten konfigurieren (nur Grid)
+
+Alle Blocks nutzen Server-Side Rendering und greifen auf die gleichen Templates wie die Shortcodes zu.
+
+## Shortcodes
+
+Alternativ können alle Funktionen auch über Shortcodes verwendet werden. Der **Shortcode Manager** (ChurchTools → ⚡ Shortcode Manager) zeigt eine übersichtliche Liste aller 13 verfügbaren Shortcodes mit Filterfunktion und Copy-to-Clipboard.
+
 ## Changelog
+
+### 0.5.8.0 - Gutenberg Block Integration
+- **NEU:** Gutenberg-Support für ChurchTools Shortcodes
+- **NEU:** Custom Block Category "ChurchTools Suite" im Block-Editor
+- **NEU:** Calendar Block mit 8 View-Varianten
+- **NEU:** List Block mit 4 View-Varianten
+- **NEU:** Grid Block mit 3 View-Varianten
+- **NEU:** InspectorControls für Block-Einstellungen (View, Calendar, Limit, Columns)
+- **NEU:** Block-Preview im Editor mit Icons
+- **NEU:** Server-Side Rendering nutzt existierende Shortcode-Templates
+- Blocks erscheinen in Block-Inserter unter "ChurchTools Suite"
+- Keine Duplikation von Template-Logik - Blocks nutzen Shortcode-System
+
+### 0.5.7.2 - Shortcode Manager Filterung
+- **NEU:** Shortcode Manager mit 13 Shortcodes auf einen Blick
+- **NEU:** Filter nach Text (Tag/Name-Suche) und Kategorie
+- **NEU:** Expandable Details für Views und Parameter
+- **NEU:** Copy-to-Clipboard für jeden Shortcode
+- **NEU:** Live-Counter zeigt gefilterte Shortcodes
+- **NEU:** Freundliche "Keine Ergebnisse" Meldung
+- Vanilla JavaScript ohne jQuery-Abhängigkeit
+
+### 0.5.7.1 - Shortcode Manager Subpage
+- **NEU:** Shortcode Manager als eigene Admin-Subpage
+- **NEU:** Grid-Layout zeigt alle 13 Shortcodes mit Metadaten
+- **NEU:** Icons, Namen, Beschreibungen, Beispiel-Code
+- **NEU:** Responsive Design für alle Bildschirmgrößen
+- Menü-Eintrag: ChurchTools → ⚡ Shortcode Manager
+
+### 0.3.11.2 - Bugfix: Services API-Endpunkt
+- **FIX:** Service Sync verwendet jetzt korrekten API-Endpunkt `/api/services` statt `/api/masterdata/serviceGroups`
+- **FIX:** Service-Struktur angepasst - verwendet `serviceGroupId` aus API
+- Behebt "API-Fehler (HTTP 404): Not found" beim Services-Sync
+- Services werden jetzt korrekt von ChurchTools geladen
+
+### 0.3.11.1 - Bugfix: Repository Table Prefix
+- **FIX:** Services Repository verwendet jetzt korrektes Tabellenpräfix (CHURCHTOOLS_SUITE_DB_PREFIX)
+- **FIX:** Event Services Repository verwendet jetzt korrektes Tabellenpräfix
+- Behebt "Table 'wp_services' doesn't exist" Fehler
+- Korrekte Tabellennamen: wp_cts_services, wp_cts_event_services
+
+### 0.3.11.0 - Services-Tabelle & Auswahl-UI
+- **NEU:** Migration 1.3 erstellt `wp_cts_services` Tabelle automatisch
+- **NEU:** Services Repository für ChurchTools Service Master Data
+- **NEU:** Service Sync Service - Synchronisiert Services von `/api/masterdata/serviceGroups`
+- **NEU:** Admin Tab "Services" mit Service-Auswahl (wie Kalender-Auswahl)
+- **NEU:** Service-Auswahl UI mit Checkboxes für jedes Service
+- **NEU:** AJAX Handler `cts_sync_services` und `cts_save_service_selection`
+- **NEU:** JavaScript Handler für Service-Sync und Auswahl-Speicherung
+- **NEU:** Services werden von ChurchTools geladen mit Service-Groups
+- **NEU:** `get_selected()`, `update_selection()`, `get_selected_service_ids()` Methoden
+- Benutzer können auswählen welche Services bei Event-Sync importiert werden
+- Grundlage für Event Services Import in nächster Version
+
+### 0.3.10.0 - Event Services Repository
+- **NEU:** Event Services Repository für Verwaltung von Event-Services
+- **NEU:** `upsert()` Methode - Insert/Update Services mit event_id + service_name als Natural Key
+- **NEU:** `get_for_event($event_id)` - Alle Services für ein Event abrufen
+- **NEU:** `delete_for_event($event_id)` - Services löschen bei Event-Delete
+- **NEU:** `get_unique_service_names()` - Liste aller importierten Service-Namen
+- **NEU:** `get_service_stats()` - Statistiken über Service-Nutzung
+- **NEU:** `search_by_person()` - Services nach Person durchsuchen
+- Repository nutzt bestehende `wp_cts_event_services` Tabelle (seit Migration 1.0)
+- Grundlage für Event Services Import in zukünftigen Versionen
+- Vollständige CRUD-Operationen für Services-Daten
+
+### 0.3.9.4 - Manueller Cron-Trigger
+- **NEU:** Manueller Trigger-Button für Event-Sync im Debug-Tab
+- **NEU:** Manueller Trigger-Button für Session Keepalive im Debug-Tab
+- **NEU:** AJAX-Handler `cts_trigger_manual_sync` und `cts_trigger_keepalive`
+- **NEU:** Sofortige Ausführung von Cron-Jobs ohne Warten auf Schedule
+- **NEU:** Manuell getriggerte Syncs werden als 'manual' in Historie gespeichert
+- Sofortiges Feedback mit Erfolgs-/Fehler-Meldung nach Ausführung
+- Seiten-Reload nach erfolgreichem Sync zeigt aktualisierte Statistiken
+- Ideal für Testing und sofortige Synchronisation
+
+### 0.3.9.3 - Sync-Historie Tabelle
+- **NEU:** Sync-Historie wird in eigener Tabelle `wp_cts_sync_history` gespeichert
+- **NEU:** Migration 1.2 erstellt sync_history Tabelle automatisch
+- **NEU:** Repository `ChurchTools_Suite_Sync_History_Repository` mit CRUD-Operationen
+- **NEU:** Debug-Tab zeigt letzte 10 Syncs in übersichtlicher Tabelle
+- **NEU:** Historie-Tracking: Sync-Typ (auto/manuell), Status, Statistiken, Fehler, Dauer
+- **NEU:** Automatisches Cleanup alter Sync-Einträge (>90 Tage)
+- **NEU:** get_recent(), get_by_type(), get_failed(), get_stats_summary() Methoden
+- Cron schreibt jeden Sync in Historie (Start + Completion)
+- Vollständige Nachvollziehbarkeit aller Sync-Operationen
+- Fehlermeldungen werden direkt unter fehlgeschlagenen Syncs angezeigt
+
+### 0.3.9.2 - Erweitertes Error-Handling
+- **NEU:** Try-Catch Block um Auto-Sync mit detailliertem Error-Tracking
+- **NEU:** Fehler werden in wp_options gespeichert und persistent angezeigt
+- **NEU:** Dashboard zeigt Sync-Status (Erfolg/Fehler) mit Details
+- **NEU:** Debug-Tab zeigt letzte Sync-Statistiken und Fehler
+- **NEU:** Success-Tracking mit vollständigen Stats (neu/aktualisiert/übersprungen)
+- **NEU:** Sync-Dauer wird gemessen und angezeigt
+- Stack Trace im WP_DEBUG Modus für detailliertes Debugging
+- Error-Logs mit Zeitstempel und Fehlermeldung
+- Automatische Fehler-Löschung bei erfolgreichem Sync
+
+### 0.3.9.1 - Tages-Intervalle & WP-Cron Detection
+- **ÄNDERUNG:** Sync-Intervalle auf Tage umgestellt (statt Stunden)
+- **NEU:** Täglich (empfohlen), alle 2 Tage, alle 3 Tage
+- **NEU:** Wöchentlich, alle 2 Wochen, monatlich
+- **NEU:** WP-Cron Disabled Detection mit Warnung
+- **NEU:** System-Cron Anleitung bei deaktiviertem WP-Cron
+- Serverfreundlich: Längere Intervalle reduzieren Server-Last
+- Passend für Events: Tägliche Updates sind ausreichend
+- Settings & Dashboard zeigen WP-Cron Status
+
+### 0.3.9.0 - Custom Cron-Intervalle (deprecated)
+- Custom Cron-Intervalle implementiert (ersetzt durch v0.3.9.1)
 
 ### 0.3.8.4 - Fix Timezone-Konvertierung
 - **Fix:** Termine-Übersicht zeigt jetzt lokale Zeit statt UTC

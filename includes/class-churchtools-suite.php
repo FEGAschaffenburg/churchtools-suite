@@ -28,6 +28,7 @@ class ChurchTools_Suite {
 	public function __construct() {
 		$this->version = CHURCHTOOLS_SUITE_VERSION;
 		$this->load_dependencies();
+		$this->init_logger(); // v0.9.2.3: Initialize logging system
 		$this->run_migrations();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
@@ -39,10 +40,47 @@ class ChurchTools_Suite {
 	 */
 	private function load_dependencies(): void {
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-loader.php';
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-logger.php';
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-migrations.php';
 		require_once CHURCHTOOLS_SUITE_PATH . 'admin/class-churchtools-suite-admin.php';
 		
+		// Repository base class
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-repository-base.php';
+		
+		// Repositories (needed in admin and frontend)
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-calendars-repository.php';
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-events-repository.php';
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-event-services-repository.php';
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-services-repository.php';
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-service-groups-repository.php';
+		
+		// Frontend components (v0.4.0.0+)
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-template-loader.php';
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-shortcodes.php';
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/services/class-churchtools-suite-template-data.php';
+		
+		// Single Event Shortcode (v0.7.1.0)
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/shortcodes/class-churchtools-suite-single-event-shortcode.php';
+		
+		// Gutenberg Blocks (v0.5.8.0+)
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-blocks.php';
+		
+		// Elementor Integration (v0.5.9.38+)
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-elementor.php';
+		
+		// Debug helper (v0.5.8.2+)
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			require_once CHURCHTOOLS_SUITE_PATH . 'includes/debug-blocks-shortcode.php';
+		}
+		
 		$this->loader = new ChurchTools_Suite_Loader();
+	}
+	
+	/**
+	 * Initialize logging system (v0.9.2.3)
+	 */
+	private function init_logger(): void {
+		ChurchTools_Suite_Logger::init();
 	}
 	
 	/**
@@ -65,6 +103,8 @@ class ChurchTools_Suite {
 		$this->loader->add_action( 'admin_enqueue_scripts', $admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'admin_menu', $admin, 'add_plugin_admin_menu' );
 		
+		// Note: Public CSS is now loaded by Admin class (enqueue_styles)
+		
 		// Register AJAX handlers immediately
 		$admin->register_ajax_handlers();
 	}
@@ -73,7 +113,51 @@ class ChurchTools_Suite {
 	 * Register public hooks
 	 */
 	private function define_public_hooks(): void {
-		// Public functionality will be added later
+		// Register shortcodes (v0.5.0.0)
+		add_action( 'init', [ 'ChurchTools_Suite_Shortcodes', 'register' ] );
+		
+		// Register Gutenberg blocks (v0.5.8.0)
+		add_action( 'init', [ 'ChurchTools_Suite_Blocks', 'register' ] );
+		
+		// Register Elementor widgets (v0.5.9.38)
+		add_action( 'plugins_loaded', [ 'ChurchTools_Suite_Elementor', 'init' ] );
+		
+		// Enqueue frontend assets (also loaded in admin via admin_enqueue_scripts)
+		$this->loader->add_action( 'wp_enqueue_scripts', $this, 'enqueue_public_assets' );
+	}
+	
+	/**
+	 * Enqueue public assets
+	 * 
+	 * @since 0.5.1.0
+	 * @since 0.6.0.3 Simplified - always load assets (small files, better UX)
+	 */
+	public function enqueue_public_assets(): void {
+		// Always load assets - they're small and better UX than conditional loading issues
+		
+		// Enqueue CSS
+		wp_enqueue_style(
+			'churchtools-suite-public',
+			CHURCHTOOLS_SUITE_URL . 'assets/css/churchtools-suite-public.css',
+			[],
+			$this->version,
+			'all'
+		);
+		
+		// Enqueue JS
+		wp_enqueue_script(
+			'churchtools-suite-public',
+			CHURCHTOOLS_SUITE_URL . 'assets/js/churchtools-suite-public.js',
+			[ 'jquery' ],
+			$this->version,
+			true
+		);
+		
+		// Localize script
+		wp_localize_script( 'churchtools-suite-public', 'churchtoolsSuitePublic', [
+			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+			'nonce' => wp_create_nonce( 'churchtools_suite_public' ),
+		] );
 	}
 	
 	/**
@@ -81,6 +165,9 @@ class ChurchTools_Suite {
 	 */
 	private function define_cron_hooks(): void {
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-cron.php';
+		
+		// Initialize cron system (register custom intervals)
+		ChurchTools_Suite_Cron::init();
 		
 		add_action( 'churchtools_suite_session_keepalive', [ 'ChurchTools_Suite_Cron', 'session_keepalive' ] );
 		add_action( 'churchtools_suite_auto_sync', [ 'ChurchTools_Suite_Cron', 'auto_sync' ] );
@@ -90,6 +177,19 @@ class ChurchTools_Suite {
 	 * Run the loader
 	 */
 	public function run(): void {
+		// Initialize logger (v0.7.2.6: Ensure log file is created)
+		ChurchTools_Suite_Logger::init();
+		
+		// Log plugin start (only once per day to avoid spam)
+		$last_start_log = get_transient('churchtools_suite_last_start_log');
+		if (!$last_start_log) {
+			ChurchTools_Suite_Logger::info(
+				'plugin',
+				sprintf('Plugin gestartet (Version %s)', CHURCHTOOLS_SUITE_VERSION)
+			);
+			set_transient('churchtools_suite_last_start_log', current_time('timestamp'), DAY_IN_SECONDS);
+		}
+		
 		$this->loader->run();
 	}
 	

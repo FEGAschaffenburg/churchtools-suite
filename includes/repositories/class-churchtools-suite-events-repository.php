@@ -22,53 +22,144 @@ class ChurchTools_Suite_Events_Repository extends ChurchTools_Suite_Repository_B
     }
     
     /**
-     * Upsert (Insert or Update) an event by event_id
+     * Upsert (Insert or Update) an event by appointment_id + start_datetime (v0.9.0.0)
      * 
-     * If event with this event_id exists, updates it.
+     * CRITICAL: Uses COMPOSITE KEY (appointment_id, start_datetime)!
+     * Why? Appointment_id is the SERIES ID for recurring appointments.
+     * Same appointment_id can appear multiple times with different start_datetime values.
+     * 
+     * Example: "Gottesdienst" has appointment_id=5084
+     *   - 2025-10-31 17:00 (instance 1)
+     *   - 2025-11-14 17:00 (instance 2)
+     *   → Same appointment_id, different dates!
+     * 
+     * If event with this (appointment_id, start_datetime) exists, updates it.
      * Otherwise inserts new event.
      *
      * @param array $data Event data
      * @return int|false Event ID or false on error
      */
-    public function upsert_by_event_id(array $data) {
+    public function upsert_by_appointment_id(array $data) {
         $defaults = [
-            'event_id' => '',
+            'event_id' => null, // v0.9.0.0: Can be NULL for standalone appointments
             'calendar_id' => null,
             'appointment_id' => null,
             'title' => '',
             'description' => null,
+            'event_description' => null, // v0.9.1.0: Event-level description
+            'appointment_description' => null, // v0.9.1.0: Appointment-level description
             'start_datetime' => null,
             'end_datetime' => null,
             'is_all_day' => 0,
             'location_name' => null,
+            'address_name' => null, // v0.9.2.0: Address name (meetingAt)
+            'address_street' => null, // v0.9.2.0: Street address
+            'address_zip' => null, // v0.9.2.0: ZIP/postal code
+            'address_city' => null, // v0.9.2.0: City
+            'address_latitude' => null, // v0.9.2.0: GPS latitude
+            'address_longitude' => null, // v0.9.2.0: GPS longitude
+            'tags' => null, // v0.9.2.0: JSON array of tags
             'status' => null,
             'raw_payload' => null,
+            'last_modified' => null, // v0.7.1.0: For incremental sync
+            'appointment_modified' => null, // v0.8.1.0: For appointment-level changes
         ];
         $data = wp_parse_args($data, $defaults);
         
-        // Check if event exists
+        // appointment_id AND start_datetime are required (composite key)
+        if (empty($data['appointment_id']) || empty($data['start_datetime'])) {
+            return false;
+        }
+        
+        // Check if appointment exists using COMPOSITE KEY
         $existing_id = $this->db->get_var(
             $this->db->prepare(
-                "SELECT id FROM {$this->table_name} WHERE event_id = %s",
-                $data['event_id']
+                "SELECT id FROM {$this->table_name} WHERE appointment_id = %s AND start_datetime = %s",
+                $data['appointment_id'],
+                $data['start_datetime']
             )
         );
         
         if ($existing_id) {
-            // Update existing event
-            $data['updated_at'] = $this->now();
-            
-            $this->db->update(
+            // Selective Update: Nur appointment-spezifische Felder überschreiben
+            $appointment_fields = [
+                'appointment_description',
+                'address_name',
+                'address_street',
+                'address_zip',
+                'address_city',
+                'address_latitude',
+                'address_longitude',
+                'tags',
+                'appointment_modified',
+                'raw_payload',
+                'status',
+                'updated_at',
+            ];
+            // Hole existierende Daten
+            $existing = $this->get_by_id($existing_id);
+            $update_data = [];
+            foreach ($appointment_fields as $field) {
+                if (array_key_exists($field, $data)) {
+                    $update_data[$field] = $data[$field];
+                }
+            }
+            $update_data['updated_at'] = $this->now();
+
+            // Debug Logging
+            if (class_exists('ChurchTools_Suite_Logger')) {
+                ChurchTools_Suite_Logger::debug(
+                    'repository',
+                    sprintf('SELECTIVE UPDATE event ID %d (appointment_id: %s)', $existing_id, $data['appointment_id']),
+                    [
+                        'update_keys' => array_keys($update_data),
+                        'has_address_name' => isset($update_data['address_name']),
+                        'has_tags' => isset($update_data['tags']),
+                        'address_name' => $update_data['address_name'] ?? 'NOT_SET',
+                        'address_latitude' => $update_data['address_latitude'] ?? 'NOT_SET',
+                        'tags' => isset($update_data['tags']) ? substr($update_data['tags'], 0, 100) : 'NOT_SET',
+                    ]
+                );
+            }
+
+            $result = $this->db->update(
                 $this->table_name,
-                $data,
+                $update_data,
                 ['id' => $existing_id]
             );
-            
+
+            // Fehler-Logging
+            if ($result === false && class_exists('ChurchTools_Suite_Logger') && !empty($this->db->last_error)) {
+                ChurchTools_Suite_Logger::error(
+                    'repository',
+                    sprintf('SELECTIVE UPDATE failed for event ID %d', $existing_id),
+                    [
+                        'wpdb_error' => $this->db->last_error,
+                        'last_query' => $this->db->last_query,
+                    ]
+                );
+            }
+
             return (int) $existing_id;
         }
         
-        // Insert new event
+        // Insert new appointment
         return $this->insert($data);
+    }
+    
+    /**
+     * Upsert (Insert or Update) an event by event_id
+     * 
+     * DEPRECATED: Use upsert_by_appointment_id() instead!
+     * Kept for backward compatibility only.
+     *
+     * @deprecated 0.9.0.0 Use upsert_by_appointment_id()
+     * @param array $data Event data
+     * @return int|false Event ID or false on error
+     */
+    public function upsert_by_event_id(array $data) {
+        // Delegate to appointment-based upsert
+        return $this->upsert_by_appointment_id($data);
     }
     
     /**
@@ -87,12 +178,28 @@ class ChurchTools_Suite_Events_Repository extends ChurchTools_Suite_Repository_B
     }
     
     /**
-     * Get event by ChurchTools appointment_id
+     * Get event by ChurchTools appointment_id (v0.9.0.0: with optional start_datetime)
+     * 
+     * WARNING: appointment_id alone may return first match of multiple instances!
+     * For recurring appointments, provide start_datetime to get specific instance.
      *
      * @param string $appointment_id ChurchTools appointment ID
+     * @param string $start_datetime Optional start datetime for specific instance (Y-m-d H:i:s)
      * @return object|null Event object or null
      */
-    public function get_by_appointment_id(string $appointment_id) {
+    public function get_by_appointment_id(string $appointment_id, string $start_datetime = '') {
+        if (!empty($start_datetime)) {
+            // Get specific instance by COMPOSITE KEY
+            return $this->db->get_row(
+                $this->db->prepare(
+                    "SELECT * FROM {$this->table_name} WHERE appointment_id = %s AND start_datetime = %s",
+                    $appointment_id,
+                    $start_datetime
+                )
+            );
+        }
+        
+        // Get first match (legacy behavior, may be ambiguous for recurring appointments)
         return $this->db->get_row(
             $this->db->prepare(
                 "SELECT * FROM {$this->table_name} WHERE appointment_id = %s",
@@ -207,8 +314,42 @@ class ChurchTools_Suite_Events_Repository extends ChurchTools_Suite_Repository_B
     }
     
     /**
-     * Check if event exists by event_id
+     * Check if appointment exists by appointment_id + start_datetime (v0.9.0.0)
+     * 
+     * Uses COMPOSITE KEY (appointment_id, start_datetime).
+     * Both parameters required because appointment_id alone is not unique!
      *
+     * @param string $appointment_id ChurchTools appointment ID
+     * @param string $start_datetime Start datetime (Y-m-d H:i:s)
+     * @return bool True if exists
+     */
+    public function exists_by_appointment_id(string $appointment_id, string $start_datetime = ''): bool {
+        // If no start_datetime provided, check by appointment_id only (may return true for any instance)
+        if (empty($start_datetime)) {
+            $count = $this->db->get_var(
+                $this->db->prepare(
+                    "SELECT COUNT(*) FROM {$this->table_name} WHERE appointment_id = %s",
+                    $appointment_id
+                )
+            );
+            return (int) $count > 0;
+        }
+        
+        // Check by COMPOSITE KEY
+        $count = $this->db->get_var(
+            $this->db->prepare(
+                "SELECT COUNT(*) FROM {$this->table_name} WHERE appointment_id = %s AND start_datetime = %s",
+                $appointment_id,
+                $start_datetime
+            )
+        );
+        return (int) $count > 0;
+    }
+    
+    /**
+     * Check if event exists by event_id
+     * 
+     * @deprecated v0.9.0.0 Use exists_by_appointment_id() - event_id is no longer unique
      * @param string $event_id ChurchTools event ID
      * @return bool True if exists
      */
@@ -220,5 +361,72 @@ class ChurchTools_Suite_Events_Repository extends ChurchTools_Suite_Repository_B
             )
         );
         return (int) $count > 0;
+    }
+    
+    /**
+     * Get newest last_modified timestamp (v0.7.1.0)
+     * 
+     * Used for incremental sync to determine when last change occurred.
+     *
+     * @return string|null MySQL datetime or null if no events
+     */
+    public function get_newest_last_modified(): ?string {
+        $result = $this->db->get_var(
+            "SELECT MAX(last_modified) FROM {$this->table_name} WHERE last_modified IS NOT NULL"
+        );
+        return $result ? $result : null;
+    }
+    
+    /**
+     * Get all event IDs in date range (v0.7.1.0)
+     * 
+     * Used to detect deleted events by comparing with API response.
+     *
+     * @param string $start_date Start date (Y-m-d H:i:s)
+     * @param string $end_date End date (Y-m-d H:i:s)
+     * @param string|null $calendar_id Optional calendar filter
+     * @return array Array of event_id strings
+     */
+    public function get_event_ids_in_range(string $start_date, string $end_date, ?string $calendar_id = null): array {
+        $sql = "SELECT event_id FROM {$this->table_name} 
+                WHERE start_datetime >= %s AND start_datetime <= %s";
+        
+        $params = [$start_date, $end_date];
+        
+        if ($calendar_id) {
+            $sql .= " AND calendar_id = %s";
+            $params[] = $calendar_id;
+        }
+        
+        $results = $this->db->get_col(
+            $this->db->prepare($sql, ...$params)
+        );
+        
+        return $results ? $results : [];
+    }
+    
+    /**
+     * Delete events by event_id array (v0.7.1.0)
+     * 
+     * Used to remove events that were deleted in ChurchTools.
+     *
+     * @param array $event_ids Array of event_id strings
+     * @return int Number of deleted rows
+     */
+    public function delete_by_event_ids(array $event_ids): int {
+        if (empty($event_ids)) {
+            return 0;
+        }
+        
+        $placeholders = implode(',', array_fill(0, count($event_ids), '%s'));
+        
+        $result = $this->db->query(
+            $this->db->prepare(
+                "DELETE FROM {$this->table_name} WHERE event_id IN ($placeholders)",
+                ...$event_ids
+            )
+        );
+        
+        return $result !== false ? $result : 0;
     }
 }

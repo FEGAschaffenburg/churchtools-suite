@@ -44,12 +44,20 @@ class ChurchTools_Suite_Activator {
 	
 	/**
 	 * Set default options
+	 * 
+	 * Smart-Defaults (v0.7.0.1):
+	 * - Auto-Sync aktiviert (täglich)
+	 * - Sync-Range: 7 Tage rückwärts, 90 Tage vorwärts
+	 * - Session Keep-Alive aktiviert
 	 */
 	private static function set_default_options(): void {
 		$defaults = [
 			'churchtools_suite_version' => CHURCHTOOLS_SUITE_VERSION,
-			'churchtools_suite_auto_sync_enabled' => 0,
-			'churchtools_suite_sync_interval' => 3600, // 1 hour
+			'churchtools_suite_auto_sync_enabled' => 1, // ✅ Auto-Sync standardmäßig aktiviert
+			'churchtools_suite_auto_sync_interval' => 'daily', // ✅ Täglich (statt stündlich)
+			'churchtools_suite_sync_days_past' => 7, // ✅ 7 Tage rückwärts
+			'churchtools_suite_sync_days_future' => 90, // ✅ 90 Tage vorwärts
+			'churchtools_suite_session_keepalive_enabled' => 1, // ✅ Session Keep-Alive aktiv
 		];
 		
 		foreach ( $defaults as $key => $value ) {

@@ -125,10 +125,46 @@ abstract class ChurchTools_Suite_Repository_Base {
         $data['created_at'] = $this->now();
         $data['updated_at'] = $this->now();
         
+        // v0.9.2.2: Debug logging for insert operation
+        if (class_exists('ChurchTools_Suite_Logger')) {
+            ChurchTools_Suite_Logger::debug(
+                'repository',
+                sprintf('INSERT into %s', $this->table_name),
+                [
+                    'data_keys' => array_keys($data),
+                    'has_address_name' => isset($data['address_name']),
+                    'has_tags' => isset($data['tags']),
+                    'address_name' => $data['address_name'] ?? 'NOT_SET',
+                    'address_latitude' => $data['address_latitude'] ?? 'NOT_SET',
+                    'tags' => isset($data['tags']) ? substr($data['tags'], 0, 100) : 'NOT_SET',
+                ]
+            );
+        }
+        
         $result = $this->db->insert($this->table_name, $data);
         
         if ($result === false) {
+            // v0.9.2.2: Log wpdb error
+            if (class_exists('ChurchTools_Suite_Logger') && !empty($this->db->last_error)) {
+                ChurchTools_Suite_Logger::error(
+                    'repository',
+                    sprintf('INSERT failed for %s', $this->table_name),
+                    [
+                        'wpdb_error' => $this->db->last_error,
+                        'last_query' => $this->db->last_query,
+                    ]
+                );
+            }
             return false;
+        }
+        
+        // v0.9.2.2: Log success
+        if (class_exists('ChurchTools_Suite_Logger')) {
+            ChurchTools_Suite_Logger::debug(
+                'repository',
+                sprintf('INSERT successful: ID %d', $this->db->insert_id),
+                ['insert_id' => $this->db->insert_id]
+            );
         }
         
         return (int) $this->db->insert_id;

@@ -13,6 +13,54 @@ if (!defined('ABSPATH')) {
 class ChurchTools_Suite_Cron {
     
     /**
+     * Initialize cron system
+     */
+    public static function init(): void {
+        // Register custom cron intervals
+        add_filter('cron_schedules', [__CLASS__, 'add_custom_cron_intervals']);
+    }
+    
+    /**
+     * Add custom cron intervals
+     * 
+     * @param array $schedules Existing schedules
+     * @return array Modified schedules
+     */
+    public static function add_custom_cron_intervals(array $schedules): array {
+        // 2 Tage
+        $schedules['cts_2days'] = [
+            'interval' => 172800, // 2 * 24 * 60 * 60
+            'display'  => __('Alle 2 Tage', 'churchtools-suite')
+        ];
+        
+        // 3 Tage
+        $schedules['cts_3days'] = [
+            'interval' => 259200, // 3 * 24 * 60 * 60
+            'display'  => __('Alle 3 Tage', 'churchtools-suite')
+        ];
+        
+        // 7 Tage (wöchentlich)
+        $schedules['cts_weekly'] = [
+            'interval' => 604800, // 7 * 24 * 60 * 60
+            'display'  => __('Wöchentlich', 'churchtools-suite')
+        ];
+        
+        // 14 Tage
+        $schedules['cts_2weeks'] = [
+            'interval' => 1209600, // 14 * 24 * 60 * 60
+            'display'  => __('Alle 2 Wochen', 'churchtools-suite')
+        ];
+        
+        // 30 Tage (monatlich)
+        $schedules['cts_monthly'] = [
+            'interval' => 2592000, // 30 * 24 * 60 * 60
+            'display'  => __('Monatlich', 'churchtools-suite')
+        ];
+        
+        return $schedules;
+    }
+    
+    /**
      * Schedule cron jobs
      */
     public static function schedule_jobs() {
@@ -103,39 +151,116 @@ class ChurchTools_Suite_Cron {
      * Auto-Sync: Synchronize events automatically
      * 
      * Wird in konfigurierbaren Intervallen ausgeführt
+     * Mit erweitertem Error-Handling, Fehler-Tracking und Sync-Historie
      */
     public static function auto_sync() {
+        $start_time = current_time('mysql');
+        
         // Nur ausführen wenn aktiviert
         $auto_sync_enabled = get_option('churchtools_suite_auto_sync_enabled', 0);
         if (!$auto_sync_enabled) {
             return;
         }
         
-        // Event Sync Service laden
-        require_once CHURCHTOOLS_SUITE_PATH . 'includes/services/class-churchtools-suite-event-sync-service.php';
-        require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-ct-client.php';
-        require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-repository-base.php';
-        require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-events-repository.php';
-        require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-calendars-repository.php';
+        // Sync-Historie Repository laden
+        require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-sync-history-repository.php';
+        $history_repo = new ChurchTools_Suite_Sync_History_Repository();
         
-        $sync_service = new ChurchTools_Suite_Event_Sync_Service();
+        // Historie-Eintrag erstellen
+        $sync_id = $history_repo->create_sync_entry('auto', $start_time);
         
-        // Sync ausführen
-        $result = $sync_service->sync_events();
-        
-        // Timestamp aktualisieren
-        update_option('churchtools_suite_last_auto_sync', current_time('mysql'));
-        
-        // Log result
-        if ($result['success']) {
+        try {
+            // Event Sync Service laden
+            require_once CHURCHTOOLS_SUITE_PATH . 'includes/services/class-churchtools-suite-event-sync-service.php';
+            require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-ct-client.php';
+            require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-repository-base.php';
+            require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-events-repository.php';
+            require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-calendars-repository.php';
+            require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-event-services-repository.php';
+            require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-services-repository.php';
+            
+            // Service initialisieren (MIT Service-Repositories für Service-Import)
+            $ct_client = new ChurchTools_Suite_CT_Client();
+            $events_repo = new ChurchTools_Suite_Events_Repository();
+            $calendars_repo = new ChurchTools_Suite_Calendars_Repository();
+            $event_services_repo = new ChurchTools_Suite_Event_Services_Repository();
+            $services_repo = new ChurchTools_Suite_Services_Repository();
+            $sync_service = new ChurchTools_Suite_Event_Sync_Service(
+                $ct_client, 
+                $events_repo, 
+                $calendars_repo,
+                $event_services_repo,
+                $services_repo
+            );
+            
+            // Sync ausführen
+            $result = $sync_service->sync_events();
+            
+            // Prüfe ob WP_Error zurückgegeben wurde
+            if (is_wp_error($result)) {
+                throw new Exception($result->get_error_message());
+            }
+            
+            // Success - Fehler löschen und Stats speichern
+            delete_option('churchtools_suite_last_sync_error');
+            delete_option('churchtools_suite_last_sync_error_time');
+            
+            $stats = [
+                'calendars_processed' => $result['calendars_processed'] ?? 0,
+                'events_found' => $result['events_found'] ?? 0,
+                'events_inserted' => $result['events_inserted'] ?? 0,
+                'events_updated' => $result['events_updated'] ?? 0,
+                'events_skipped' => $result['events_skipped'] ?? 0,
+                'services_imported' => $result['services_imported'] ?? 0,
+                'started_at' => $start_time,
+                'completed_at' => current_time('mysql')
+            ];
+            
+            update_option('churchtools_suite_last_auto_sync', current_time('mysql'));
+            update_option('churchtools_suite_last_sync_status', 'success');
+            update_option('churchtools_suite_last_sync_stats', $stats);
+            
+            // Historie-Eintrag abschließen
+            if ($sync_id) {
+                $history_repo->complete_sync($sync_id, $stats, null);
+            }
+            
+            // Success Log
             error_log(sprintf(
-                'ChurchTools Suite Auto-Sync: %d neu, %d aktualisiert, %d übersprungen',
-                $result['inserted'],
-                $result['updated'],
-                $result['skipped']
+                'ChurchTools Suite Auto-Sync [SUCCESS]: %d Kalender, %d Events gefunden, %d neu, %d aktualisiert, %d übersprungen, %d Services importiert',
+                $stats['calendars_processed'],
+                $stats['events_found'],
+                $stats['events_inserted'],
+                $stats['events_updated'],
+                $stats['events_skipped'],
+                $stats['services_imported']
             ));
-        } else {
-            error_log('ChurchTools Suite Auto-Sync fehlgeschlagen: ' . $result['message']);
+            
+        } catch (Exception $e) {
+            // Error - Details speichern
+            $error_message = $e->getMessage();
+            $error_time = current_time('mysql');
+            
+            update_option('churchtools_suite_last_sync_error', $error_message);
+            update_option('churchtools_suite_last_sync_error_time', $error_time);
+            update_option('churchtools_suite_last_sync_status', 'error');
+            
+            // Historie-Eintrag mit Fehler abschließen
+            if ($sync_id) {
+                $history_repo->complete_sync($sync_id, [], $error_message);
+            }
+            
+            // Error Log mit Stack Trace
+            error_log(sprintf(
+                'ChurchTools Suite Auto-Sync [ERROR]: %s (Zeit: %s)',
+                $error_message,
+                $error_time
+            ));
+            
+            // Detaillierter Stack Trace im Debug-Modus
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('Stack Trace: ' . $e->getTraceAsString());
+            }
         }
     }
 }

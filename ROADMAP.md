@@ -1,474 +1,363 @@
 # ChurchTools Suite - Roadmap
 
-## Aktueller Stand: v0.3.1.0
-✅ Cookie-basierte Authentifizierung mit Session Keep-Alive
+> **Aktueller Stand:** v0.9.0.0 (22. Dezember 2025)  
+> **Nächstes Milestone:** v0.9.1.0 - Shortcode Presets
 
 ---
 
-## v0.3.2.0 - Repository Base-Klasse
-**Ziel:** Grundlage für alle Repositories schaffen
+## 🎯 Vision
 
-### Features:
-- [ ] Repository Base-Klasse (class-churchtools-suite-repository-base.php)
-  - Gemeinsame Basis für alle Repositories
-  - CRUD-Operationen (create, read, update, delete)
-  - DB-Query-Helfer (where, orderBy, limit)
-  - Prepared Statements für Sicherheit
-  - Error-Handling
+ChurchTools Suite ist eine umfassende WordPress-Integration für ChurchTools, die es Gemeinden ermöglicht, ihre Termine, Kalender und Services nahtlos auf ihrer Website zu präsentieren.
 
 ---
 
-## v0.3.3.0 - Calendars Repository
-**Ziel:** Kalender-Daten verwalten
+## ✅ Abgeschlossen
 
-### Features:
-- [ ] Calendars Repository (class-churchtools-suite-calendars-repository.php)
-  - Erweitert Repository Base
-  - Kalender aus DB lesen/schreiben
-  - get_all(), get_by_id(), get_selected()
-  - is_selected Flag für Auswahl
-  - Kalender-Sync-Status
+### v0.1.0 - v0.3.13.0: Foundation & Core Features
+- ✅ Cookie-basierte ChurchTools API-Authentifizierung
+- ✅ Repository-Pattern für Datenzugriff
+- ✅ Kalender & Events Synchronisation (2-Phasen: Events + Appointments)
+- ✅ Admin UI (Dashboard, Settings, Calendars, Events, Sync, Debug)
+- ✅ Migration System (DB-Versionierung)
+- ✅ Service Groups & Services Synchronisation
+- ✅ Event Services Import (Personen-Zuordnung)
+- ✅ Auto-Sync mit WP-Cron
+- ✅ Sync-Historie Tracking
 
----
+### v0.4.0 - v0.5.9.38: Template System & Frontend
+- ✅ Template Loader mit Theme-Override Support
+- ✅ 13 Shortcode-Handler (Calendar, List, Grid, Modal, Slider, etc.)
+- ✅ Template Data Provider Service
+- ✅ Frontend CSS/JS mit Responsive Design
+- ✅ Shortcode Manager (Admin UI für Shortcode-Übersicht)
+- ✅ Gutenberg Block Integration (Vereinfachter Block mit View-Auswahl)
+- ✅ Elementor Integration
 
-## v0.3.4.0 - Calendar Sync Service
-**Ziel:** Kalender von ChurchTools abrufen
+### v0.6.0 - v0.6.5.19: Advanced Templates & UI
+- ✅ List Templates optimiert (Classic, Medium, Fluent)
+- ✅ Grid Templates erweitert
+- ✅ Calendar Templates (Monthly, Weekly)
+- ✅ Demo-Seiten für alle View-Typen
 
-### Features:
-- [ ] Calendar Sync Service (class-churchtools-suite-calendar-sync-service.php)
-  - API-Call zu `/calendars`
-  - ChurchTools-Kalender abrufen
-  - In `cts_calendars` Tabelle speichern
-  - Sync-Timestamp verwalten
-  - Fehlerbehandlung und Logging
+### v0.7.0.0 - v0.7.2.0: Sync Optimizations & Single Event
+- ✅ Incremental Sync (Modified-After Parameter)
+- ✅ Deleted Events Detection (nur bei Full Sync)
+- ✅ Plugin-eigenes Logging System (JSON, Rotation)
+- ✅ Single Event Templates & Data Providers
+- ✅ Enhanced Error Handling (500 Errors, JSON Validation, Shutdown Handler)
 
----
+### v0.7.2.1 - v0.7.3.3: Bugfixes & Refinements
+- ✅ Logger Parameter Fixes (3-Parameter Format)
+- ✅ Backward-Compatibility Constants (INFO, DEBUG, etc.)
+- ✅ Enhanced Debug Logging (Event Sync, Service Import)
+- ✅ Service Import Validation (personId auf eventService-Level)
+- ✅ Date Range Filtering (Events & Appointments)
+- ✅ Calculated Date Range Display in Settings
 
-## v0.3.5.0 - Admin UI: Kalender-Tab
-**Ziel:** Kalender im Admin anzeigen und auswählen
+### v0.7.4.0: Admin Navigation Restructure
+- ✅ Sub-Tab Navigation (Einstellungen, Daten)
+- ✅ Advanced Mode Toggle (Debug-Tab optional)
+- ✅ Reorganized Settings (API, Sync, Calendars, Services, Advanced)
+- ✅ Data Section (Events, Imported Services)
 
-### Features:
-- [ ] Tab "Kalender" im Admin
-  - Neuer Tab in admin-page.php
-  - View: tab-calendars.php
-- [ ] Kalender-Liste anzeigen
-  - Alle synchronisierten Kalender
-  - Name, Beschreibung, Farbe
-  - Checkbox für Auswahl
-- [ ] "Kalender synchronisieren" Button
-  - AJAX Handler für Kalender-Sync
-  - Progress-Anzeige
-  - Erfolgs-/Fehlermeldung
+### v0.8.0.0: Clickable Events & Modal Details
+- ✅ List Templates clickable (classic, medium, fluent)
+- ✅ Grid Templates clickable (simple, modern, colorful)
+- ✅ JavaScript Event-Handler für .cts-event-clickable
+- ✅ CSS Hover-Effekte und Keyboard-Support
+- ✅ Modal-Integration mit existierenden Single Event Templates
+- ✅ Accessibility (role="button", tabindex, aria-label)
 
----
+### v0.8.1.0 - v0.8.1.3: Appointment Change Tracking & Combined Descriptions
+- ✅ Migration 1.9: `appointment_modified` Spalte in events-Tabelle
+- ✅ Kombinierte Descriptions (Event.note + Appointment.note)
+- ✅ Phase 1: Event-Sync extrahiert appointment_modified Timestamp
+- ✅ Phase 2: Appointments-Sync prüft auf Änderungen
+- ✅ Update-Logik für Appointment-Only Changes
+- ✅ Kombinierte Description mit Separator "--- Termindetails ---"
+- ✅ Template-Bugfixes (list/medium.php Syntax-Fehler)
 
-## v0.3.6.0 - Events Repository
-**Ziel:** Event-Daten verwalten
+### v0.9.0.0: Appointment als Primary Key (AKTUELL - CRITICAL FIX)
+**Ziel:** Fix fundamental data model bug - recurring events overwriting each other
 
-### Features:
-- [ ] Events Repository (class-churchtools-suite-events-repository.php)
-  - Erweitert Repository Base
-  - Events aus DB lesen/schreiben
-  - get_all(), get_by_calendar(), get_upcoming()
-  - Suche/Filter-Funktionen
-  - Bulk-Operations
+**Problem:**
+- ChurchTools Datenmodell: appointment_id = Serie-ID für wiederkehrende Termine
+- Gleiche appointment_id kann mehrfach vorkommen mit unterschiedlichen Daten
+- Beispiel: "Gottesdienst" (appointment_id 5084)
+  - 2025-10-31 17:00 (Instanz 1)
+  - 2025-11-14 17:00 (Instanz 2)
+  → **Gleiche appointment_id, unterschiedliche start_datetime!**
+- Alte Implementierung: appointment_id als UNIQUE Key → Instanzen überschreiben sich
 
----
+**Lösung:**
+- ✅ Migration 2.0: COMPOSITE UNIQUE KEY (appointment_id, start_datetime)
+- ✅ event_id wird nullable (für standalone appointments)
+- ✅ event_id behält INDEX für Filterung nach Serie
+- ✅ Repository: Alle Methoden verwenden COMPOSITE KEY
+  - `upsert_by_appointment_id()` - Prüft appointment_id + start_datetime
+  - `exists_by_appointment_id()` - Kann mit/ohne start_datetime prüfen
+  - `get_by_appointment_id()` - Gibt spezifische Instanz zurück
+- ✅ Sync Service: Übergibt start_datetime bei allen Prüfungen
+- ✅ Korrekte Statistiken (inserted/updated)
 
-## v0.3.7.0 - Event Sync Service
-**Ziel:** Events von ChurchTools abrufen
-
-### Features:
-- [ ] Event Sync Service (class-churchtools-suite-sync-service.php)
-  - API-Call zu `/calendars/{id}/appointments`
-  - Termine für ausgewählte Kalender abrufen
-  - In `cts_events` Tabelle speichern
-  - Deduplizierung nach ChurchTools-ID
-  - Update bestehender Events
-  - Alte Events löschen
-
----
-
-## v0.3.8.0 - Sync-Button funktionsfähig
-**Ziel:** Manuelle Synchronisation ermöglichen
-
-### Features:
-- [ ] AJAX Handler für manuellen Sync
-  - ajax_sync_now in Admin-Klasse
-  - Sync-Service aufrufen
-  - Status zurückgeben
-- [ ] Progress-Bar während Sync
-  - Fortschritts-Anzeige
-  - Anzahl synchronisierter Events
-- [ ] Dashboard-Statistiken aktualisieren
-  - Event-Count nach Sync
-  - Calendar-Count
-  - Letzter Sync-Zeitpunkt
-
----
-
-## v0.3.9.0 - Admin UI: Events-Tab
-**Ziel:** Synchronisierte Events im Admin anzeigen
-
-### Features:
-- [ ] Tab "Events" im Admin
-  - Neuer Tab in admin-page.php
-  - View: tab-events.php
-- [ ] Event-Liste anzeigen
-  - Tabelle mit allen Events
-  - Titel, Datum, Kalender, Status
-  - Pagination
-- [ ] Filter-Optionen
-  - Nach Kalender filtern
-  - Nach Datum filtern
-  - Suche nach Titel
+**API Verhalten:**
+ChurchTools /calendars/{id}/appointments API liefert für wiederkehrende Termine:
+```json
+// Instanz 1:
+{"appointment":{"base":{"id":5084}}, "calculated":{"startDate":"2025-10-31T17:00:00Z"}}
+// Instanz 2:
+{"appointment":{"base":{"id":5084}}, "calculated":{"startDate":"2025-11-14T17:00:00Z"}}
+```
+→ Gleiche ID, unterschiedliche Daten = Serie, nicht einzelner Termin!
 
 ---
 
-## v0.3.10.0 - Event Services Repository
-**Ziel:** Event-Services verwalten
+## 🚀 In Arbeit
 
-### Features:
-- [ ] Event Services Repository
-  - Services zu Events zuordnen
-  - Service-Details speichern
-  - get_by_event(), get_by_service_id()
+Keine aktuellen Arbeiten. Nächstes Milestone: v0.9.1.0
 
 ---
 
-## v0.3.11.0 - Schedule Repository
-**Ziel:** Mitarbeiter-Dienste verwalten
+## 📋 Geplant
 
-### Features:
-- [ ] Schedule Repository
-  - Schedule-Einträge (Mitarbeiter-Dienste)
-  - Personen-Zuordnungen
-  - get_by_event(), get_by_person()
+### v0.8.2.0: Extended Event Data
+**Ziel:** Mehr Event-Informationen nutzen
 
----
+**Features:**
+- [ ] Neue Spalten: `note`, `information`, `category`, `image_url`, `link`, `cost`
+- [ ] Migration für Schema-Änderungen
+- [ ] Template Data Provider erweitern
+- [ ] Frontend Displays aktualisieren
+- [ ] Gutenberg Block erweitern (neue Felder)
 
-## v0.3.12.0 - Template Loader
-**Ziel:** Template-System vorbereiten
+**Priorität:** Mittel  
+**Geschätzter Aufwand:** 3-4 Tage
 
-### Features:
-- [ ] Template Loader (class-churchtools-suite-template-loader.php)
-  - Template-System für Themes
-  - Override-Mechanismus (Theme > Plugin)
-  - Default-Templates
-  - locate_template(), render_template()
+### v0.8.3.0: Service Group Hierarchy
+**Ziel:** Service-Verwaltung verbessern
 
----
+**Features:**
+- [ ] Service Group Namen in UI anzeigen
+- [ ] Hierarchische Service-Organisation
+- [ ] Filter nach Service Group
+- [ ] Service Group Icons/Colors
 
-## v0.3.13.0 - Shortcode Handler (Basis)
-**Ziel:** [cts_events] Shortcode implementieren
+**Priorität:** Niedrig  
+**Geschätzter Aufwand:** 2-3 Tage
 
-### Features:
-- [ ] Shortcode Handler (class-churchtools-suite-shortcodes.php)
-  - [cts_events] - Event-Liste
-  - Attribute: calendar, limit, order
-  - Events Repository nutzen
-  - Template Loader nutzen
-- [ ] Basis-Template
-  - templates/events/list.php - Einfache Listen-Ansicht
-  - HTML-Struktur mit CSS-Klassen
+### v0.9.0.0: Performance & Batch Processing
+**Ziel:** Große Event-Mengen effizient verarbeiten
 
----
+**Features:**
+- [ ] Batch Event Processing (Chunk-Size konfigurierbar)
+- [ ] Progress Tracking mit AJAX Polling
+- [ ] Background Processing mit WP-Cron
+- [ ] Abort Button für laufende Syncs
+- [ ] Batch Database Inserts (Performance)
+- [ ] API Response Caching (Transients)
+- [ ] Query Optimization (Indexed Queries)
 
-## v0.3.14.0 - Frontend CSS/JS
-**Ziel:** Styling für Frontend
+**Priorität:** Niedrig (aktuell keine großen Datenmengen erwartet)  
+**Geschätzter Aufwand:** 4-5 Tage
 
-### Features:
-- [ ] Frontend CSS
-  - public/css/churchtools-suite-public.css
-  - Event-Liste Styling
-  - Responsive Design
-- [ ] Frontend JS (falls benötigt)
-  - public/js/churchtools-suite-public.js
-  - Interaktive Features
+### v0.9.1.0: Shortcode Presets
+**Ziel:** Wiederverwendbare Konfigurationen
 
----
-
-## v0.3.15.0 - Weitere Event-Templates
-**Ziel:** Verschiedene Ansichten
-
-### Features:
-- [ ] Grid-Template
-  - templates/events/grid.php - Kachel-Ansicht
-- [ ] Compact-Template
-  - templates/events/compact.php - Kompakte Liste
-- [ ] Single-Template
-  - templates/events/single.php - Einzelansicht
-
----
-
-## v0.3.16.0 - Shortcode-Presets Repository
-**Ziel:** Vordefinierte Konfigurationen
-
-### Features:
+**Features:**
 - [ ] Shortcode Presets Repository
-  - Presets speichern/laden
-  - Name, Beschreibung, Konfiguration (JSON)
-  - get_all(), get_by_id(), save(), delete()
+- [ ] Migration für wp_cts_shortcode_presets Tabelle
+- [ ] Presets speichern/laden/löschen
+- [ ] System Presets (Default-Konfigurationen)
+- [ ] User Presets (Custom-Konfigurationen)
+- [ ] Admin UI für Preset-Verwaltung
+- [ ] Import/Export Funktionalität
+
+**Priorität:** Mittel  
+**Geschätzter Aufwand:** 3-4 Tage
+
+### v0.8.3.0: Service Group Hierarchy
+**Ziel:** Service-Verwaltung verbessern
+
+**Features:**
+- [ ] Service Group Namen in UI anzeigen
+- [ ] Hierarchische Service-Organisation
+- [ ] Filter nach Service Group
+- [ ] Service Group Icons/Colors
+
+**Priorität:** Niedrig  
+**Geschätzter Aufwand:** 2-3 Tage
+
+### v0.9.0.0: Performance & Batch Processing
+**Ziel:** Große Event-Mengen effizient verarbeiten
+
+**Features:**
+- [ ] Batch Event Processing (Chunk-Size konfigurierbar)
+- [ ] Progress Tracking mit AJAX Polling
+- [ ] Background Processing mit WP-Cron
+- [ ] Abort Button für laufende Syncs
+- [ ] Batch Database Inserts (Performance)
+- [ ] API Response Caching (Transients)
+- [ ] Query Optimization (Indexed Queries)
+
+**Priorität:** Niedrig (aktuell keine großen Datenmengen erwartet)  
+**Geschätzter Aufwand:** 4-5 Tage
+
+### v0.9.1.0: Shortcode Presets
+**Ziel:** Wiederverwendbare Konfigurationen
+
+**Features:**
+- [ ] Shortcode Presets Repository
+- [ ] Migration für wp_cts_shortcode_presets Tabelle
+- [ ] Presets speichern/laden/löschen
+- [ ] System Presets (Default-Konfigurationen)
+- [ ] User Presets (Custom-Konfigurationen)
+- [ ] Admin UI für Preset-Verwaltung
+- [ ] Import/Export Funktionalität
+
+**Priorität:** Mittel  
+**Geschätzter Aufwand:** 3-4 Tage
+
+### v0.9.2.0: Advanced Filtering & Search
+**Ziel:** Bessere Event-Suche
+
+**Features:**
+- [ ] Calendar-Filter in Shortcodes
+- [ ] Datum-Range Filter
+- [ ] Service-Filter
+- [ ] Text-Search
+- [ ] AJAX Live-Search
+- [ ] URL Parameter Support
+
+**Priorität:** Mittel  
+**Geschätzter Aufwand:** 3-4 Tage
+
+### v1.0.0.0: Production Ready
+**Ziel:** Stable Release für Production
+
+**Features:**
+- [ ] Security Audit
+- [ ] Performance Audit
+- [ ] Dokumentation komplett
+- [ ] Unit Tests
+- [ ] Integration Tests
+- [ ] WordPress.org Submission Vorbereitung
+
+**Priorität:** Hoch  
+**Geschätzter Aufwand:** 5-7 Tage
 
 ---
 
-## v0.3.17.0 - Preset-Manager UI
-**Ziel:** Admin-Interface für Presets
+## 🔮 Zukünftig
 
-### Features:
-- [ ] Tab "Shortcodes" im Admin
-  - View: tab-shortcodes.php
-  - Liste aller Presets
-- [ ] Preset-Editor
-  - Formular für Preset-Erstellung
-  - Attribute konfigurieren
-  - Vorschau
-- [ ] Shortcode-Generator
-  - Generiert fertigen Shortcode
-  - Copy-to-Clipboard Button
+### v1.1.0: Multi-Language Support
+- [ ] Übersetzungs-Dateien (.pot, .po, .mo)
+- [ ] WPML/Polylang Kompatibilität
+- [ ] ChurchTools Multi-Language Events
 
----
+### v1.2.0: Extended Frontend Widgets
+- [ ] Weitere Slider-Varianten
+- [ ] Countdown-Templates
+- [ ] Cover-Templates
+- [ ] Timetable-Templates
+- [ ] Carousel-Templates
 
-## v0.3.18.0 - Automatischer Sync (Einstellungen)
-**Ziel:** Auto-Sync konfigurieren
+### v1.3.0: Advanced Integration
+- [ ] REST API Endpoints (öffentlich)
+- [ ] Webhook Support
+- [ ] iCal Export
+- [ ] Google Calendar Integration
 
-### Features:
-- [ ] Auto-Sync Settings UI
-  - Checkbox aktivieren/deaktivieren
-  - Intervall-Auswahl (30min, 1h, 2h, 6h, 12h, 24h)
-  - Speichern in Options-Tabelle
-- [ ] Validierung
-  - Mindest-Intervall: 30 Minuten
-  - Fehlermeldungen
+### v1.4.0: Extended Admin Tools
+- [ ] Bulk Operations
+- [ ] Advanced Filtering
+- [ ] Export/Import
+- [ ] Statistics & Analytics
 
 ---
 
-## v0.3.19.0 - Sync Cron-Job
-**Ziel:** Automatische Synchronisation
+## 🐛 Bekannte Probleme
 
-### Features:
-- [ ] Sync Cron-Job implementieren
-  - Neuer Cron-Hook: churchtools_suite_auto_sync
-  - Ruft Calendar & Event Sync Services auf
-  - Error-Handling und Logging
-- [ ] Cron-Scheduling
-  - Schedule bei Aktivierung/Settings-Änderung
-  - Dynamisches Intervall
-  - Clear bei Deaktivierung
+### Kritisch
+- Keine kritischen Bugs bekannt
+
+### Mittel
+- Keine
+
+### Niedrig
+- Keine
 
 ---
 
-## v0.3.20.0 - Sync-Historie
-**Ziel:** Sync-Verlauf nachvollziehen
+## 📝 Notizen
 
-### Features:
-- [ ] Sync-Historie im Dashboard
-  - Letzter Sync-Zeitpunkt
-  - Nächster geplanter Sync
-  - Anzahl synchronisierter Items
-- [ ] Sync-Log
-  - Erfolg/Fehler-Status
-  - Dauer des Syncs
-  - Anzahl neuer/aktualisierter/gelöschter Events
+### Technische Schulden
+- [ ] Tests hinzufügen (PHPUnit)
+- [ ] Code Coverage erhöhen
+- [ ] Inline-Dokumentation vervollständigen
+- [ ] Performance Profiling durchführen
 
----
-
-## v0.4.0.0 - Rate Limiting
-**Ziel:** API-Schutz
-
-### Features:
-- [ ] Rate Limiter (class-churchtools-suite-rate-limiter.php)
-  - Request-Limits pro Zeiteinheit
-  - Schutz vor API-Überlastung
-  - Automatische Throttling
-  - Transients für Counter
+### Verbesserungsideen
+- [ ] Dashboard Widgets
+- [ ] Quick-Edit in Event-Liste
+- [ ] Drag & Drop Kalender-Sortierung
+- [ ] Visual Shortcode Builder
+- [ ] Template Preview im Admin
 
 ---
 
-## v0.4.1.0 - Input Validator
-**Ziel:** Sicherheit erhöhen
+## 🎓 Ressourcen
 
-### Features:
-- [ ] Input Validator (class-churchtools-suite-input-validator.php)
-  - Validierung von Formulareingaben
-  - Sanitization-Helfer
-  - XSS-Schutz
-  - Nonce-Validierung-Helfer
+**Dokumentation:**
+- [ChurchTools API Docs](https://api.church.tools/)
+- [WordPress Plugin Handbook](https://developer.wordpress.org/plugins/)
+- [Gutenberg Block Editor](https://developer.wordpress.org/block-editor/)
 
----
-
-## v0.4.2.0 - Crypto Helper
-**Ziel:** Credentials sicher speichern
-
-### Features:
-- [ ] Crypto Helper (class-churchtools-suite-crypto.php)
-  - Passwort-Verschlüsselung in DB
-  - Secure Storage für Credentials
-  - WordPress Salts nutzen
+**Tools:**
+- [WP-CLI](https://wp-cli.org/)
+- [Query Monitor](https://querymonitor.com/)
+- [Debug Bar](https://wordpress.org/plugins/debug-bar/)
 
 ---
 
-## v0.4.3.0 - Logger
-**Ziel:** Fehlersuche ermöglichen
+**Letzte Aktualisierung:** 22. Dezember 2025 (v0.8.1.0)
 
-### Features:
-- [ ] Logger (class-churchtools-suite-logger.php)
-  - Log-Levels (error, warning, info, debug)
-  - Log-Dateien in wp-content/uploads/churchtools-suite/logs/
-  - Log-Rotation (max 10 MB, max 30 Tage)
-  - get_logs(), clear_logs()
+### Mittel
+- Keine
+
+### Niedrig
+- Keine
 
 ---
 
-## v0.4.4.0 - Debug-Tab
-**Ziel:** Admin-Tools für Debugging
+## 📝 Notizen
 
-### Features:
-- [ ] Admin Debug-Tab
-  - View: tab-debug.php
-  - System-Informationen (PHP, WordPress, Plugin-Version)
-  - API-Test-Tool (Connection Test mit Details)
-  - Log-Viewer
-- [ ] Datenbank-Browser
-  - Tabellen-Übersicht
-  - Anzahl Einträge
-  - Letzte Aktualisierung
+### Technische Schulden
+- [ ] Tests hinzufügen (PHPUnit)
+- [ ] Code Coverage erhöhen
+- [ ] Inline-Dokumentation vervollständigen
+- [ ] Performance Profiling durchführen
 
----
-
-## v0.4.5.0 - Updater
-**Ziel:** Plugin-Updates verwalten
-
-### Features:
-- [ ] Updater (class-churchtools-suite-updater.php)
-  - Versions-Prüfung gegen GitHub
-  - Update-Benachrichtigungen
-  - Automatische DB-Migrationen bei Update
+### Verbesserungsideen
+- [ ] Dashboard Widgets
+- [ ] Quick-Edit in Event-Liste
+- [ ] Drag & Drop Kalender-Sortierung
+- [ ] Visual Shortcode Builder
+- [ ] Template Preview im Admin
 
 ---
 
-## v0.4.6.0 - Migrations-System
-**Ziel:** DB-Änderungen versionieren
+## 🎓 Ressourcen
 
-### Features:
-- [ ] Migrations-System
-  - Versionierte Migrationen
-  - migration-v{version}.php Dateien
-  - Automatische Ausführung bei Update
-  - Migration-Status in Options
+**Dokumentation:**
+- [ChurchTools API Docs](https://api.church.tools/)
+- [WordPress Plugin Handbook](https://developer.wordpress.org/plugins/)
+- [Gutenberg Block Editor](https://developer.wordpress.org/block-editor/)
 
----
-
-## v0.5.0.0 - Internationalisierung
-**Ziel:** Mehrsprachigkeit
-
-### Features:
-- [ ] i18n Setup (class-churchtools-suite-i18n.php)
-  - Text-Domain laden
-  - POT-Datei generieren
-  - Deutsche Übersetzung (de_DE.po/mo)
-- [ ] Alle Texte übersetzen
-  - Admin-Texte
-  - Frontend-Texte
-  - JavaScript-Strings
-  - Error-Messages
+**Tools:**
+- [WP-CLI](https://wp-cli.org/)
+- [Query Monitor](https://querymonitor.com/)
+- [Debug Bar](https://wordpress.org/plugins/debug-bar/)
 
 ---
 
-## v1.0.0.0 - Production Ready
-**Ziel:** Produktionsreife Version
-
-### Features:
-- [ ] Performance-Optimierungen
-  - DB-Query-Caching
-  - Transients für API-Calls
-  - Lazy-Loading
-
-- [ ] Testing
-  - Unit-Tests für Repositories
-  - Integration-Tests für Services
-  - E2E-Tests für Frontend
-
-- [ ] Dokumentation
-  - Benutzer-Handbuch
-  - Entwickler-Dokumentation
-  - API-Dokumentation
-  - Video-Tutorials
-
-- [ ] Polish
-  - Icon-Set vervollständigen
-  - Animationen
-  - Accessibility (WCAG 2.1)
-  - SEO-Optimierung
-
----
-
-## Optionale Features (v1.1.0+)
-
-### Calendar-View
-- Monats-/Wochen-Ansicht
-- FullCalendar.js Integration
-- iCal-Export
-
-### Extended Filtering
-- Kategorie-Filter
-- Orts-Filter
-- Schlagwort-Filter
-- Volltextsuche
-
-### Notifications
-- E-Mail-Benachrichtigungen bei neuen Events
-- RSS-Feed
-- Push-Notifications
-
-### Widgets
-- WordPress Widget für Sidebar
-- Gutenberg-Blocks
-- Elementor-Integration
-
-### Advanced Shortcodes
-- [cts_countdown] - Countdown bis Event
-- [cts_next_event] - Nächster Termin
-- [cts_event_count] - Event-Zähler
-- [cts_person_schedule] - Persönliche Dienste
-
----
-
-## Migration-Strategie vom alten Plugin
-
-### Daten übernehmen:
-1. Mapping alter → neuer Tabellennamen
-2. Daten-Migration-Script
-3. Option zur parallelen Nutzung
-4. Deaktivierungs-Hinweis für altes Plugin
-
-### Kompatibilität:
-- Alte Shortcodes als Alias unterstützen
-- Template-Pfade kompatibel halten
-- Options-Migration
-
----
-
-## v1.0.0.0 - Production Ready
-**Ziel:** Produktionsreife Version
-
-### Features:
-- [ ] Performance-Optimierungen
-  - DB-Query-Caching
-  - Transients für API-Calls
-  - Lazy-Loading
-- [ ] Testing
-  - Unit-Tests für Repositories
-  - Integration-Tests für Services
-- [ ] Dokumentation
-  - Benutzer-Handbuch
-  - Entwickler-Dokumentation
-  - Video-Tutorials
-- [ ] Polish
-  - Accessibility (WCAG 2.1)
-  - SEO-Optimierung
-
----
-
-**Stand:** Version 0.3.1.0 (11. Dezember 2025)
-**Nächster Schritt:** v0.3.2.0 - Repository Base-Klasse
+**Letzte Aktualisierung:** 22. Dezember 2025 (v0.8.0.0)

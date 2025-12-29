@@ -1,0 +1,555 @@
+<!-- 
+ChurchTools Suite - Shortcode Demo & Test-Seite
+Version: 0.5.9.21
+Kopiere diesen Inhalt in eine neue WordPress-Seite (HTML-Modus)
+-->
+
+<style>
+.cts-demo-section {
+    margin: 40px 0;
+    padding: 30px;
+    background: #f9fafb;
+    border-left: 4px solid #667eea;
+    border-radius: 8px;
+}
+.cts-demo-section h2 {
+    margin-top: 0;
+    color: #1d2327;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.cts-demo-subsection {
+    margin: 25px 0;
+    padding: 20px;
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.cts-demo-subsection h3 {
+    margin: 0 0 15px;
+    color: #374151;
+    font-size: 18px;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 10px;
+}
+.cts-demo-note {
+    padding: 15px;
+    background: #fffbeb;
+    border-left: 3px solid #f59e0b;
+    margin: 20px 0;
+    border-radius: 4px;
+}
+.cts-demo-checklist {
+    background: #f0f9ff;
+    padding: 20px;
+    border-radius: 6px;
+    margin: 20px 0;
+}
+.cts-demo-checklist h3 {
+    color: #0369a1;
+    margin-top: 0;
+}
+</style>
+
+<!-- INTRO -->
+<div class="cts-demo-note">
+    <strong>🎯 Anleitung:</strong> Diese Seite enthält alle verfügbaren Shortcodes der ChurchTools Suite v0.5.9.21. 
+    Scrolle durch die Seite, um alle Views zu sehen und zu testen. Notiere Probleme und Verbesserungsvorschläge am Ende.
+</div>
+
+<!-- ============================================ -->
+<!-- 1. CALENDAR VIEWS -->
+<!-- ============================================ -->
+<div class="cts-demo-section">
+    <h2><span>📅</span> Calendar Views (Kalenderansichten)</h2>
+    
+    <div class="cts-demo-subsection">
+        <h3>Monthly Modern</h3>
+        [cts_calendar view="monthly-modern" limit="20"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Monthly Clean</h3>
+        [cts_calendar view="monthly-clean" limit="20"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Monthly Classic</h3>
+        [cts_calendar view="monthly-classic" limit="20"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Weekly Fluent</h3>
+        [cts_calendar view="weekly-fluent" limit="20"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Weekly Liquid</h3>
+        [cts_calendar view="weekly-liquid" limit="20"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Yearly</h3>
+        [cts_calendar view="yearly" limit="50"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Daily</h3>
+        [cts_calendar view="daily" limit="10"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Daily Liquid</h3>
+        [cts_calendar view="daily-liquid" limit="10"]
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- 2. LIST VIEWS -->
+<!-- ============================================ -->
+<div class="cts-demo-section">
+    <h2><span>📋</span> List Views (Listenansichten)</h2>
+    
+    <div class="cts-demo-subsection">
+        <h3>Classic</h3>
+        [cts_list view="classic" limit="10" show_services="true"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Standard</h3>
+        [cts_list view="standard" limit="10" show_services="true"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Modern</h3>
+        [cts_list view="modern" limit="10" show_services="true"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Minimal</h3>
+        [cts_list view="minimal" limit="10"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Toggle (aufklappbar)</h3>
+        [cts_list view="toggle" limit="10" show_services="true"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>With Map (mit Karte)</h3>
+        [cts_list view="with-map" limit="10"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Fluent</h3>
+        [cts_list view="fluent" limit="10" show_services="true"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Large Liquid</h3>
+        [cts_list view="large-liquid" limit="10" show_services="true"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Medium Liquid</h3>
+        [cts_list view="medium-liquid" limit="10" show_services="true"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Small Liquid</h3>
+        [cts_list view="small-liquid" limit="10" show_services="true"]
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- 3. GRID VIEWS -->
+<!-- ============================================ -->
+<div class="cts-demo-section">
+    <h2><span>▦</span> Grid Views (Rasteransichten)</h2>
+    
+    <div class="cts-demo-subsection">
+        <h3>Simple (2 Spalten)</h3>
+        [cts_grid view="simple" columns="2" limit="6"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Simple (3 Spalten)</h3>
+        [cts_grid view="simple" columns="3" limit="9"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Simple (4 Spalten)</h3>
+        [cts_grid view="simple" columns="4" limit="8"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Modern</h3>
+        [cts_grid view="modern" columns="3" limit="9"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Minimal</h3>
+        [cts_grid view="minimal" columns="3" limit="9"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Ocean</h3>
+        [cts_grid view="ocean" columns="3" limit="9"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Classic</h3>
+        [cts_grid view="classic" columns="3" limit="9"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Colorful</h3>
+        [cts_grid view="colorful" columns="3" limit="9"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Novel</h3>
+        [cts_grid view="novel" columns="3" limit="9"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>With Map</h3>
+        [cts_grid view="with-map" columns="2" limit="6"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Large Liquid</h3>
+        [cts_grid view="large-liquid" columns="2" limit="6"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Medium Liquid</h3>
+        [cts_grid view="medium-liquid" columns="3" limit="9"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Small Liquid</h3>
+        [cts_grid view="small-liquid" columns="4" limit="8"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Tile</h3>
+        [cts_grid view="tile" columns="3" limit="9"]
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- 4. SLIDER VIEWS -->
+<!-- ============================================ -->
+<div class="cts-demo-section">
+    <h2><span>🎠</span> Slider Views</h2>
+    
+    <div class="cts-demo-subsection">
+        <h3>Type 1 (Autoplay)</h3>
+        [cts_slider view="type-1" limit="5" autoplay="true" interval="5000"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Type 2 (Autoplay)</h3>
+        [cts_slider view="type-2" limit="5" autoplay="true" interval="5000"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Type 3 (Autoplay)</h3>
+        [cts_slider view="type-3" limit="5" autoplay="true" interval="5000"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Type 4 (Manuell)</h3>
+        [cts_slider view="type-4" limit="5" autoplay="false"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Type 5 (Schneller)</h3>
+        [cts_slider view="type-5" limit="5" autoplay="true" interval="4000"]
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- 5. COUNTDOWN VIEWS -->
+<!-- ============================================ -->
+<div class="cts-demo-section">
+    <h2><span>⏱️</span> Countdown Views</h2>
+    
+    <div class="cts-demo-subsection">
+        <h3>Type 1</h3>
+        [cts_countdown view="type-1"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Type 2</h3>
+        [cts_countdown view="type-2"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Type 3</h3>
+        [cts_countdown view="type-3"]
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- 6. COVER VIEWS -->
+<!-- ============================================ -->
+<div class="cts-demo-section">
+    <h2><span>🎨</span> Cover Views (Hero-Banner)</h2>
+    
+    <div class="cts-demo-subsection">
+        <h3>Classic</h3>
+        [cts_cover view="classic" limit="1"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Modern</h3>
+        [cts_cover view="modern" limit="1"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Clean</h3>
+        [cts_cover view="clean" limit="1"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Fluent</h3>
+        [cts_cover view="fluent" limit="1"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Liquid</h3>
+        [cts_cover view="liquid" limit="1"]
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- 7. TIMETABLE VIEWS -->
+<!-- ============================================ -->
+<div class="cts-demo-section">
+    <h2><span>🗓️</span> Timetable Views (Zeitplan)</h2>
+    
+    <div class="cts-demo-subsection">
+        <h3>Modern</h3>
+        [cts_timetable view="modern" limit="20"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Clean</h3>
+        [cts_timetable view="clean" limit="20"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Timeline</h3>
+        [cts_timetable view="timeline" limit="20"]
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- 8. CAROUSEL VIEWS -->
+<!-- ============================================ -->
+<div class="cts-demo-section">
+    <h2><span>🎡</span> Carousel Views</h2>
+    
+    <div class="cts-demo-subsection">
+        <h3>Type 1</h3>
+        [cts_carousel view="type-1" limit="10" autoplay="true" interval="5000"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Type 2</h3>
+        [cts_carousel view="type-2" limit="10" autoplay="true" interval="5000"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Type 3</h3>
+        [cts_carousel view="type-3" limit="10" autoplay="false"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Type 4</h3>
+        [cts_carousel view="type-4" limit="10" autoplay="true" interval="4000"]
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- 9. WIDGET VIEWS -->
+<!-- ============================================ -->
+<div class="cts-demo-section">
+    <h2><span>🎁</span> Widget Views (Sidebar)</h2>
+    
+    <div class="cts-demo-subsection">
+        <h3>Upcoming Events</h3>
+        [cts_widget view="upcoming-events" limit="5"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Calendar Widget</h3>
+        [cts_widget view="calendar-widget"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Countdown Widget</h3>
+        [cts_widget view="countdown-widget"]
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- 10. SEARCH VIEWS -->
+<!-- ============================================ -->
+<div class="cts-demo-section">
+    <h2><span>🔍</span> Search Views</h2>
+    
+    <div class="cts-demo-subsection">
+        <h3>Search Bar</h3>
+        [cts_search view="bar"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Advanced Search</h3>
+        [cts_search view="advanced"]
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- 11. MAP VIEWS -->
+<!-- ============================================ -->
+<div class="cts-demo-section">
+    <h2><span>🗺️</span> Map Views</h2>
+    
+    <div class="cts-demo-subsection">
+        <h3>Standard Map</h3>
+        [cts_map view="standard" limit="20"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Advanced Map</h3>
+        [cts_map view="advanced" limit="20"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Liquid Map</h3>
+        [cts_map view="liquid" limit="20"]
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- 12. PARAMETER TESTS -->
+<!-- ============================================ -->
+<div class="cts-demo-section">
+    <h2><span>🧪</span> Parameter-Tests</h2>
+    
+    <div class="cts-demo-subsection">
+        <h3>Nur Kalender ID 1</h3>
+        [cts_list view="classic" calendar="1" limit="5"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Mehrere Kalender (ID 2 und 3)</h3>
+        [cts_list view="classic" calendar="2,3" limit="5"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Mit Services anzeigen</h3>
+        [cts_list view="classic" show_services="true" limit="5"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Ohne Services</h3>
+        [cts_list view="classic" show_services="false" limit="5"]
+    </div>
+    
+    <div class="cts-demo-subsection">
+        <h3>Grid 2 Spalten + Filter</h3>
+        [cts_grid view="simple" columns="2" calendar="1" limit="4"]
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- TEST CHECKLIST -->
+<!-- ============================================ -->
+<div class="cts-demo-checklist">
+    <h3>✅ Test-Checkliste</h3>
+    
+    <h4>Funktionalität</h4>
+    <ul>
+        <li>☐ Alle Shortcodes rendern ohne Fehler</li>
+        <li>☐ Events werden korrekt angezeigt</li>
+        <li>☐ Kalenderfilter funktionieren</li>
+        <li>☐ Services werden angezeigt (wo aktiviert)</li>
+        <li>☐ Datumsformatierung korrekt</li>
+    </ul>
+    
+    <h4>Layout & Design</h4>
+    <ul>
+        <li>☐ Responsive Design auf Mobile</li>
+        <li>☐ Keine Layout-Breaks</li>
+        <li>☐ Farben konsistent</li>
+        <li>☐ Schriften lesbar</li>
+        <li>☐ Abstände harmonisch</li>
+    </ul>
+    
+    <h4>Performance</h4>
+    <ul>
+        <li>☐ Ladezeiten akzeptabel</li>
+        <li>☐ Keine JavaScript-Fehler</li>
+        <li>☐ Keine PHP-Fehler</li>
+        <li>☐ CSS wird geladen</li>
+    </ul>
+    
+    <h4>Interaktion</h4>
+    <ul>
+        <li>☐ Slider autoplay funktioniert</li>
+        <li>☐ Carousel Navigation funktioniert</li>
+        <li>☐ Countdown zählt korrekt</li>
+        <li>☐ Buttons/Links funktionieren</li>
+    </ul>
+    
+    <h4>Edge Cases</h4>
+    <ul>
+        <li>☐ Keine Events → Empty State</li>
+        <li>☐ Sehr lange Titel → Umbruch</li>
+        <li>☐ Keine Services → Kein Break</li>
+        <li>☐ Ungültige Parameter → Fehlerbehandlung</li>
+    </ul>
+</div>
+
+<!-- ============================================ -->
+<!-- NOTES SECTION -->
+<!-- ============================================ -->
+<div class="cts-demo-section">
+    <h2><span>📝</span> Notizen & Feedback</h2>
+    
+    <h3>Gefundene Probleme:</h3>
+    <ol>
+        <li><strong>Problem:</strong> [Beschreibung]<br>
+            <strong>View:</strong> [Name]<br>
+            <strong>Priorität:</strong> Hoch/Mittel/Niedrig
+        </li>
+        <li><strong>Problem:</strong> [Beschreibung]<br>
+            <strong>View:</strong> [Name]<br>
+            <strong>Priorität:</strong> Hoch/Mittel/Niedrig
+        </li>
+    </ol>
+    
+    <h3>Verbesserungsvorschläge:</h3>
+    <ol>
+        <li><strong>Idee:</strong> [Beschreibung]<br>
+            <strong>Aufwand:</strong> Hoch/Mittel/Niedrig
+        </li>
+        <li><strong>Idee:</strong> [Beschreibung]<br>
+            <strong>Aufwand:</strong> Hoch/Mittel/Niedrig
+        </li>
+    </ol>
+</div>
+
+<hr style="margin: 40px 0;">
+
+<div class="cts-demo-note">
+    <strong>🎉 Ende der Demo</strong><br>
+    ChurchTools Suite v0.5.9.21 | 16. Dezember 2025<br>
+    Alle 13 Shortcode-Typen mit 70+ View-Varianten getestet
+</div>

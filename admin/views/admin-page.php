@@ -11,6 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'dashboard';
+$advanced_mode = get_option( 'churchtools_suite_advanced_mode', 0 );
 ?>
 
 <div class="wrap cts-wrap">
@@ -32,22 +33,20 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'dashboard'
 			<span>⚙️</span>
 			<?php esc_html_e( 'Einstellungen', 'churchtools-suite' ); ?>
 		</a>
-		<a href="?page=churchtools-suite&tab=calendars" class="cts-tab <?php echo $active_tab === 'calendars' ? 'active' : ''; ?>">
-			<span>🗓️</span>
-			<?php esc_html_e( 'Kalender', 'churchtools-suite' ); ?>
-		</a>
-		<a href="?page=churchtools-suite&tab=events" class="cts-tab <?php echo $active_tab === 'events' ? 'active' : ''; ?>">
+		<a href="?page=churchtools-suite&tab=data" class="cts-tab <?php echo $active_tab === 'data' ? 'active' : ''; ?>">
 			<span>📋</span>
-			<?php esc_html_e( 'Termine', 'churchtools-suite' ); ?>
+			<?php esc_html_e( 'Daten', 'churchtools-suite' ); ?>
 		</a>
 		<a href="?page=churchtools-suite&tab=sync" class="cts-tab <?php echo $active_tab === 'sync' ? 'active' : ''; ?>">
 			<span>🔄</span>
-			<?php esc_html_e( 'Sync', 'churchtools-suite' ); ?>
+			<?php esc_html_e( 'Synchronisation', 'churchtools-suite' ); ?>
 		</a>
+		<?php if ( $advanced_mode ) : ?>
 		<a href="?page=churchtools-suite&tab=debug" class="cts-tab <?php echo $active_tab === 'debug' ? 'active' : ''; ?>">
 			<span>🔧</span>
-			<?php esc_html_e( 'Debug', 'churchtools-suite' ); ?>
+			<?php esc_html_e( 'Erweitert', 'churchtools-suite' ); ?>
 		</a>
+		<?php endif; ?>
 	</div>
 
 	<?php
@@ -55,17 +54,16 @@ $active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'dashboard'
 		case 'settings':
 			include __DIR__ . '/tab-settings.php';
 			break;
-		case 'calendars':
-			include __DIR__ . '/tab-calendars.php';
-			break;
-		case 'events':
-			include __DIR__ . '/tab-events.php';
+		case 'data':
+			include __DIR__ . '/tab-data.php';
 			break;
 		case 'sync':
 			include __DIR__ . '/tab-sync.php';
 			break;
 		case 'debug':
-			include __DIR__ . '/tab-debug.php';
+			if ( $advanced_mode ) {
+				include __DIR__ . '/tab-debug-minimal.php';
+			}
 			break;
 		case 'dashboard':
 		default:

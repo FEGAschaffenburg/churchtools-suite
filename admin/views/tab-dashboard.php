@@ -28,10 +28,22 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 
 <div class="cts-dashboard">
 	
-	<!-- Dashboard Header -->
-	<div class="cts-section-header">
-		<h2><?php esc_html_e( 'Dashboard', 'churchtools-suite' ); ?></h2>
-		<p class="cts-section-description"><?php esc_html_e( 'Übersicht über den aktuellen Status der ChurchTools-Integration.', 'churchtools-suite' ); ?></p>
+	<!-- Dashboard Header mit One-Click-Actions -->
+	<div class="cts-section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+		<div>
+			<h2><?php esc_html_e( 'Dashboard', 'churchtools-suite' ); ?></h2>
+			<p class="cts-section-description"><?php esc_html_e( 'Übersicht über den aktuellen Status der ChurchTools-Integration.', 'churchtools-suite' ); ?></p>
+		</div>
+		<?php if ( $is_connected ) : ?>
+		<div style="display: flex; gap: 10px;">
+			<a href="?page=churchtools-suite&tab=sync" class="cts-button cts-button-primary" style="font-size: 16px; padding: 12px 24px;">
+				🔄 <?php esc_html_e( 'Jetzt synchronisieren', 'churchtools-suite' ); ?>
+			</a>
+			<a href="?page=churchtools-suite&tab=debug" class="cts-button cts-button-secondary" style="padding: 12px 20px;">
+				📊 <?php esc_html_e( 'Sync-Logs', 'churchtools-suite' ); ?>
+			</a>
+		</div>
+		<?php endif; ?>
 	</div>
 	
 	<!-- Status Cards -->
@@ -70,27 +82,146 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 			</div>
 			<div class="cts-card-footer">
 				<a href="?page=churchtools-suite&tab=settings" class="cts-button cts-button-secondary">
-					<?php esc_html_e( 'Einstellungen', 'churchtools-suite' ); ?>
+					⚙️ <?php esc_html_e( 'Einstellungen', 'churchtools-suite' ); ?>
 				</a>
 			</div>
 		</div>
 
 		<!-- Automatischer Sync -->
+		<?php
+		$auto_sync_enabled = get_option( 'churchtools_suite_auto_sync_enabled', 0 );
+		$last_sync_status = get_option( 'churchtools_suite_last_sync_status', '' );
+		$last_sync_error = get_option( 'churchtools_suite_last_sync_error', '' );
+		$last_sync_error_time = get_option( 'churchtools_suite_last_sync_error_time', '' );
+		$last_sync_stats = get_option( 'churchtools_suite_last_sync_stats', [] );
+		$auto_sync_interval = get_option( 'churchtools_suite_auto_sync_interval', 'daily' );
+		
+		// Intervall-Namen
+		$interval_names = [
+			'daily' => __( 'Täglich', 'churchtools-suite' ),
+			'cts_2days' => __( 'Alle 2 Tage', 'churchtools-suite' ),
+			'cts_3days' => __( 'Alle 3 Tage', 'churchtools-suite' ),
+			'cts_weekly' => __( 'Wöchentlich', 'churchtools-suite' ),
+			'cts_2weeks' => __( 'Alle 2 Wochen', 'churchtools-suite' ),
+			'cts_monthly' => __( 'Monatlich', 'churchtools-suite' ),
+		];
+		?>
 		<div class="cts-card">
 			<div class="cts-card-header">
 				<span class="cts-card-icon">🔄</span>
 				<h3><?php esc_html_e( 'Automatischer Sync', 'churchtools-suite' ); ?></h3>
 			</div>
 			<div class="cts-card-body">
-				<p class="cts-status cts-status-inactive">
-					<span class="cts-status-indicator"></span>
-					<?php esc_html_e( 'Deaktiviert', 'churchtools-suite' ); ?>
-				</p>
-				<p class="cts-card-detail"><?php esc_html_e( 'Automatische Synchronisation ist ausgeschaltet', 'churchtools-suite' ); ?></p>
+				<?php if ( $auto_sync_enabled ) : ?>
+					<?php if ( $last_sync_status === 'error' && ! empty( $last_sync_error ) ) : ?>
+						<p class="cts-status cts-status-error">
+							<span class="cts-status-indicator"></span>
+							<?php esc_html_e( 'Fehler beim letzten Sync', 'churchtools-suite' ); ?>
+						</p>
+						<p class="cts-card-detail" style="color: #d63638; font-size: 13px; margin-bottom: 8px;">
+							<?php echo esc_html( $last_sync_error ); ?>
+						</p>
+						<?php if ( $last_sync_error_time ) : ?>
+							<p class="cts-card-meta" style="color: #d63638;">
+								<?php echo esc_html( sprintf( __( 'Fehler: %s', 'churchtools-suite' ), date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $last_sync_error_time ) ) ) ); ?>
+							</p>
+						<?php endif; ?>					<p class="cts-card-meta" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f1;">
+						<small><?php printf(
+							esc_html__('Manueller Trigger im %sDebug-Tab%s verfügbar', 'churchtools-suite'),
+							'<a href="?page=churchtools-suite&tab=debug">',
+							'</a>'
+						); ?></small>
+					</p>					<?php elseif ( $last_sync_status === 'success' && ! empty( $last_sync_stats ) ) : ?>
+						<p class="cts-status cts-status-success">
+							<span class="cts-status-indicator"></span>
+							<?php echo esc_html( sprintf( __( 'Aktiv (%s)', 'churchtools-suite' ), $interval_names[ $auto_sync_interval ] ?? $auto_sync_interval ) ); ?>
+						</p>
+						<p class="cts-card-detail">
+							<?php
+							// Show sync type badge (v0.7.1.0)
+							$sync_type = $last_sync_stats['sync_type'] ?? 'full';
+							$sync_type_label = $sync_type === 'incremental' ? __( 'INKREMENTELL', 'churchtools-suite' ) : __( 'VOLL', 'churchtools-suite' );
+							$sync_type_color = $sync_type === 'incremental' ? '#00a32a' : '#2271b1';
+							?>
+							<span style="display: inline-block; padding: 2px 8px; font-size: 11px; font-weight: 600; color: white; background: <?php echo esc_attr( $sync_type_color ); ?>; border-radius: 3px; margin-right: 6px;">
+								<?php echo esc_html( $sync_type_label ); ?>
+							</span>
+							<?php
+							echo esc_html( sprintf(
+								__( '%d Events gefunden, %d neu, %d aktualisiert', 'churchtools-suite' ),
+								$last_sync_stats['events_found'] ?? 0,
+								$last_sync_stats['events_inserted'] ?? 0,
+								$last_sync_stats['events_updated'] ?? 0
+							) );
+							
+							// Show unchanged/deleted counts if incremental (v0.7.1.0)
+							if ( $sync_type === 'incremental' ) {
+								$unchanged = $last_sync_stats['events_unchanged'] ?? 0;
+								$deleted = $last_sync_stats['events_deleted'] ?? 0;
+								if ( $unchanged > 0 || $deleted > 0 ) {
+									echo ' <span style="color: #646970; font-size: 12px;">';
+									if ( $unchanged > 0 ) {
+										echo esc_html( sprintf( __( '(%d unverändert)', 'churchtools-suite' ), $unchanged ) );
+									}
+									if ( $deleted > 0 ) {
+										echo esc_html( sprintf( __( ' (%d gelöscht)', 'churchtools-suite' ), $deleted ) );
+									}
+									echo '</span>';
+								}
+							}
+							?>
+						</p>
+						<?php if ( ! empty( $last_sync_stats['completed_at'] ) ) : ?>
+							<p class="cts-card-meta">
+								<?php echo esc_html( sprintf( __( 'Letzter Sync: %s', 'churchtools-suite' ), date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $last_sync_stats['completed_at'] ) ) ) ); ?>
+							</p>
+						<?php endif; ?>					<?php
+					// Nächster geplanter Sync berechnen
+					$next_scheduled = wp_next_scheduled('churchtools_suite_auto_sync');
+					if ($next_scheduled) :
+					?>
+						<p class="cts-card-meta" style="margin-top: 8px;">
+							<?php echo esc_html( sprintf( __( 'Nächster Sync: %s', 'churchtools-suite' ), date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $next_scheduled ) ) ); ?>
+						</p>
+					<?php endif; ?>
+					<p class="cts-card-meta" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f1;">
+						<small><?php printf(
+							esc_html__('Manueller Trigger im %sDebug-Tab%s verfügbar', 'churchtools-suite'),
+							'<a href="?page=churchtools-suite&tab=debug">',
+							'</a>'
+						); ?></small>
+					</p>					<?php else : ?>
+						<p class="cts-status cts-status-success">
+							<span class="cts-status-indicator"></span>
+							<?php echo esc_html( sprintf( __( 'Aktiv (%s)', 'churchtools-suite' ), $interval_names[ $auto_sync_interval ] ?? $auto_sync_interval ) ); ?>
+						</p>
+						<p class="cts-card-detail"><?php esc_html_e( 'Wartet auf ersten automatischen Sync', 'churchtools-suite' ); ?></p>					<?php
+					// Nächster geplanter Sync berechnen
+					$next_scheduled = wp_next_scheduled('churchtools_suite_auto_sync');
+					if ($next_scheduled) :
+					?>
+						<p class="cts-card-meta">
+							<?php echo esc_html( sprintf( __( 'Nächster Sync: %s', 'churchtools-suite' ), date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $next_scheduled ) ) ); ?>
+						</p>
+					<?php endif; ?>
+					<p class="cts-card-meta" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f1;">
+						<small><?php printf(
+							esc_html__('Manueller Trigger im %sDebug-Tab%s verfügbar', 'churchtools-suite'),
+							'<a href="?page=churchtools-suite&tab=debug">',
+							'</a>'
+						); ?></small>
+					</p>					<?php endif; ?>
+				<?php else : ?>
+					<p class="cts-status cts-status-inactive">
+						<span class="cts-status-indicator"></span>
+						<?php esc_html_e( 'Deaktiviert', 'churchtools-suite' ); ?>
+					</p>
+					<p class="cts-card-detail"><?php esc_html_e( 'Automatische Synchronisation ist ausgeschaltet', 'churchtools-suite' ); ?></p>
+				<?php endif; ?>
 			</div>
 			<div class="cts-card-footer">
-				<a href="?page=churchtools-suite&tab=sync" class="cts-button cts-button-secondary">
-					<?php esc_html_e( 'Konfigurieren', 'churchtools-suite' ); ?>
+				<a href="?page=churchtools-suite&tab=settings#auto-sync" class="cts-button cts-button-secondary">
+					⚙️ <?php esc_html_e( 'Konfigurieren', 'churchtools-suite' ); ?>
 				</a>
 			</div>
 		</div>
@@ -113,8 +244,8 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 				</p>
 			</div>
 			<div class="cts-card-footer">
-				<a href="?page=churchtools-suite&tab=sync" class="cts-button cts-button-secondary">
-					<?php esc_html_e( 'Termine anzeigen', 'churchtools-suite' ); ?>
+				<a href="?page=churchtools-suite&tab=events" class="cts-button cts-button-secondary">
+					📅 <?php esc_html_e( 'Termine anzeigen', 'churchtools-suite' ); ?>
 				</a>
 			</div>
 		</div>
@@ -145,10 +276,25 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 		</div>
 		<div class="cts-card-footer">
 			<a href="?page=churchtools-suite&tab=debug" class="cts-button cts-button-secondary">
-				<?php esc_html_e( 'Update-Info', 'churchtools-suite' ); ?>
+				🔧 <?php esc_html_e( 'Debug-Info', 'churchtools-suite' ); ?>
 			</a>
 		</div>
 	</div>
+
+	<!-- WP-Cron Warnung -->
+	<?php if ( defined( 'DISABLE_WP_CRON' ) && DISABLE_WP_CRON ) : ?>
+	<div style="margin-top: 20px; padding: 16px; background: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; max-width: 800px;">
+		<h4 style="margin: 0 0 10px; color: #856404; font-size: 15px;">
+			⚠️ <?php esc_html_e( 'WP-Cron ist deaktiviert', 'churchtools-suite' ); ?>
+		</h4>
+		<p style="margin: 0 0 10px; color: #856404; font-size: 13px; line-height: 1.6;">
+			<?php esc_html_e( 'Die automatische Synchronisation ist nicht aktiv, da WP-Cron in Ihrer Konfiguration deaktiviert wurde. Bitte richten Sie einen System-Cron ein oder aktivieren Sie WP-Cron.', 'churchtools-suite' ); ?>
+		</p>
+		<a href="?page=churchtools-suite&tab=settings#auto-sync" class="cts-button cts-button-secondary" style="margin-top: 8px;">
+			<?php esc_html_e( 'System-Cron Anleitung anzeigen', 'churchtools-suite' ); ?>
+		</a>
+	</div>
+	<?php endif; ?>
 
 	<!-- Quick Start -->
 	<?php if ( ! $is_configured ) : ?>

@@ -21,6 +21,7 @@ $calendars_last_sync = get_option('churchtools_suite_calendars_last_sync', null)
 $events_last_sync = get_option('churchtools_suite_events_last_sync', null);
 $days_past = get_option('churchtools_suite_sync_days_past', 7);
 $days_future = get_option('churchtools_suite_sync_days_future', 90);
+$auto_sync_enabled = get_option('churchtools_suite_auto_sync_enabled', 0);
 ?>
 
 <div class="cts-tab-content-inner">
@@ -84,11 +85,37 @@ $days_future = get_option('churchtools_suite_sync_days_future', 90);
 				<div class="notice notice-warning inline">
 					<p><?php esc_html_e('Bitte wählen Sie im Kalender-Tab mindestens einen Kalender aus.', 'churchtools-suite'); ?></p>
 				</div>
+			<?php elseif ($auto_sync_enabled): ?>
+				<div class="notice notice-info inline">
+					<p>
+						<strong><?php esc_html_e('Automatischer Sync ist aktiviert', 'churchtools-suite'); ?></strong><br>
+						<?php esc_html_e('Der manuelle Sync ist deaktiviert, da der automatische Sync in den Einstellungen aktiviert ist. Termine werden automatisch im konfigurierten Intervall synchronisiert.', 'churchtools-suite'); ?><br>
+						<?php printf(
+							esc_html__('Um einen Sync sofort auszuführen, nutzen Sie den %sManuellen Trigger im Debug-Tab%s.', 'churchtools-suite'),
+							'<a href="?page=churchtools-suite&tab=debug">',
+							'</a>'
+						); ?>
+					</p>
+				</div>
+				<div class="cts-button-group">
+					<button type="button" id="cts-sync-events-btn" class="button button-primary" disabled title="<?php esc_attr_e('Automatischer Sync ist aktiviert', 'churchtools-suite'); ?>">
+						<span class="dashicons dashicons-calendar"></span>
+						<?php esc_html_e('Termine jetzt synchronisieren', 'churchtools-suite'); ?>
+					</button>
+					<button type="button" id="cts-force-full-sync-btn" class="button button-secondary" disabled title="<?php esc_attr_e('Automatischer Sync ist aktiviert', 'churchtools-suite'); ?>" style="margin-left: 10px;">
+						<span class="dashicons dashicons-backup"></span>
+						<?php esc_html_e('Vollständigen Sync erzwingen', 'churchtools-suite'); ?>
+					</button>
+				</div>
 			<?php else: ?>
 				<div class="cts-button-group">
 					<button type="button" id="cts-sync-events-btn" class="button button-primary">
 						<span class="dashicons dashicons-calendar"></span>
 						<?php esc_html_e('Termine jetzt synchronisieren', 'churchtools-suite'); ?>
+					</button>
+					<button type="button" id="cts-force-full-sync-btn" class="button button-secondary" style="margin-left: 10px;">
+						<span class="dashicons dashicons-backup"></span>
+						<?php esc_html_e('Vollständigen Sync erzwingen', 'churchtools-suite'); ?>
 					</button>
 				</div>
 			<?php endif; ?>
@@ -108,6 +135,7 @@ $days_future = get_option('churchtools_suite_sync_days_future', 90);
 				<li><?php esc_html_e('Nach der Kalender-Synchronisation können Sie im Kalender-Tab auswählen, welche Kalender synchronisiert werden sollen.', 'churchtools-suite'); ?></li>
 				<li><?php esc_html_e('Die Termin-Synchronisation lädt nur Termine aus den im Kalender-Tab ausgewählten Kalendern.', 'churchtools-suite'); ?></li>
 				<li><?php esc_html_e('Den Zeitraum für die Termin-Synchronisation können Sie im Einstellungen-Tab anpassen.', 'churchtools-suite'); ?></li>
+				<li><strong><?php esc_html_e('Inkrementelle Synchronisation (v0.7.1.0):', 'churchtools-suite'); ?></strong> <?php esc_html_e('Nach dem ersten Sync werden nur noch geänderte Termine abgerufen (80-95% weniger API-Anfragen). Ein vollständiger Sync kann mit dem "Vollständigen Sync erzwingen"-Button ausgelöst werden.', 'churchtools-suite'); ?></li>
 			</ul>
 		</div>
 	</div>

@@ -1,0 +1,869 @@
+/**
+ * ChurchTools Suite Public CSS
+ * Frontend-Styles für alle View-Typen
+ *
+ * @package ChurchTools_Suite
+ * @since   0.5.1.0
+ */
+
+/* === Base Styles === */
+.churchtools-suite-wrapper {
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+	line-height: 1.6;
+	color: #333;
+}
+
+.churchtools-suite-wrapper * {
+	box-sizing: border-box;
+}
+
+/* === Loading State === */
+.cts-loading {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 200px;
+}
+
+.cts-spinner {
+	display: inline-block;
+	width: 50px;
+	height: 50px;
+	border: 4px solid rgba(0, 0, 0, 0.1);
+	border-left-color: #667eea;
+	border-radius: 50%;
+	animation: cts-spin 1s linear infinite;
+}
+
+@keyframes cts-spin {
+	to { transform: rotate(360deg); }
+}
+
+/* === List Views === */
+
+/* === List Classic === */
+.cts-list-classic {
+	background: var(--wp--preset--color--base, #fff);
+	border-radius: 8px;
+	box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+	overflow: hidden;
+}
+
+.cts-event-classic {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding: 10px 16px;
+	border-bottom: 1px solid #f0f0f0;
+	font-size: 14px;
+	transition: background 0.15s;
+}
+
+.cts-event-classic:hover {
+	background: var(--wp--preset--color--tertiary, #f9fafb);
+}
+
+.cts-event-classic:last-child {
+	border-bottom: none;
+}
+
+.cts-list-classic .cts-date {
+	flex-shrink: 0;
+	width: 70px;
+	font-weight: 600;
+	color: var(--wp--preset--color--primary, var(--wp-admin-theme-color, #2271b1));
+	font-size: 13px;
+}
+
+.cts-list-classic .cts-time {
+	flex-shrink: 0;
+	width: 140px;
+	font-weight: 500;
+	color: var(--wp--preset--color--contrast, #50575e);
+	font-size: 13px;
+}
+
+.cts-list-classic .cts-title-block {
+	flex: 1;
+	min-width: 0;
+}
+
+.cts-list-classic .cts-title {
+	font-weight: 600;
+	color: var(--wp--preset--color--contrast, #1d2327);
+	margin-bottom: 4px;
+}
+
+.cts-list-classic .cts-description {
+	font-size: 12px;
+	color: var(--wp--preset--color--secondary, #646970);
+	line-height: 1.4;
+}
+
+.cts-list-classic .cts-services {
+	flex-shrink: 0;
+	width: 280px;
+	color: var(--wp--preset--color--secondary, #646970);
+	font-size: 13px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.cts-list-classic .cts-more {
+	font-weight: 600;
+	color: var(--wp--preset--color--primary, var(--wp-admin-theme-color, #2271b1));
+}
+
+.cts-list-classic .cts-location {
+	flex-shrink: 0;
+	width: 150px;
+	color: var(--wp--preset--color--secondary, #646970);
+	font-size: 13px;
+	text-align: right;
+}
+
+@media (max-width: 1024px) {
+	.cts-list-classic .cts-services {
+		display: none;
+	}
+}
+
+@media (max-width: 768px) {
+	.cts-event-classic {
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+	
+	.cts-list-classic .cts-date,
+	.cts-list-classic .cts-time {
+		width: auto;
+	}
+	
+	.cts-list-classic .cts-title-block {
+		flex-basis: 100%;
+	}
+	
+	.cts-list-classic .cts-location {
+		width: auto;
+		text-align: left;
+	}
+}
+
+/* === List Medium === */
+.cts-list-medium {
+	background: var(--wp--preset--color--base, #fff);
+	border-radius: 8px;
+	box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+	overflow: hidden;
+}
+
+.cts-event-medium {
+	display: flex;
+	align-items: stretch;
+	gap: 16px;
+	padding: 12px 16px;
+	border-bottom: 1px solid #f0f0f0;
+	transition: background 0.15s;
+}
+
+.cts-event-medium:hover {
+	background: var(--wp--preset--color--tertiary, #f6f7f7);
+}
+
+.cts-event-medium:last-child {
+	border-bottom: none;
+}
+
+.cts-date-box {
+	flex-shrink: 0 !important;
+	width: 70px !important;
+	height: auto !important;
+	text-align: center !important;
+	background: linear-gradient(135deg, #0a4b78 0%, #135e96 100%) !important;
+	color: #ffffff !important;
+	border-radius: 6px !important;
+	padding: 10px 6px !important;
+	display: flex !important;
+	flex-direction: column !important;
+	justify-content: center !important;
+	box-shadow: 0 2px 4px rgba(0,0,0,0.15) !important;
+	min-height: 70px !important;
+}
+
+.cts-date-day {
+	font-size: 26px !important;
+	font-weight: 700 !important;
+	line-height: 1 !important;
+	margin: 0 0 2px 0 !important;
+	text-shadow: 0 1px 2px rgba(0,0,0,0.2) !important;
+	color: #ffffff !important;
+}
+
+.cts-date-month {
+	font-size: 10px !important;
+	font-weight: 700 !important;
+	text-transform: uppercase !important;
+	letter-spacing: 0.5px !important;
+	opacity: 1 !important;
+	color: #ffffff !important;
+}
+
+.cts-date-year {
+	font-size: 9px !important;
+	font-weight: 600 !important;
+	margin-top: 2px !important;
+	opacity: 0.9 !important;
+	color: #ffffff !important;
+}
+
+.cts-event-content {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	min-width: 0;
+}
+
+.cts-content-line1 {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+}
+
+.cts-event-title {
+	margin: 0;
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--wp--preset--color--contrast, #1d2327);
+	line-height: 1.3;
+}
+
+.cts-event-description {
+	font-size: 12px;
+	color: var(--wp--preset--color--secondary, #646970);
+	line-height: 1.4;
+}
+
+.cts-content-line2 {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	flex-wrap: wrap;
+	font-size: 13px;
+}
+
+.cts-meta-time {
+	font-weight: 500;
+	color: var(--wp--preset--color--contrast, #50575e);
+}
+
+.cts-meta-services {
+	color: var(--wp--preset--color--secondary, #646970);
+}
+
+.cts-location-block {
+	flex-shrink: 0;
+	width: 160px;
+	display: flex;
+	align-items: center;
+	padding: 6px 10px;
+	background: var(--wp--preset--color--tertiary, #f6f7f7);
+	border-radius: 4px;
+	font-size: 12px;
+	color: var(--wp--preset--color--contrast, #50575e);
+}
+
+@media (max-width: 1024px) {
+	.cts-location-block {
+		width: 140px;
+	}
+}
+
+@media (max-width: 768px) {
+	.cts-event-medium {
+		flex-direction: column;
+		gap: 12px;
+	}
+	
+	.cts-date-box {
+		width: 100%;
+		flex-direction: row;
+		padding: 8px 12px;
+		gap: 8px;
+	}
+	
+	.cts-date-day {
+		font-size: 24px;
+	}
+	
+	.cts-date-month {
+		text-align: left;
+	}
+	
+	.cts-location-block {
+		width: 100%;
+	}
+}
+
+/* === List Modern === */
+.cts-list-modern {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 16px;
+}
+
+.cts-event-modern {
+	background: var(--wp--preset--color--base, #fff);
+	border-radius: 8px;
+	box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+	overflow: hidden;
+	transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.cts-event-modern:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+}
+
+.cts-event-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px 16px;
+	color: #fff;
+	height: 60px;
+}
+
+.cts-event-date {
+	display: flex;
+	align-items: baseline;
+	gap: 6px;
+}
+
+.cts-list-modern .cts-date-day {
+	font-size: 24px;
+	font-weight: 700;
+	line-height: 1;
+}
+
+.cts-list-modern .cts-date-month {
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	opacity: 0.9;
+}
+
+.cts-event-time {
+	font-size: 12px;
+	font-weight: 500;
+	opacity: 0.95;
+}
+
+.cts-event-body {
+	padding: 14px 16px;
+}
+
+.cts-list-modern .cts-event-title {
+	margin: 0 0 8px;
+	font-size: 16px;
+	font-weight: 700;
+	color: var(--wp--preset--color--contrast, #1f2937);
+	line-height: 1.3;
+}
+
+.cts-list-modern .cts-event-description {
+	margin-bottom: 12px;
+	font-size: 13px;
+	line-height: 1.5;
+	color: var(--wp--preset--color--secondary, #6b7280);
+}
+
+.cts-event-meta {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	font-size: 12px;
+	color: var(--wp--preset--color--secondary, #6b7280);
+}
+
+.cts-event-meta > span {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+/* Empty State (gemeinsam für alle Listen) */
+.cts-list-empty {
+	padding: 60px 20px;
+	text-align: center;
+	color: #6b7280;
+}
+
+.cts-empty-icon {
+	font-size: 64px;
+	display: block;
+	margin-bottom: 16px;
+}
+
+.cts-list-empty h3 {
+	margin: 0 0 8px;
+	font-size: 18px;
+	font-weight: 600;
+	color: #374151;
+}
+
+.cts-list-empty p {
+	margin: 0;
+	font-size: 14px;
+}
+
+.cts-list-modern .cts-list-empty {
+	grid-column: 1 / -1;
+}
+
+/* === Calendar Views === */
+.cts-calendar-view {
+	background: #fff;
+	border-radius: 8px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	overflow: hidden;
+}
+
+.cts-calendar-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 20px;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: #fff;
+}
+
+.cts-calendar-title {
+	font-size: 24px;
+	font-weight: 600;
+	margin: 0;
+}
+
+.cts-calendar-nav {
+	display: flex;
+	gap: 10px;
+}
+
+.cts-calendar-nav button {
+	background: rgba(255, 255, 255, 0.2);
+	border: none;
+	border-radius: 4px;
+	padding: 8px 16px;
+	color: #fff;
+	cursor: pointer;
+	transition: background 0.3s;
+}
+
+.cts-calendar-nav button:hover {
+	background: rgba(255, 255, 255, 0.3);
+}
+
+.cts-calendar-weekdays {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	background: #f9fafb;
+	border-bottom: 1px solid #e5e7eb;
+}
+
+.cts-calendar-weekday {
+	padding: 12px;
+	text-align: center;
+	font-weight: 600;
+	font-size: 14px;
+	color: #6b7280;
+}
+
+.cts-calendar-grid {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: 1px;
+	background: #e5e7eb;
+}
+
+.cts-calendar-day {
+	background: #fff;
+	min-height: 100px;
+	padding: 8px;
+	cursor: pointer;
+	transition: background 0.2s;
+}
+
+.cts-calendar-day:hover {
+	background: #f9fafb;
+}
+
+.cts-calendar-day-number {
+	font-weight: 600;
+	margin-bottom: 4px;
+}
+
+.cts-calendar-day.other-month {
+	background: #fafafa;
+	color: #9ca3af;
+}
+
+.cts-calendar-day.today {
+	background: #eff6ff;
+}
+
+.cts-calendar-day.today .cts-calendar-day-number {
+	color: #2563eb;
+}
+
+.cts-calendar-event {
+	font-size: 12px;
+	padding: 4px 6px;
+	margin: 2px 0;
+	border-radius: 3px;
+	background: #3498db;
+	color: #fff;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* === List Views === */
+.cts-list,
+.cts-list-view {
+	background: #fff;
+	border-radius: 8px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	overflow: hidden;
+}
+
+.cts-list-empty {
+	padding: 60px 20px;
+	text-align: center;
+	color: #6b7280;
+}
+
+.cts-list-items {
+	display: flex;
+	flex-direction: column;
+}
+
+.cts-list-item {
+	display: flex;
+	gap: 20px;
+	padding: 20px;
+	border-bottom: 1px solid #f0f0f1;
+	transition: background 0.2s;
+}
+
+.cts-list-item:hover {
+	background: #f9fafb;
+}
+
+.cts-list-item:last-child {
+	border-bottom: none;
+}
+
+.cts-list-date,
+.cts-list-item-date {
+	flex-shrink: 0;
+	width: 70px;
+	text-align: center;
+	padding: 12px 10px;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: #fff;
+	border-radius: 8px;
+}
+
+.cts-list-date-day,
+.cts-list-item-day {
+	font-size: 28px;
+	font-weight: 700;
+	line-height: 1;
+	margin-bottom: 4px;
+}
+
+.cts-list-date-month,
+.cts-list-item-month {
+	font-size: 14px;
+	font-weight: 600;
+	text-transform: uppercase;
+	margin-bottom: 2px;
+}
+
+.cts-list-date-year,
+.cts-list-item-year {
+	font-size: 12px;
+	opacity: 0.9;
+}
+
+.cts-list-content,
+.cts-list-item-content {
+	flex: 1;
+}
+
+.cts-list-title,
+.cts-list-item-title {
+	font-size: 20px;
+	font-weight: 600;
+	margin: 0 0 8px;
+	color: #1f2937;
+}
+
+.cts-list-meta,
+.cts-list-item-meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+	margin-bottom: 12px;
+	font-size: 14px;
+	color: #6b7280;
+}
+
+.cts-list-meta-item,
+.cts-list-item-time,
+.cts-list-item-location,
+.cts-list-item-calendar {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.cts-list-description,
+.cts-list-item-description {
+	color: #6b7280;
+	line-height: 1.6;
+	margin-bottom: 12px;
+}
+
+.cts-list-item-description p {
+	margin: 0 0 8px;
+}
+
+.cts-list-item-description p:last-child {
+	margin-bottom: 0;
+}
+
+.cts-list-services,
+.cts-list-item-services {
+	margin-top: 12px;
+	padding: 12px;
+	background: #f9fafb;
+	border-radius: 6px;
+}
+
+.cts-list-item-services h4 {
+	font-size: 14px;
+	font-weight: 600;
+	color: #374151;
+	margin: 0 0 8px;
+}
+
+.cts-list-item-services-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.cts-list-service,
+.cts-list-item-service {
+	display: block;
+	padding: 6px 0;
+	font-size: 13px;
+	color: #374151;
+	border-bottom: 1px solid #e5e7eb;
+}
+
+.cts-list-item-service:last-child {
+	border-bottom: none;
+	padding-bottom: 0;
+}
+
+.cts-list-service strong {
+	color: #1f2937;
+	font-weight: 600;
+}
+
+.cts-list-item-service-person {
+	color: #6b7280;
+	font-style: italic;
+}
+
+.cts-list-category {
+	display: inline-block;
+	padding: 4px 12px;
+	border-radius: 12px;
+	font-size: 13px;
+	font-weight: 500;
+	color: #fff;
+	background: #3498db;
+}
+
+/* === Grid Views === */
+.cts-grid-view {
+	display: grid;
+	gap: 24px;
+	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.cts-grid-columns-2 {
+	grid-template-columns: repeat(2, 1fr);
+}
+
+.cts-grid-columns-3 {
+	grid-template-columns: repeat(3, 1fr);
+}
+
+.cts-grid-columns-4 {
+	grid-template-columns: repeat(4, 1fr);
+}
+
+@media (max-width: 1024px) {
+	.cts-grid-columns-3,
+	.cts-grid-columns-4 {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media (max-width: 640px) {
+	.cts-grid-view {
+		grid-template-columns: 1fr;
+	}
+}
+
+.cts-grid-item {
+	background: #fff;
+	border-radius: 8px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	overflow: hidden;
+	transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.cts-grid-item:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.cts-grid-header {
+	padding: 16px;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: #fff;
+}
+
+.cts-grid-date {
+	display: flex;
+	align-items: baseline;
+	gap: 6px;
+	margin-bottom: 4px;
+}
+
+.cts-grid-date-day {
+	font-size: 28px;
+	font-weight: 700;
+	line-height: 1;
+}
+
+.cts-grid-date-month {
+	font-size: 14px;
+	font-weight: 600;
+	text-transform: uppercase;
+}
+
+.cts-grid-body {
+	padding: 16px;
+}
+
+.cts-grid-title {
+	font-size: 18px;
+	font-weight: 600;
+	margin: 0 0 8px;
+	color: #1f2937;
+}
+
+.cts-grid-excerpt {
+	color: #6b7280;
+	font-size: 14px;
+	line-height: 1.6;
+	margin-bottom: 12px;
+}
+
+.cts-grid-meta {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	font-size: 13px;
+	color: #6b7280;
+}
+
+.cts-grid-footer {
+	padding: 12px 16px;
+	border-top: 1px solid #f0f0f1;
+	background: #f9fafb;
+}
+
+.cts-grid-button {
+	display: inline-block;
+	padding: 8px 16px;
+	background: #2563eb;
+	color: #fff;
+	border-radius: 4px;
+	text-decoration: none;
+	font-size: 14px;
+	font-weight: 500;
+	transition: background 0.2s;
+}
+
+.cts-grid-button:hover {
+	background: #1d4ed8;
+}
+
+/* === Empty State === */
+.cts-empty-state {
+	text-align: center;
+	padding: 60px 20px;
+	color: #6b7280;
+}
+
+.cts-empty-icon {
+	font-size: 64px;
+	margin-bottom: 16px;
+	display: block;
+}
+
+.cts-empty-title {
+	font-size: 20px;
+	font-weight: 600;
+	color: #1f2937;
+	margin: 0 0 8px;
+}
+
+.cts-empty-message {
+	font-size: 14px;
+	color: #6b7280;
+	margin: 0;
+}
+
+/* === Utilities === */
+.cts-text-center {
+	text-align: center;
+}
+
+.cts-text-left {
+	text-align: left;
+}
+
+.cts-text-right {
+	text-align: right;
+}
+
+.cts-mb-0 { margin-bottom: 0; }
+.cts-mb-1 { margin-bottom: 8px; }
+.cts-mb-2 { margin-bottom: 16px; }
+.cts-mb-3 { margin-bottom: 24px; }
+.cts-mb-4 { margin-bottom: 32px; }
+
+.cts-mt-0 { margin-top: 0; }
+.cts-mt-1 { margin-top: 8px; }
+.cts-mt-2 { margin-top: 16px; }
+.cts-mt-3 { margin-top: 24px; }
+.cts-mt-4 { margin-top: 32px; }
