@@ -86,9 +86,9 @@ $total_pages = ceil( $total / $limit );
 		</div>
 		
 		<!-- Filter -->
-		<form method="get" class="cts-filter-section">
-			<input type="hidden" name="page" value="churchtools-suite" />
-			<input type="hidden" name="tab" value="events" />
+			<form method="get" class="cts-filter-section">
+				<input type="hidden" name="page" value="churchtools-suite-data" />
+				<input type="hidden" name="subtab" value="events" />
 			
 			<div class="cts-filter-grid">
 				<div class="cts-form-group">
@@ -121,7 +121,7 @@ $total_pages = ceil( $total / $limit );
 				</button>
 				
 				<?php if ( ! empty( $from ) || ! empty( $to ) || ! empty( $calendar_filter ) ) : ?>
-					<a href="?page=churchtools-suite&tab=events" class="cts-btn cts-btn-secondary">
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=churchtools-suite-data&subtab=events' ) ); ?>" class="cts-btn cts-btn-secondary">
 						<span>✖</span>
 						<?php esc_html_e( 'Filter zurücksetzen', 'churchtools-suite' ); ?>
 					</a>
@@ -396,8 +396,8 @@ $total_pages = ceil( $total / $limit );
 					<?php
 					$base_url = add_query_arg(
 						[
-							'page' => 'churchtools-suite',
-							'tab' => 'events',
+							'page' => 'churchtools-suite-data',
+							'subtab' => 'events',
 							'from' => $from,
 							'to' => $to,
 							'calendar_id' => $calendar_filter,

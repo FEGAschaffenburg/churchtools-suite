@@ -19,6 +19,7 @@
 	function init() {
 		initTabs();
 		initSyncButton();
+		initDataHeaderSync();
 		initForms();
 		initTestConnection();
 		initCalendarSync();
@@ -105,6 +106,54 @@
 			.finally(() => {
 				syncButton.disabled = false;
 				syncButton.textContent = 'Jetzt synchronisieren';
+			});
+		});
+	}
+
+	/**
+	 * Data Subpage Header Sync Button
+	 * Binds #cts-data-sync-now to the manual sync AJAX endpoint and shows result in #cts-data-sync-result
+	 */
+	function initDataHeaderSync() {
+		const dataBtn = document.getElementById('cts-data-sync-now');
+		if (!dataBtn) return;
+
+		dataBtn.addEventListener('click', function() {
+			const result = document.getElementById('cts-data-sync-result');
+			const originalText = dataBtn.innerHTML;
+			dataBtn.disabled = true;
+			dataBtn.innerHTML = '<span class="dashicons dashicons-update"></span> Synchronisiere...';
+			if (result) { result.style.display = 'none'; result.innerHTML = ''; }
+
+			fetch(churchtoolsSuite.ajaxUrl, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body: new URLSearchParams({ action: 'cts_trigger_manual_sync', nonce: churchtoolsSuite.nonce })
+			})
+			.then(r => r.json())
+			.then(data => {
+				if (result) result.style.display = 'block';
+				if (data.success) {
+					if (result) {
+						result.innerHTML = '<div class="cts-notice cts-notice-success"><p>' + (data.data.message || 'Manueller Sync erfolgreich') + '</p></div>';
+					}
+					// If events filter form exists, submit it to refresh the list
+					const eventsForm = document.querySelector('.cts-events form.cts-filter-section');
+					if (eventsForm) {
+						eventsForm.submit();
+					}
+				} else {
+					if (result) {
+						result.innerHTML = '<div class="cts-notice cts-notice-error"><p>' + (data.data?.message || 'Sync fehlgeschlagen') + '</p></div>';
+					}
+				}
+			})
+			.catch(err => {
+				if (result) { result.style.display = 'block'; result.innerHTML = '<div class="cts-notice cts-notice-error"><p>Fehler: ' + err.message + '</p></div>'; }
+			})
+			.finally(() => {
+				dataBtn.disabled = false;
+				dataBtn.innerHTML = originalText;
 			});
 		});
 	}

@@ -245,7 +245,7 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 				</p>
 			</div>
 			<div class="cts-card-footer">
-				<a href="?page=churchtools-suite&tab=events" class="cts-button cts-button-secondary">
+				<a href="<?php echo esc_url( admin_url( 'admin.php?page=churchtools-suite-data&subtab=events' ) ); ?>" class="cts-button cts-button-secondary">
 					📅 <?php esc_html_e( 'Termine anzeigen', 'churchtools-suite' ); ?>
 				</a>
 			</div>

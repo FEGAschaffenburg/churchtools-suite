@@ -163,14 +163,14 @@ $total_pages = ceil( $total_count / $limit );
 				</span>
 				<div style="display: flex; gap: 8px;">
 					<?php if ( $page > 1 ) : ?>
-						<a href="?page=churchtools-suite&tab=imported-services&paged=<?php echo esc_attr( $page - 1 ); ?>" 
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=churchtools-suite-data&subtab=imported-services&paged=' . ( $page - 1 ) ) ); ?>" 
 						   class="cts-button cts-button-secondary">
 							<?php esc_html_e( 'Zurück', 'churchtools-suite' ); ?>
 						</a>
 					<?php endif; ?>
 					
 					<?php if ( $page < $total_pages ) : ?>
-						<a href="?page=churchtools-suite&tab=imported-services&paged=<?php echo esc_attr( $page + 1 ); ?>" 
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=churchtools-suite-data&subtab=imported-services&paged=' . ( $page + 1 ) ) ); ?>" 
 						   class="cts-button cts-button-primary">
 							<?php esc_html_e( 'Weiter', 'churchtools-suite' ); ?>
 						</a>
