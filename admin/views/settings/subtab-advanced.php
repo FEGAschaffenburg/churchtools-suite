@@ -130,6 +130,11 @@ $update_interval = get_option( 'churchtools_suite_update_interval', 'daily' );
 		}).done(function(resp){
 			if ( resp.success && resp.data ) {
 				var data = resp.data.data || resp.data; // older/newer shapes
+				// Only show modal if an update is actually available
+				if ( ! data.is_update ) {
+					alert( resp.data.message || '<?php esc_html_e( 'Keine neuere Version verfügbar.', 'churchtools-suite' ); ?>' );
+					return;
+				}
 				var html = '<p><strong><?php esc_html_e( 'Version', 'churchtools-suite' ); ?>:</strong> ' + (data.latest_version || data.latest_version) + '</p>' +
 						   '<p><strong><?php esc_html_e( 'Release', 'churchtools-suite' ); ?>:</strong> <a href="' + (data.html_url || '#') + '" target="_blank">' + (data.tag_name || '') + '</a></p>' +
 						   '<p><strong><?php esc_html_e( 'Paket', 'churchtools-suite' ); ?>:</strong> ' + (data.zip_url ? ('<a href="' + data.zip_url + '" target="_blank">Download</a>') : '<?php esc_html_e( 'Kein Paket verfügbar', 'churchtools-suite' ); ?>') + '</p>';
