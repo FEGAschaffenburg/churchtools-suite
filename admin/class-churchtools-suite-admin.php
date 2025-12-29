@@ -161,15 +161,7 @@ class ChurchTools_Suite_Admin {
 			[ $this, 'display_shortcode_manager' ]
 		);
 		
-		// Add Shortcode Demo as submenu
-		add_submenu_page(
-			'churchtools-suite',
-			__( 'Shortcode Demo', 'churchtools-suite' ),
-			__( '🎯 Shortcode Demo', 'churchtools-suite' ),
-			'manage_options',
-			'churchtools-suite-demo',
-			[ $this, 'display_shortcode_demo' ]
-		);
+		// Shortcode Demo removed as separate submenu — demo is now integrated into Shortcode Manager
 
 		// Add Data subpage (separate admin page for large lists)
 		add_submenu_page(
