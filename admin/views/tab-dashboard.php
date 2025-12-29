@@ -46,7 +46,40 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 		</div>
 		<?php endif; ?>
 	</div>
-	
+	</div>
+
+	<?php
+	// Show update notice if an update is available (cached by transient if desired)
+	$update_info = null;
+	if ( class_exists( 'ChurchTools_Suite_Auto_Updater' ) ) {
+		$info = ChurchTools_Suite_Auto_Updater::get_latest_release_info();
+		if ( ! is_wp_error( $info ) ) {
+			$update_info = $info;
+		}
+	}
+
+	if ( is_array( $update_info ) && ! empty( $update_info['is_update'] ) ) :
+	?>
+	<div class="cts-card" style="border-left:4px solid #2d7bf6; margin-top:16px;">
+		<div class="cts-card-header">
+			<span class="cts-card-icon">⬆️</span>
+			<h3><?php esc_html_e( 'Update verfügbar', 'churchtools-suite' ); ?></h3>
+		</div>
+		<div class="cts-card-body">
+			<p style="margin:0 0 8px;"><strong><?php echo esc_html( $update_info['tag_name'] ?? $update_info['latest_version'] ); ?></strong> — <?php esc_html_e( 'Neue Version verfügbar', 'churchtools-suite' ); ?></p>
+			<?php if ( ! empty( $update_info['html_url'] ) ) : ?>
+				<p style="margin:0 0 8px; font-size:13px;"><a href="<?php echo esc_url( $update_info['html_url'] ); ?>" target="_blank"><?php esc_html_e( 'Release Notes anzeigen', 'churchtools-suite' ); ?></a></p>
+			<?php endif; ?>
+			<p style="margin:0; font-size:13px; color:#444;">
+				<?php esc_html_e( 'Sie können das Update manuell installieren oder die automatische Installation in den Einstellungen konfigurieren.', 'churchtools-suite' ); ?>
+			</p>
+		</div>
+		<div class="cts-card-footer">
+			<button id="cts_install_update_btn" class="cts-button cts-button-danger"><?php esc_html_e( 'Update installieren', 'churchtools-suite' ); ?></button>
+			<a href="?page=churchtools-suite&tab=settings" class="cts-button" style="margin-left:8px;"><?php esc_html_e( 'Einstellungen', 'churchtools-suite' ); ?></a>
+		</div>
+	</div>
+	<?php endif; ?>
 	<!-- Status Cards -->
 	<div class="cts-grid cts-grid-3">
 		
@@ -343,6 +376,37 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 		}).finally(() => {
 			btn.disabled = false;
 			btn.innerHTML = original;
+		});
+	});
+})();
+</script>
+
+<script>
+(function(){
+	'use strict';
+	var installBtn = document.getElementById('cts_install_update_btn');
+	if (!installBtn) return;
+	installBtn.addEventListener('click', function(){
+		if (!confirm('<?php echo esc_js( __( 'Update jetzt installieren? Dies überschreibt Plugin-Dateien.', 'churchtools-suite' ) ); ?>')) return;
+		installBtn.disabled = true;
+		var orig = installBtn.innerHTML;
+		installBtn.innerHTML = '⏳ <?php echo esc_js( __( 'Installiere...', 'churchtools-suite' ) ); ?>';
+
+		fetch( churchtoolsSuite.ajaxUrl, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			body: new URLSearchParams({ action: 'cts_run_update', nonce: churchtoolsSuite.nonce })
+		}).then(r => r.json()).then(function(data){
+			if (data.success) {
+				alert( data.data && data.data.message ? data.data.message : '<?php echo esc_js( __( 'Update gestartet', 'churchtools-suite' ) ); ?>' );
+			} else {
+				alert( data.data && data.data.message ? data.data.message : (data.message || '<?php echo esc_js( __( 'Fehler beim Update', 'churchtools-suite' ) ); ?>') );
+			}
+		}).catch(function(err){
+			alert('Netzwerkfehler: ' + err.message);
+		}).finally(function(){
+			installBtn.disabled = false;
+			installBtn.innerHTML = orig;
 		});
 	});
 })();

@@ -19,6 +19,14 @@ if ( isset( $_POST['cts_save_advanced'] ) && check_admin_referer( 'cts_settings'
 	$interval = in_array( $_POST['cts_update_interval'] ?? '', [ 'hourly', 'daily', 'weekly' ], true ) ? $_POST['cts_update_interval'] : 'daily';
 	update_option( 'churchtools_suite_update_interval', $interval );
 
+	// Auto-update enable/level
+	$auto_enabled = isset( $_POST['cts_auto_update_enabled'] ) ? 1 : 0;
+	update_option( 'churchtools_suite_auto_update_enabled', $auto_enabled );
+
+	$allowed_levels = [ 'none', 'patch', 'minor', 'major' ];
+	$auto_level = in_array( $_POST['cts_auto_update_level'] ?? 'none', $allowed_levels, true ) ? $_POST['cts_auto_update_level'] : 'none';
+	update_option( 'churchtools_suite_auto_update_level', $auto_level );
+
 	// Reschedule updater if class exists
 	if ( class_exists( 'ChurchTools_Suite_Auto_Updater' ) ) {
 		ChurchTools_Suite_Auto_Updater::reschedule( $interval );
@@ -29,6 +37,8 @@ if ( isset( $_POST['cts_save_advanced'] ) && check_admin_referer( 'cts_settings'
 
 $advanced_mode = get_option( 'churchtools_suite_advanced_mode', 0 );
 $update_interval = get_option( 'churchtools_suite_update_interval', 'daily' );
+$auto_update_enabled = get_option( 'churchtools_suite_auto_update_enabled', 0 );
+$auto_update_level = get_option( 'churchtools_suite_auto_update_level', 'none' );
 ?>
 
 <form method="post" action="" class="cts-form">
@@ -68,6 +78,40 @@ $update_interval = get_option( 'churchtools_suite_update_interval', 'daily' );
 						<option value="weekly" <?php selected( $update_interval, 'weekly' ); ?>><?php esc_html_e( 'Wöchentlich', 'churchtools-suite' ); ?></option>
 					</select>
 					<p class="cts-form-description"><?php esc_html_e( 'Legt fest, wie oft das Plugin automatisch nach Releases sucht.', 'churchtools-suite' ); ?></p>
+				</td>
+			</tr>
+
+			<tr>
+				<th scope="row">
+					<label for="cts_auto_update_enabled"><?php esc_html_e( 'Auto‑Updates erlauben', 'churchtools-suite' ); ?></label>
+				</th>
+				<td>
+					<label class="cts-toggle">
+						<input type="checkbox"
+							   id="cts_auto_update_enabled"
+							   name="cts_auto_update_enabled"
+							   value="1"
+							   <?php checked( $auto_update_enabled, 1 ); ?>>
+						<span class="cts-toggle-slider"></span>
+					</label>
+					<span class="cts-form-description">
+						<?php esc_html_e( 'Wenn aktiviert, werden Updates automatisch gemäß der gewählten Stufe installiert.', 'churchtools-suite' ); ?>
+					</span>
+				</td>
+			</tr>
+
+			<tr>
+				<th scope="row">
+					<label for="cts_auto_update_level"><?php esc_html_e( 'Auto‑Update Stufe', 'churchtools-suite' ); ?></label>
+				</th>
+				<td>
+					<select id="cts_auto_update_level" name="cts_auto_update_level">
+						<option value="none" <?php selected( $auto_update_level, 'none' ); ?>><?php esc_html_e( 'Keine (Deaktiviert)', 'churchtools-suite' ); ?></option>
+						<option value="patch" <?php selected( $auto_update_level, 'patch' ); ?>><?php esc_html_e( 'Nur Patch‑Updates', 'churchtools-suite' ); ?></option>
+						<option value="minor" <?php selected( $auto_update_level, 'minor' ); ?>><?php esc_html_e( 'Patch + Minor‑Updates', 'churchtools-suite' ); ?></option>
+						<option value="major" <?php selected( $auto_update_level, 'major' ); ?>><?php esc_html_e( 'Alle Updates (inkl. Major)', 'churchtools-suite' ); ?></option>
+					</select>
+					<p class="cts-form-description"><?php esc_html_e( 'Wählen Sie aus, welche Arten von Versionssprüngen automatisch installiert werden dürfen.', 'churchtools-suite' ); ?></p>
 				</td>
 			</tr>
 

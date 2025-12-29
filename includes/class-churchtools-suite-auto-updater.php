@@ -94,8 +94,71 @@ class ChurchTools_Suite_Auto_Updater {
             return;
         }
 
+        // Check auto-update settings
+        $auto_enabled = (int) get_option( 'churchtools_suite_auto_update_enabled', 0 );
+        $auto_level = get_option( 'churchtools_suite_auto_update_level', 'none' );
+
+        if ( ! $auto_enabled ) {
+            if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+                ChurchTools_Suite_Logger::info( 'updater', 'Update available but auto-update disabled by settings', [ 'tag' => $info['tag_name'] ] );
+            }
+            return;
+        }
+
+        // Determine bump level between current and latest
+        $current = ltrim( CHURCHTOOLS_SUITE_VERSION, 'v' );
+        $latest = ltrim( $info['latest_version'] ?? ( $info['tag_name'] ?? '' ), 'v' );
+        $bump = self::determine_bump_level( $current, $latest );
+
+        $allow = false;
+        switch ( $auto_level ) {
+            case 'patch':
+                $allow = ( $bump === 'patch' );
+                break;
+            case 'minor':
+                $allow = ( $bump === 'patch' || $bump === 'minor' );
+                break;
+            case 'major':
+                $allow = ( $bump === 'patch' || $bump === 'minor' || $bump === 'major' );
+                break;
+            default:
+                $allow = false;
+        }
+
+        if ( ! $allow ) {
+            if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+                ChurchTools_Suite_Logger::info( 'updater', 'Auto-update skipped due to configured level', [ 'current' => $current, 'latest' => $latest, 'bump' => $bump, 'configured' => $auto_level ] );
+            }
+            return;
+        }
+
         // Perform update
         self::perform_update( $info['zip_url'], $info['tag_name'] );
+    }
+
+    /**
+     * Determine semantic bump level between two versions
+     * Returns 'major', 'minor', 'patch' or 'none'
+     */
+    private static function determine_bump_level( string $current, string $latest ): string {
+        if ( empty( $current ) || empty( $latest ) ) {
+            return 'none';
+        }
+
+        // Normalize to numbers
+        $curParts = array_map( 'intval', array_pad( explode( '.', $current ), 3, 0 ) );
+        $latParts = array_map( 'intval', array_pad( explode( '.', $latest ), 3, 0 ) );
+
+        if ( $latParts[0] > $curParts[0] ) {
+            return 'major';
+        }
+        if ( $latParts[0] === $curParts[0] && $latParts[1] > $curParts[1] ) {
+            return 'minor';
+        }
+        if ( $latParts[0] === $curParts[0] && $latParts[1] === $curParts[1] && $latParts[2] > $curParts[2] ) {
+            return 'patch';
+        }
+        return 'none';
     }
 
     /**
