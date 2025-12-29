@@ -211,13 +211,30 @@
 		$('#cts-modal-time').text(event.time_display || event.start_time);
 		
 		// Location (prefer structured address fields)
-		var loc = event.address_name || event.location_name || null;
-		if (!loc && (event.address_street || event.address_city || event.address_zip)) {
-			var parts = [];
-			if (event.address_street) parts.push(event.address_street);
-			if (event.address_zip) parts.push(event.address_zip);
-			if (event.address_city) parts.push(event.address_city);
-			if (parts.length) loc = parts.join(', ');
+		var loc = event.address_name || event.location_name || '';
+		if (!loc && event.address_street) {
+			loc = event.address_street;
+		}
+		if (!loc && event.address) {
+			loc = event.address;
+		}
+
+		// Build fallback info string
+		var infoParts = [];
+		if (event.address_street) infoParts.push(event.address_street);
+		if (event.address_zip) infoParts.push(event.address_zip);
+		if (event.address_city) infoParts.push(event.address_city);
+		var infoStr = infoParts.join(', ');
+
+		if (loc) {
+			$('#cts-modal-location').text(loc);
+			$('#cts-modal-location-wrapper').show();
+			if (infoStr) {
+				$('#cts-modal-location').find('.cts-info-popup').remove();
+				$('#cts-modal-location').append(' <span class="cts-info-popup" title="'+infoStr+'"> ⓘ</span>');
+			}
+		} else {
+			$('#cts-modal-location-wrapper').hide();
 		}
 
 		if (loc) {

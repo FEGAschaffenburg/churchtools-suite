@@ -94,15 +94,25 @@ $show_time = isset( $args['show_time'] ) ? ChurchTools_Suite_Shortcodes::parse_b
 			
 			<!-- Ort -->
 			<?php if ( $show_location && ( ! empty( $event['address_name'] ) || ! empty( $event['location_name'] ) || ! empty( $event['address_street'] ) ) ) : ?>
-				<div class="cts-location">
+				<div class="cts-list-location">
+					<span class="dashicons dashicons-location"></span>
 					<?php
 					if ( ! empty( $event['address_name'] ) ) {
 						echo esc_html( $event['address_name'] );
 					} elseif ( ! empty( $event['location_name'] ) ) {
 						echo esc_html( $event['location_name'] );
 					} else {
-						$parts = array_filter( [ $event['address_street'] ?? '', $event['address_zip'] ?? '', $event['address_city'] ?? '' ] );
-						echo esc_html( implode( ', ', $parts ) );
+						echo esc_html( $event['address_street'] ?? '' );
+					}
+
+					$info_parts = array_filter( [ $event['address_street'] ?? '', $event['address_zip'] ?? '', $event['address_city'] ?? '' ] );
+					if ( ! empty( $info_parts ) ) {
+						$info_text = implode( ', ', $info_parts );
+						?> <span class="cts-info-popup" title="<?php echo esc_attr( $info_text ); ?>"> ⓘ</span><?php
+					}
+					?>
+				</div>
+			<?php endif; ?>
 					}
 					?>
 				</div>

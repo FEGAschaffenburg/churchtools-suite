@@ -405,7 +405,14 @@ class ChurchTools_Suite_Template_Data {
 			'calendars' => [],
 		];
 		
-		foreach ( $events as $event ) {
+			'location_name' => $event->location_name,
+			'address_name' => $event->address_name ?? null,
+			'address_street' => $event->address_street ?? null,
+			'address_zip' => $event->address_zip ?? null,
+			'address_city' => $event->address_city ?? null,
+			'address_latitude' => $event->address_latitude ?? null,
+			'address_longitude' => $event->address_longitude ?? null,
+			'tags' => $event->tags ?? null,
 			if ( $event['is_past'] ) {
 				$stats['past']++;
 			} else {

@@ -69,8 +69,13 @@ $show_time = isset( $args['show_time'] ) ? ChurchTools_Suite_Shortcodes::parse_b
 							} elseif ( ! empty( $event['location_name'] ) ) {
 								echo esc_html( $event['location_name'] );
 							} else {
-								$parts = array_filter( [ $event['address_street'] ?? '', $event['address_zip'] ?? '', $event['address_city'] ?? '' ] );
-								echo esc_html( implode( ', ', $parts ) );
+								echo esc_html( $event['address_street'] ?? '' );
+							}
+
+							$info_parts = array_filter( [ $event['address_street'] ?? '', $event['address_zip'] ?? '', $event['address_city'] ?? '' ] );
+							if ( ! empty( $info_parts ) ) {
+								$info_text = implode( ', ', $info_parts );
+								?> <span class="cts-info-popup" title="<?php echo esc_attr( $info_text ); ?>"> ⓘ</span><?php
 							}
 							?>
 						</div>
