@@ -19,9 +19,13 @@ Professionelle WordPress-Integration für ChurchTools.
 
 ## Entwicklung
 
-- **Version:** 0.8.0.2
+- **Version:** 0.9.2.24
 - **PHP:** 8.0+
 - **WordPress:** 6.0+
+
+## Updater
+
+Das Plugin enthält einen optionalen GitHub-basierten Updater. Details zur Konfiguration (PAT, Option `churchtools_suite_github_token`, `WP_CHURCHTOOLS_SUITE_GITHUB_TOKEN`, Verhalten von "Manuelles Update prüfen" vs. "Update ausführen", Rollback) stehen in der Dokumentation: `docs/UPDATER.md`.
 
 ## Gutenberg Integration
 

@@ -35,13 +35,14 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 			<p class="cts-section-description"><?php esc_html_e( 'Übersicht über den aktuellen Status der ChurchTools-Integration.', 'churchtools-suite' ); ?></p>
 		</div>
 		<?php if ( $is_connected ) : ?>
-		<div style="display: flex; gap: 10px;">
-			<a href="?page=churchtools-suite&tab=sync" class="cts-button cts-button-primary" style="font-size: 16px; padding: 12px 24px;">
+		<div style="display: flex; gap: 10px; align-items: center;">
+			<button id="cts-sync-now" class="cts-button cts-button-primary" style="font-size: 16px; padding: 12px 24px;">
 				🔄 <?php esc_html_e( 'Jetzt synchronisieren', 'churchtools-suite' ); ?>
-			</a>
+			</button>
 			<a href="?page=churchtools-suite&tab=debug" class="cts-button cts-button-secondary" style="padding: 12px 20px;">
 				📊 <?php esc_html_e( 'Sync-Logs', 'churchtools-suite' ); ?>
 			</a>
+			<div id="cts-sync-result" style="margin-left:12px; font-size:13px; color:#333; display:none;"></div>
 		</div>
 		<?php endif; ?>
 	</div>
@@ -309,3 +310,40 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 	<?php endif; ?>
 
 </div>
+
+<script>
+(function(){
+	'use strict';
+	const btn = document.getElementById('cts-sync-now');
+	const result = document.getElementById('cts-sync-result');
+	if (!btn) return;
+
+	btn.addEventListener('click', function(){
+		if (!confirm('<?php echo esc_js( __( 'Einen manuellen Sync jetzt starten? Dies kann einige Zeit dauern.', 'churchtools-suite' ) ); ?>')) {
+			return;
+		}
+
+		btn.disabled = true;
+		const original = btn.innerHTML;
+		btn.innerHTML = '⏳ ' + '<?php echo esc_js( __( 'Synchronisiere...', 'churchtools-suite' ) ); ?>';
+		if (result) { result.style.display = 'inline-block'; result.innerHTML = ''; }
+
+		fetch( churchtoolsSuite.ajaxUrl, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			body: new URLSearchParams({ action: 'cts_trigger_manual_sync', nonce: churchtoolsSuite.nonce })
+		}).then(r => r.json()).then(data => {
+			if (data.success) {
+				if (result) result.innerHTML = '<span style="color:#0a0">' + (data.data.message || '✅ Synchronisation abgeschlossen') + '</span>';
+			} else {
+				if (result) result.innerHTML = '<span style="color:#d63638">' + (data.data?.message || data.message || 'Fehler beim Sync') + '</span>';
+			}
+		}).catch(err => {
+			if (result) result.innerHTML = '<span style="color:#d63638">Fehler: ' + err.message + '</span>';
+		}).finally(() => {
+			btn.disabled = false;
+			btn.innerHTML = original;
+		});
+	});
+})();
+</script>

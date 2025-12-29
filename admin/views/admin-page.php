@@ -41,6 +41,10 @@ $advanced_mode = get_option( 'churchtools_suite_advanced_mode', 0 );
 			<span>🔄</span>
 			<?php esc_html_e( 'Synchronisation', 'churchtools-suite' ); ?>
 		</a>
+		<a href="?page=churchtools-suite&tab=documentation" class="cts-tab <?php echo $active_tab === 'documentation' ? 'active' : ''; ?>">
+			<span>📚</span>
+			<?php esc_html_e( 'Dokumentation', 'churchtools-suite' ); ?>
+		</a>
 		<?php if ( $advanced_mode ) : ?>
 		<a href="?page=churchtools-suite&tab=debug" class="cts-tab <?php echo $active_tab === 'debug' ? 'active' : ''; ?>">
 			<span>🔧</span>
