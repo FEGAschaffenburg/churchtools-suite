@@ -98,13 +98,21 @@ $show_calendar_name = isset( $args['show_calendar_name'] ) ? ChurchTools_Suite_S
 	<?php if ( $show_location && ( ! empty( $event['address_name'] ) || ! empty( $event['location_name'] ) || ! empty( $event['address_street'] ) ) ) : ?>
 		<div class="cts-location-block">
 			<?php
+			// Display preferred label (address_name or location_name or street)
 			if ( ! empty( $event['address_name'] ) ) {
 				echo esc_html( $event['address_name'] );
 			} elseif ( ! empty( $event['location_name'] ) ) {
 				echo esc_html( $event['location_name'] );
 			} else {
-				$parts = array_filter( [ $event['address_street'] ?? '', $event['address_zip'] ?? '', $event['address_city'] ?? '' ] );
-				echo esc_html( implode( ', ', $parts ) );
+				echo esc_html( $event['address_street'] );
+			}
+			// Prepare info popup content (street, zip, city)
+			$info_parts = array_filter( [ $event['address_street'] ?? '', $event['address_zip'] ?? '', $event['address_city'] ?? '' ] );
+			if ( ! empty( $info_parts ) ) {
+				$info_text = implode( ', ', $info_parts );
+				?>
+				<span class="cts-info-popup" title="<?php echo esc_attr( $info_text ); ?>"> ⓘ</span>
+				<?php
 			}
 			?>
 		</div>
