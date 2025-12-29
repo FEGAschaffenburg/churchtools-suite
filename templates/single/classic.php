@@ -65,7 +65,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 		
 		<!-- Location -->
-		<?php if ( ! empty( $event->location_name ) ) : ?>
+		<?php if ( ! empty( $event->address_name ) || ! empty( $event->location_name ) || ! empty( $event->address_street ) ) : ?>
 		<div class="cts-single-meta-item cts-single-location">
 			<svg class="cts-single-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 				<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
@@ -73,7 +73,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</svg>
 			<div class="cts-single-meta-content">
 				<strong><?php esc_html_e( 'Ort:', 'churchtools-suite' ); ?></strong>
-				<div><?php echo esc_html( $event->location_name ); ?></div>
+				<div><?php
+				if ( ! empty( $event->address_name ) ) {
+					echo esc_html( $event->address_name );
+				} elseif ( ! empty( $event->location_name ) ) {
+					echo esc_html( $event->location_name );
+				} else {
+					$parts = array_filter( [ $event->address_street ?? '', $event->address_zip ?? '', $event->address_city ?? '' ] );
+					echo esc_html( implode( ', ', $parts ) );
+				}
+				?></div>
 			</div>
 		</div>
 		<?php endif; ?>

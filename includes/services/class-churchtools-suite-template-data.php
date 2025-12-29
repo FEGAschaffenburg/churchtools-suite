@@ -234,6 +234,14 @@ class ChurchTools_Suite_Template_Data {
 			'title' => $event['title'] ?? __( 'Unbenannt', 'churchtools-suite' ),
 			'description' => $event['description'] ?? '',
 			'location_name' => $event['location_name'] ?? '',
+			// Structured address fields (preferred)
+			'address_name' => $event['address_name'] ?? '',
+			'address_street' => $event['address_street'] ?? '',
+			'address_zip' => $event['address_zip'] ?? '',
+			'address_city' => $event['address_city'] ?? '',
+			'address_latitude' => $event['address_latitude'] ?? null,
+			'address_longitude' => $event['address_longitude'] ?? null,
+			'tags' => $event['tags'] ?? null,
 			'status' => $event['status'] ?? 'active',
 			
 			// Dates

@@ -84,7 +84,16 @@ $calendar_color = ! empty( $calendar->color ) ? $calendar->color : '#0073aa';
 					</div>
 					<div class="cts-info-content">
 						<div class="cts-info-label"><?php esc_html_e( 'Ort', 'churchtools-suite' ); ?></div>
-						<div class="cts-info-value"><?php echo esc_html( $event->location_name ); ?></div>
+						<div class="cts-info-value"><?php
+						if ( ! empty( $event->address_name ) ) {
+							echo esc_html( $event->address_name );
+						} elseif ( ! empty( $event->location_name ) ) {
+							echo esc_html( $event->location_name );
+						} else {
+							$parts = array_filter( [ $event->address_street ?? '', $event->address_zip ?? '', $event->address_city ?? '' ] );
+							echo esc_html( implode( ', ', $parts ) );
+						}
+						?></div>
 					</div>
 				</div>
 				<?php endif; ?>

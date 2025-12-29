@@ -95,9 +95,18 @@ $show_calendar_name = isset( $args['show_calendar_name'] ) ? ChurchTools_Suite_S
 		</div>
 		
 		<!-- Ort - eigener Block rechts -->
-	<?php if ( $show_location && ! empty( $event['location_name'] ) ) : ?>
+	<?php if ( $show_location && ( ! empty( $event['address_name'] ) || ! empty( $event['location_name'] ) || ! empty( $event['address_street'] ) ) ) : ?>
 		<div class="cts-location-block">
-			<?php echo esc_html( $event['location_name'] ); ?>
+			<?php
+			if ( ! empty( $event['address_name'] ) ) {
+				echo esc_html( $event['address_name'] );
+			} elseif ( ! empty( $event['location_name'] ) ) {
+				echo esc_html( $event['location_name'] );
+			} else {
+				$parts = array_filter( [ $event['address_street'] ?? '', $event['address_zip'] ?? '', $event['address_city'] ?? '' ] );
+				echo esc_html( implode( ', ', $parts ) );
+			}
+			?>
 		</div>
 	<?php endif; ?>
 		

@@ -210,9 +210,18 @@
 		$('#cts-modal-date').text(event.start_date);
 		$('#cts-modal-time').text(event.time_display || event.start_time);
 		
-		// Location
-		if (event.location_name) {
-			$('#cts-modal-location').text(event.location_name);
+		// Location (prefer structured address fields)
+		var loc = event.address_name || event.location_name || null;
+		if (!loc && (event.address_street || event.address_city || event.address_zip)) {
+			var parts = [];
+			if (event.address_street) parts.push(event.address_street);
+			if (event.address_zip) parts.push(event.address_zip);
+			if (event.address_city) parts.push(event.address_city);
+			if (parts.length) loc = parts.join(', ');
+		}
+
+		if (loc) {
+			$('#cts-modal-location').text(loc);
 			$('#cts-modal-location-wrapper').show();
 		} else {
 			$('#cts-modal-location-wrapper').hide();

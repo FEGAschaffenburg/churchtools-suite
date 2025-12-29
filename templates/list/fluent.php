@@ -83,12 +83,21 @@ $show_services = isset( $args['show_services'] ) ? ChurchTools_Suite_Shortcodes:
 						</div>
 						<?php endif; ?>
 
-						<?php if ( $show_location && ! empty( $event['location_name'] ) ) : ?>
+						<?php if ( $show_location && ( ! empty( $event['address_name'] ) || ! empty( $event['location_name'] ) || ! empty( $event['address_street'] ) ) ) : ?>
 							<div class="cts-event-location">
 								<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
 									<path d="M8 0C5.243 0 3 2.243 3 5c0 3.854 5 11 5 11s5-7.146 5-11c0-2.757-2.243-5-5-5zm0 7.5c-1.378 0-2.5-1.122-2.5-2.5S6.622 2.5 8 2.5 10.5 3.622 10.5 5 9.378 7.5 8 7.5z"/>
 								</svg>
-								<?php echo esc_html( $event['location_name'] ); ?>
+								<?php
+								if ( ! empty( $event['address_name'] ) ) {
+									echo esc_html( $event['address_name'] );
+								} elseif ( ! empty( $event['location_name'] ) ) {
+									echo esc_html( $event['location_name'] );
+								} else {
+									$parts = array_filter( [ $event['address_street'] ?? '', $event['address_zip'] ?? '', $event['address_city'] ?? '' ] );
+									echo esc_html( implode( ', ', $parts ) );
+								}
+								?>
 							</div>
 						<?php endif; ?>
 						<!-- Title -->

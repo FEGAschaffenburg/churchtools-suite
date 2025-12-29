@@ -79,10 +79,19 @@ $show_description = isset( $args['show_description'] ) ? ChurchTools_Suite_Short
 					<!-- Details -->
 					<div class="cts-card-details">
 						
-						<?php if ( $show_location && ! empty( $event['location_name'] ) ) : ?>
+						<?php if ( $show_location && ( ! empty( $event['address_name'] ) || ! empty( $event['location_name'] ) || ! empty( $event['address_street'] ) ) ) : ?>
 							<div class="cts-detail-item">
 								<span class="cts-detail-icon">📍</span>
-								<span class="cts-detail-text"><?php echo esc_html( $event['location_name'] ); ?></span>
+								<span class="cts-detail-text"><?php
+								if ( ! empty( $event['address_name'] ) ) {
+									echo esc_html( $event['address_name'] );
+								} elseif ( ! empty( $event['location_name'] ) ) {
+									echo esc_html( $event['location_name'] );
+								} else {
+									$parts = array_filter( [ $event['address_street'] ?? '', $event['address_zip'] ?? '', $event['address_city'] ?? '' ] );
+									echo esc_html( implode( ', ', $parts ) );
+								}
+								?></span>
 							</div>
 						<?php endif; ?>
 						
