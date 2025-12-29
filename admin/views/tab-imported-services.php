@@ -82,9 +82,10 @@ $total_pages = ceil( $total_count / $limit );
 			<p><?php esc_html_e( 'Führen Sie eine Event-Synchronisation durch, um Services zu importieren.', 'churchtools-suite' ); ?></p>
 		</div>
 	<?php else : ?>
-		<div class="cts-card">
-			<div class="cts-table-wrapper">
-				<table class="cts-events-table">
+			<div id="cts-imported-services-ajax-container">
+				<div class="cts-card">
+					<div class="cts-table-wrapper">
+						<table class="cts-events-table">
 					<thead>
 						<tr>
 							<th><?php esc_html_e( 'Service', 'churchtools-suite' ); ?></th>
@@ -143,9 +144,10 @@ $total_pages = ceil( $total_count / $limit );
 							</tr>
 						<?php endforeach; ?>
 					</tbody>
-				</table>
+						</table>
+					</div>
+				</div>
 			</div>
-		</div>
 		
 		<!-- Pagination -->
 		<?php if ( $total_pages > 1 ) : ?>
@@ -176,6 +178,29 @@ $total_pages = ceil( $total_count / $limit );
 				</div>
 			</div>
 		<?php endif; ?>
+
+		<script>
+		jQuery(function($){
+			function fetchServices(paged){
+				var data = { action: 'cts_fetch_imported_services_list', paged: paged || 1, nonce: churchtoolsSuite.nonce };
+				$.post(churchtoolsSuite.ajaxUrl, data, function(resp){
+					if (resp.success){
+						$('#cts-imported-services-ajax-container').html(resp.data.html);
+					} else {
+						alert(resp.data && resp.data.message ? resp.data.message : 'Fehler');
+					}
+				}, 'json');
+			}
+
+			// Intercept pagination links inside this card
+			$(document).on('click', '.cts-imported-services .cts-pagination a', function(e){
+				e.preventDefault();
+				var href = $(this).attr('href');
+				var match = href && href.match(/paged=(\d+)/);
+				if ( match ) { fetchServices( match[1] ); }
+			});
+		});
+		</script>
 	<?php endif; ?>
 	
 </div>

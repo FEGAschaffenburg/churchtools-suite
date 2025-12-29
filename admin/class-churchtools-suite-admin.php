@@ -170,6 +170,26 @@ class ChurchTools_Suite_Admin {
 			'churchtools-suite-demo',
 			[ $this, 'display_shortcode_demo' ]
 		);
+
+		// Add Data subpage (separate admin page for large lists)
+		add_submenu_page(
+			'churchtools-suite',
+			__( 'Daten', 'churchtools-suite' ),
+			__( '📋 Daten', 'churchtools-suite' ),
+			'manage_options',
+			'churchtools-suite-data',
+			[ $this, 'display_data_page' ]
+		);
+
+		// Add Documentation subpage
+		add_submenu_page(
+			'churchtools-suite',
+			__( 'Dokumentation', 'churchtools-suite' ),
+			__( '📚 Dokumentation', 'churchtools-suite' ),
+			'manage_options',
+			'churchtools-suite-docs',
+			[ $this, 'display_documentation_page' ]
+		);
 	}
 	
 	/**
@@ -195,6 +215,21 @@ class ChurchTools_Suite_Admin {
 	 */
 	public function display_shortcode_demo() {
 		include_once CHURCHTOOLS_SUITE_PATH . 'admin/views/shortcode-demo.php';
+	}
+
+	/**
+	 * Display Data page (dedicated subpage)
+	 */
+	public function display_data_page() {
+		// Reuse existing data subtab view
+		include_once CHURCHTOOLS_SUITE_PATH . 'admin/views/tab-data.php';
+	}
+
+	/**
+	 * Display Documentation page (dedicated subpage)
+	 */
+	public function display_documentation_page() {
+		include_once CHURCHTOOLS_SUITE_PATH . 'admin/views/tab-documentation.php';
 	}
 	
 	/**
@@ -228,6 +263,9 @@ class ChurchTools_Suite_Admin {
 		add_action( 'wp_ajax_cts_update_preset', [ $this, 'ajax_update_preset' ] );
 		add_action( 'wp_ajax_cts_delete_preset', [ $this, 'ajax_delete_preset' ] );
 		add_action( 'wp_ajax_cts_get_calendars', [ $this, 'ajax_get_calendars' ] );
+		// AJAX data lists (server-side filtering/pagination)
+		add_action( 'wp_ajax_cts_fetch_events_list', [ $this, 'ajax_fetch_events_list' ] );
+		add_action( 'wp_ajax_cts_fetch_imported_services_list', [ $this, 'ajax_fetch_imported_services_list' ] );
 		
 		// Reset & Cleanup (v0.7.2.4)
 		add_action( 'wp_ajax_cts_clear_events', [ $this, 'ajax_clear_events' ] );
@@ -759,6 +797,217 @@ class ChurchTools_Suite_Admin {
 				'message' => __( 'Fehler: ', 'churchtools-suite' ) . $e->getMessage()
 			] );
 		}
+	}
+
+	/**
+	 * AJAX: Fetch events list (server-side pagination & filtering)
+	 */
+	public function ajax_fetch_events_list() {
+		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => __( 'Keine Berechtigung.', 'churchtools-suite' ) ] );
+			return;
+		}
+
+		global $wpdb;
+		$from = isset( $_POST['from'] ) ? sanitize_text_field( wp_unslash( $_POST['from'] ) ) : '';
+		$to = isset( $_POST['to'] ) ? sanitize_text_field( wp_unslash( $_POST['to'] ) ) : '';
+		$calendar_filter = isset( $_POST['calendar_id'] ) ? sanitize_text_field( wp_unslash( $_POST['calendar_id'] ) ) : '';
+		$page = max( 1, (int) ( $_POST['paged'] ?? 1 ) );
+		$limit = 50;
+		$offset = ( $page - 1 ) * $limit;
+
+		$prefix = $wpdb->prefix . CHURCHTOOLS_SUITE_DB_PREFIX;
+		$table = $prefix . 'events';
+
+		$sql = "SELECT id, event_id, appointment_id, calendar_id, title, description, event_description, appointment_description, start_datetime, end_datetime, is_all_day, location_name, address_name, address_street, address_zip, address_city, address_latitude, address_longitude, tags FROM {$table} WHERE 1=1";
+		$count_sql = "SELECT COUNT(*) FROM {$table} WHERE 1=1";
+		$where = [];
+		$params = [];
+
+		if ( ! empty( $from ) ) {
+			$where[] = 'start_datetime >= %s';
+			$params[] = $from . ' 00:00:00';
+		}
+		if ( ! empty( $to ) ) {
+			$where[] = 'start_datetime <= %s';
+			$params[] = $to . ' 23:59:59';
+		}
+		if ( ! empty( $calendar_filter ) ) {
+			$where[] = 'calendar_id = %s';
+			$params[] = $calendar_filter;
+		}
+
+		if ( ! empty( $where ) ) {
+			$cond = ' AND ' . implode( ' AND ', $where );
+			$sql .= $cond;
+			$count_sql .= $cond;
+		}
+
+		$sql .= ' ORDER BY start_datetime ASC LIMIT %d OFFSET %d';
+		$params_with_limit = array_merge( $params, [ $limit, $offset ] );
+
+		$prepared_sql = empty( $params_with_limit ) ? $sql : $wpdb->prepare( $sql, ...$params_with_limit );
+		$prepared_count = empty( $params ) ? $count_sql : $wpdb->prepare( $count_sql, ...$params );
+
+		$events = $wpdb->get_results( $prepared_sql );
+		$total = (int) $wpdb->get_var( $prepared_count );
+		$total_pages = max(1, ceil( $total / $limit ));
+
+		// Build HTML fragment (table rows + pagination)
+		ob_start();
+		if ( empty( $events ) ) {
+			?>
+			<div class="cts-empty-state"><span class="cts-empty-icon">📅</span><h3><?php esc_html_e( 'Keine Termine gefunden', 'churchtools-suite' ); ?></h3></div>
+			<?php
+		} else {
+			?>
+			<div class="cts-table-wrapper">
+				<table class="cts-events-table">
+					<thead>
+						<tr>
+							<th><?php esc_html_e( 'Datum & Zeit', 'churchtools-suite' ); ?></th>
+							<th><?php esc_html_e( 'Titel', 'churchtools-suite' ); ?></th>
+							<th><?php esc_html_e( 'Kalender', 'churchtools-suite' ); ?></th>
+							<th><?php esc_html_e( 'Ort / Adresse', 'churchtools-suite' ); ?></th>
+							<th><?php esc_html_e( 'Tags', 'churchtools-suite' ); ?></th>
+							<th><?php esc_html_e( 'Typ', 'churchtools-suite' ); ?></th>
+							<th><?php esc_html_e( 'Services', 'churchtools-suite' ); ?></th>
+							<th><?php esc_html_e( 'Details', 'churchtools-suite' ); ?></th>
+						</tr>
+					</thead>
+					<tbody>
+					<?php foreach ( $events as $event ) :
+						$start_local = get_date_from_gmt( $event->start_datetime );
+						$end_local = $event->end_datetime ? get_date_from_gmt( $event->end_datetime ) : null;
+						$is_all_day = (bool) $event->is_all_day;
+						$type_label = ! empty( $event->appointment_id ) ? __( 'Termin', 'churchtools-suite' ) : __( 'Event', 'churchtools-suite' );
+						$type_icon = ! empty( $event->appointment_id ) ? '📅' : '🎯';
+						?>
+						<tr>
+							<td class="cts-event-date">
+								<div class="cts-event-date-primary"><?php echo esc_html( date_i18n( get_option( 'date_format' ), strtotime( $start_local ) ) ); ?></div>
+								<div class="cts-event-date-time"><?php if ( ! $is_all_day ) { echo esc_html( date_i18n( get_option( 'time_format' ), strtotime( $start_local ) ) ); if ( $end_local ) { echo ' - ' . esc_html( date_i18n( get_option( 'time_format' ), strtotime( $end_local ) ) ); } } else { esc_html_e( 'Ganztägig', 'churchtools-suite' ); } ?></div>
+							</td>
+							<td class="cts-event-title"><div class="cts-event-title-main"><?php echo esc_html( $event->title ); ?></div></td>
+							<td class="cts-event-calendar"><span class="cts-calendar-badge"><?php echo esc_html( $event->calendar_id ); ?></span></td>
+							<td class="cts-event-location">
+								<?php if ( ! empty( $event->address_name ) || ! empty( $event->address_street ) ) : ?>
+									<div class="cts-address-structured">
+										<?php if ( ! empty( $event->address_name ) ) : ?><div class="cts-address-name"><strong>🏠 <?php echo esc_html( $event->address_name ); ?></strong></div><?php endif; ?>
+										<?php if ( ! empty( $event->address_street ) ) : ?><div class="cts-address-street"><?php echo esc_html( $event->address_street ); ?></div><?php endif; ?>
+									</div>
+								<?php elseif ( ! empty( $event->location_name ) ) : ?>
+									<span>📍 <?php echo esc_html( $event->location_name ); ?></span>
+								<?php else : ?><span class="cts-muted">—</span><?php endif; ?>
+							</td>
+							<td class="cts-event-tags">
+								<?php if ( ! empty( $event->tags ) ) { $tags = json_decode( $event->tags, true ); if ( is_array( $tags ) && ! empty( $tags ) ) { foreach ( $tags as $tag ) { ?><span class="cts-tag">🏷️ <?php echo esc_html( $tag['name'] ?? '' ); ?></span><?php } } else { echo '<span class="cts-muted">—</span>'; } } else { echo '<span class="cts-muted">—</span>'; } ?>
+							</td>
+							<td class="cts-event-type"><span class="cts-type-badge"><?php echo esc_html( $type_icon . ' ' . $type_label ); ?></span></td>
+							<td class="cts-event-services"><span class="cts-muted">—</span></td>
+							<td class="cts-event-details"><span class="cts-muted">—</span></td>
+						</tr>
+					<?php endforeach; ?>
+					</tbody>
+				</table>
+			</div>
+			<?php
+		}
+
+		// Pagination HTML
+		if ( $total_pages > 1 ) {
+			$pagination = '<div class="cts-pagination">';
+			if ( $page > 1 ) {
+				$pagination .= '<button data-paged="' . ( $page - 1 ) . '" class="cts-ajax-page cts-btn cts-btn-secondary">← ' . __( 'Zurück', 'churchtools-suite' ) . '</button>';
+			}
+			$pagination .= '<span class="cts-pagination-info">' . sprintf( __( 'Seite %d von %d', 'churchtools-suite' ), $page, $total_pages ) . '</span>';
+			if ( $page < $total_pages ) {
+				$pagination .= '<button data-paged="' . ( $page + 1 ) . '" class="cts-ajax-page cts-btn cts-btn-secondary">' . __( 'Weiter', 'churchtools-suite' ) . ' →</button>';
+			}
+			$pagination .= '</div>';
+			echo $pagination;
+		}
+
+		$html = ob_get_clean();
+		wp_send_json_success( [ 'html' => $html, 'total' => $total, 'page' => $page, 'total_pages' => $total_pages ] );
+	}
+
+	/**
+	 * AJAX: Fetch imported services list (server-side pagination)
+	 */
+	public function ajax_fetch_imported_services_list() {
+		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => __( 'Keine Berechtigung.', 'churchtools-suite' ) ] );
+			return;
+		}
+
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-repository-base.php';
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-event-services-repository.php';
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-events-repository.php';
+
+		$event_services_repo = new ChurchTools_Suite_Event_Services_Repository();
+		$events_repo = new ChurchTools_Suite_Events_Repository();
+
+		$page = max( 1, (int) ( $_POST['paged'] ?? 1 ) );
+		$limit = 50;
+		$offset = ( $page - 1 ) * $limit;
+
+		$all_services = $event_services_repo->get_all();
+		$total = count( $all_services );
+		$services = array_slice( $all_services, $offset, $limit );
+		$total_pages = max(1, ceil( $total / $limit ));
+
+		ob_start();
+		if ( empty( $services ) ) {
+			?>
+			<div class="cts-empty-state"><span class="cts-empty-icon">👥</span><h3><?php esc_html_e( 'Keine Services gefunden', 'churchtools-suite' ); ?></h3></div>
+			<?php
+		} else {
+			?>
+			<div class="cts-card">
+				<div class="cts-table-wrapper">
+					<table class="cts-events-table">
+						<thead>
+							<tr>
+								<th><?php esc_html_e( 'Service', 'churchtools-suite' ); ?></th>
+								<th><?php esc_html_e( 'Person', 'churchtools-suite' ); ?></th>
+								<th><?php esc_html_e( 'Event', 'churchtools-suite' ); ?></th>
+								<th><?php esc_html_e( 'Service ID', 'churchtools-suite' ); ?></th>
+								<th><?php esc_html_e( 'Importiert', 'churchtools-suite' ); ?></th>
+							</tr>
+						</thead>
+						<tbody>
+						<?php foreach ( $services as $service ) : $event = $events_repo->get_by_id( $service->event_id ); ?>
+							<tr>
+								<td><strong><?php echo esc_html( $service->service_name ); ?></strong></td>
+								<td><?php echo ! empty( $service->person_name ) ? esc_html( $service->person_name ) : '<span class="cts-muted">—</span>'; ?></td>
+								<td><?php if ( $event ) { echo '<div class="cts-event-title-main">' . esc_html( $event->title ) . '</div><div class="cts-event-date-time">' . esc_html( date_i18n( get_option( 'date_format' ), strtotime( $event->start_datetime ) ) ) . '</div>'; } else { echo '<span class="cts-muted">Event gelöscht</span>'; } ?></td>
+								<td><?php echo ! empty( $service->service_id ) ? '<code>' . esc_html( $service->service_id ) . '</code>' : '<span class="cts-muted">—</span>'; ?></td>
+								<td><?php echo ! empty( $service->created_at ) ? esc_html( date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $service->created_at ) ) ) : '<span class="cts-muted">—</span>'; ?></td>
+							</tr>
+						<?php endforeach; ?>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<?php
+		}
+
+		if ( $total_pages > 1 ) {
+			$pagination = '<div class="cts-pagination">';
+			if ( $page > 1 ) { $pagination .= '<button data-paged="' . ( $page - 1 ) . '" class="cts-ajax-page cts-btn cts-btn-secondary">← ' . __( 'Zurück', 'churchtools-suite' ) . '</button>'; }
+			$pagination .= '<span class="cts-pagination-info">' . sprintf( __( 'Seite %d von %d', 'churchtools-suite' ), $page, $total_pages ) . '</span>';
+			if ( $page < $total_pages ) { $pagination .= '<button data-paged="' . ( $page + 1 ) . '" class="cts-ajax-page cts-btn cts-btn-secondary">' . __( 'Weiter', 'churchtools-suite' ) . ' →</button>'; }
+			$pagination .= '</div>';
+			echo $pagination;
+		}
+
+		$html = ob_get_clean();
+		wp_send_json_success( [ 'html' => $html, 'total' => $total, 'page' => $page, 'total_pages' => $total_pages ] );
 	}
 	
 	/**

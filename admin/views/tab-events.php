@@ -160,7 +160,8 @@ $total_pages = ceil( $total / $limit );
 				<p><?php esc_html_e( 'Versuchen Sie andere Filterwerte oder synchronisieren Sie die Termine im Tab "Sync".', 'churchtools-suite' ); ?></p>
 			</div>
 		<?php else : ?>
-			<div class="cts-table-wrapper">
+			<div id="cts-events-ajax-container">
+				<div class="cts-table-wrapper">
 				<table class="cts-events-table">
 					<thead>
 						<tr>
@@ -356,8 +357,40 @@ $total_pages = ceil( $total / $limit );
 					</tbody>
 				</table>
 			</div>
-			
-			<!-- Pagination -->
+		</div>
+		<!-- Pagination -->
+
+		<script>
+		jQuery(function($){
+			var $form = $('.cts-filter-section');
+			function fetchEvents(paged){
+				var data = $form.serializeArray();
+				if (paged) data.push({name:'paged', value: paged});
+				data.push({name:'action', value:'cts_fetch_events_list'});
+				data.push({name:'nonce', value: churchtoolsSuite.nonce});
+				$.post(churchtoolsSuite.ajaxUrl, data, function(resp){
+					if (resp.success){
+						$('#cts-events-ajax-container').html(resp.data.html);
+					} else {
+						alert(resp.data && resp.data.message ? resp.data.message : 'Fehler');
+					}
+				}, 'json');
+			}
+
+			// Intercept filter submit
+			$form.on('submit', function(e){
+				e.preventDefault();
+				fetchEvents(1);
+			});
+
+			// Bind pagination buttons (delegated)
+			$(document).on('click', '.cts-ajax-page', function(e){
+				e.preventDefault();
+				var p = $(this).data('paged');
+				fetchEvents(p);
+			});
+		});
+		</script>
 			<?php if ( $total_pages > 1 ) : ?>
 				<div class="cts-pagination">
 					<?php
