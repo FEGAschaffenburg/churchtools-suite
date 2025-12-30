@@ -1209,6 +1209,11 @@ class ChurchTools_Suite_Admin {
 	 * Führt sofortigen Session Keepalive aus
 	 */
 	public function ajax_trigger_keepalive() {
+		// Clear any previous output to avoid HTML before JSON
+		while ( ob_get_level() ) {
+			ob_end_clean();
+		}
+
 		// Use plugin logger to verify handler invocation
 		if ( ! class_exists( 'ChurchTools_Suite_Logger' ) ) {
 			require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-logger.php';
@@ -1217,15 +1222,20 @@ class ChurchTools_Suite_Admin {
 			ChurchTools_Suite_Logger::info( 'ajax_keepalive', 'ajax_trigger_keepalive called', [ 'user_id' => get_current_user_id() ] );
 		}
 
-		// Start output buffer to capture any unexpected output (will be logged)
-		if ( ob_get_level() === 0 ) {
-			ob_start();
-		} else {
-			// nested buffers: start a new one to capture only this handler's output
-			ob_start();
-		}
+		// Start a fresh output buffer to capture any unexpected output during handler
+		ob_start();
 
-		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
+		// Check nonce without dying (avoid wp_die HTML) and handle failure with JSON
+		$nonce_ok = check_ajax_referer( 'churchtools_suite_admin', 'nonce', false );
+		if ( $nonce_ok === false ) {
+			if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+				ChurchTools_Suite_Logger::warning( 'ajax_keepalive', 'Invalid nonce in ajax_trigger_keepalive', [ 'user_id' => get_current_user_id() ] );
+			}
+			// capture any output and discard
+			@ob_end_clean();
+			wp_send_json_error( [ 'message' => __( 'Ungültiger oder fehlender Nonce.', 'churchtools-suite' ) ] );
+			return;
+		}
 		
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( [
