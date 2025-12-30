@@ -210,20 +210,58 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 								<?php echo esc_html( sprintf( __( 'Letzter Sync: %s', 'churchtools-suite' ), date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $last_sync_stats['completed_at'] ) ) ) ); ?>
 							</p>
 						<?php endif; ?>					<?php
-					// Nächster geplanter Sync berechnen
-					$next_scheduled = wp_next_scheduled('churchtools_suite_auto_sync');
-					if ( $next_scheduled ) :
-						if ( $next_scheduled < time() ) :
-							$diff = human_time_diff( $next_scheduled, time() );
+					// Liste aller relevanten Cron-Jobs anzeigen (plugin-assoziiert)
+					$cron = _get_cron_array();
+					$relevant_hooks = [];
+					if ( is_array( $cron ) ) {
+						foreach ( $cron as $ts => $hooks ) {
+							foreach ( $hooks as $hook => $events ) {
+								if ( preg_match( '/churchtools|cts_|puc_/i', $hook ) ) {
+									if ( ! isset( $relevant_hooks[ $hook ] ) ) {
+										$relevant_hooks[ $hook ] = [];
+									}
+									$relevant_hooks[ $hook ][] = (int) $ts;
+								}
+							}
+						}
+					}
+
+					if ( empty( $relevant_hooks ) ) : ?>
+						<p class="cts-card-meta"><?php esc_html_e( 'Keine automatischen Cron-Jobs für dieses Plugin gefunden.', 'churchtools-suite' ); ?></p>
+					<?php else : ?>
+						<ul style="margin:6px 0 0 0; padding-left:16px; font-size:13px;">
+						<?php foreach ( $relevant_hooks as $hook_name => $timestamps ) :
+							sort( $timestamps );
+							$next = (int) $timestamps[0];
+							$count = count( $timestamps );
+							$overdue = $next < time();
 							?>
-							<p class="cts-card-meta" style="margin-top: 8px; color:#d66;">
-								<?php echo esc_html( sprintf( __( 'Nächster Sync (überfällig seit %s): %s', 'churchtools-suite' ), $diff, date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $next_scheduled ) ) ); ?>
-							</p>
-						<?php else : ?>
-							<p class="cts-card-meta" style="margin-top: 8px;">
-								<?php echo esc_html( sprintf( __( 'Nächster Sync: %s', 'churchtools-suite' ), date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $next_scheduled ) ) ); ?>
-							</p>
-						<?php endif; ?>
+							<li style="margin-bottom:6px;">
+								<strong><?php echo esc_html( $hook_name ); ?></strong>
+								<span style="color:#666; margin-left:8px;">(<?php echo esc_html( sprintf( _n( '%d scheduled', '%d scheduled', $count, 'churchtools-suite' ), $count ) ); ?>)</span>
+								<div style="margin-top:3px; font-size:13px; color:<?php echo $overdue ? '#d66' : '#666'; ?>;">
+									<?php if ( $overdue ) :
+										$diff = human_time_diff( $next, time() );
+										printf( esc_html__( 'Next: %s (überfällig seit %s)', 'churchtools-suite' ), date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $next ), $diff );
+									else :
+										printf( esc_html__( 'Next: %s', 'churchtools-suite' ), date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $next ) );
+									endif; ?>
+								</div>
+								<?php if ( $count > 1 ) : ?>
+									<div style="margin-top:4px; font-size:12px; color:#888;">Weitere Termine: 
+										<?php
+										$others = $timestamps;
+										array_shift( $others );
+										$preview = array_slice( $others, 0, 3 );
+										$labels = array_map( function( $t ) { return date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $t ); }, $preview );
+										echo esc_html( implode( ', ', $labels ) );
+										if ( count( $others ) > 3 ) echo ' ...';
+									?>
+									</div>
+								<?php endif; ?>
+							</li>
+						<?php endforeach; ?>
+						</ul>
 					<?php endif; ?>
 					<p class="cts-card-meta" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f1;">
 						<small><?php printf(

@@ -64,9 +64,39 @@ class ChurchTools_Suite_Cron {
      * Schedule cron jobs
      */
     public static function schedule_jobs() {
-        // Session Keep-Alive: Stündlich ChurchTools API anpingen
-        if (!wp_next_scheduled('churchtools_suite_session_keepalive')) {
-            wp_schedule_event(time(), 'hourly', 'churchtools_suite_session_keepalive');
+        // Session Keep-Alive: schedule according to cookie expiry when possible
+        // Clear existing keepalive schedules to avoid duplicates
+        wp_clear_scheduled_hook('churchtools_suite_session_keepalive');
+
+        // Try to schedule based on stored CT cookies (expires)
+        require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-ct-client.php';
+        $client = new ChurchTools_Suite_CT_Client();
+        $cookies = $client->get_cookies();
+
+        $buffer_seconds = 300; // refresh 5 minutes before cookie expiry
+        $now = time();
+        $scheduled = false;
+
+        if (!empty($cookies) && is_array($cookies)) {
+            $max_expires = 0;
+            foreach ($cookies as $c) {
+                if (!empty($c['expires']) && is_numeric($c['expires'])) {
+                    $max_expires = max($max_expires, (int) $c['expires']);
+                }
+            }
+
+            if ($max_expires > $now + 10) {
+                $next_run = max($now + 60, $max_expires - $buffer_seconds);
+                wp_schedule_single_event($next_run, 'churchtools_suite_session_keepalive');
+                $scheduled = true;
+            }
+        }
+
+        // Fallback: schedule hourly if no cookie expiry info available
+        if (!$scheduled) {
+            if (!wp_next_scheduled('churchtools_suite_session_keepalive')) {
+                wp_schedule_event(time(), 'hourly', 'churchtools_suite_session_keepalive');
+            }
         }
         
         // Auto-Sync: Falls aktiviert, Schedule erstellen
@@ -124,26 +154,69 @@ class ChurchTools_Suite_Cron {
         
         // CT Client laden und whoami aufrufen
         require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-ct-client.php';
-        
+
         $client = new ChurchTools_Suite_CT_Client();
-        
+
         // Wenn nicht authentifiziert, versuche Login
         if (!$client->is_authenticated()) {
             $login_result = $client->login();
             if (!$login_result['success']) {
                 error_log('ChurchTools Suite: Session Keep-Alive Login fehlgeschlagen - ' . $login_result['message']);
+                // Still attempt to reschedule a keepalive in short time
+                self::reschedule_keepalive_after_attempt($client);
                 return;
             }
         }
-        
+
         // Ping API mit whoami
         $result = $client->api_request('whoami', 'GET');
-        
+
         if (is_wp_error($result)) {
             error_log('ChurchTools Suite: Session Keep-Alive fehlgeschlagen - ' . $result->get_error_message());
         } else {
             // Update last keepalive timestamp
             update_option('churchtools_suite_last_keepalive', current_time('mysql'));
+        }
+
+        // After performing keepalive, reschedule next run based on refreshed cookies
+        self::reschedule_keepalive_after_attempt($client);
+    }
+
+    /**
+     * Reschedule keepalive based on client's cookie expiries.
+     * If no useful expiry found, schedule hourly fallback.
+     *
+     * @param ChurchTools_Suite_CT_Client $client
+     */
+    private static function reschedule_keepalive_after_attempt($client) {
+        // Clear any existing scheduled hooks first
+        wp_clear_scheduled_hook('churchtools_suite_session_keepalive');
+
+        $cookies = $client->get_cookies();
+        $buffer_seconds = 300; // 5 minutes before expiry
+        $now = time();
+        $scheduled = false;
+
+        if (!empty($cookies) && is_array($cookies)) {
+            $max_expires = 0;
+            foreach ($cookies as $c) {
+                if (!empty($c['expires']) && is_numeric($c['expires'])) {
+                    $max_expires = max($max_expires, (int) $c['expires']);
+                }
+            }
+
+            if ($max_expires > $now + 10) {
+                $next_run = max($now + 60, $max_expires - $buffer_seconds);
+                wp_schedule_single_event($next_run, 'churchtools_suite_session_keepalive');
+                $scheduled = true;
+            }
+        }
+
+        // Fallback: hourly recurring event
+        if (!$scheduled) {
+            if (!wp_next_scheduled('churchtools_suite_session_keepalive')) {
+                wp_schedule_event(time(), 'hourly', 'churchtools_suite_session_keepalive');
+            }
         }
     }
     
