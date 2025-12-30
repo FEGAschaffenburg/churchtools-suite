@@ -183,7 +183,37 @@ class ChurchTools_Suite_Auto_Updater {
 
         $body = wp_remote_retrieve_body( $response );
         $data = json_decode( $body, true );
+
+        // If the Releases API didn't return a valid release, attempt to fall back to the tags API
         if ( ! is_array( $data ) || empty( $data['tag_name'] ) ) {
+            // Try tags endpoint (may exist when a tag was pushed but no GitHub Release created)
+            $tags_url = 'https://api.github.com/repos/FEGAschaffenburg/churchtools-suite/tags';
+            $tags_resp = wp_remote_get( $tags_url, [ 'headers' => $headers, 'timeout' => 20 ] );
+            if ( is_wp_error( $tags_resp ) ) {
+                return $tags_resp;
+            }
+            $tags_body = wp_remote_retrieve_body( $tags_resp );
+            $tags = json_decode( $tags_body, true );
+            if ( is_array( $tags ) && ! empty( $tags[0]['name'] ) ) {
+                $tag_name = $tags[0]['name'];
+                $latest_tag = ltrim( $tag_name, 'v' );
+                $current = ltrim( CHURCHTOOLS_SUITE_VERSION, 'v' );
+                $is_update = version_compare( $latest_tag, $current, '>' );
+
+                // Construct zip URL for the tag (GitHub provides archive by tag)
+                $zip_url = sprintf( 'https://github.com/FEGAschaffenburg/churchtools-suite/archive/refs/tags/%s.zip', rawurlencode( $tag_name ) );
+                $html_url = sprintf( 'https://github.com/FEGAschaffenburg/churchtools-suite/releases/tag/%s', rawurlencode( $tag_name ) );
+
+                return [
+                    'tag_name' => $tag_name,
+                    'latest_version' => $latest_tag,
+                    'is_update' => $is_update,
+                    'zip_url' => $zip_url,
+                    'html_url' => $html_url,
+                    'assets' => [],
+                ];
+            }
+
             return new WP_Error( 'invalid_release', 'Invalid release data' );
         }
 
