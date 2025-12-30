@@ -495,4 +495,38 @@ class ChurchTools_Suite_CT_Client {
         delete_option('churchtools_suite_ct_user_info');
         delete_option('churchtools_suite_ct_last_login');
     }
+
+    /**
+     * Keepalive / Session ping
+     *
+     * Ensures the client is authenticated and performs a lightweight API call
+     * to keep the session alive. Returns WP_Error on failure or an array on success.
+     *
+     * @return array|WP_Error
+     */
+    public function keepalive() {
+        // Ensure we have credentials
+        if (empty($this->url) || empty($this->username) || empty($this->password)) {
+            return new WP_Error('missing_credentials', 'ChurchTools connection not configured');
+        }
+
+        // If not authenticated, attempt login
+        if (!$this->is_authenticated()) {
+            $login = $this->login();
+            if (!isset($login['success']) || $login['success'] !== true) {
+                return new WP_Error('login_failed', $login['message'] ?? 'Login failed');
+            }
+        }
+
+        // Call whoami to keep session alive
+        $result = $this->api_request('whoami', 'GET');
+        if (is_wp_error($result)) {
+            return $result;
+        }
+
+        // Update last keepalive timestamp
+        update_option('churchtools_suite_last_keepalive', current_time('mysql'));
+
+        return [ 'success' => true, 'message' => 'Keepalive OK', 'data' => $result ];
+    }
 }
