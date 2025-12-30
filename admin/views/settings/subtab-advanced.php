@@ -68,6 +68,19 @@ $auto_update_level = get_option( 'churchtools_suite_auto_update_level', 'none' )
 			</tr>
 
 			<tr>
+				<td colspan="2">
+					<div class="cts-info" style="margin-top:12px; background:#f1f7ff; border-left:4px solid #2d7bf6; padding:12px;">
+						<strong><?php esc_html_e( 'Update‑Kategorien (Beispiele)', 'churchtools-suite' ); ?></strong>
+						<ul style="margin:8px 0 0 18px; padding:0; color:#333;">
+							<li><strong><?php esc_html_e( 'Nur Major', 'churchtools-suite' ); ?>:</strong> <?php esc_html_e( 'Nur wenn sich die Major‑Version erhöht (z.B. 1.2.3 → 2.0.0).', 'churchtools-suite' ); ?></li>
+							<li><strong><?php esc_html_e( 'Major + Minor', 'churchtools-suite' ); ?>:</strong> <?php esc_html_e( 'Major‑ oder Minor‑Sprünge (z.B. 1.2.3 → 1.3.0 oder 2.0.0).', 'churchtools-suite' ); ?></li>
+							<li><strong><?php esc_html_e( 'Alle Updates', 'churchtools-suite' ); ?>:</strong> <?php esc_html_e( 'Major, Minor oder Patch (z.B. 1.2.3 → 1.2.4, 1.3.0, 2.0.0).', 'churchtools-suite' ); ?></li>
+						</ul>
+					</div>
+				</td>
+			</tr>
+
+			<tr>
 				<th scope="row">
 					<label for="cts_update_interval"><?php esc_html_e( 'Auto‑Update Intervall', 'churchtools-suite' ); ?></label>
 				</th>
