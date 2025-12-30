@@ -1209,9 +1209,13 @@ class ChurchTools_Suite_Admin {
 	 * Führt sofortigen Session Keepalive aus
 	 */
 	public function ajax_trigger_keepalive() {
-		// Simple fallback debug file to verify handler invocation
-		$debug_file = rtrim( CHURCHTOOLS_SUITE_PATH, "\\/" ) . DIRECTORY_SEPARATOR . 'keepalive-debug.log';
-		@file_put_contents( $debug_file, sprintf("%s - ajax_trigger_keepalive called\n", date('c') ), FILE_APPEND );
+		// Use plugin logger to verify handler invocation
+		if ( ! class_exists( 'ChurchTools_Suite_Logger' ) ) {
+			require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-logger.php';
+		}
+		if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+			ChurchTools_Suite_Logger::info( 'ajax_keepalive', 'ajax_trigger_keepalive called', [ 'user_id' => get_current_user_id() ] );
+		}
 
 		// Start output buffer to capture any unexpected output (will be logged)
 		if ( ob_get_level() === 0 ) {
@@ -1237,24 +1241,24 @@ class ChurchTools_Suite_Admin {
 			// Keepalive ausführen
 			$result = $ct_client->keepalive();
 			
-			if (is_wp_error($result)) {
-				// Write fallback debug info
-				@file_put_contents( $debug_file, sprintf("%s - keepalive result: WP_Error: %s\n", date('c'), $result->get_error_message() ), FILE_APPEND );
+			if ( is_wp_error( $result ) ) {
+				// Log result via plugin logger
+				if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+					ChurchTools_Suite_Logger::error( 'ajax_keepalive', 'Keepalive failed: ' . $result->get_error_message(), [ 'user_id' => get_current_user_id() ] );
+				}
 				// Capture any extra output
 				$extra = trim( ob_get_clean() );
 				if ( class_exists( 'ChurchTools_Suite_Logger' ) && ! empty( $extra ) ) {
 					ChurchTools_Suite_Logger::error( 'ajax_keepalive', 'Unexpected output before JSON (keepalive failed)', [ 'extra' => substr( $extra, 0, 2000 ) ] );
 				}
-				wp_send_json_error( [
-					'message' => __( 'Keepalive fehlgeschlagen: ', 'churchtools-suite' ) . $result->get_error_message()
-				] );
+				wp_send_json_error( [ 'message' => __( 'Keepalive fehlgeschlagen: ', 'churchtools-suite' ) . $result->get_error_message() ] );
 				return;
 			}
 
-			// Capture any extra output
+			// Capture any extra output and log via plugin logger
 			$extra = trim( ob_get_clean() );
 			if ( class_exists( 'ChurchTools_Suite_Logger' ) && ! empty( $extra ) ) {
-				ChurchTools_Suite_Logger::warning( 'ajax_keepalive', 'Unexpected output before JSON (keepalive success)', [ 'extra' => substr( $extra, 0, 2000 ) ] );
+				ChurchTools_Suite_Logger::warning( 'ajax_keepalive', 'Unexpected output before JSON (keepalive success)', [ 'extra' => substr( $extra, 0, 2000 ), 'user_id' => get_current_user_id() ] );
 			}
 
 			wp_send_json_success( [
