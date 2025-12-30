@@ -212,11 +212,18 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 						<?php endif; ?>					<?php
 					// Nächster geplanter Sync berechnen
 					$next_scheduled = wp_next_scheduled('churchtools_suite_auto_sync');
-					if ($next_scheduled) :
-					?>
-						<p class="cts-card-meta" style="margin-top: 8px;">
-							<?php echo esc_html( sprintf( __( 'Nächster Sync: %s', 'churchtools-suite' ), date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $next_scheduled ) ) ); ?>
-						</p>
+					if ( $next_scheduled ) :
+						if ( $next_scheduled < time() ) :
+							$diff = human_time_diff( $next_scheduled, time() );
+							?>
+							<p class="cts-card-meta" style="margin-top: 8px; color:#d66;">
+								<?php echo esc_html( sprintf( __( 'Nächster Sync (überfällig seit %s): %s', 'churchtools-suite' ), $diff, date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $next_scheduled ) ) ); ?>
+							</p>
+						<?php else : ?>
+							<p class="cts-card-meta" style="margin-top: 8px;">
+								<?php echo esc_html( sprintf( __( 'Nächster Sync: %s', 'churchtools-suite' ), date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $next_scheduled ) ) ); ?>
+							</p>
+						<?php endif; ?>
 					<?php endif; ?>
 					<p class="cts-card-meta" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f1;">
 						<small><?php printf(
@@ -232,11 +239,18 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 						<p class="cts-card-detail"><?php esc_html_e( 'Wartet auf ersten automatischen Sync', 'churchtools-suite' ); ?></p>					<?php
 					// Nächster geplanter Sync berechnen
 					$next_scheduled = wp_next_scheduled('churchtools_suite_auto_sync');
-					if ($next_scheduled) :
-					?>
-						<p class="cts-card-meta">
-							<?php echo esc_html( sprintf( __( 'Nächster Sync: %s', 'churchtools-suite' ), date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $next_scheduled ) ) ); ?>
-						</p>
+					if ( $next_scheduled ) :
+						if ( $next_scheduled < time() ) :
+							$diff = human_time_diff( $next_scheduled, time() );
+							?>
+							<p class="cts-card-meta" style="color:#d66;">
+								<?php echo esc_html( sprintf( __( 'Nächster Sync (überfällig seit %s): %s', 'churchtools-suite' ), $diff, date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $next_scheduled ) ) ); ?>
+							</p>
+						<?php else : ?>
+							<p class="cts-card-meta">
+								<?php echo esc_html( sprintf( __( 'Nächster Sync: %s', 'churchtools-suite' ), date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $next_scheduled ) ) ); ?>
+							</p>
+						<?php endif; ?>
 					<?php endif; ?>
 					<p class="cts-card-meta" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #f0f0f1;">
 						<small><?php printf(
