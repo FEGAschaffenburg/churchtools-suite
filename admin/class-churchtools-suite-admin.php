@@ -1209,6 +1209,10 @@ class ChurchTools_Suite_Admin {
 	 * Führt sofortigen Session Keepalive aus
 	 */
 	public function ajax_trigger_keepalive() {
+		// Simple fallback debug file to verify handler invocation
+		$debug_file = rtrim( CHURCHTOOLS_SUITE_PATH, "\\/" ) . DIRECTORY_SEPARATOR . 'keepalive-debug.log';
+		@file_put_contents( $debug_file, sprintf("%s - ajax_trigger_keepalive called\n", date('c') ), FILE_APPEND );
+
 		// Start output buffer to capture any unexpected output (will be logged)
 		if ( ob_get_level() === 0 ) {
 			ob_start();
@@ -1234,6 +1238,8 @@ class ChurchTools_Suite_Admin {
 			$result = $ct_client->keepalive();
 			
 			if (is_wp_error($result)) {
+				// Write fallback debug info
+				@file_put_contents( $debug_file, sprintf("%s - keepalive result: WP_Error: %s\n", date('c'), $result->get_error_message() ), FILE_APPEND );
 				// Capture any extra output
 				$extra = trim( ob_get_clean() );
 				if ( class_exists( 'ChurchTools_Suite_Logger' ) && ! empty( $extra ) ) {
