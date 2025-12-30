@@ -27,16 +27,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div class="cts-card" style="margin-top:24px;">
 		<h3>🛠️ Update & Log</h3>
 		<div style="display: flex; gap: 12px; flex-wrap: wrap;">
-			<button type="button" id="cts_manual_update_btn" class="cts-button">
+			<button type="button" id="cts-manual-update" class="cts-button">
 				<span>🔄</span> Manuelles Update prüfen
 			</button>
-			<button type="button" id="cts_clear_logs_btn" class="cts-button cts-button-danger">
+			<button type="button" id="cts-clear-logs" class="cts-button cts-button-danger">
 				<span>🗑️</span> Log löschen
 			</button>
 		</div>
 	</div>
 </div>
-<script>
+<!-- <script>
 jQuery(function($){
 	$('#cts_clear_logs_btn').on('click', function(e){
 		e.preventDefault();
@@ -60,4 +60,4 @@ jQuery(function($){
 		});
 	});
 });
-</script>
+</script> -->

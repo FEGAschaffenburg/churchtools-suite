@@ -1058,6 +1058,41 @@
 				});
 			});
 		}
+
+			// Manual update check button (migrated from inline jQuery)
+			const manualUpdateButton = document.getElementById('cts-manual-update');
+			if (manualUpdateButton) {
+				manualUpdateButton.addEventListener('click', function() {
+					const resultDiv = document.getElementById('cts-manual-trigger-result');
+					if (resultDiv) { resultDiv.style.display = 'none'; resultDiv.innerHTML = ''; }
+					manualUpdateButton.disabled = true;
+					const originalText = manualUpdateButton.innerHTML;
+					manualUpdateButton.innerHTML = '<span class="dashicons dashicons-update"></span> Prüfe...';
+
+					fetch(churchtoolsSuite.ajaxUrl, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+						body: new URLSearchParams({ action: 'cts_manual_update', nonce: churchtoolsSuite.nonce })
+					})
+					.then(r => r.json())
+					.then(data => {
+						if (resultDiv) { resultDiv.style.display = 'block'; }
+						if (data.success) {
+							if (resultDiv) resultDiv.innerHTML = '<div class="cts-notice cts-notice-success"><p>' + (data.data.message || 'Update-Prüfung abgeschlossen') + '</p></div>';
+						} else {
+							if (resultDiv) resultDiv.innerHTML = '<div class="cts-notice cts-notice-error"><p>' + (data.data?.message || 'Update-Prüfung fehlgeschlagen') + '</p></div>';
+						}
+					})
+					.catch(err => {
+						if (resultDiv) resultDiv.style.display = 'block';
+						if (resultDiv) resultDiv.innerHTML = '<div class="cts-notice cts-notice-error"><p>Fehler: ' + err.message + '</p></div>';
+					})
+					.finally(() => {
+						manualUpdateButton.disabled = false;
+						manualUpdateButton.innerHTML = originalText;
+					});
+				});
+			}
 	}
 
 	/**
