@@ -79,14 +79,36 @@ $advanced_mode = get_option( 'churchtools_suite_advanced_mode', 0 );
 								$label = __( 'Manuelle Trigger', 'churchtools-suite' );
 							} elseif ( $slug === 'logs' ) {
 								$label = __( 'Logs', 'churchtools-suite' );
+							} elseif ( $slug === 'reset-cleanup' ) {
+								$label = __( 'Reset & Cleanup', 'churchtools-suite' );
 							}
 							$subtabs[ $slug ] = $label;
 						}
 					}
 				}
+
+				// Enforce preferred order: Übersicht / Trigger / Logs / Reset & Cleanup
+				$preferred = array( 'uebersicht', 'manuelle-trigger', 'logs', 'reset-cleanup' );
+				$ordered = array();
+				foreach ( $preferred as $p ) {
+					if ( isset( $subtabs[ $p ] ) ) {
+						$ordered[ $p ] = $subtabs[ $p ];
+						unset( $subtabs[ $p ] );
+					}
+				}
+				// append any remaining subtabs (if any)
+				if ( ! empty( $subtabs ) ) {
+					foreach ( $subtabs as $k => $v ) {
+						$ordered[ $k ] = $v;
+					}
+				}
+
+				// replace subtabs with ordered list for rendering
+				$subtabs = $ordered;
+
 				if ( empty( $subtab ) ) {
-					// choose first available subtab or default to 'uebersicht'
-					$subtab = key( $subtabs ) ?: 'uebersicht';
+					// choose Übersicht as default
+					$subtab = isset( $subtabs['uebersicht'] ) ? 'uebersicht' : ( key( $subtabs ) ?: 'uebersicht' );
 				}
 				?>
 				<div class="cts-subtab-nav" role="tablist" aria-label="CTS Debug Subtabs">

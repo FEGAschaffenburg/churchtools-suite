@@ -92,6 +92,7 @@ Key API endpoints:
 
 ## Build & Deploy
 
+
 ### Creating WordPress-compatible ZIP:
 ```powershell
 cd scripts
@@ -101,6 +102,8 @@ cd scripts
 - Normalizes paths to forward slashes (WordPress requirement)
 - Excludes: `.git`, `scripts`, `tests`, `node_modules`, `composer.*`
 - Output: `C:\privat\churchtools-suite-{version}.zip`
+
+**WICHTIG:** Nach jedem neuen ZIP-Release muss auch ein neues GitHub-Release/Tag erstellt werden (z.B. `git tag v0.9.3.0; git push; git push --tags` und Release im Web anlegen). Erst dann erkennt die Auto-Update-Funktion die neue Version!
 
 ### Testing:
 1. Install plugin in local WordPress

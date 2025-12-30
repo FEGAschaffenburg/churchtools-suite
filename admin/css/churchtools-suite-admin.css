@@ -1,0 +1,30 @@
+/* Debug/Erweitert Subtab-Navigation */
+.cts-subtab-nav {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.cts-subtab {
+  display: inline-block;
+  padding: 8px 18px;
+  background: #f6f8fa;
+  border-radius: 4px 4px 0 0;
+  color: #1e293b;
+  text-decoration: none;
+  font-weight: 500;
+  border: 1px solid #e5e7eb;
+  border-bottom: none;
+  transition: background 0.15s, color 0.15s;
+}
+.cts-subtab.active, .cts-subtab:hover {
+  background: #fff;
+  color: #2563eb;
+  border-bottom: 2px solid #2563eb;
+  font-weight: 600;
+}
+.cts-debug-subtab-content {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0 0 6px 6px;
+  padding: 24px 24px 12px 24px;
+}

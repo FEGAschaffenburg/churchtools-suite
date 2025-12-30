@@ -22,12 +22,55 @@ $last_sync = get_option('churchtools_suite_calendars_last_sync', null);
 ?>
 
 <div class="cts-tab-content-inner">
-	
-	<!-- Calendar Selection Card -->
-	<div class="cts-card" style="margin-top: 20px;">
-		<div class="cts-card-header">
-			<h2>✅ <?php esc_html_e('Kalenderauswahl', 'churchtools-suite'); ?></h2>
+
+   <!-- Kalender Sync Button -->
+   <div class="cts-card" style="margin-top: 20px; margin-bottom: 0; background: #f8f9fa; border: 1px solid #e0e0e0;">
+	   <div class="cts-card-header" style="display: flex; align-items: center; justify-content: space-between;">
+		   <h2 style="margin:0;">📅 <?php esc_html_e('Kalender', 'churchtools-suite'); ?></h2>
+		   <button id="cts-sync-calendars-btn" class="button button-secondary" style="font-size:15px; padding:8px 18px;">
+			   <span class="dashicons dashicons-update"></span> <?php esc_html_e('Kalender synchronisieren', 'churchtools-suite'); ?>
+		   </button>
+	   </div>
+	   <div id="cts-sync-calendars-result" style="margin-top:8px; font-size:13px; color:#2271b1;"></div>
+   </div>
+
+   <!-- Calendar Selection Card -->
+   <div class="cts-card" style="margin-top: 20px;">
+	   <div class="cts-card-header">
+		   <h2>✅ <?php esc_html_e('Kalenderauswahl', 'churchtools-suite'); ?></h2>
+	   </div>
 		</div>
+
+		<script type="text/javascript">
+		document.addEventListener('DOMContentLoaded', function() {
+			var btn = document.getElementById('cts-sync-calendars-btn');
+			var result = document.getElementById('cts-sync-calendars-result');
+			if (!btn) return;
+			btn.addEventListener('click', function() {
+				if (!confirm('<?php echo esc_js(__('Kalender jetzt mit ChurchTools synchronisieren?', 'churchtools-suite')); ?>')) return;
+				btn.disabled = true;
+				var orig = btn.innerHTML;
+				btn.innerHTML = '⏳ <?php echo esc_js(__('Synchronisiere...', 'churchtools-suite')); ?>';
+				if (result) result.innerHTML = '';
+				fetch(churchtoolsSuite.ajaxUrl, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+					body: new URLSearchParams({ action: 'cts_sync_calendars', nonce: churchtoolsSuite.nonce })
+				}).then(r => r.json()).then(function(data) {
+					if (data.success) {
+						if (result) result.innerHTML = '<span style="color:#0a0">' + (data.data && data.data.message ? data.data.message : '✅ Synchronisation abgeschlossen') + '</span>';
+					} else {
+						if (result) result.innerHTML = '<span style="color:#d63638">' + (data.data && data.data.message ? data.data.message : (data.message || 'Fehler beim Sync')) + '</span>';
+					}
+				}).catch(function(err) {
+					if (result) result.innerHTML = '<span style="color:#d63638">Fehler: ' + err.message + '</span>';
+				}).finally(function() {
+					btn.disabled = false;
+					btn.innerHTML = orig;
+				});
+			});
+		});
+		</script>
 		<div class="cts-card-body">
 			
 			<?php if (empty($calendars)): ?>
