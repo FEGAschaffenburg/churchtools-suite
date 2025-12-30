@@ -69,22 +69,46 @@ class ChurchTools_Suite_Admin {
 			return;
 		}
 
-		try {
-			if ( ! class_exists( 'ChurchTools_Suite_Auto_Updater' ) ) {
-				require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-auto-updater.php';
-			}
+		   try {
+			   if ( ! class_exists( 'ChurchTools_Suite_Auto_Updater' ) ) {
+				   require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-auto-updater.php';
+			   }
 
-			// Only check availability — do NOT perform the update from the admin button
-			$info = ChurchTools_Suite_Auto_Updater::get_latest_release_info();
-			if ( is_wp_error( $info ) ) {
-				wp_send_json_error( [ 'message' => __( 'Fehler beim Abrufen der Release-Informationen.', 'churchtools-suite' ), 'error' => $info->get_error_message() ] );
-				return;
-			}
+			   // Logging: Start manuelle Update-Prüfung
+			   if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+				   ChurchTools_Suite_Logger::info('updater', 'Manuelle Update-Prüfung gestartet', [
+					   'current_version' => defined('CHURCHTOOLS_SUITE_VERSION') ? CHURCHTOOLS_SUITE_VERSION : null,
+					   'user' => get_current_user_id(),
+					   'ip' => $_SERVER['REMOTE_ADDR'] ?? null
+				   ]);
+			   }
 
-			wp_send_json_success( [ 'message' => __( 'Update-Prüfung abgeschlossen.', 'churchtools-suite' ), 'data' => $info ] );
-		} catch ( Exception $e ) {
-			wp_send_json_error( [ 'message' => __( 'Fehler: ', 'churchtools-suite' ) . $e->getMessage() ] );
-		}
+			   // Only check availability — do NOT perform the update from the admin button
+			   $info = ChurchTools_Suite_Auto_Updater::get_latest_release_info();
+			   if ( is_wp_error( $info ) ) {
+				   if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+					   ChurchTools_Suite_Logger::error('updater', 'Fehler bei manueller Update-Prüfung', [ 'error' => $info->get_error_message() ]);
+				   }
+				   wp_send_json_error( [ 'message' => __( 'Fehler beim Abrufen der Release-Informationen.', 'churchtools-suite' ), 'error' => $info->get_error_message() ] );
+				   return;
+			   }
+
+			   if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+				   ChurchTools_Suite_Logger::info('updater', 'Manuelle Update-Prüfung abgeschlossen', [
+					   'found_update' => !empty($info['is_update']),
+					   'latest_version' => $info['latest_version'] ?? null,
+					   'tag_name' => $info['tag_name'] ?? null,
+					   'zip_url' => $info['zip_url'] ?? null
+				   ]);
+			   }
+
+			   wp_send_json_success( [ 'message' => __( 'Update-Prüfung abgeschlossen.', 'churchtools-suite' ), 'data' => $info ] );
+		   } catch ( Exception $e ) {
+			   if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+				   ChurchTools_Suite_Logger::error('updater', 'Exception bei manueller Update-Prüfung', [ 'exception' => $e->getMessage() ]);
+			   }
+			   wp_send_json_error( [ 'message' => __( 'Fehler: ', 'churchtools-suite' ) . $e->getMessage() ] );
+		   }
 	}
 	
 	/**
@@ -182,6 +206,38 @@ class ChurchTools_Suite_Admin {
 			'churchtools-suite-docs',
 			[ $this, 'display_documentation_page' ]
 		);
+
+		// Add Settings subpage
+		add_submenu_page(
+			'churchtools-suite',
+			__( 'Einstellungen', 'churchtools-suite' ),
+			__( '⚙️ Einstellungen', 'churchtools-suite' ),
+			'manage_options',
+			'churchtools-suite-settings',
+			[ $this, 'display_settings_page' ]
+		);
+
+		// Add Sync subpage
+		add_submenu_page(
+			'churchtools-suite',
+			__( 'Synchronisation', 'churchtools-suite' ),
+			__( '🔄 Synchronisation', 'churchtools-suite' ),
+			'manage_options',
+			'churchtools-suite-sync',
+			[ $this, 'display_sync_page' ]
+		);
+
+		// Add Debug subpage (only when advanced mode enabled)
+		if ( get_option( 'churchtools_suite_advanced_mode', 0 ) ) {
+			add_submenu_page(
+				'churchtools-suite',
+				__( 'Erweitert', 'churchtools-suite' ),
+				__( '🔧 Erweitert', 'churchtools-suite' ),
+				'manage_options',
+				'churchtools-suite-debug',
+				[ $this, 'display_debug_page' ]
+			);
+		}
 	}
 	
 	/**
@@ -215,6 +271,32 @@ class ChurchTools_Suite_Admin {
 	public function display_data_page() {
 		// Reuse existing data subtab view
 		include_once CHURCHTOOLS_SUITE_PATH . 'admin/views/tab-data.php';
+	}
+
+	/**
+	 * Display Settings page (dedicated subpage)
+	 */
+	public function display_settings_page() {
+		include_once CHURCHTOOLS_SUITE_PATH . 'admin/views/tab-settings.php';
+	}
+
+	/**
+	 * Display Sync page (dedicated subpage)
+	 */
+	public function display_sync_page() {
+		include_once CHURCHTOOLS_SUITE_PATH . 'admin/views/tab-sync.php';
+	}
+
+	/**
+	 * Display Debug page (dedicated subpage)
+	 * Reuse admin-page with debug tab to keep subtabs navigation logic
+	 */
+	public function display_debug_page() {
+		// Ensure tab=debug for the admin view
+		if ( empty( $_GET['tab'] ) ) {
+			$_GET['tab'] = 'debug';
+		}
+		include_once CHURCHTOOLS_SUITE_PATH . 'admin/views/admin-page.php';
 	}
 
 	/**
