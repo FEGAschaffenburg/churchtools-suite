@@ -207,37 +207,8 @@ class ChurchTools_Suite_Admin {
 			[ $this, 'display_documentation_page' ]
 		);
 
-		// Add Settings subpage
-		add_submenu_page(
-			'churchtools-suite',
-			__( 'Einstellungen', 'churchtools-suite' ),
-			__( '⚙️ Einstellungen', 'churchtools-suite' ),
-			'manage_options',
-			'churchtools-suite-settings',
-			[ $this, 'display_settings_page' ]
-		);
-
-		// Add Sync subpage
-		add_submenu_page(
-			'churchtools-suite',
-			__( 'Synchronisation', 'churchtools-suite' ),
-			__( '🔄 Synchronisation', 'churchtools-suite' ),
-			'manage_options',
-			'churchtools-suite-sync',
-			[ $this, 'display_sync_page' ]
-		);
-
-		// Add Debug subpage (only when advanced mode enabled)
-		if ( get_option( 'churchtools_suite_advanced_mode', 0 ) ) {
-			add_submenu_page(
-				'churchtools-suite',
-				__( 'Erweitert', 'churchtools-suite' ),
-				__( '🔧 Erweitert', 'churchtools-suite' ),
-				'manage_options',
-				'churchtools-suite-debug',
-				[ $this, 'display_debug_page' ]
-			);
-		}
+		// Note: Settings, Sync and Debug are handled as tabs in the main admin page
+		// (admin/views/admin-page.php) — no separate submenu entries are added here.
 	}
 	
 	/**
@@ -273,31 +244,6 @@ class ChurchTools_Suite_Admin {
 		include_once CHURCHTOOLS_SUITE_PATH . 'admin/views/tab-data.php';
 	}
 
-	/**
-	 * Display Settings page (dedicated subpage)
-	 */
-	public function display_settings_page() {
-		include_once CHURCHTOOLS_SUITE_PATH . 'admin/views/tab-settings.php';
-	}
-
-	/**
-	 * Display Sync page (dedicated subpage)
-	 */
-	public function display_sync_page() {
-		include_once CHURCHTOOLS_SUITE_PATH . 'admin/views/tab-sync.php';
-	}
-
-	/**
-	 * Display Debug page (dedicated subpage)
-	 * Reuse admin-page with debug tab to keep subtabs navigation logic
-	 */
-	public function display_debug_page() {
-		// Ensure tab=debug for the admin view
-		if ( empty( $_GET['tab'] ) ) {
-			$_GET['tab'] = 'debug';
-		}
-		include_once CHURCHTOOLS_SUITE_PATH . 'admin/views/admin-page.php';
-	}
 
 	/**
 	 * Display Documentation page (dedicated subpage)
