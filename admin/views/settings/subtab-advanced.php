@@ -23,7 +23,7 @@ if ( isset( $_POST['cts_save_advanced'] ) && check_admin_referer( 'cts_settings'
 	$auto_enabled = isset( $_POST['cts_auto_update_enabled'] ) ? 1 : 0;
 	update_option( 'churchtools_suite_auto_update_enabled', $auto_enabled );
 
-	$allowed_levels = [ 'none', 'patch', 'minor', 'major' ];
+	$allowed_levels = [ 'none', 'major', 'major_minor', 'all' ];
 	$auto_level = in_array( $_POST['cts_auto_update_level'] ?? 'none', $allowed_levels, true ) ? $_POST['cts_auto_update_level'] : 'none';
 	update_option( 'churchtools_suite_auto_update_level', $auto_level );
 
@@ -107,9 +107,9 @@ $auto_update_level = get_option( 'churchtools_suite_auto_update_level', 'none' )
 				<td>
 					<select id="cts_auto_update_level" name="cts_auto_update_level">
 						<option value="none" <?php selected( $auto_update_level, 'none' ); ?>><?php esc_html_e( 'Keine (Deaktiviert)', 'churchtools-suite' ); ?></option>
-						<option value="patch" <?php selected( $auto_update_level, 'patch' ); ?>><?php esc_html_e( 'Nur Patch‑Updates', 'churchtools-suite' ); ?></option>
-						<option value="minor" <?php selected( $auto_update_level, 'minor' ); ?>><?php esc_html_e( 'Patch + Minor‑Updates', 'churchtools-suite' ); ?></option>
-						<option value="major" <?php selected( $auto_update_level, 'major' ); ?>><?php esc_html_e( 'Alle Updates (inkl. Major)', 'churchtools-suite' ); ?></option>
+						<option value="major" <?php selected( $auto_update_level, 'major' ); ?>><?php esc_html_e( 'Nur Major‑Updates', 'churchtools-suite' ); ?></option>
+						<option value="major_minor" <?php selected( $auto_update_level, 'major_minor' ); ?>><?php esc_html_e( 'Major + Minor‑Updates', 'churchtools-suite' ); ?></option>
+						<option value="all" <?php selected( $auto_update_level, 'all' ); ?>><?php esc_html_e( 'Alle Updates (inkl. Patch)', 'churchtools-suite' ); ?></option>
 					</select>
 					<p class="cts-form-description"><?php esc_html_e( 'Wählen Sie aus, welche Arten von Versionssprüngen automatisch installiert werden dürfen.', 'churchtools-suite' ); ?></p>
 				</td>

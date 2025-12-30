@@ -112,14 +112,17 @@ class ChurchTools_Suite_Auto_Updater {
 
         $allow = false;
         switch ( $auto_level ) {
-            case 'patch':
-                $allow = ( $bump === 'patch' );
-                break;
-            case 'minor':
-                $allow = ( $bump === 'patch' || $bump === 'minor' );
-                break;
             case 'major':
-                $allow = ( $bump === 'patch' || $bump === 'minor' || $bump === 'major' );
+                // Only allow when major version increased
+                $allow = ( $bump === 'major' );
+                break;
+            case 'major_minor':
+                // Allow major or minor bumps
+                $allow = ( $bump === 'major' || $bump === 'minor' );
+                break;
+            case 'all':
+                // Allow any bump (major, minor, patch)
+                $allow = ( $bump === 'major' || $bump === 'minor' || $bump === 'patch' );
                 break;
             default:
                 $allow = false;
