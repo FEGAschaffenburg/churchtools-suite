@@ -28,6 +28,11 @@ class ChurchTools_Suite_Admin {
 	 * AJAX Handler: Run update now (performs installation) — requires additional confirmation
 	 */
 	public function ajax_run_update() {
+		// Clean any previous output to avoid HTML before JSON
+		while ( ob_get_level() ) {
+			ob_end_clean();
+		}
+
 		// Check nonce
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
 
@@ -60,6 +65,11 @@ class ChurchTools_Suite_Admin {
 	 * Triggers the auto-updater check immediately.
 	 */
 	public function ajax_manual_update() {
+		// Clean any previous output to avoid HTML before JSON
+		while ( ob_get_level() ) {
+			ob_end_clean();
+		}
+
 		// Check nonce
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
 
@@ -1199,6 +1209,11 @@ class ChurchTools_Suite_Admin {
 	 * Führt sofortigen Session Keepalive aus
 	 */
 	public function ajax_trigger_keepalive() {
+		// Clean any previous output to avoid HTML before JSON
+		while ( ob_get_level() ) {
+			ob_end_clean();
+		}
+
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
 		
 		if ( ! current_user_can( 'manage_options' ) ) {
