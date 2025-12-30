@@ -286,6 +286,8 @@ class ChurchTools_Suite_Admin {
 		add_action( 'wp_ajax_cts_manual_update', [ $this, 'ajax_manual_update' ] );
 		add_action( 'wp_ajax_cts_run_update', [ $this, 'ajax_run_update' ] );
 		add_action( 'wp_ajax_cts_trigger_keepalive', [ $this, 'ajax_trigger_keepalive' ] );
+		// Simple ping endpoint to verify AJAX/JSON pipeline
+		add_action( 'wp_ajax_cts_keepalive_ping', [ $this, 'ajax_keepalive_ping' ] );
 		add_action( 'wp_ajax_cts_reload_logs', [ $this, 'ajax_reload_logs' ] );
 		add_action( 'wp_ajax_cts_clear_logs', [ $this, 'ajax_clear_logs' ] );
 		add_action( 'wp_ajax_cts_clear_block_logs', [ $this, 'ajax_clear_block_logs' ] );
@@ -317,6 +319,24 @@ class ChurchTools_Suite_Admin {
 	public function ajax_test_connection() {
 		// Check nonce
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
+	}
+
+	/**
+	 * AJAX Handler: Keepalive ping (test endpoint)
+	 * Returns simple JSON to validate that admin-ajax.php returns JSON correctly.
+	 */
+	public function ajax_keepalive_ping() {
+		// Use non-fatal nonce check and return JSON
+		$ok = check_ajax_referer( 'churchtools_suite_admin', 'nonce', false );
+		if ( $ok === false ) {
+			wp_send_json_error( [ 'message' => 'Invalid nonce' ] );
+			return;
+		}
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => 'No permission' ] );
+			return;
+		}
+		wp_send_json_success( [ 'message' => 'pong' ] );
 		
 		// Check permissions
 		if ( ! current_user_can( 'manage_options' ) ) {
@@ -1225,8 +1245,42 @@ class ChurchTools_Suite_Admin {
 		// Start a fresh output buffer to capture any unexpected output during handler
 		ob_start();
 
+		if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+			ChurchTools_Suite_Logger::debug( 'ajax_keepalive', 'Output buffer started for ajax_trigger_keepalive', [ 'ob_level' => ob_get_level() ] );
+		}
+
+		// Register shutdown handler to catch fatal errors and return JSON instead of raw HTML
+		register_shutdown_function( function() {
+			$error = error_get_last();
+			if ( $error && in_array( $error['type'], [ E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR ] ) ) {
+				require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-logger.php';
+				$ob = '';
+				if ( ob_get_length() ) {
+					$ob = substr( ob_get_contents(), 0, 2000 );
+				}
+				$shutdown_payload = [
+					'error' => $error,
+					'headers_sent' => headers_sent(),
+					'ob_preview' => $ob,
+					'request_keys' => array_keys( $_REQUEST ?? [] ),
+					'server' => [ 'REQUEST_URI' => $_SERVER['REQUEST_URI'] ?? null, 'REMOTE_ADDR' => $_SERVER['REMOTE_ADDR'] ?? null ],
+				];
+				ChurchTools_Suite_Logger::critical('ajax_keepalive', 'Fatal error in ajax_trigger_keepalive', $shutdown_payload );
+				// If headers not sent, send JSON response
+				if ( ! headers_sent() ) {
+					header( 'Content-Type: application/json; charset=utf-8' );
+					http_response_code( 500 );
+					echo json_encode( [ 'success' => false, 'data' => [ 'message' => 'PHP Fatal Error: ' . $error['message'], 'file' => $error['file'], 'line' => $error['line'] ] ] );
+				}
+				exit;
+			}
+		} );
+
 		// Check nonce without dying (avoid wp_die HTML) and handle failure with JSON
 		$nonce_ok = check_ajax_referer( 'churchtools_suite_admin', 'nonce', false );
+		if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+			ChurchTools_Suite_Logger::debug( 'ajax_keepalive', 'Nonce check result', [ 'nonce_ok' => $nonce_ok === false ? false : true, 'request_keys' => array_keys( $_REQUEST ?? [] ) ] );
+		}
 		if ( $nonce_ok === false ) {
 			if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
 				ChurchTools_Suite_Logger::warning( 'ajax_keepalive', 'Invalid nonce in ajax_trigger_keepalive', [ 'user_id' => get_current_user_id() ] );
@@ -1246,10 +1300,27 @@ class ChurchTools_Suite_Admin {
 		try {
 			// CT-Client laden
 			require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-ct-client.php';
+			if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+				ChurchTools_Suite_Logger::debug( 'ajax_keepalive', 'Instantiating CT client' );
+			}
 			$ct_client = new ChurchTools_Suite_CT_Client();
+			if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+				ChurchTools_Suite_Logger::info( 'ajax_keepalive', 'CT client instantiated', [ 'is_authenticated' => $ct_client->is_authenticated(), 'cookies_count' => is_array( $ct_client->get_cookies() ) ? count( $ct_client->get_cookies() ) : 0 ] );
+			}
 			
 			// Keepalive ausführen
+			if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+				ChurchTools_Suite_Logger::debug( 'ajax_keepalive', 'Calling keepalive on CT client' );
+			}
 			$result = $ct_client->keepalive();
+			if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+				// Log summarized result (avoid dumping sensitive data)
+				if ( is_wp_error( $result ) ) {
+					ChurchTools_Suite_Logger::error( 'ajax_keepalive', 'Keepalive returned WP_Error', [ 'error' => $result->get_error_message() ] );
+				} else {
+					ChurchTools_Suite_Logger::info( 'ajax_keepalive', 'Keepalive succeeded', [ 'message' => is_array( $result ) && isset($result['message']) ? $result['message'] : null ] );
+				}
+			}
 			
 			if ( is_wp_error( $result ) ) {
 				// Log result via plugin logger
