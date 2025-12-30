@@ -60,13 +60,34 @@ $advanced_mode = get_option( 'churchtools_suite_advanced_mode', 0 );
 			   break;
 		   case 'debug':
 			   if ( $advanced_mode ) {
-				// Subtab navigation for Debug/Erweitert
-				$subtab = isset( $_GET['subtab'] ) ? sanitize_key( wp_unslash( $_GET['subtab'] ) ) : 'uebersicht';
-				$subtabs = [
-					'uebersicht' => __( 'Übersicht', 'churchtools-suite' ),
-					'logs' => __( 'Logs', 'churchtools-suite' ),
-					'manuelle-trigger' => __( 'Manuelle Trigger', 'churchtools-suite' ),
-				];
+				// Dynamic Subtab navigation for Debug/Erweitert
+				$subtab = isset( $_GET['subtab'] ) ? sanitize_key( wp_unslash( $_GET['subtab'] ) ) : '';
+				$subtabs = [];
+				$debug_dir = __DIR__ . '/debug';
+				if ( is_dir( $debug_dir ) ) {
+					$files = scandir( $debug_dir );
+					foreach ( $files as $file ) {
+						if ( strpos( $file, 'subtab-' ) === 0 && substr( $file, -4 ) === '.php' ) {
+							$slug = str_replace( [ 'subtab-', '.php' ], '', $file );
+							// Generate label from slug: replace hyphens with spaces and ucfirst words
+							$label = str_replace( '-', ' ', $slug );
+							$label = mb_convert_case( $label, MB_CASE_TITLE, 'UTF-8' );
+							// Small localization fixes
+							if ( $slug === 'uebersicht' ) {
+								$label = __( 'Übersicht', 'churchtools-suite' );
+							} elseif ( $slug === 'manuelle-trigger' ) {
+								$label = __( 'Manuelle Trigger', 'churchtools-suite' );
+							} elseif ( $slug === 'logs' ) {
+								$label = __( 'Logs', 'churchtools-suite' );
+							}
+							$subtabs[ $slug ] = $label;
+						}
+					}
+				}
+				if ( empty( $subtab ) ) {
+					// choose first available subtab or default to 'uebersicht'
+					$subtab = key( $subtabs ) ?: 'uebersicht';
+				}
 				?>
 				<div class="cts-subtab-nav" role="tablist" aria-label="CTS Debug Subtabs">
 					<?php foreach ( $subtabs as $key => $label ) : ?>
@@ -78,7 +99,6 @@ $advanced_mode = get_option( 'churchtools_suite_advanced_mode', 0 );
 				if ( file_exists( $subtab_file ) ) {
 					include $subtab_file;
 				} else {
-					// Fallback minimal debug view
 					include __DIR__ . '/tab-debug-minimal.php';
 				}
 			   }
