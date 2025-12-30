@@ -95,14 +95,14 @@ class ChurchTools_Suite_Cron {
         $auto_sync_enabled = get_option('churchtools_suite_auto_sync_enabled', 0);
         $interval = get_option('churchtools_suite_auto_sync_interval', 'hourly');
         
-        // Clear existing schedule
-        $timestamp = wp_next_scheduled('churchtools_suite_auto_sync');
-        if ($timestamp) {
-            wp_unschedule_event($timestamp, 'churchtools_suite_auto_sync');
+        // Clear all existing schedules for this hook to avoid duplicates
+        if ( has_action( 'churchtools_suite_auto_sync' ) || true ) {
+            wp_clear_scheduled_hook( 'churchtools_suite_auto_sync' );
         }
         
         // Schedule new job if enabled
         if ($auto_sync_enabled) {
+            // Schedule new job starting now
             wp_schedule_event(time(), $interval, 'churchtools_suite_auto_sync');
         }
     }
