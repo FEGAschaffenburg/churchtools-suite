@@ -1209,9 +1209,12 @@ class ChurchTools_Suite_Admin {
 	 * Führt sofortigen Session Keepalive aus
 	 */
 	public function ajax_trigger_keepalive() {
-		// Clean any previous output to avoid HTML before JSON
-		while ( ob_get_level() ) {
-			ob_end_clean();
+		// Start output buffer to capture any unexpected output (will be logged)
+		if ( ob_get_level() === 0 ) {
+			ob_start();
+		} else {
+			// nested buffers: start a new one to capture only this handler's output
+			ob_start();
 		}
 
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
@@ -1231,12 +1234,23 @@ class ChurchTools_Suite_Admin {
 			$result = $ct_client->keepalive();
 			
 			if (is_wp_error($result)) {
+				// Capture any extra output
+				$extra = trim( ob_get_clean() );
+				if ( class_exists( 'ChurchTools_Suite_Logger' ) && ! empty( $extra ) ) {
+					ChurchTools_Suite_Logger::error( 'ajax_keepalive', 'Unexpected output before JSON (keepalive failed)', [ 'extra' => substr( $extra, 0, 2000 ) ] );
+				}
 				wp_send_json_error( [
 					'message' => __( 'Keepalive fehlgeschlagen: ', 'churchtools-suite' ) . $result->get_error_message()
 				] );
 				return;
 			}
-			
+
+			// Capture any extra output
+			$extra = trim( ob_get_clean() );
+			if ( class_exists( 'ChurchTools_Suite_Logger' ) && ! empty( $extra ) ) {
+				ChurchTools_Suite_Logger::warning( 'ajax_keepalive', 'Unexpected output before JSON (keepalive success)', [ 'extra' => substr( $extra, 0, 2000 ) ] );
+			}
+
 			wp_send_json_success( [
 				'message' => __( '✅ Session Keepalive erfolgreich!', 'churchtools-suite' )
 			] );
