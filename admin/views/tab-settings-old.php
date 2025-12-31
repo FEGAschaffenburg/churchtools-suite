@@ -65,23 +65,18 @@ $active_subtab = isset( $_GET['subtab'] ) ? sanitize_key( $_GET['subtab'] ) : 'a
 <div class="cts-settings">
 	
 	<!-- Sub-Navigation -->
-	<div class="cts-sub-tabs" style="margin-bottom: 20px; border-bottom: 1px solid #ddd;">
-		<a href="?page=churchtools-suite&tab=settings&subtab=api" class="cts-sub-tab <?php echo $active_subtab === 'api' ? 'active' : ''; ?>">
-			<?php esc_html_e( 'API & Verbindung', 'churchtools-suite' ); ?>
-		</a>
-		<a href="?page=churchtools-suite&tab=settings&subtab=sync" class="cts-sub-tab <?php echo $active_subtab === 'sync' ? 'active' : ''; ?>">
-			<?php esc_html_e( 'Synchronisation', 'churchtools-suite' ); ?>
-		</a>
-		<a href="?page=churchtools-suite&tab=settings&subtab=calendars" class="cts-sub-tab <?php echo $active_subtab === 'calendars' ? 'active' : ''; ?>">
-			<?php esc_html_e( 'Kalender', 'churchtools-suite' ); ?>
-		</a>
-		<a href="?page=churchtools-suite&tab=settings&subtab=services" class="cts-sub-tab <?php echo $active_subtab === 'services' ? 'active' : ''; ?>">
-			<?php esc_html_e( 'Services', 'churchtools-suite' ); ?>
-		</a>
-		<a href="?page=churchtools-suite&tab=settings&subtab=advanced" class="cts-sub-tab <?php echo $active_subtab === 'advanced' ? 'active' : ''; ?>">
-			<?php esc_html_e( 'Erweitert', 'churchtools-suite' ); ?>
-		</a>
-	</div>
+	<?php
+	$subtabs = array(
+		'api' => __( 'API & Verbindung', 'churchtools-suite' ),
+		'sync' => __( 'Synchronisation', 'churchtools-suite' ),
+		'calendars' => __( 'Kalender', 'churchtools-suite' ),
+		'services' => __( 'Services', 'churchtools-suite' ),
+		'advanced' => __( 'Erweitert', 'churchtools-suite' ),
+	);
+	$subtab_active = $active_subtab;
+	$subtab_parent_tab = 'settings';
+	include __DIR__ . '/partials/render-subtabs.php';
+	?>
 	
 	<?php
 	switch ( $active_subtab ) {

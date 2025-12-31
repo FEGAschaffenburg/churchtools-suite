@@ -60,70 +60,32 @@ $advanced_mode = get_option( 'churchtools_suite_advanced_mode', 0 );
 			   break;
 		   case 'debug':
 			   if ( $advanced_mode ) {
-				// Dynamic Subtab navigation for Debug/Erweitert
-				$subtab = isset( $_GET['subtab'] ) ? sanitize_key( wp_unslash( $_GET['subtab'] ) ) : '';
-				$subtabs = [];
-				$debug_dir = __DIR__ . '/debug';
-				if ( is_dir( $debug_dir ) ) {
-					$files = scandir( $debug_dir );
-					foreach ( $files as $file ) {
-						if ( strpos( $file, 'subtab-' ) === 0 && substr( $file, -4 ) === '.php' ) {
-							$slug = str_replace( [ 'subtab-', '.php' ], '', $file );
-							// Generate label from slug: replace hyphens with spaces and ucfirst words
-							$label = str_replace( '-', ' ', $slug );
-							$label = mb_convert_case( $label, MB_CASE_TITLE, 'UTF-8' );
-							// Small localization fixes
-							if ( $slug === 'uebersicht' ) {
-								$label = __( 'Übersicht', 'churchtools-suite' );
-							} elseif ( $slug === 'manuelle-trigger' ) {
-								$label = __( 'Manuelle Trigger', 'churchtools-suite' );
-							} elseif ( $slug === 'logs' ) {
-								$label = __( 'Logs', 'churchtools-suite' );
-							} elseif ( $slug === 'reset-cleanup' ) {
-								$label = __( 'Reset & Cleanup', 'churchtools-suite' );
-							}
-							$subtabs[ $slug ] = $label;
-						}
-					}
-				}
+			   	$subtab = isset( $_GET['subtab'] ) ? sanitize_key( wp_unslash( $_GET['subtab'] ) ) : '';
 
-				// Enforce preferred order: Übersicht / Trigger / Logs / Reset & Cleanup
-				$preferred = array( 'uebersicht', 'manuelle-trigger', 'logs', 'reset-cleanup' );
-				$ordered = array();
-				foreach ( $preferred as $p ) {
-					if ( isset( $subtabs[ $p ] ) ) {
-						$ordered[ $p ] = $subtabs[ $p ];
-						unset( $subtabs[ $p ] );
-					}
-				}
-				// append any remaining subtabs (if any)
-				if ( ! empty( $subtabs ) ) {
-					foreach ( $subtabs as $k => $v ) {
-						$ordered[ $k ] = $v;
-					}
-				}
+               	// Statically defined Debug subtabs to keep behavior consistent with Settings subtabs
+               	$subtabs = array(
+               		'uebersicht' => __( 'Übersicht', 'churchtools-suite' ),
+               		'manuelle-trigger' => __( 'Manuelle Trigger', 'churchtools-suite' ),
+               		'logs' => __( 'Logs', 'churchtools-suite' ),
+               		'reset-cleanup' => __( 'Reset & Cleanup', 'churchtools-suite' ),
+               	);
 
-				// replace subtabs with ordered list for rendering
-				$subtabs = $ordered;
+               	if ( empty( $subtab ) ) {
+               		$subtab = 'uebersicht';
+               	}
 
-				if ( empty( $subtab ) ) {
-					// choose Übersicht as default
-					$subtab = isset( $subtabs['uebersicht'] ) ? 'uebersicht' : ( key( $subtabs ) ?: 'uebersicht' );
-				}
-				?>
-				<div class="cts-subtab-nav" role="tablist" aria-label="CTS Debug Subtabs">
-					<?php foreach ( $subtabs as $key => $label ) : ?>
-						<a href="?page=churchtools-suite&tab=debug&subtab=<?php echo esc_attr( $key ); ?>" class="cts-subtab <?php echo $subtab === $key ? 'active' : ''; ?>"><?php echo esc_html( $label ); ?></a>
-					<?php endforeach; ?>
-				</div>
-				<?php
-				$subtab_file = __DIR__ . '/debug/subtab-' . $subtab . '.php';
-				if ( file_exists( $subtab_file ) ) {
-					include $subtab_file;
-				} else {
-					include __DIR__ . '/tab-debug-minimal.php';
-				}
-			   }
+               	// expose variables for shared partial
+               	$subtab_active = $subtab;
+               	$subtab_parent_tab = 'debug';
+               	include __DIR__ . '/partials/render-subtabs.php';
+
+               	$subtab_file = __DIR__ . '/debug/subtab-' . $subtab . '.php';
+               	if ( file_exists( $subtab_file ) ) {
+               		include $subtab_file;
+               	} else {
+               		include __DIR__ . '/tab-debug-minimal.php';
+               	}
+               }
 			   break;
 		   case 'dashboard':
 		   default:
