@@ -22,6 +22,9 @@ class ChurchTools_Suite_Auto_Updater {
 
         // Ensure weekly schedule exists if requested
         add_filter( 'cron_schedules', [ __CLASS__, 'add_weekly_cron_schedule' ] );
+        
+        // Offer update info to WordPress update API so plugin updates show in Plugins list
+        add_filter( 'pre_set_site_transient_update_plugins', [ __CLASS__, 'push_update_to_transient' ] );
 
         // Schedule according to saved option
         $interval = get_option( 'churchtools_suite_update_interval', 'daily' );
@@ -433,6 +436,55 @@ class ChurchTools_Suite_Auto_Updater {
             }
 
             ChurchTools_Suite_Logger::info( 'updater', sprintf( 'Plugin updated to %s via WP Upgrader', $tag ) );
+    }
+
+    /**
+     * Push GitHub release info into WP plugin update transient so updates appear on Plugins page.
+     *
+     * @param object|false $transient
+     * @return object|false
+     */
+    public static function push_update_to_transient( $transient ) {
+        if ( empty( $transient ) || ! is_object( $transient ) ) {
+            return $transient;
+        }
+
+        // If no checked list present, bail
+        if ( empty( $transient->checked ) || ! is_array( $transient->checked ) ) {
+            return $transient;
+        }
+
+        $info = self::get_latest_release_info();
+        if ( is_wp_error( $info ) ) {
+            return $transient;
+        }
+
+        if ( empty( $info['is_update'] ) || empty( $info['zip_url'] ) ) {
+            return $transient;
+        }
+
+        $plugin_file = plugin_basename( CHURCHTOOLS_SUITE_PATH . 'churchtools-suite.php' );
+
+        // If response already set, don't overwrite
+        if ( isset( $transient->response ) && isset( $transient->response[ $plugin_file ] ) ) {
+            return $transient;
+        }
+
+        $update = new stdClass();
+        $update->id = 0;
+        $update->slug = dirname( $plugin_file );
+        $update->plugin = $plugin_file;
+        $update->new_version = ltrim( $info['latest_version'] ?? ( $info['tag_name'] ?? '' ), 'v' );
+        $update->package = $info['zip_url'];
+        $update->url = $info['html_url'] ?? '';
+
+        if ( ! isset( $transient->response ) || ! is_array( $transient->response ) ) {
+            $transient->response = [];
+        }
+
+        $transient->response[ $plugin_file ] = $update;
+
+        return $transient;
     }
 
     private static function rcopy( string $src, string $dst ): bool {
