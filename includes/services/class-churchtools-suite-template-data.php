@@ -123,26 +123,36 @@ class ChurchTools_Suite_Template_Data {
 			}
 		}
 		
-		if ( ! $results ) {
-			return [];
+		// Format events (empty array if no results)
+		$events = [];
+		if ( $results ) {
+			foreach ( $results as $row ) {
+				$events[] = $this->format_event( $row );
+			}
 		}
 		
-		// Format events
-		$events = [];
-		foreach ( $results as $row ) {
-			$events[] = $this->format_event( $row );
+		// Debug logging before filter
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			error_log( 'ChurchTools Suite Template Data: BEFORE apply_filters - ' . count( $events ) . ' events' );
 		}
 		
 		/**
 		 * Filter events before returning to templates (v0.10.0.0)
 		 * 
 		 * Allows external plugins (like churchtools-suite-demo) to override events.
+		 * This filter is ALWAYS called, even if database is empty, to allow
+		 * demo plugins to inject events.
 		 * 
-		 * @param array $events  Formatted events array
+		 * @param array $events  Formatted events array (may be empty)
 		 * @param array $filters Original query filters
 		 * @return array Modified events array
 		 */
 		$events = apply_filters( 'churchtools_suite_get_events', $events, $filters );
+		
+		// Debug logging after filter
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			error_log( 'ChurchTools Suite Template Data: AFTER apply_filters - ' . count( $events ) . ' events' );
+		}
 		
 		return $events;
 	}
