@@ -489,7 +489,7 @@ class ChurchTools_Suite_Template_Data {
 			] );
 		}
 		
-		// Get demo events (already formatted)
+		// Get demo events (raw data from provider)
 		$demo_events = $demo_provider->get_events( $demo_args );
 		
 		// Debug result
@@ -500,11 +500,17 @@ class ChurchTools_Suite_Template_Data {
 			] );
 		}
 		
-		// Apply order sorting
-		if ( ! empty( $filters['order'] ) && strtoupper( $filters['order'] ) === 'DESC' ) {
-			$demo_events = array_reverse( $demo_events );
+		// WICHTIG: Demo-Events müssen durch format_event() laufen!
+		// Sie benötigen start_day, start_month, start_year, start_time etc.
+		$formatted_events = [];
+		foreach ( $demo_events as $event ) {
+			$formatted_events[] = $this->format_event( $event );
 		}
 		
-		// Demo events sind bereits vollständig formatiert durch Demo Data Provider
-		return $demo_events;
+		// Apply order sorting
+		if ( ! empty( $filters['order'] ) && strtoupper( $filters['order'] ) === 'DESC' ) {
+			$formatted_events = array_reverse( $formatted_events );
+		}
+		
+		return $formatted_events;
 	}}
