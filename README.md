@@ -17,6 +17,69 @@ Professionelle WordPress-Integration für ChurchTools.
 3. Plugin aktivieren
 4. ChurchTools-Zugangsdaten eingeben
 
+## Demo-Modus (für Demo-Websites)
+
+**Hinweis:** Dieser Modus ist nur für Demo-Websites gedacht und wird normalen Plugin-Benutzern nicht angezeigt.
+
+### Was ist der Demo-Modus?
+
+Der Demo-Modus ermöglicht es, das Plugin **ohne ChurchTools-API-Zugriff** zu nutzen. Perfekt für:
+- Demo-Websites (z.B. https://plugin.feg-aschaffenburg.de)
+- Präsentationen und Screenshots
+- Entwicklung ohne ChurchTools-Instanz
+
+### Aktivierung
+
+Fügen Sie in Ihrer `wp-config.php` (vor `/* That's all, stop editing! */`) hinzu:
+
+```php
+/**
+ * ChurchTools Suite - Demo Mode
+ * Generiert fake Events ohne ChurchTools API
+ */
+define('CTS_DEMO_MODE', true);
+```
+
+### Was bietet der Demo-Modus?
+
+- ✅ **6 Demo-Kalender** mit realistischen Namen und Farben
+- ✅ **90 Tage Event-Daten** (wöchentliche Events + spezielle Termine)
+- ✅ **9 Service-Typen** (Prediger, Moderation, Lobpreis, etc.)
+- ✅ **Realistische deutsche Beschreibungen** für alle Events
+- ✅ **Vollständige Adressen** (Straße, PLZ, Stadt, GPS-Koordinaten)
+- ✅ **Farb-codierte Tags** für bessere Visualisierung
+
+### Demo-Daten im Detail
+
+**Kalender:**
+1. Gottesdienste (blau)
+2. Jugend (grün)
+3. Kinder (gelb)
+4. Musik (rot)
+5. Kleingruppen (lila)
+6. Gemeindeveranstaltungen (cyan)
+
+**Wöchentliche Events:**
+- Gottesdienst (Sonntags 10:00-11:30)
+- Jugendabend (Freitags 19:00-21:00)
+- Kindergottesdienst (Sonntags 10:00-11:30)
+- Lobpreis-Probe (Donnerstags 20:00-21:30)
+- Hauskreis (Mittwochs 19:30-21:30)
+
+**Spezielle Events:**
+- Gemeindefest (+30 Tage)
+- Alpha-Kurs Startabend (+14 Tage)
+
+### Deaktivierung
+
+Entfernen Sie die Zeile aus `wp-config.php` oder setzen Sie:
+
+```php
+define('CTS_DEMO_MODE', false);
+```
+
+**Wichtig:** Normalen Plugin-Benutzern wird diese Option nicht angezeigt. Der Demo-Modus ist ausschließlich über die `wp-config.php` steuerbar.
+
 ## Entwicklung
 
 - **Version:** 0.9.2.24

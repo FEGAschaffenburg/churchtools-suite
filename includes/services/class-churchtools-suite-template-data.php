@@ -60,6 +60,11 @@ class ChurchTools_Suite_Template_Data {
 	 * @return array Formatted events data
 	 */
 	public function get_events( array $filters = [] ): array {
+		// DEMO MODE: Use fake data if CTS_DEMO_MODE is enabled
+		if ( $this->is_demo_mode() ) {
+			return $this->get_demo_events( $filters );
+		}
+		
 		$defaults = [
 			'calendar_ids' => [],
 			'limit' => 20,
@@ -425,4 +430,50 @@ class ChurchTools_Suite_Template_Data {
 
 		return $stats;
 	}
-}
+	
+	/**
+	 * Check if demo mode is enabled (v0.9.3.0)
+	 * 
+	 * Demo mode only active wenn CTS_DEMO_MODE constant in wp-config.php gesetzt ist.
+	 * Ermöglicht Demo-Seite ohne ChurchTools API Zugriff.
+	 * 
+	 * @return bool True wenn Demo-Modus aktiv
+	 */
+	private function is_demo_mode(): bool {
+		return defined( 'CTS_DEMO_MODE' ) && CTS_DEMO_MODE === true;
+	}
+	
+	/**
+	 * Get demo events (v0.9.3.0)
+	 * 
+	 * Nutzt Demo Data Provider wenn Demo-Modus aktiv ist.
+	 * Gibt realistische fake Events für nächste 90 Tage zurück.
+	 * 
+	 * @param array $filters Query filters (same as get_events)
+	 * @return array Formatted events data
+	 */
+	private function get_demo_events( array $filters = [] ): array {
+		// Load Demo Data Provider
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/services/class-churchtools-suite-demo-data-provider.php';
+		
+		$demo_provider = new ChurchTools_Suite_Demo_Data_Provider();
+		
+		// Convert filters to demo provider format
+		$demo_args = [
+			'from' => ! empty( $filters['from'] ) ? $filters['from'] : date( 'Y-m-d H:i:s' ),
+			'to' => ! empty( $filters['to'] ) ? $filters['to'] : date( 'Y-m-d H:i:s', strtotime( '+90 days' ) ),
+			'limit' => ! empty( $filters['limit'] ) ? absint( $filters['limit'] ) : 20,
+			'calendar_ids' => ! empty( $filters['calendar_ids'] ) ? $filters['calendar_ids'] : [],
+		];
+		
+		// Get demo events (already formatted)
+		$demo_events = $demo_provider->get_events( $demo_args );
+		
+		// Apply order sorting
+		if ( ! empty( $filters['order'] ) && strtoupper( $filters['order'] ) === 'DESC' ) {
+			$demo_events = array_reverse( $demo_events );
+		}
+		
+		// Demo events sind bereits vollständig formatiert durch Demo Data Provider
+		return $demo_events;
+	}
