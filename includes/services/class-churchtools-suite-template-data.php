@@ -46,7 +46,7 @@ class ChurchTools_Suite_Template_Data {
 	}
 	
 	/**
-	 * Get events with filters
+	 * Get events with filters (v0.10.0.0: Added filter hook for extensibility)
 	 * 
 	 * @param array $filters {
 	 *     Optional. Query filters.
@@ -60,27 +60,6 @@ class ChurchTools_Suite_Template_Data {
 	 * @return array Formatted events data
 	 */
 	public function get_events( array $filters = [] ): array {
-		// DEMO MODE: Use fake data if CTS_DEMO_MODE is enabled
-		if ( $this->is_demo_mode() ) {
-			// Debug logging
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG && class_exists( 'ChurchTools_Suite_Logger' ) ) {
-				ChurchTools_Suite_Logger::debug( 'demo_mode', 'Demo mode ACTIVE - using fake data', [
-					'filters' => $filters,
-					'constant_defined' => defined( 'CTS_DEMO_MODE' ),
-					'constant_value' => defined( 'CTS_DEMO_MODE' ) ? CTS_DEMO_MODE : 'not set',
-				] );
-			}
-			return $this->get_demo_events( $filters );
-		}
-		
-		// Debug: Demo mode NOT active
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && class_exists( 'ChurchTools_Suite_Logger' ) ) {
-			ChurchTools_Suite_Logger::debug( 'demo_mode', 'Demo mode INACTIVE - using database', [
-				'constant_defined' => defined( 'CTS_DEMO_MODE' ),
-				'constant_value' => defined( 'CTS_DEMO_MODE' ) ? CTS_DEMO_MODE : 'not set',
-			] );
-		}
-		
 		$defaults = [
 			'calendar_ids' => [],
 			'limit' => 20,
@@ -153,6 +132,17 @@ class ChurchTools_Suite_Template_Data {
 		foreach ( $results as $row ) {
 			$events[] = $this->format_event( $row );
 		}
+		
+		/**
+		 * Filter events before returning to templates (v0.10.0.0)
+		 * 
+		 * Allows external plugins (like churchtools-suite-demo) to override events.
+		 * 
+		 * @param array $events  Formatted events array
+		 * @param array $filters Original query filters
+		 * @return array Modified events array
+		 */
+		$events = apply_filters( 'churchtools_suite_get_events', $events, $filters );
 		
 		return $events;
 	}
