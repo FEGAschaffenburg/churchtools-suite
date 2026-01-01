@@ -37,8 +37,37 @@ $ct_password = get_option( 'churchtools_suite_ct_password', '' );
 <form method="post" action="" class="cts-form">
 	<?php wp_nonce_field( 'cts_settings' ); ?>
 	
+	<?php
+	// Demo Mode Status anzeigen
+	$is_demo_mode = defined( 'CTS_DEMO_MODE' ) && CTS_DEMO_MODE === true;
+	if ( $is_demo_mode ) :
+	?>
+	<div class="cts-card" style="border-left: 4px solid #16a34a; background: #f0fdf4;">
+		<div style="display: flex; align-items: start; gap: 12px;">
+			<span style="font-size: 24px;">🎭</span>
+			<div>
+				<h3 style="margin: 0 0 8px 0; color: #15803d;"><?php esc_html_e( 'Demo-Modus aktiv', 'churchtools-suite' ); ?></h3>
+				<p style="margin: 0; color: #166534;">
+					<?php esc_html_e( 'Plugin nutzt Demo-Daten ohne ChurchTools-Verbindung. Alle Shortcodes zeigen simulierte Events.', 'churchtools-suite' ); ?>
+				</p>
+				<p style="margin: 8px 0 0 0; font-size: 13px; color: #15803d;">
+					<strong><?php esc_html_e( 'Deaktivierung:', 'churchtools-suite' ); ?></strong>
+					<?php esc_html_e( 'Entfernen Sie define(\'CTS_DEMO_MODE\', true); aus wp-config.php', 'churchtools-suite' ); ?>
+				</p>
+			</div>
+		</div>
+	</div>
+	<?php endif; ?>
+	
 	<div class="cts-card">
 		<h3><?php esc_html_e( 'ChurchTools API-Verbindung', 'churchtools-suite' ); ?></h3>
+		
+		<?php if ( $is_demo_mode ) : ?>
+		<div class="cts-notice cts-notice-info" style="margin-bottom: 20px;">
+			<strong><?php esc_html_e( 'Hinweis:', 'churchtools-suite' ); ?></strong>
+			<?php esc_html_e( 'Im Demo-Modus werden diese Einstellungen nicht verwendet. API-Verbindung ist deaktiviert.', 'churchtools-suite' ); ?>
+		</div>
+		<?php endif; ?>
 		
 		<table class="cts-form-table">
 			<tr>

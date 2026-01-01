@@ -62,7 +62,23 @@ class ChurchTools_Suite_Template_Data {
 	public function get_events( array $filters = [] ): array {
 		// DEMO MODE: Use fake data if CTS_DEMO_MODE is enabled
 		if ( $this->is_demo_mode() ) {
+			// Debug logging
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG && class_exists( 'ChurchTools_Suite_Logger' ) ) {
+				ChurchTools_Suite_Logger::debug( 'demo_mode', 'Demo mode ACTIVE - using fake data', [
+					'filters' => $filters,
+					'constant_defined' => defined( 'CTS_DEMO_MODE' ),
+					'constant_value' => defined( 'CTS_DEMO_MODE' ) ? CTS_DEMO_MODE : 'not set',
+				] );
+			}
 			return $this->get_demo_events( $filters );
+		}
+		
+		// Debug: Demo mode NOT active
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && class_exists( 'ChurchTools_Suite_Logger' ) ) {
+			ChurchTools_Suite_Logger::debug( 'demo_mode', 'Demo mode INACTIVE - using database', [
+				'constant_defined' => defined( 'CTS_DEMO_MODE' ),
+				'constant_value' => defined( 'CTS_DEMO_MODE' ) ? CTS_DEMO_MODE : 'not set',
+			] );
 		}
 		
 		$defaults = [
@@ -466,8 +482,23 @@ class ChurchTools_Suite_Template_Data {
 			'calendar_ids' => ! empty( $filters['calendar_ids'] ) ? $filters['calendar_ids'] : [],
 		];
 		
+		// Debug logging
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && class_exists( 'ChurchTools_Suite_Logger' ) ) {
+			ChurchTools_Suite_Logger::debug( 'demo_mode', 'Getting demo events', [
+				'demo_args' => $demo_args,
+			] );
+		}
+		
 		// Get demo events (already formatted)
 		$demo_events = $demo_provider->get_events( $demo_args );
+		
+		// Debug result
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && class_exists( 'ChurchTools_Suite_Logger' ) ) {
+			ChurchTools_Suite_Logger::debug( 'demo_mode', 'Demo events loaded', [
+				'count' => count( $demo_events ),
+				'first_event_title' => ! empty( $demo_events[0]['title'] ) ? $demo_events[0]['title'] : 'N/A',
+			] );
+		}
 		
 		// Apply order sorting
 		if ( ! empty( $filters['order'] ) && strtoupper( $filters['order'] ) === 'DESC' ) {

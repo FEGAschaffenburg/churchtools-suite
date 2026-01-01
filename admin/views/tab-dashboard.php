@@ -83,14 +83,26 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 	<!-- Status Cards -->
 	<div class="cts-grid cts-grid-3">
 		
+		<?php
+		// Demo Mode Status Check
+		$is_demo_mode = defined( 'CTS_DEMO_MODE' ) && CTS_DEMO_MODE === true;
+		?>
+		
 		<!-- ChurchTools Verbindung -->
 		<div class="cts-card">
 			<div class="cts-card-header">
-				<span class="cts-card-icon">☁️</span>
+				<span class="cts-card-icon"><?php echo $is_demo_mode ? '🎭' : '☁️'; ?></span>
 				<h3><?php esc_html_e( 'ChurchTools', 'churchtools-suite' ); ?></h3>
 			</div>
 			<div class="cts-card-body">
-				<?php if ( $is_connected ) : ?>
+				<?php if ( $is_demo_mode ) : ?>
+					<p class="cts-status cts-status-warning">
+						<span class="cts-status-indicator" style="background: #eab308;"></span>
+						<?php esc_html_e( 'Demo-Modus', 'churchtools-suite' ); ?>
+					</p>
+					<p class="cts-card-detail"><?php esc_html_e( 'Simulierte Daten', 'churchtools-suite' ); ?></p>
+					<p class="cts-card-meta"><?php esc_html_e( 'API-Verbindung deaktiviert', 'churchtools-suite' ); ?></p>
+				<?php elseif ( $is_connected ) : ?>
 					<p class="cts-status cts-status-success">
 						<span class="cts-status-indicator"></span>
 						<?php esc_html_e( 'Verbunden', 'churchtools-suite' ); ?>
