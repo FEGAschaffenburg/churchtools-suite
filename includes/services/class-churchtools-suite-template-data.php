@@ -476,4 +476,4 @@ class ChurchTools_Suite_Template_Data {
 		
 		// Demo events sind bereits vollständig formatiert durch Demo Data Provider
 		return $demo_events;
-	}
+	}}
