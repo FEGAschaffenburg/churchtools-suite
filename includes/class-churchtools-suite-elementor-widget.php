@@ -142,6 +142,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 		$list_options = [
 			'classic' => __( 'Classic', 'churchtools-suite' ),
 			'medium'  => __( 'Medium', 'churchtools-suite' ),
+			'compact' => __( 'Compact', 'churchtools-suite' ),
 		];
 		
 		$this->add_control(
@@ -379,7 +380,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 				'min'         => 1,
 				'max'         => 100,
 				'step'        => 1,
-				'default'     => 10,
+				'default'     => 5,
 				'description' => __( 'Maximale Anzahl der angezeigten Termine', 'churchtools-suite' ),
 				'condition'   => [
 					'view_type' => [ 'list', 'grid' ],

@@ -289,7 +289,7 @@ class ChurchTools_Suite_Shortcodes {
 		$atts = shortcode_atts( [
 			'view' => 'classic',
 			'calendar' => '',
-			'limit' => 20,
+			'limit' => 5,
 			'from' => '',
 			'to' => '',
 			'class' => '',

@@ -27,7 +27,8 @@
 		list: [
 			{ label: '--- Standard Views ---', value: '', disabled: true },
 			{ label: 'Classic', value: 'classic' },
-			{ label: 'Medium', value: 'medium' }
+			{ label: 'Medium', value: 'medium' },
+			{ label: 'Compact', value: 'compact' }
 		],
 		calendar: [
 			{ label: '--- Standard Views ---', value: '', disabled: true },
@@ -36,6 +37,14 @@
 		grid: [
 			{ label: '--- Standard Views ---', value: '', disabled: true },
 			{ label: 'Simple', value: 'simple' }
+		],
+		search: [
+			{ label: '--- Standard Views ---', value: '', disabled: true },
+			{ label: 'Classic', value: 'classic' }
+		],
+		widget: [
+			{ label: '--- Standard Views ---', value: '', disabled: true },
+			{ label: 'Upcoming', value: 'upcoming' }
 		]
 	};
 	
@@ -145,7 +154,7 @@
 			viewType: { type: 'string', default: 'list' },
 			view: { type: 'string', default: 'classic' },
 			calendar: { type: 'string', default: '' },
-			limit: { type: 'number', default: 20 },
+			limit: { type: 'number', default: 5 },
 			columns: { type: 'number', default: 3 },
 			show_description: { type: 'boolean', default: true },
 			show_location: { type: 'boolean', default: true },
