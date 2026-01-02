@@ -238,15 +238,7 @@
 								{ label: '📅 Kalender', value: 'calendar' },
 							{ label: '▦ Raster', value: 'grid' },
 							{ label: '🔍 Suche', value: 'search' },
-							{ label: '📱 Widget', value: 'widget' },
-							{ label: '🎬 Slider', value: 'slider' },
-							{ label: '🧱 Masonry', value: 'masonry' },
-							{ label: '📒 Agenda', value: 'agenda' },
-							{ label: '🏢 Timetable', value: 'timetable' },
-							{ label: '🎠 Carousel', value: 'carousel' },
-							{ label: '⏱️ Countdown', value: 'countdown' },
-							{ label: '🏞️ Cover', value: 'cover' },
-							{ label: '🗺️ Karte', value: 'map' }
+							{ label: '📱 Widget', value: 'widget' }
 							],
 							onChange: handleViewTypeChange
 						}),

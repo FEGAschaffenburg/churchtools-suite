@@ -452,21 +452,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 			]
 		);
 		
-		// Click-to-Details Modal aktivieren (v0.10.2.9)
-		$this->add_control(
-			'enable_modal',
-			[
-				'label'        => __( '👆 Click-to-Details', 'churchtools-suite' ),
-				'type'         => \Elementor\Controls_Manager::SWITCHER,
-				'label_on'     => __( 'Aktiv', 'churchtools-suite' ),
-				'label_off'    => __( 'Aus', 'churchtools-suite' ),
-				'return_value' => 'yes',
-				'default'      => 'yes',
-				'description'  => __( 'Öffnet Event-Details in einem Modal beim Klick auf einen Termin', 'churchtools-suite' ),
-			]
-		);
-		
-		// Click-to-Details Modal aktivieren
+		// Click-to-Details Modal aktivieren (v0.10.3.0)
 		$this->add_control(
 			'enable_modal',
 			[
@@ -489,7 +475,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 				'label'     => __( '👁️ Was anzeigen?', 'churchtools-suite' ),
 				'tab'       => \Elementor\Controls_Manager::TAB_CONTENT,
 				'condition' => [
-					'view_mode' => 'standard',
+					'preset_source' => 'standard',
 				],
 			]
 		);
@@ -573,7 +559,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 				'label'     => __( '🔍 Filter & Sortierung', 'churchtools-suite' ),
 				'tab'       => \Elementor\Controls_Manager::TAB_CONTENT,
 				'condition' => [
-					'view_mode' => 'standard',
+					'preset_source' => 'standard',
 				],
 			]
 		);

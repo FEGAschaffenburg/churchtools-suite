@@ -59,23 +59,86 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 	}
 
 	if ( is_array( $update_info ) && ! empty( $update_info['is_update'] ) ) :
+		// Auto-Update Konfiguration prüfen
+		$auto_update_enabled = get_option( 'churchtools_suite_auto_update_enabled', 0 );
+		
+		// Versions-Typ ermitteln (Major.Minor.Patch.Build)
+		$current_version = CHURCHTOOLS_SUITE_VERSION;
+		$new_version = ltrim( $update_info['tag_name'] ?? $update_info['latest_version'], 'v' );
+		
+		$current_parts = explode( '.', $current_version );
+		$new_parts = explode( '.', $new_version );
+		
+		// Fehlende Teile mit 0 auffüllen
+		while ( count( $current_parts ) < 4 ) $current_parts[] = '0';
+		while ( count( $new_parts ) < 4 ) $new_parts[] = '0';
+		
+		// Update-Typ bestimmen
+		$update_type = 'build'; // Default
+		$update_icon = '🔨';
+		$update_color = '#0ea5e9'; // Cyan
+		$update_label = __( 'Build Update', 'churchtools-suite' );
+		$update_desc = __( 'Kleinste Änderungen, Bugfixes oder technische Verbesserungen', 'churchtools-suite' );
+		
+		if ( (int) $new_parts[0] > (int) $current_parts[0] ) {
+			$update_type = 'major';
+			$update_icon = '🚀';
+			$update_color = '#dc2626'; // Red
+			$update_label = __( 'Major Update', 'churchtools-suite' );
+			$update_desc = __( 'Große neue Features, möglicherweise Breaking Changes', 'churchtools-suite' );
+		} elseif ( (int) $new_parts[1] > (int) $current_parts[1] ) {
+			$update_type = 'minor';
+			$update_icon = '✨';
+			$update_color = '#f59e0b'; // Orange
+			$update_label = __( 'Minor Update', 'churchtools-suite' );
+			$update_desc = __( 'Neue Features, keine Breaking Changes', 'churchtools-suite' );
+		} elseif ( (int) $new_parts[2] > (int) $current_parts[2] ) {
+			$update_type = 'patch';
+			$update_icon = '🔧';
+			$update_color = '#10b981'; // Green
+			$update_label = __( 'Patch Update', 'churchtools-suite' );
+			$update_desc = __( 'Bugfixes und kleinere Verbesserungen', 'churchtools-suite' );
+		}
 	?>
-	<div class="cts-card" style="border-left:4px solid #2d7bf6; margin-top:16px;">
+	<div class="cts-card" style="border-left:4px solid <?php echo esc_attr( $update_color ); ?>; margin-top:16px;">
 		<div class="cts-card-header">
-			<span class="cts-card-icon">⬆️</span>
-			<h3><?php esc_html_e( 'Update verfügbar', 'churchtools-suite' ); ?></h3>
+			<span class="cts-card-icon"><?php echo $update_icon; ?></span>
+			<h3><?php echo esc_html( $update_label ); ?> <?php esc_html_e( 'verfügbar', 'churchtools-suite' ); ?></h3>
 		</div>
 		<div class="cts-card-body">
-			<p style="margin:0 0 8px;"><strong><?php echo esc_html( $update_info['tag_name'] ?? $update_info['latest_version'] ); ?></strong> — <?php esc_html_e( 'Neue Version verfügbar', 'churchtools-suite' ); ?></p>
-			<?php if ( ! empty( $update_info['html_url'] ) ) : ?>
-				<p style="margin:0 0 8px; font-size:13px;"><a href="<?php echo esc_url( $update_info['html_url'] ); ?>" target="_blank"><?php esc_html_e( 'Release Notes anzeigen', 'churchtools-suite' ); ?></a></p>
-			<?php endif; ?>
-			<p style="margin:0; font-size:13px; color:#444;">
-				<?php esc_html_e( 'Sie können das Update manuell installieren oder die automatische Installation in den Einstellungen konfigurieren.', 'churchtools-suite' ); ?>
+			<p style="margin:0 0 8px;">
+				<strong><?php echo esc_html( $current_version ); ?></strong> 
+				<span style="color:#888;">→</span> 
+				<strong style="color:<?php echo esc_attr( $update_color ); ?>;"><?php echo esc_html( $new_version ); ?></strong>
 			</p>
+			<p style="margin:0 0 8px; font-size:13px; color:#666;">
+				<?php echo esc_html( $update_desc ); ?>
+			</p>
+			<?php if ( ! empty( $update_info['html_url'] ) ) : ?>
+				<p style="margin:0 0 8px; font-size:13px;"><a href="<?php echo esc_url( $update_info['html_url'] ); ?>" target="_blank">📋 <?php esc_html_e( 'Release Notes anzeigen', 'churchtools-suite' ); ?></a></p>
+			<?php endif; ?>
+			<?php if ( ! $auto_update_enabled ) : ?>
+				<p style="margin:8px 0 0; padding:8px 12px; background:#fff3cd; border-radius:4px; font-size:13px; color:#856404;">
+					⚠️ <?php 
+					printf(
+						esc_html__( 'Auto-Update ist deaktiviert. %sJetzt aktivieren%s', 'churchtools-suite' ),
+						'<a href="?page=churchtools-suite&tab=settings&subtab=advanced">',
+						'</a>'
+					); 
+					?>
+				</p>
+			<?php endif; ?>
 		</div>
 		<div class="cts-card-footer">
-			<button id="cts_install_update_btn" class="cts-button cts-button-danger"><?php esc_html_e( 'Update installieren', 'churchtools-suite' ); ?></button>
+			<?php if ( $auto_update_enabled ) : ?>
+				<button id="cts_install_update_btn" class="cts-button cts-button-danger">
+					<?php echo $update_icon; ?> <?php esc_html_e( 'Jetzt installieren', 'churchtools-suite' ); ?>
+				</button>
+			<?php else : ?>
+				<a href="?page=churchtools-suite&tab=settings&subtab=advanced" class="cts-button cts-button-secondary">
+					⚙️ <?php esc_html_e( 'Auto-Update aktivieren', 'churchtools-suite' ); ?>
+				</a>
+			<?php endif; ?>
 			<a href="?page=churchtools-suite&tab=settings" class="cts-button" style="margin-left:8px;"><?php esc_html_e( 'Einstellungen', 'churchtools-suite' ); ?></a>
 		</div>
 	</div>
