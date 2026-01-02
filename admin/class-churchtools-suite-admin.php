@@ -207,16 +207,6 @@ class ChurchTools_Suite_Admin {
 			[ $this, 'display_data_page' ]
 		);
 
-		// Add Documentation subpage
-		add_submenu_page(
-			'churchtools-suite',
-			__( 'Dokumentation', 'churchtools-suite' ),
-			__( '📚 Dokumentation', 'churchtools-suite' ),
-			'manage_options',
-			'churchtools-suite-docs',
-			[ $this, 'display_documentation_page' ]
-		);
-
 		// Note: Settings, Sync and Debug are handled as tabs in the main admin page
 		// (admin/views/admin-page.php) — no separate submenu entries are added here.
 	}
@@ -238,13 +228,6 @@ class ChurchTools_Suite_Admin {
 	public function display_shortcode_manager() {
 		include_once CHURCHTOOLS_SUITE_PATH . 'admin/views/shortcode-manager.php';
 	}
-	
-	/**
-	 * Display shortcode demo page
-	 */
-	public function display_shortcode_demo() {
-		include_once CHURCHTOOLS_SUITE_PATH . 'admin/views/shortcode-demo.php';
-	}
 
 	/**
 	 * Display Data page (dedicated subpage)
@@ -252,14 +235,6 @@ class ChurchTools_Suite_Admin {
 	public function display_data_page() {
 		// Reuse existing data subtab view
 		include_once CHURCHTOOLS_SUITE_PATH . 'admin/views/tab-data.php';
-	}
-
-
-	/**
-	 * Display Documentation page (dedicated subpage)
-	 */
-	public function display_documentation_page() {
-		include_once CHURCHTOOLS_SUITE_PATH . 'admin/views/tab-documentation.php';
 	}
 	
 	/**
