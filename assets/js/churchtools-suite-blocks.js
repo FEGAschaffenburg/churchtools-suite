@@ -28,11 +28,7 @@
 		list: [
 			{ label: '--- Standard Views ---', value: '', disabled: true },
 			{ label: 'Classic', value: 'classic' },
-			{ label: 'Classic Services', value: 'classic-services' },
-			{ label: 'Modern', value: 'modern' },
-			{ label: 'Medium', value: 'medium' },
-			{ label: 'Fluent', value: 'fluent' },
-			{ label: 'Compact', value: 'compact' }
+			{ label: 'Medium', value: 'medium' }
 		],
 		calendar: [
 			{ label: '--- Standard Views ---', value: '', disabled: true },
@@ -40,9 +36,7 @@
 		],
 		grid: [
 			{ label: '--- Standard Views ---', value: '', disabled: true },
-			{ label: 'Simple', value: 'simple' },
-			{ label: 'Colorful', value: 'colorful' },
-			{ label: 'Modern', value: 'modern' }
+			{ label: 'Simple', value: 'simple' }
 		],
 		search: [
 			{ label: '--- Standard Views ---', value: '', disabled: true },

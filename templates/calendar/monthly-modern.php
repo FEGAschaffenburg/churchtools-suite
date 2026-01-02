@@ -28,12 +28,15 @@ foreach ( $events as $event ) {
 ?>
 
 <div class="churchtools-suite-wrapper">
-<div class="cts-calendar cts-calendar-monthly" data-view="calendar-monthly">
+<div class="cts-calendar cts-calendar-monthly" 
+     data-view="calendar-monthly"
+     data-calendar-ids="<?php echo esc_attr( $args['calendar'] ?? '' ); ?>"
+     data-limit="<?php echo esc_attr( $args['limit'] ?? 100 ); ?>">
 	
 	<div class="cts-calendar-header">
-		<button class="cts-nav-btn cts-prev-month">‹</button>
+		<button class="cts-nav-btn cts-prev-month" aria-label="<?php esc_attr_e( 'Vorheriger Monat', 'churchtools-suite' ); ?>">‹</button>
 		<h2 class="cts-calendar-title"><?php echo esc_html( date_i18n( 'F Y' ) ); ?></h2>
-		<button class="cts-nav-btn cts-next-month">›</button>
+		<button class="cts-nav-btn cts-next-month" aria-label="<?php esc_attr_e( 'Nächster Monat', 'churchtools-suite' ); ?>">›</button>
 	</div>
 	
 	<?php if ( empty( $events ) ) : ?>
@@ -244,6 +247,31 @@ foreach ( $events as $event ) {
 	font-size: 64px;
 	display: block;
 	margin-bottom: 16px;
+}
+
+/* Loading State */
+.cts-calendar-monthly.cts-loading {
+	opacity: 0.6;
+	pointer-events: none;
+	position: relative;
+}
+
+.cts-calendar-monthly.cts-loading::after {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 40px;
+	height: 40px;
+	border: 4px solid #f3f4f6;
+	border-top-color: #667eea;
+	border-radius: 50%;
+	animation: cts-spin 0.8s linear infinite;
+}
+
+@keyframes cts-spin {
+	to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
 /* Responsive */

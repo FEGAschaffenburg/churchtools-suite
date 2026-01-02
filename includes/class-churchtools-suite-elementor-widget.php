@@ -108,22 +108,23 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 			]
 		);
 		
-		// View Mode (Standard oder Preset)
+		// Preset Source (Standard oder Eigene)
 		$this->add_control(
-			'view_mode',
+			'preset_source',
 			[
-				'label'   => __( 'Ansichts-Modus', 'churchtools-suite' ),
+				'label'   => __( 'Ansichts-Quelle', 'churchtools-suite' ),
 				'type'    => \Elementor\Controls_Manager::SELECT,
 				'default' => 'standard',
 				'options' => [
-					'standard' => __( '⚙️ Standard-Views (anpassbar)', 'churchtools-suite' ),
-					'preset'   => __( '⭐ Eigene Presets (über Manager)', 'churchtools-suite' ),
+					'standard' => __( 'Standard-Ansichten', 'churchtools-suite' ),
+					'preset'   => __( 'Eigene Presets', 'churchtools-suite' ),
 				],
+				'description' => __( 'Standard-Ansichten können hier angepasst werden. Eigene Presets werden über den Shortcode-Manager erstellt.', 'churchtools-suite' ),
 			]
 		);
 		
 		// View Type - einheitliches Control für beide Modi
-		// Options werden dynamisch basierend auf view_mode gefiltert
+		// Options werden dynamisch basierend auf preset_source gefiltert
 		$this->add_control(
 			'view_type',
 			[
@@ -143,12 +144,8 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 		
 		// List Views (nur Standard)
 		$list_options = [
-			'classic'          => __( 'Classic', 'churchtools-suite' ),
-			'classic-services' => __( 'Classic Services', 'churchtools-suite' ),
-			'modern'           => __( 'Modern', 'churchtools-suite' ),
-			'medium'           => __( 'Medium', 'churchtools-suite' ),
-			'fluent'           => __( 'Fluent', 'churchtools-suite' ),
-			'compact'          => __( 'Compact', 'churchtools-suite' ),
+			'classic' => __( 'Classic', 'churchtools-suite' ),
+			'medium'  => __( 'Medium', 'churchtools-suite' ),
 		];
 		
 		$this->add_control(
@@ -162,7 +159,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 					'relation' => 'and',
 					'terms'    => [
 						[
-							'name'     => 'view_mode',
+							'name'     => 'preset_source',
 							'operator' => '===',
 							'value'    => 'standard',
 						],
@@ -189,7 +186,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 						'relation' => 'and',
 						'terms'    => [
 							[
-								'name'     => 'view_mode',
+								'name'     => 'preset_source',
 								'operator' => '===',
 								'value'    => 'preset',
 							],
@@ -220,7 +217,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 					'relation' => 'and',
 					'terms'    => [
 						[
-							'name'     => 'view_mode',
+							'name'     => 'preset_source',
 							'operator' => '===',
 							'value'    => 'standard',
 						],
@@ -247,7 +244,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 						'relation' => 'and',
 						'terms'    => [
 							[
-								'name'     => 'view_mode',
+								'name'     => 'preset_source',
 								'operator' => '===',
 								'value'    => 'preset',
 							],
@@ -264,9 +261,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 		
 		// Grid Views (nur Standard)
 		$grid_options = [
-			'simple'   => __( 'Simple', 'churchtools-suite' ),
-			'colorful' => __( 'Colorful', 'churchtools-suite' ),
-			'modern'   => __( 'Modern', 'churchtools-suite' ),
+			'simple' => __( 'Simple', 'churchtools-suite' ),
 		];
 		
 		$this->add_control(
@@ -280,7 +275,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 					'relation' => 'and',
 					'terms'    => [
 						[
-							'name'     => 'view_mode',
+							'name'     => 'preset_source',
 							'operator' => '===',
 							'value'    => 'standard',
 						],
@@ -307,7 +302,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 						'relation' => 'and',
 						'terms'    => [
 							[
-								'name'     => 'view_mode',
+								'name'     => 'preset_source',
 								'operator' => '===',
 								'value'    => 'preset',
 							],
@@ -336,7 +331,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 					'relation' => 'and',
 					'terms'    => [
 						[
-							'name'     => 'view_mode',
+							'name'     => 'preset_source',
 							'operator' => '===',
 							'value'    => 'standard',
 						],
@@ -364,7 +359,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 					'relation' => 'and',
 					'terms'    => [
 						[
-							'name'     => 'view_mode',
+							'name'     => 'preset_source',
 							'operator' => '===',
 							'value'    => 'standard',
 						],
@@ -414,7 +409,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 				'label'     => __( '⚙️ Basis-Einstellungen', 'churchtools-suite' ),
 				'tab'       => \Elementor\Controls_Manager::TAB_CONTENT,
 				'condition' => [
-					'view_mode' => 'standard',
+					'preset_source' => 'standard',
 				],
 			]
 		);
@@ -430,7 +425,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 				</div>',
 				'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
 				'condition'       => [
-					'view_mode' => 'preset',
+					'preset_source' => 'preset',
 				],
 			]
 		);
@@ -605,7 +600,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 					'relation' => 'and',
 					'terms'    => [
 						[
-							'name'     => 'view_mode',
+							'name'     => 'preset_source',
 							'operator' => '===',
 							'value'    => 'standard',
 						],
@@ -659,12 +654,14 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 	protected function render() {
 		$settings = $this->get_settings_for_display();
 		
-		// Fallback für alte Widgets ohne view_mode (vor v0.5.11.x)
-		$view_mode = ! empty( $settings['view_mode'] ) ? $settings['view_mode'] : 'standard';
+		// Fallback für alte Widgets ohne preset_source (vor v0.10.2.7)
+		$preset_source = ! empty( $settings['preset_source'] ) ? $settings['preset_source'] : (
+			! empty( $settings['view_mode'] ) ? $settings['view_mode'] : 'standard'
+		);
 		$view_type = $settings['view_type'];
 		$view = '';
 		
-		if ( $view_mode === 'preset' ) {
+		if ( $preset_source === 'preset' ) {
 			// Use preset view
 			switch ( $view_type ) {
 				case 'calendar':
@@ -704,7 +701,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 		$calendars = $this->get_calendars();
 		$selected_calendar_ids = [];
 		
-		if ( $view_mode === 'standard' ) {
+		if ( $preset_source === 'standard' ) {
 			foreach ( array_keys( $calendars ) as $calendar_id ) {
 				if ( ! empty( $settings[ 'calendar_' . $calendar_id ] ) && $settings[ 'calendar_' . $calendar_id ] === 'yes' ) {
 					$selected_calendar_ids[] = $calendar_id;
@@ -718,7 +715,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 		];
 		
 		// Add calendar selection nur bei Standard-Modus
-		if ( $view_mode === 'standard' ) {
+		if ( $preset_source === 'standard' ) {
 			$atts['calendar'] = ! empty( $selected_calendar_ids ) ? implode( ',', $selected_calendar_ids ) : '';
 			
 			// Sprint 1: Basis-Parameter hinzufügen

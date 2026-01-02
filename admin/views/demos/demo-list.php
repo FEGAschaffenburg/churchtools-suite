@@ -33,10 +33,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="cts-demo-item">
 			<div class="cts-demo-item-header">
 				<h4>Classic List - mit Services</h4>
-				<code>[cts_list view="classic-services"]</code>
+				<code>[cts_list view="classic" show_services="true"]</code>
 			</div>
 			<div class="cts-demo-item-preview">
-				<?php echo do_shortcode( '[cts_list view="classic-services"]' ); ?>
+				<?php echo do_shortcode( '[cts_list view="classic" show_services="true"]' ); ?>
 			</div>
 		</div>
 		

@@ -20,6 +20,12 @@
 	 * Initialize Calendar Views
 	 */
 	function initCalendarViews() {
+		// Initialize monthly modern calendar
+		$('.cts-calendar-monthly').each(function() {
+			setupCalendarNavigation($(this));
+		});
+		
+		// Legacy calendar view support
 		$('.cts-calendar-view').each(function() {
 			const $calendar = $(this);
 			const eventsData = $calendar.find('.cts-calendar-grid').data('events');
@@ -76,11 +82,102 @@
 	 * Setup calendar navigation
 	 */
 	function setupCalendarNavigation($calendar) {
-		$calendar.find('.cts-calendar-nav button').on('click', function() {
-			const direction = $(this).data('direction');
-			// AJAX call to load different month
-			// TODO: Implement AJAX calendar navigation
-			console.log('Navigate calendar:', direction);
+		// Event listener für Monatswechsel-Buttons
+		$calendar.find('.cts-prev-month, .cts-next-month').on('click', function(e) {
+			e.preventDefault();
+			const isPrev = $(this).hasClass('cts-prev-month');
+			const direction = isPrev ? -1 : 1;
+			
+			// Aktuellen Monat aus dem Titel extrahieren
+			const $title = $calendar.find('.cts-calendar-title');
+			const titleText = $title.text().trim(); // z.B. "Januar 2026"
+			
+			// Parse aktuellen Monat
+			let currentDate = new Date();
+			try {
+				// Versuche verschiedene Formate zu parsen
+				const parsedDate = parseMonthYear(titleText);
+				if (parsedDate) {
+					currentDate = parsedDate;
+				}
+			} catch (err) {
+				console.warn('Could not parse month/year, using current date:', err);
+			}
+			
+			// Neuen Monat berechnen
+			const newDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + direction, 1);
+			const year = newDate.getFullYear();
+			const month = newDate.getMonth() + 1; // JavaScript months are 0-based
+			
+			// Lade neuen Monat via AJAX
+			loadCalendarMonth($calendar, year, month);
+		});
+	}
+	
+	/**
+	 * Parse month/year from calendar title
+	 */
+	function parseMonthYear(titleText) {
+		// Monatsnamen auf Deutsch
+		const monthNames = [
+			'januar', 'februar', 'märz', 'april', 'mai', 'juni',
+			'juli', 'august', 'september', 'oktober', 'november', 'dezember'
+		];
+		
+		const parts = titleText.toLowerCase().split(' ');
+		if (parts.length !== 2) return null;
+		
+		const monthName = parts[0];
+		const year = parseInt(parts[1]);
+		
+		const monthIndex = monthNames.indexOf(monthName);
+		if (monthIndex === -1 || isNaN(year)) return null;
+		
+		return new Date(year, monthIndex, 1);
+	}
+	
+	/**
+	 * Load calendar for specific month via AJAX
+	 */
+	function loadCalendarMonth($calendar, year, month) {
+		// Show loading state
+		$calendar.addClass('cts-loading');
+		
+		// Extract shortcode attributes from calendar element
+		const calendarIds = $calendar.data('calendar-ids') || '';
+		const limit = $calendar.data('limit') || 100;
+		
+		$.ajax({
+			url: churchtoolsSuitePublic.ajaxUrl,
+			type: 'POST',
+			data: {
+				action: 'cts_load_calendar_month',
+				nonce: churchtoolsSuitePublic.nonce,
+				year: year,
+				month: month,
+				calendar_ids: calendarIds,
+				limit: limit
+			},
+			success: function(response) {
+				if (response.success && response.data.html) {
+					// Replace calendar content
+					$calendar.replaceWith(response.data.html);
+					
+					// Re-initialize navigation for new calendar
+					const $newCalendar = $('.cts-calendar-monthly').last();
+					setupCalendarNavigation($newCalendar);
+				} else {
+					console.error('Failed to load calendar month:', response);
+					alert('Fehler beim Laden des Kalenders');
+				}
+			},
+			error: function(xhr, status, error) {
+				console.error('AJAX error loading calendar:', error);
+				alert('Netzwerkfehler beim Laden des Kalenders');
+			},
+			complete: function() {
+				$calendar.removeClass('cts-loading');
+			}
 		});
 	}
 
