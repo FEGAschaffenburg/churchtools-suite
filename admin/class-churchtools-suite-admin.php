@@ -2119,14 +2119,17 @@ class ChurchTools_Suite_Admin {
 				'count' => count( $raw_events ),
 			] );
 			
-			// Formatiere Events
-			if ( ! class_exists( 'ChurchTools_Suite_Template_Data_Provider' ) ) {
-				ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Loading Template_Data_Provider class' );
-				require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-template-data-provider.php';
+			// Formatiere Events für Template
+			// Events sind schon DB-Objekte, müssen nur in Array konvertiert werden
+			ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Converting events to array' );
+			$events = [];
+			foreach ( $raw_events as $event ) {
+				$events[] = (array) $event;
 			}
 			
-			ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Formatting events' );
-			$events = ChurchTools_Suite_Template_Data_Provider::format_events_for_template( $raw_events );
+			ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Events converted', [
+				'count' => count( $events ),
+			] );
 			
 			ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Events formatted', [
 				'count' => count( $events ),
