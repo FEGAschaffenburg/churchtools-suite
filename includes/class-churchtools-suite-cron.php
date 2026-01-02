@@ -27,6 +27,12 @@ class ChurchTools_Suite_Cron {
      * @return array Modified schedules
      */
     public static function add_custom_cron_intervals(array $schedules): array {
+        // Täglich (24 Stunden) - WordPress hat kein natives 'daily'!
+        $schedules['daily'] = [
+            'interval' => 86400, // 24 * 60 * 60
+            'display'  => __('Täglich', 'churchtools-suite')
+        ];
+        
         // 2 Tage
         $schedules['cts_2days'] = [
             'interval' => 172800, // 2 * 24 * 60 * 60
@@ -123,12 +129,7 @@ class ChurchTools_Suite_Cron {
 	 */
 	public static function update_sync_schedule() {
 		$auto_sync_enabled = get_option('churchtools_suite_auto_sync_enabled', 0);
-		$interval = get_option('churchtools_suite_auto_sync_interval', 'hourly');
-		
-		// Clear all existing schedules for this hook to avoid duplicates
-		wp_clear_scheduled_hook( 'churchtools_suite_auto_sync' );
-		
-		// Schedule new job if enabled
+		$interval = get_option('churchtools_suite_auto_sync_interval', 'daily'); // v0.10.2.0: Default 'daily' (nicht 'hourly'!)
 		if ($auto_sync_enabled) {
 			// Calculate next run time based on interval
 			$next_run = self::calculate_next_run_time($interval);

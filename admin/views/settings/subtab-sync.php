@@ -28,7 +28,7 @@ if ( isset( $_POST['cts_save_sync'] ) && check_admin_referer( 'cts_settings' ) )
 $sync_days_past = get_option( 'churchtools_suite_sync_days_past', 7 );
 $sync_days_future = get_option( 'churchtools_suite_sync_days_future', 90 );
 $auto_sync_enabled = get_option( 'churchtools_suite_auto_sync_enabled', 0 );
-$auto_sync_interval = get_option( 'churchtools_suite_auto_sync_interval', 'hourly' );
+$auto_sync_interval = get_option( 'churchtools_suite_auto_sync_interval', 'daily' ); // v0.10.2.0: Default 'daily'
 $last_auto_sync = get_option( 'churchtools_suite_last_auto_sync', '' );
 ?>
 
