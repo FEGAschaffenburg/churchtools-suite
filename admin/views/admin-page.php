@@ -60,6 +60,8 @@ $advanced_mode = get_option( 'churchtools_suite_advanced_mode', 0 );
 			   break;
 		   case 'debug':
 			   if ( $advanced_mode ) {
+			   	echo '<div class="cts-settings">'; // Wrapper für konsistente Darstellung
+			   	
 			   	$subtab = isset( $_GET['subtab'] ) ? sanitize_key( wp_unslash( $_GET['subtab'] ) ) : '';
 
                	// Statically defined Debug subtabs to keep behavior consistent with Settings subtabs
@@ -85,6 +87,8 @@ $advanced_mode = get_option( 'churchtools_suite_advanced_mode', 0 );
                	} else {
                		include __DIR__ . '/tab-debug-minimal.php';
                	}
+               	
+               	echo '</div>'; // Close wrapper
                }
 			   break;
 		   case 'dashboard':

@@ -19,8 +19,9 @@ $active = isset( $subtab_active ) ? (string) $subtab_active : '';
 $parent_tab = isset( $subtab_parent_tab ) ? (string) $subtab_parent_tab : ( isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'settings' );
 
 ?>
-<div class="cts-subtab-nav" role="tablist" aria-label="CTS Subtabs">
+<!-- Sub-Navigation -->
+<div class="cts-sub-tabs">
     <?php foreach ( $subtabs as $key => $label ) : ?>
-        <a href="?page=churchtools-suite&tab=<?php echo esc_attr( $parent_tab ); ?>&subtab=<?php echo esc_attr( $key ); ?>" class="cts-subtab <?php echo $active === (string) $key ? 'active' : ''; ?>"><?php echo esc_html( $label ); ?></a>
+        <a href="?page=churchtools-suite&tab=<?php echo esc_attr( $parent_tab ); ?>&subtab=<?php echo esc_attr( $key ); ?>" class="cts-sub-tab <?php echo $active === (string) $key ? 'active' : ''; ?>"><?php echo esc_html( $label ); ?></a>
     <?php endforeach; ?>
 </div>
