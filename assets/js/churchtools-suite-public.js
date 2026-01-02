@@ -200,8 +200,6 @@
 				console.error('Response:', xhr.responseText);
 				alert('Netzwerkfehler beim Laden des Kalenders: ' + error);
 			},
-				alert('Netzwerkfehler beim Laden des Kalenders');
-			},
 			complete: function() {
 				$calendar.removeClass('cts-loading');
 			}
