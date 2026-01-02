@@ -2030,18 +2030,36 @@ class ChurchTools_Suite_Admin {
 	 * @since 0.10.2.7
 	 */
 	public function ajax_load_calendar_month() {
+		// Log AJAX call start
+		ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'AJAX call started', [
+			'POST' => $_POST,
+			'nonce_isset' => isset( $_POST['nonce'] ),
+		] );
+		
 		// Verify nonce
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'churchtools_suite_public' ) ) {
+			ChurchTools_Suite_Logger::error( 'ajax_calendar', 'Nonce verification failed' );
 			wp_send_json_error( [ 'message' => __( 'Sicherheitsprüfung fehlgeschlagen', 'churchtools-suite' ) ] );
 			return;
 		}
+		
+		ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Nonce verified' );
 		
 		try {
 			$year = isset( $_POST['year'] ) ? absint( $_POST['year'] ) : date( 'Y' );
 			$month = isset( $_POST['month'] ) ? absint( $_POST['month'] ) : date( 'n' );
 			
+			ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Parameters extracted', [
+				'year' => $year,
+				'month' => $month,
+			] );
+			
 			// Validierung
 			if ( $year < 2000 || $year > 2100 || $month < 1 || $month > 12 ) {
+				ChurchTools_Suite_Logger::error( 'ajax_calendar', 'Invalid date', [
+					'year' => $year,
+					'month' => $month,
+				] );
 				wp_send_json_error( [ 'message' => __( 'Ungültiges Datum', 'churchtools-suite' ) ] );
 				return;
 			}
@@ -2054,6 +2072,13 @@ class ChurchTools_Suite_Admin {
 			// Berechne Datumsbereich für den Monat
 			$from_date = sprintf( '%04d-%02d-01', $year, $month );
 			$to_date = date( 'Y-m-t', strtotime( $from_date ) );
+			
+			ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Date range calculated', [
+				'from' => $from_date,
+				'to' => $to_date,
+				'calendar_ids' => $calendar_ids,
+				'limit' => $limit,
+			] );
 			
 			// Baue Shortcode-Attribute
 			$atts = [
@@ -2068,19 +2093,20 @@ class ChurchTools_Suite_Admin {
 				$atts['calendar'] = $calendar_ids;
 			}
 			
-			// Rendere Calendar-Template
-			ob_start();
-			
 			// Lade Template Loader
 			if ( ! class_exists( 'ChurchTools_Suite_Template_Loader' ) ) {
+				ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Loading Template_Loader class' );
 				require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-template-loader.php';
 			}
 			
 			// Lade Events für diesen Monat
 			if ( ! class_exists( 'ChurchTools_Suite_Events_Repository' ) ) {
+				ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Loading Events_Repository class' );
 				require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-events-repository.php';
 			}
 			$events_repo = new ChurchTools_Suite_Events_Repository();
+			
+			ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Fetching events from database' );
 			
 			$raw_events = $events_repo->get_events_in_range(
 				$from_date . ' 00:00:00',
@@ -2089,17 +2115,38 @@ class ChurchTools_Suite_Admin {
 				$limit
 			);
 			
+			ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Events fetched', [
+				'count' => count( $raw_events ),
+			] );
+			
 			// Formatiere Events
 			if ( ! class_exists( 'ChurchTools_Suite_Template_Data_Provider' ) ) {
+				ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Loading Template_Data_Provider class' );
 				require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-template-data-provider.php';
 			}
+			
+			ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Formatting events' );
 			$events = ChurchTools_Suite_Template_Data_Provider::format_events_for_template( $raw_events );
 			
+			ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Events formatted', [
+				'count' => count( $events ),
+			] );
+			
 			// Lade Template
+			ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Rendering template', [
+				'template' => 'calendar/monthly-modern.php',
+				'events_count' => count( $events ),
+				'args' => $atts,
+			] );
+			
 			$html = ChurchTools_Suite_Template_Loader::render_template( 'calendar/monthly-modern.php', [
 				'events' => $events,
 				'args' => $atts,
 			], false );
+			
+			ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Template rendered', [
+				'html_length' => strlen( $html ),
+			] );
 			
 			wp_send_json_success( [
 				'html' => $html,
@@ -2114,16 +2161,15 @@ class ChurchTools_Suite_Admin {
 			}
 			
 			// Log error
-			if ( function_exists( 'ChurchTools_Suite_Logger::error' ) ) {
-				ChurchTools_Suite_Logger::error( 'ajax_calendar', 'AJAX Calendar Error', [
-					'error' => $e->getMessage(),
-					'trace' => $e->getTraceAsString(),
-				] );
-			}
+			ChurchTools_Suite_Logger::error( 'ajax_calendar', 'AJAX Calendar Error', [
+				'error' => $e->getMessage(),
+				'trace' => $e->getTraceAsString(),
+			] );
 			
 			wp_send_json_error( [ 
 				'message' => __( 'Fehler beim Laden des Kalenders', 'churchtools-suite' ),
 				'error' => WP_DEBUG ? $e->getMessage() : '',
+				'trace' => WP_DEBUG ? $e->getTraceAsString() : '',
 			] );
 		}
 	}
