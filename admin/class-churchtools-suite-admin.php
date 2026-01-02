@@ -1484,10 +1484,24 @@ class ChurchTools_Suite_Admin {
 		// Load template loader
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-template-loader.php';
 		
-		// Render modal template
+		// Render modal template (echo=true, da wir mit ob_start() den Output fangen)
 		ob_start();
-		ChurchTools_Suite_Template_Loader::render_template( 'modal/event-detail.php', [], false );
+		ChurchTools_Suite_Template_Loader::render_template( 'modal/event-detail.php', [], true );
 		$html = ob_get_clean();
+		
+		// v0.10.3.6: Debug - Prüfe ob HTML vorhanden ist
+		if ( empty( $html ) || strpos( $html, '<!--' ) === 0 ) {
+			// Fehler beim Laden des Templates
+			wp_send_json_error( [
+				'message' => 'Modal-Template konnte nicht geladen werden',
+				'html' => $html, // Sende trotzdem für Debugging
+				'debug' => [
+					'template_path' => CHURCHTOOLS_SUITE_PATH . 'templates/modal/event-detail.php',
+					'exists' => file_exists( CHURCHTOOLS_SUITE_PATH . 'templates/modal/event-detail.php' ),
+				],
+			] );
+			return;
+		}
 		
 		wp_send_json_success( [
 			'html' => $html

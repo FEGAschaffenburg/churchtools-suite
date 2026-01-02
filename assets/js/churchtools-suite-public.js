@@ -282,13 +282,20 @@
 				},
 				success: function(response) {
 					console.log('[ChurchTools Suite] Modal template response:', response);
-					if (response.success && response.data.html) {
+					console.log('[ChurchTools Suite] response.success:', response.success);
+					console.log('[ChurchTools Suite] response.data:', response.data);
+					console.log('[ChurchTools Suite] response.data.html exists:', !!response.data?.html);
+					console.log('[ChurchTools Suite] response.data.html length:', response.data?.html?.length);
+					
+					if (response.success && response.data && response.data.html) {
+						console.log('[ChurchTools Suite] Appending modal HTML to body...');
 						$('body').append(response.data.html);
 						$overlay = $('#cts-modal-overlay');
 						console.log('[ChurchTools Suite] Modal template appended to body');
 						loadEventData(eventId, $overlay);
 					} else {
 						console.error('[ChurchTools Suite] Invalid modal template response');
+						console.error('[ChurchTools Suite] Missing html in response.data!');
 					}
 				},
 				error: function(xhr, status, error) {
