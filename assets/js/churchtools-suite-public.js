@@ -11,10 +11,12 @@
 
 	// DOM Ready
 	$(function() {
+		console.log('[ChurchTools Suite] Public JS loaded');
 		initCalendarViews();
 		initGridButtons();
 		initModalViews();
 		initClickableEvents(); // v0.10.3.0: Click-to-details
+		console.log('[ChurchTools Suite] Init complete');
 	});
 
 	/**
@@ -227,12 +229,18 @@
 	 * Macht alle Events mit .cts-event-clickable klickbar
 	 */
 	function initClickableEvents() {
+		console.log('[ChurchTools Suite] initClickableEvents() called');
+		console.log('[ChurchTools Suite] Found clickable events:', $('.cts-event-clickable').length);
+		
 		// Event-Delegation für dynamisch geladene Events
 		$(document).on('click', '.cts-event-clickable', function(e) {
 			e.preventDefault();
 			const eventId = $(this).data('event-id');
+			console.log('[ChurchTools Suite] Event clicked, ID:', eventId);
 			if (eventId) {
 				showEventModal(eventId);
+			} else {
+				console.error('[ChurchTools Suite] No event-id attribute found!');
 			}
 		});
 		
@@ -241,6 +249,7 @@
 			if (e.keyCode === 13 || e.keyCode === 32) { // Enter or Space
 				e.preventDefault();
 				const eventId = $(this).data('event-id');
+				console.log('[ChurchTools Suite] Keyboard event, ID:', eventId);
 				if (eventId) {
 					showEventModal(eventId);
 				}
@@ -252,11 +261,17 @@
 	 * Show event detail modal
 	 */
 	function showEventModal(eventId) {
+		console.log('[ChurchTools Suite] showEventModal() called with ID:', eventId);
+		
 		// Show modal overlay
 		let $overlay = $('#cts-modal-overlay');
+		console.log('[ChurchTools Suite] Modal overlay found:', $overlay.length > 0);
 		
 		// Create modal if not exists
 		if ($overlay.length === 0) {
+			console.log('[ChurchTools Suite] Loading modal template via AJAX...');
+			console.log('[ChurchTools Suite] AJAX URL:', churchtoolsSuitePublic.ajaxUrl);
+			
 			// Load modal template via AJAX
 			$.ajax({
 				url: churchtoolsSuitePublic.ajaxUrl,
@@ -266,13 +281,18 @@
 					nonce: churchtoolsSuitePublic.nonce
 				},
 				success: function(response) {
+					console.log('[ChurchTools Suite] Modal template response:', response);
 					if (response.success && response.data.html) {
 						$('body').append(response.data.html);
 						$overlay = $('#cts-modal-overlay');
+						console.log('[ChurchTools Suite] Modal template appended to body');
 						loadEventData(eventId, $overlay);
+					} else {
+						console.error('[ChurchTools Suite] Invalid modal template response');
 					}
 				},
-				error: function() {
+				error: function(xhr, status, error) {
+					console.error('[ChurchTools Suite] AJAX error loading modal template:', error);
 					alert('Modal konnte nicht geladen werden.');
 				}
 			});
