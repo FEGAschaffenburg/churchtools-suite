@@ -27,7 +27,10 @@
 		list: [
 			{ label: '--- Standard Views ---', value: '', disabled: true },
 			{ label: 'Classic', value: 'classic' },
+			{ label: 'Classic Services', value: 'classic-services' },
+			{ label: 'Modern', value: 'modern' },
 			{ label: 'Medium', value: 'medium' },
+			{ label: 'Fluent', value: 'fluent' },
 			{ label: 'Compact', value: 'compact' }
 		],
 		calendar: [
@@ -36,7 +39,9 @@
 		],
 		grid: [
 			{ label: '--- Standard Views ---', value: '', disabled: true },
-			{ label: 'Simple', value: 'simple' }
+			{ label: 'Simple', value: 'simple' },
+			{ label: 'Colorful', value: 'colorful' },
+			{ label: 'Modern', value: 'modern' }
 		],
 		search: [
 			{ label: '--- Standard Views ---', value: '', disabled: true },
@@ -45,6 +50,38 @@
 		widget: [
 			{ label: '--- Standard Views ---', value: '', disabled: true },
 			{ label: 'Upcoming', value: 'upcoming' }
+		],
+		slider: [
+			{ label: '--- Standard Views ---', value: '', disabled: true },
+			{ label: 'Classic', value: 'classic' }
+		],
+		masonry: [
+			{ label: '--- Standard Views ---', value: '', disabled: true },
+			{ label: 'Classic', value: 'classic' }
+		],
+		agenda: [
+			{ label: '--- Standard Views ---', value: '', disabled: true },
+			{ label: 'Classic', value: 'classic' }
+		],
+		timetable: [
+			{ label: '--- Standard Views ---', value: '', disabled: true },
+			{ label: 'Classic', value: 'classic' }
+		],
+		carousel: [
+			{ label: '--- Standard Views ---', value: '', disabled: true },
+			{ label: 'Classic', value: 'classic' }
+		],
+		countdown: [
+			{ label: '--- Standard Views ---', value: '', disabled: true },
+			{ label: 'Classic', value: 'classic' }
+		],
+		cover: [
+			{ label: '--- Standard Views ---', value: '', disabled: true },
+			{ label: 'Classic', value: 'classic' }
+		],
+		map: [
+			{ label: '--- Standard Views ---', value: '', disabled: true },
+			{ label: 'Classic', value: 'classic' }
 		]
 	};
 	
@@ -123,7 +160,17 @@
 		const defaults = {
 			list: 'classic',
 			calendar: 'monthly-modern',
-			grid: 'simple'
+			grid: 'simple',
+			search: 'classic',
+			widget: 'upcoming',
+			slider: 'classic',
+			masonry: 'classic',
+			agenda: 'classic',
+			timetable: 'classic',
+			carousel: 'classic',
+			countdown: 'classic',
+			cover: 'classic',
+			map: 'classic'
 		};
 		return defaults[viewType] || 'classic';
 	}
@@ -135,7 +182,17 @@
 		const icons = {
 			list: '📋',
 			calendar: '📅',
-			grid: '▦'
+			grid: '▦',
+			search: '🔍',
+			widget: '📱',
+			slider: '🎬',
+			masonry: '🧱',
+			agenda: '📒',
+			timetable: '🏢',
+			carousel: '🎠',
+			countdown: '⏱️',
+			cover: '🏞️',
+			map: '🗺️'
 		};
 		return icons[viewType] || '📋';
 	}
@@ -226,7 +283,17 @@
 							options: [
 								{ label: '📋 Liste', value: 'list' },
 								{ label: '📅 Kalender', value: 'calendar' },
-								{ label: '▦ Raster', value: 'grid' }
+							{ label: '▦ Raster', value: 'grid' },
+							{ label: '🔍 Suche', value: 'search' },
+							{ label: '📱 Widget', value: 'widget' },
+							{ label: '🎬 Slider', value: 'slider' },
+							{ label: '🧱 Masonry', value: 'masonry' },
+							{ label: '📒 Agenda', value: 'agenda' },
+							{ label: '🏢 Timetable', value: 'timetable' },
+							{ label: '🎠 Carousel', value: 'carousel' },
+							{ label: '⏱️ Countdown', value: 'countdown' },
+							{ label: '🏞️ Cover', value: 'cover' },
+							{ label: '🗺️ Karte', value: 'map' }
 							],
 							onChange: handleViewTypeChange
 						}),

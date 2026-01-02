@@ -131,18 +131,31 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 				'type'    => \Elementor\Controls_Manager::SELECT,
 				'default' => 'list',
 				'options' => [
-					'list'     => __( '📋 Liste', 'churchtools-suite' ),
-					'calendar' => __( '📅 Kalender', 'churchtools-suite' ),
-					'grid'     => __( '▦ Raster', 'churchtools-suite' ),
+					'list'      => __( '📋 Liste', 'churchtools-suite' ),
+					'calendar'  => __( '📅 Kalender', 'churchtools-suite' ),
+					'grid'      => __( '▦ Raster', 'churchtools-suite' ),
+					'search'    => __( '🔍 Suche', 'churchtools-suite' ),
+					'widget'    => __( '📱 Widget', 'churchtools-suite' ),
+					'slider'    => __( '🎬 Slider', 'churchtools-suite' ),
+					'masonry'   => __( '🧱 Masonry', 'churchtools-suite' ),
+					'agenda'    => __( '📒 Agenda', 'churchtools-suite' ),
+					'timetable' => __( '🏢 Timetable', 'churchtools-suite' ),
+					'carousel'  => __( '🎠 Carousel', 'churchtools-suite' ),
+					'countdown' => __( '⏱️ Countdown', 'churchtools-suite' ),
+					'cover'     => __( '🏞️ Cover', 'churchtools-suite' ),
+					'map'       => __( '🗺️ Karte', 'churchtools-suite' ),
 				],
 			]
 		);
 		
 		// List Views (nur Standard)
 		$list_options = [
-			'classic' => __( 'Classic', 'churchtools-suite' ),
-			'medium'  => __( 'Medium', 'churchtools-suite' ),
-			'compact' => __( 'Compact', 'churchtools-suite' ),
+			'classic'          => __( 'Classic', 'churchtools-suite' ),
+			'classic-services' => __( 'Classic Services', 'churchtools-suite' ),
+			'modern'           => __( 'Modern', 'churchtools-suite' ),
+			'medium'           => __( 'Medium', 'churchtools-suite' ),
+			'fluent'           => __( 'Fluent', 'churchtools-suite' ),
+			'compact'          => __( 'Compact', 'churchtools-suite' ),
 		];
 		
 		$this->add_control(
@@ -258,7 +271,9 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 		
 		// Grid Views (nur Standard)
 		$grid_options = [
-			'simple' => __( 'Simple', 'churchtools-suite' ),
+			'simple'   => __( 'Simple', 'churchtools-suite' ),
+			'colorful' => __( 'Colorful', 'churchtools-suite' ),
+			'modern'   => __( 'Modern', 'churchtools-suite' ),
 		];
 		
 		$this->add_control(
@@ -313,6 +328,286 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 				]
 			);
 		}
+		
+		// Search Views (nur Standard - nur eine Variante)
+		$this->add_control(
+			'search_view',
+			[
+				'label'      => __( 'Suche-Variante', 'churchtools-suite' ),
+				'type'       => \Elementor\Controls_Manager::SELECT,
+				'default'    => 'classic',
+				'options'    => [
+					'classic' => __( 'Classic', 'churchtools-suite' ),
+				],
+				'conditions' => [
+					'relation' => 'and',
+					'terms'    => [
+						[
+							'name'     => 'view_mode',
+							'operator' => '===',
+							'value'    => 'standard',
+						],
+						[
+							'name'     => 'view_type',
+							'operator' => '===',
+							'value'    => 'search',
+						],
+					],
+				],
+			]
+		);
+		
+		// Widget Views (nur Standard - nur eine Variante)
+		$this->add_control(
+			'widget_view',
+			[
+				'label'      => __( 'Widget-Variante', 'churchtools-suite' ),
+				'type'       => \Elementor\Controls_Manager::SELECT,
+				'default'    => 'upcoming',
+				'options'    => [
+					'upcoming' => __( 'Upcoming', 'churchtools-suite' ),
+				],
+				'conditions' => [
+					'relation' => 'and',
+					'terms'    => [
+						[
+							'name'     => 'view_mode',
+							'operator' => '===',
+							'value'    => 'standard',
+						],
+						[
+							'name'     => 'view_type',
+							'operator' => '===',
+							'value'    => 'widget',
+						],
+					],
+				],
+			]
+		);
+		
+		// Slider Views (nur Standard - nur eine Variante)
+		$this->add_control(
+			'slider_view',
+			[
+				'label'      => __( 'Slider-Variante', 'churchtools-suite' ),
+				'type'       => \Elementor\Controls_Manager::SELECT,
+				'default'    => 'classic',
+				'options'    => [
+					'classic' => __( 'Classic', 'churchtools-suite' ),
+				],
+				'conditions' => [
+					'relation' => 'and',
+					'terms'    => [
+						[
+							'name'     => 'view_mode',
+							'operator' => '===',
+							'value'    => 'standard',
+						],
+						[
+							'name'     => 'view_type',
+							'operator' => '===',
+							'value'    => 'slider',
+						],
+					],
+				],
+			]
+		);
+		
+		// Masonry Views (nur Standard - nur eine Variante)
+		$this->add_control(
+			'masonry_view',
+			[
+				'label'      => __( 'Masonry-Variante', 'churchtools-suite' ),
+				'type'       => \Elementor\Controls_Manager::SELECT,
+				'default'    => 'classic',
+				'options'    => [
+					'classic' => __( 'Classic', 'churchtools-suite' ),
+				],
+				'conditions' => [
+					'relation' => 'and',
+					'terms'    => [
+						[
+							'name'     => 'view_mode',
+							'operator' => '===',
+							'value'    => 'standard',
+						],
+						[
+							'name'     => 'view_type',
+							'operator' => '===',
+							'value'    => 'masonry',
+						],
+					],
+				],
+			]
+		);
+		
+		// Agenda Views (nur Standard - nur eine Variante)
+		$this->add_control(
+			'agenda_view',
+			[
+				'label'      => __( 'Agenda-Variante', 'churchtools-suite' ),
+				'type'       => \Elementor\Controls_Manager::SELECT,
+				'default'    => 'classic',
+				'options'    => [
+					'classic' => __( 'Classic', 'churchtools-suite' ),
+				],
+				'conditions' => [
+					'relation' => 'and',
+					'terms'    => [
+						[
+							'name'     => 'view_mode',
+							'operator' => '===',
+							'value'    => 'standard',
+						],
+						[
+							'name'     => 'view_type',
+							'operator' => '===',
+							'value'    => 'agenda',
+						],
+					],
+				],
+			]
+		);
+		
+		// Timetable Views (nur Standard - nur eine Variante)
+		$this->add_control(
+			'timetable_view',
+			[
+				'label'      => __( 'Timetable-Variante', 'churchtools-suite' ),
+				'type'       => \Elementor\Controls_Manager::SELECT,
+				'default'    => 'classic',
+				'options'    => [
+					'classic' => __( 'Classic', 'churchtools-suite' ),
+				],
+				'conditions' => [
+					'relation' => 'and',
+					'terms'    => [
+						[
+							'name'     => 'view_mode',
+							'operator' => '===',
+							'value'    => 'standard',
+						],
+						[
+							'name'     => 'view_type',
+							'operator' => '===',
+							'value'    => 'timetable',
+						],
+					],
+				],
+			]
+		);
+		
+		// Carousel Views (nur Standard - nur eine Variante)
+		$this->add_control(
+			'carousel_view',
+			[
+				'label'      => __( 'Carousel-Variante', 'churchtools-suite' ),
+				'type'       => \Elementor\Controls_Manager::SELECT,
+				'default'    => 'classic',
+				'options'    => [
+					'classic' => __( 'Classic', 'churchtools-suite' ),
+				],
+				'conditions' => [
+					'relation' => 'and',
+					'terms'    => [
+						[
+							'name'     => 'view_mode',
+							'operator' => '===',
+							'value'    => 'standard',
+						],
+						[
+							'name'     => 'view_type',
+							'operator' => '===',
+							'value'    => 'carousel',
+						],
+					],
+				],
+			]
+		);
+		
+		// Countdown Views (nur Standard - nur eine Variante)
+		$this->add_control(
+			'countdown_view',
+			[
+				'label'      => __( 'Countdown-Variante', 'churchtools-suite' ),
+				'type'       => \Elementor\Controls_Manager::SELECT,
+				'default'    => 'classic',
+				'options'    => [
+					'classic' => __( 'Classic', 'churchtools-suite' ),
+				],
+				'conditions' => [
+					'relation' => 'and',
+					'terms'    => [
+						[
+							'name'     => 'view_mode',
+							'operator' => '===',
+							'value'    => 'standard',
+						],
+						[
+							'name'     => 'view_type',
+							'operator' => '===',
+							'value'    => 'countdown',
+						],
+					],
+				],
+			]
+		);
+		
+		// Cover Views (nur Standard - nur eine Variante)
+		$this->add_control(
+			'cover_view',
+			[
+				'label'      => __( 'Cover-Variante', 'churchtools-suite' ),
+				'type'       => \Elementor\Controls_Manager::SELECT,
+				'default'    => 'classic',
+				'options'    => [
+					'classic' => __( 'Classic', 'churchtools-suite' ),
+				],
+				'conditions' => [
+					'relation' => 'and',
+					'terms'    => [
+						[
+							'name'     => 'view_mode',
+							'operator' => '===',
+							'value'    => 'standard',
+						],
+						[
+							'name'     => 'view_type',
+							'operator' => '===',
+							'value'    => 'cover',
+						],
+					],
+				],
+			]
+		);
+		
+		// Map Views (nur Standard - nur eine Variante)
+		$this->add_control(
+			'map_view',
+			[
+				'label'      => __( 'Karten-Variante', 'churchtools-suite' ),
+				'type'       => \Elementor\Controls_Manager::SELECT,
+				'default'    => 'classic',
+				'options'    => [
+					'classic' => __( 'Classic', 'churchtools-suite' ),
+				],
+				'conditions' => [
+					'relation' => 'and',
+					'terms'    => [
+						[
+							'name'     => 'view_mode',
+							'operator' => '===',
+							'value'    => 'standard',
+						],
+						[
+							'name'     => 'view_type',
+							'operator' => '===',
+							'value'    => 'map',
+						],
+					],
+				],
+			]
+		);
 		
 		// Calendar Selection (nur bei Standard-Modus)
 		$calendars = $this->get_calendars();
@@ -623,6 +918,36 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 				case 'grid':
 					$view = $settings['grid_view'];
 					break;
+				case 'search':
+					$view = $settings['search_view'];
+					break;
+				case 'widget':
+					$view = $settings['widget_view'];
+					break;
+				case 'slider':
+					$view = $settings['slider_view'];
+					break;
+				case 'masonry':
+					$view = $settings['masonry_view'];
+					break;
+				case 'agenda':
+					$view = $settings['agenda_view'];
+					break;
+				case 'timetable':
+					$view = $settings['timetable_view'];
+					break;
+				case 'carousel':
+					$view = $settings['carousel_view'];
+					break;
+				case 'countdown':
+					$view = $settings['countdown_view'];
+					break;
+				case 'cover':
+					$view = $settings['cover_view'];
+					break;
+				case 'map':
+					$view = $settings['map_view'];
+					break;
 				case 'list':
 				default:
 					$view = $settings['list_view'];
@@ -692,6 +1017,36 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 				break;
 			case 'grid':
 				echo ChurchTools_Suite_Shortcodes::grid_shortcode( $atts );
+				break;
+			case 'search':
+				echo ChurchTools_Suite_Shortcodes::search_shortcode( $atts );
+				break;
+			case 'widget':
+				echo ChurchTools_Suite_Shortcodes::widget_shortcode( $atts );
+				break;
+			case 'slider':
+				echo ChurchTools_Suite_Shortcodes::slider_shortcode( $atts );
+				break;
+			case 'masonry':
+				echo ChurchTools_Suite_Shortcodes::masonry_shortcode( $atts );
+				break;
+			case 'agenda':
+				echo ChurchTools_Suite_Shortcodes::agenda_shortcode( $atts );
+				break;
+			case 'timetable':
+				echo ChurchTools_Suite_Shortcodes::timetable_shortcode( $atts );
+				break;
+			case 'carousel':
+				echo ChurchTools_Suite_Shortcodes::carousel_shortcode( $atts );
+				break;
+			case 'countdown':
+				echo ChurchTools_Suite_Shortcodes::countdown_shortcode( $atts );
+				break;
+			case 'cover':
+				echo ChurchTools_Suite_Shortcodes::cover_shortcode( $atts );
+				break;
+			case 'map':
+				echo ChurchTools_Suite_Shortcodes::map_shortcode( $atts );
 				break;
 			case 'list':
 			default:
