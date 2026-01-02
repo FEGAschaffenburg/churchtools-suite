@@ -115,14 +115,27 @@
 	 * Setup calendar navigation
 	 */
 	function setupCalendarNavigation($calendar) {
+		// Verhindere mehrfache Handler-Registrierung
+		if ($calendar.data('navigation-setup')) {
+			console.log('[Calendar] Navigation already set up, skipping');
+			return;
+		}
+		$calendar.data('navigation-setup', true);
+		
+		console.log('[Calendar] Setting up navigation for calendar');
+		
 		// Event listener für Monatswechsel-Buttons
 		$calendar.find('.cts-prev-month, .cts-next-month').on('click', function(e) {
 			e.preventDefault();
 			const isPrev = $(this).hasClass('cts-prev-month');
 			const direction = isPrev ? -1 : 1;
 			
+			// CRITICAL: Finde aktuellen Kalender im DOM (nicht alte $calendar Variable!)
+			// Nach replaceWith() zeigt $calendar auf ein gelöschtes Element
+			const $currentCalendar = $(this).closest('.cts-calendar-monthly');
+			
 			// Aktuellen Monat aus dem Titel extrahieren
-			const $title = $calendar.find('.cts-calendar-title');
+			const $title = $currentCalendar.find('.cts-calendar-title');
 			const titleText = $title.text().trim(); // z.B. "Januar 2026"
 			
 			// Parse aktuellen Monat
@@ -142,8 +155,10 @@
 			const year = newDate.getFullYear();
 			const month = newDate.getMonth() + 1; // JavaScript months are 0-based
 			
-			// Lade neuen Monat via AJAX
-			loadCalendarMonth($calendar, year, month);
+			console.log('[Calendar] Navigation clicked:', direction > 0 ? 'next' : 'prev', 'New date:', year, month);
+			
+			// Lade neuen Monat via AJAX (nutze AKTUELLEN Kalender!)
+			loadCalendarMonth($currentCalendar, year, month);
 		});
 	}
 	
@@ -185,6 +200,9 @@
 		
 		console.log('[Calendar] Loading month:', year, month, 'enableModal:', enableModal, 'raw:', enableModalAttr);
 		
+		// Variable für neuen Kalender (wird in success gesetzt)
+		let $newCalendar = null;
+		
 		$.ajax({
 			url: churchtoolsSuitePublic.ajaxUrl,
 			type: 'POST',
@@ -201,7 +219,7 @@
 				console.log('[Calendar] AJAX success:', response);
 				if (response.success && response.data.html) {
 					// Replace calendar content
-					const $newCalendar = $(response.data.html);
+					$newCalendar = $(response.data.html);
 					$calendar.replaceWith($newCalendar);
 					
 					// Mark as initialized to prevent duplicate setup
@@ -245,7 +263,13 @@
 				alert('Netzwerkfehler beim Laden des Kalenders: ' + error);
 			},
 			complete: function() {
-				$calendar.removeClass('cts-loading');
+				// Loading-State vom NEUEN Kalender entfernen (falls ersetzt)
+				if ($newCalendar && $newCalendar.length) {
+					$newCalendar.removeClass('cts-loading');
+				} else {
+					// Fallback: Versuche Loading-State vom alten zu entfernen
+					$calendar.removeClass('cts-loading');
+				}
 			}
 		});
 	}
