@@ -36,7 +36,19 @@ foreach ( $events as $event ) {
 	
 	<div class="cts-calendar-header">
 		<button class="cts-nav-btn cts-prev-month" aria-label="<?php esc_attr_e( 'Vorheriger Monat', 'churchtools-suite' ); ?>">‹</button>
-		<h2 class="cts-calendar-title"><?php echo esc_html( date_i18n( 'F Y' ) ); ?></h2>
+		<h2 class="cts-calendar-title">
+			<?php 
+			// Use year/month from AJAX if available, otherwise current date
+			if ( isset( $args['year'] ) && isset( $args['month'] ) ) {
+				// AJAX calendar navigation - use provided year/month
+				$timestamp = mktime( 0, 0, 0, $args['month'], 1, $args['year'] );
+				echo esc_html( date_i18n( 'F Y', $timestamp ) );
+			} else {
+				// Initial page load - use current date
+				echo esc_html( date_i18n( 'F Y' ) );
+			}
+			?>
+		</h2>
 		<button class="cts-nav-btn cts-next-month" aria-label="<?php esc_attr_e( 'Nächster Monat', 'churchtools-suite' ); ?>">›</button>
 	</div>
 	
@@ -62,10 +74,21 @@ foreach ( $events as $event ) {
 			
 			<!-- Tage -->
 			<?php
-			$first_day = date( 'Y-m-01' );
-			$last_day = date( 'Y-m-t' );
-			$start_weekday = date( 'N', strtotime( $first_day ) );
-			$days_in_month = date( 't' );
+			// Use year/month from AJAX if available, otherwise current date
+			if ( isset( $args['year'] ) && isset( $args['month'] ) ) {
+				// AJAX calendar navigation
+				$year = $args['year'];
+				$month = $args['month'];
+			} else {
+				// Initial page load
+				$year = date( 'Y' );
+				$month = date( 'm' );
+			}
+			
+			$first_day = sprintf( '%04d-%02d-01', $year, $month );
+			$last_day = date( 'Y-m-t', strtotime( $first_day ) );
+			$start_weekday = date( 'N', strtotime( $first_day ) ); // 1=Monday
+			$days_in_month = date( 't', strtotime( $first_day ) );
 			
 			// Leere Zellen vor dem 1. Tag
 			for ( $i = 1; $i < $start_weekday; $i++ ) {
@@ -74,7 +97,7 @@ foreach ( $events as $event ) {
 			
 			// Tage des Monats
 			for ( $day = 1; $day <= $days_in_month; $day++ ) {
-				$date = date( 'Y-m-' . sprintf( '%02d', $day ) );
+				$date = sprintf( '%04d-%02d-%02d', $year, $month, $day );
 				$has_events = isset( $events_by_date[ $date ] );
 				$is_today = $date === date( 'Y-m-d' );
 				?>

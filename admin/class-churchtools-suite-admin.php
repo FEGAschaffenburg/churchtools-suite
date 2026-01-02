@@ -2087,6 +2087,8 @@ class ChurchTools_Suite_Admin {
 				'to' => $to_date,
 				'limit' => $limit,
 				'enable_modal' => $enable_modal,
+				'year' => $year,   // AJAX-spezifisch: Jahr für Titel
+				'month' => $month, // AJAX-spezifisch: Monat für Titel
 			];
 			
 			if ( ! empty( $calendar_ids ) ) {
