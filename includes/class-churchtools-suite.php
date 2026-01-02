@@ -101,6 +101,36 @@ class ChurchTools_Suite {
 	 */
 	private function run_migrations(): void {
 		ChurchTools_Suite_Migrations::run_migrations();
+		
+		// v0.10.2.2: Nach Update Cron-Jobs neu planen (falls Intervalle geändert wurden)
+		$this->maybe_reschedule_crons();
+	}
+	
+	/**
+	 * Reschedule cron jobs after plugin update (v0.10.2.2)
+	 * 
+	 * Ensures cron jobs use correct intervals after updates.
+	 * Only runs once per version to avoid unnecessary rescheduling.
+	 */
+	private function maybe_reschedule_crons(): void {
+		$last_cron_reschedule_version = get_option( 'churchtools_suite_last_cron_reschedule_version', '0.0.0' );
+		
+		// Nur neu planen wenn neue Version installiert wurde
+		if ( version_compare( $last_cron_reschedule_version, $this->version, '<' ) ) {
+			require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-cron.php';
+			ChurchTools_Suite_Cron::update_sync_schedule();
+			
+			// Version speichern
+			update_option( 'churchtools_suite_last_cron_reschedule_version', $this->version, false );
+			
+			// Log
+			if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+				ChurchTools_Suite_Logger::info(
+					'cron',
+					sprintf( 'Cron-Jobs nach Update auf v%s neu geplant', $this->version )
+				);
+			}
+		}
 	}
 	
 	/**

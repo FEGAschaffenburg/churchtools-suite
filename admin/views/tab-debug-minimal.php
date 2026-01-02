@@ -97,7 +97,9 @@ $sync_history = $wpdb->get_results( "SELECT * FROM {$sync_history_table} ORDER B
 					echo '</td>';
 					echo '<td>';
 					if ( $next_run ) {
-						echo esc_html( date_i18n( 'D, d. M Y H:i', $next_run ) );
+						// v0.10.2.2: WordPress-Zeitzone verwenden (nicht UTC!)
+						$local_time = get_date_from_gmt( gmdate( 'Y-m-d H:i:s', $next_run ), 'Y-m-d H:i:s' );
+						echo esc_html( date_i18n( 'D, d. M Y H:i', strtotime( $local_time ) ) );
 						echo '<br><span style="color:#666; font-size:0.85em;">in ' . human_time_diff( $next_run ) . '</span>';
 					} else {
 						echo '<span style="color:#d63638;">❌ ' . esc_html__( 'Nicht geplant', 'churchtools-suite' ) . '</span>';
