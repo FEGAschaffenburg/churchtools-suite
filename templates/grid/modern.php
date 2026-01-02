@@ -37,8 +37,8 @@ $show_description = isset( $args['show_description'] ) ? ChurchTools_Suite_Short
 	<?php else : ?>
 		
 		<?php foreach ( $events as $event ) : ?>
-			
-			<div class="cts-grid-card-modern cts-event-clickable" data-event-id="<?php echo esc_attr( $event['id'] ); ?>" role="button" tabindex="0" aria-label="<?php echo esc_attr( sprintf( __( 'Details für %s anzeigen', 'churchtools-suite' ), $event['title'] ) ); ?>">
+			<?php $enable_modal = $args['enable_modal'] ?? true; ?>
+			<div class="cts-grid-card-modern <?php echo $enable_modal ? 'cts-event-clickable' : ''; ?>" <?php if ( $enable_modal ) : ?>data-event-id="<?php echo esc_attr( $event['id'] ); ?>" role="button" tabindex="0" aria-label="<?php echo esc_attr( sprintf( __( 'Details für %s anzeigen', 'churchtools-suite' ), $event['title'] ) ); ?>"<?php endif; ?>>
 				
 				<!-- Header with Gradient -->
 				<div class="cts-card-header" style="background: linear-gradient(135deg, <?php echo esc_attr( $event['calendar_color'] ?? '#667eea' ); ?> 0%, #764ba2 100%);">

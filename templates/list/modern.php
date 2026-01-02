@@ -39,8 +39,8 @@ $show_services = isset( $args['show_services'] ) ? ChurchTools_Suite_Shortcodes:
 	<?php else : ?>
 		
 		<?php foreach ( $events as $event ) : ?>
-			
-			<div class="cts-event-modern cts-event-clickable" data-event-id="<?php echo esc_attr( $event['id'] ); ?>" role="button" tabindex="0" aria-label="<?php echo esc_attr( sprintf( __( 'Details für %s anzeigen', 'churchtools-suite' ), $event['title'] ) ); ?>">
+			<?php $enable_modal = $args['enable_modal'] ?? true; ?>
+			<div class="cts-event-modern <?php echo $enable_modal ? 'cts-event-clickable' : ''; ?>" <?php if ( $enable_modal ) : ?>data-event-id="<?php echo esc_attr( $event['id'] ); ?>" role="button" tabindex="0" aria-label="<?php echo esc_attr( sprintf( __( 'Details für %s anzeigen', 'churchtools-suite' ), $event['title'] ) ); ?>"<?php endif; ?>>
 				
 				<!-- Header kompakt -->
 				<div class="cts-event-header" style="background: <?php echo ! empty( $event['calendar_color'] ) ? 'linear-gradient(135deg, ' . esc_attr( $event['calendar_color'] ) . ' 0%, ' . esc_attr( $event['calendar_color'] ) . 'dd 100%)' : 'var(--wp--preset--color--primary, var(--wp-admin-theme-color, #2271b1))'; ?>;">

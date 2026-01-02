@@ -149,6 +149,7 @@
 		// Extract shortcode attributes from calendar element
 		const calendarIds = $calendar.data('calendar-ids') || '';
 		const limit = $calendar.data('limit') || 100;
+		const enableModal = $calendar.data('enable-modal') !== undefined ? $calendar.data('enable-modal') : true;
 		
 		$.ajax({
 			url: churchtoolsSuitePublic.ajaxUrl,
@@ -159,7 +160,8 @@
 				year: year,
 				month: month,
 				calendar_ids: calendarIds,
-				limit: limit
+				limit: limit,
+				enable_modal: enableModal
 			},
 			success: function(response) {
 				if (response.success && response.data.html) {

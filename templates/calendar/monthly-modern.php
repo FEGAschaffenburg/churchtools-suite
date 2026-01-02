@@ -31,7 +31,8 @@ foreach ( $events as $event ) {
 <div class="cts-calendar cts-calendar-monthly" 
      data-view="calendar-monthly"
      data-calendar-ids="<?php echo esc_attr( $args['calendar'] ?? '' ); ?>"
-     data-limit="<?php echo esc_attr( $args['limit'] ?? 100 ); ?>">
+     data-limit="<?php echo esc_attr( $args['limit'] ?? 100 ); ?>"
+     data-enable-modal="<?php echo esc_attr( $args['enable_modal'] ?? true ? 'true' : 'false' ); ?>">
 	
 	<div class="cts-calendar-header">
 		<button class="cts-nav-btn cts-prev-month" aria-label="<?php esc_attr_e( 'Vorheriger Monat', 'churchtools-suite' ); ?>">‹</button>

@@ -33,7 +33,8 @@ $show_location = isset( $args['show_location'] ) ? ChurchTools_Suite_Shortcodes:
 		
 		<ul class="cts-list-items">
 			<?php foreach ( $events as $event ) : ?>
-				<li class="cts-list-item cts-event-clickable" data-event-id="<?php echo esc_attr( $event['id'] ); ?>">
+				<?php $enable_modal = $args['enable_modal'] ?? true; ?>
+				<li class="cts-list-item <?php echo $enable_modal ? 'cts-event-clickable' : ''; ?>" <?php if ( $enable_modal ) : ?>data-event-id="<?php echo esc_attr( $event['id'] ); ?>"<?php endif; ?>>
 					
 					<div class="cts-list-item-date">
 						<?php echo esc_html( $event['start_day'] ?? '' ); ?>.<?php echo esc_html( $event['start_month'] ?? '' ); ?>.

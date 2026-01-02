@@ -46,9 +46,9 @@ $show_description = isset( $args['show_description'] ) ? ChurchTools_Suite_Short
 		<?php else : ?>
 			
 			<div class="cts-search-items">
-				<?php foreach ( $events as $event ) : ?>
-					<div class="cts-search-item cts-event-clickable" data-event-id="<?php echo esc_attr( $event['id'] ); ?>" data-event-title="<?php echo esc_attr( $event['title'] ); ?>">
-						
+			<?php $enable_modal = $args['enable_modal'] ?? true; ?>
+			<?php foreach ( $events as $event ) : ?>
+				<div class="cts-search-item <?php echo $enable_modal ? 'cts-event-clickable' : ''; ?>" <?php if ( $enable_modal ) : ?>data-event-id="<?php echo esc_attr( $event['id'] ); ?>"<?php endif; ?> data-event-title="<?php echo esc_attr( $event['title'] ); ?>">
 						<div class="cts-search-item-title">
 							<?php echo esc_html( $event['title'] ); ?>
 						</div>

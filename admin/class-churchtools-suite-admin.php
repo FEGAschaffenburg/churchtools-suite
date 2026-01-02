@@ -2048,6 +2048,7 @@ class ChurchTools_Suite_Admin {
 		// Shortcode-Attribute aus Request
 		$calendar_ids = isset( $_POST['calendar_ids'] ) ? sanitize_text_field( $_POST['calendar_ids'] ) : '';
 		$limit = isset( $_POST['limit'] ) ? absint( $_POST['limit'] ) : 100;
+		$enable_modal = isset( $_POST['enable_modal'] ) ? filter_var( $_POST['enable_modal'], FILTER_VALIDATE_BOOLEAN ) : true;
 		
 		// Berechne Datumsbereich für den Monat
 		$from_date = sprintf( '%04d-%02d-01', $year, $month );
@@ -2059,6 +2060,7 @@ class ChurchTools_Suite_Admin {
 			'from' => $from_date,
 			'to' => $to_date,
 			'limit' => $limit,
+			'enable_modal' => $enable_modal,
 		];
 		
 		if ( ! empty( $calendar_ids ) ) {

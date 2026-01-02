@@ -40,9 +40,8 @@ $show_calendar_name = isset( $args['show_calendar_name'] ) ? ChurchTools_Suite_S
 	<?php else : ?>
 		
 		<?php foreach ( $events as $event ) : ?>
-			
-<div class="cts-event-medium cts-event-clickable" data-event-id="<?php echo esc_attr( $event['id'] ); ?>" role="button" tabindex="0" aria-label="<?php echo esc_attr( sprintf( __( 'Details für %s anzeigen', 'churchtools-suite' ), $event['title'] ) ); ?>">
-				
+			<?php $enable_modal = $args['enable_modal'] ?? true; ?>
+<div class="cts-event-medium <?php echo $enable_modal ? 'cts-event-clickable' : ''; ?>" <?php if ( $enable_modal ) : ?>data-event-id="<?php echo esc_attr( $event['id'] ); ?>" role="button" tabindex="0" aria-label="<?php echo esc_attr( sprintf( __( 'Details für %s anzeigen', 'churchtools-suite' ), $event['title'] ) ); ?>"<?php endif; ?>>
 				<!-- Datumbox -->
 				<div class="cts-date-box">
 					<div class="cts-date-day"><?php echo esc_html( $event['start_day'] ); ?></div>

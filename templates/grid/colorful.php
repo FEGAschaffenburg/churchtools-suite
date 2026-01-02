@@ -37,8 +37,8 @@ $show_description = isset( $args['show_description'] ) ? ChurchTools_Suite_Short
 	<?php else : ?>
 		
 		<?php foreach ( $events as $event ) : ?>
-			
-			<div class="cts-grid-card-colorful cts-event-clickable" data-event-id="<?php echo esc_attr( $event['id'] ); ?>" role="button" tabindex="0" aria-label="<?php echo esc_attr( sprintf( __( 'Details für %s anzeigen', 'churchtools-suite' ), $event['title'] ) ); ?>" style="--card-color: <?php echo esc_attr( $event['calendar_color'] ?? '#667eea' ); ?>;">
+			<?php $enable_modal = $args['enable_modal'] ?? true; ?>
+			<div class="cts-grid-card-colorful <?php echo $enable_modal ? 'cts-event-clickable' : ''; ?>" <?php if ( $enable_modal ) : ?>data-event-id="<?php echo esc_attr( $event['id'] ); ?>" role="button" tabindex="0" aria-label="<?php echo esc_attr( sprintf( __( 'Details für %s anzeigen', 'churchtools-suite' ), $event['title'] ) ); ?>"<?php endif; ?> style="--card-color: <?php echo esc_attr( $event['calendar_color'] ?? '#667eea' ); ?>;">
 				
 				<!-- Color Strip -->
 				<div class="cts-color-strip"></div>

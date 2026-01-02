@@ -38,8 +38,8 @@ $show_time = isset( $args['show_time'] ) ? ChurchTools_Suite_Shortcodes::parse_b
 	<?php else : ?>
 		
 		<?php foreach ( $events as $event ) : ?>
-			
-			<div class="cts-grid-card cts-event-clickable" data-event-id="<?php echo esc_attr( $event['id'] ); ?>" role="button" tabindex="0" aria-label="<?php echo esc_attr( sprintf( __( 'Details für %s anzeigen', 'churchtools-suite' ), $event['title'] ) ); ?>">
+			<?php $enable_modal = $args['enable_modal'] ?? true; ?>
+			<div class="cts-grid-card <?php echo $enable_modal ? 'cts-event-clickable' : ''; ?>" <?php if ( $enable_modal ) : ?>data-event-id="<?php echo esc_attr( $event['id'] ); ?>" role="button" tabindex="0" aria-label="<?php echo esc_attr( sprintf( __( 'Details für %s anzeigen', 'churchtools-suite' ), $event['title'] ) ); ?>"<?php endif; ?>>
 				
 				<!-- Date Badge -->
 				<div class="cts-card-date" style="background-color: <?php echo esc_attr( $event['calendar_color'] ?? '#667eea' ); ?>">
