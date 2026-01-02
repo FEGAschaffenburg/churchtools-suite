@@ -628,7 +628,7 @@ class ChurchTools_Suite_Shortcodes {
 	 */
 	public static function widget_shortcode( $atts ): string {
 		$atts = shortcode_atts( [
-			'view' => 'upcoming-events',
+			'view' => 'upcoming',
 			'calendar' => '',
 			'limit' => 5,
 			'class' => '',
@@ -636,7 +636,7 @@ class ChurchTools_Suite_Shortcodes {
 		
 		$events = self::get_events( $atts );
 		
-		return self::render_template( "widgets/{$atts['view']}", $events, $atts );
+		return self::render_template( "widget/{$atts['view']}", $events, $atts );
 	}
 	
 	/**
