@@ -42,6 +42,9 @@ class ChurchTools_Suite_Admin {
 			return;
 		}
 
+		// v0.10.3.4: Set redirect destination BEFORE update (prevents plugins.php redirect)
+		set_transient( 'churchtools_suite_update_redirect', admin_url( 'admin.php?page=churchtools-suite' ), 60 );
+
 		try {
 			if ( ! class_exists( 'ChurchTools_Suite_Auto_Updater' ) ) {
 				require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-auto-updater.php';
@@ -2082,5 +2085,26 @@ class ChurchTools_Suite_Admin {
 			'month' => $month,
 			'year' => $year,
 		] );
+	}
+	
+	/**
+	 * Prevent WordPress from redirecting to plugins.php after plugin update
+	 * 
+	 * WordPress by default redirects to plugins.php after Plugin_Upgrader->install().
+	 * We intercept this redirect and send users back to our plugin dashboard instead.
+	 * 
+	 * @since 0.10.3.4
+	 */
+	public function handle_update_redirect() {
+		$redirect_target = get_transient( 'churchtools_suite_update_redirect' );
+		
+		if ( ! empty( $redirect_target ) ) {
+			// Clear transient
+			delete_transient( 'churchtools_suite_update_redirect' );
+			
+			// Perform redirect
+			wp_safe_redirect( $redirect_target );
+			exit;
+		}
 	}
 }

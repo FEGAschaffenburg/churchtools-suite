@@ -145,6 +145,9 @@ class ChurchTools_Suite {
 		$this->loader->add_action( 'admin_enqueue_scripts', $admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'admin_menu', $admin, 'add_plugin_admin_menu' );
 		
+		// v0.10.3.4: Prevent redirect to plugins.php after update
+		$this->loader->add_action( 'admin_init', $admin, 'handle_update_redirect', 1 );
+		
 		// Note: Public CSS is now loaded by Admin class (enqueue_styles)
 		
 		// Register AJAX handlers immediately
