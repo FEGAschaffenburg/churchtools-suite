@@ -2121,33 +2121,24 @@ class ChurchTools_Suite_Admin {
 				'count' => count( $raw_events ),
 			] );
 			
-			// Formatiere Events für Template
-			// Events sind schon DB-Objekte, müssen nur in Array konvertiert werden
-			// + Kalender-Farbe hinzufügen
-			ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Converting events to array and adding calendar colors' );
+			// Formatiere Events für Template mit Template_Data Service
+			ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Formatting events with Template_Data service' );
 			
-			// Lade Calendars Repository für Farben
-			if ( ! class_exists( 'ChurchTools_Suite_Calendars_Repository' ) ) {
-				require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-calendars-repository.php';
+			// Lade Template_Data Service
+			if ( ! class_exists( 'ChurchTools_Suite_Template_Data' ) ) {
+				require_once CHURCHTOOLS_SUITE_PATH . 'includes/services/class-churchtools-suite-template-data.php';
 			}
-			$calendars_repo = new ChurchTools_Suite_Calendars_Repository();
+			$template_data = new ChurchTools_Suite_Template_Data();
 			
 			$events = [];
 			foreach ( $raw_events as $event ) {
 				$event_array = (array) $event;
-				
-				// Füge Kalender-Farbe hinzu
-				if ( ! empty( $event->calendar_id ) ) {
-					$calendar = $calendars_repo->get_by_calendar_id( $event->calendar_id );
-					$event_array['calendar_color'] = $calendar ? $calendar->color : '#667eea';
-				} else {
-					$event_array['calendar_color'] = '#667eea'; // Default color
-				}
-				
-				$events[] = $event_array;
+				// Formatiere Event (fügt start_time, start_day, calendar_color, etc. hinzu)
+				$formatted_event = $template_data->format_event( $event_array );
+				$events[] = $formatted_event;
 			}
 			
-			ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Events converted', [
+			ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Events formatted', [
 				'count' => count( $events ),
 			] );
 			
