@@ -16,19 +16,23 @@
 		// Check if we're in editor mode (Gutenberg or Elementor)
 		const isEditor = $('body').hasClass('block-editor-page') || 
 		                 typeof elementor !== 'undefined' ||
-		                 $('body').hasClass('elementor-editor-active');
+		                 $('body').hasClass('elementor-editor-active') ||
+		                 $('body').hasClass('wp-admin') ||
+		                 window.location.href.indexOf('/wp-admin/') !== -1;
 		
 		if (isEditor) {
-			console.log('[ChurchTools Suite] Editor mode detected - skipping click handlers');
+			console.log('[ChurchTools Suite] Editor mode detected - skipping ALL click handlers');
+			// Only initialize modal close handlers (for cleanup)
+			initModalCloseHandlers();
 		} else {
-			console.log('[ChurchTools Suite] Frontend mode - initializing click handlers');
-			initClickableEvents(); // v0.10.3.0: Click-to-details (nur im Frontend!)
+			console.log('[ChurchTools Suite] Frontend mode - initializing ALL handlers');
+			initClickableEvents(); // v0.10.3.0: Click-to-details
+			initGridButtons(); // Grid/List detail buttons
+			initModalViews(); // Modal open/close
 		}
 		
-		// Always initialize these (needed in editor too)
+		// Always initialize these (needed everywhere)
 		initCalendarViews();
-		initGridButtons();
-		initModalViews();
 		
 		console.log('[ChurchTools Suite] Init complete');
 	});
@@ -226,6 +230,14 @@
 	 * Initialize modal views
 	 */
 	function initModalViews() {
+		// Close handlers
+		initModalCloseHandlers();
+	}
+	
+	/**
+	 * Initialize modal close handlers only (safe for editor)
+	 */
+	function initModalCloseHandlers() {
 		// Close modal on background click
 		$(document).on('click', '#cts-modal-overlay', function(e) {
 			if (e.target === this || $(e.target).hasClass('cts-modal-overlay')) {
