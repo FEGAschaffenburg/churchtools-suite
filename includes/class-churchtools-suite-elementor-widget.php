@@ -146,6 +146,9 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 		$list_options = [
 			'classic' => __( 'Classic', 'churchtools-suite' ),
 			'medium'  => __( 'Medium', 'churchtools-suite' ),
+			'compact' => __( 'Compact', 'churchtools-suite' ),
+			'fluent'  => __( 'Fluent', 'churchtools-suite' ),
+			'modern'  => __( 'Modern', 'churchtools-suite' ),
 		];
 		
 		$this->add_control(
@@ -261,7 +264,9 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 		
 		// Grid Views (nur Standard)
 		$grid_options = [
-			'simple' => __( 'Simple', 'churchtools-suite' ),
+			'simple'   => __( 'Simple', 'churchtools-suite' ),
+			'modern'   => __( 'Modern', 'churchtools-suite' ),
+			'colorful' => __( 'Colorful', 'churchtools-suite' ),
 		];
 		
 		$this->add_control(
@@ -444,6 +449,34 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 				'condition'   => [
 					'view_type' => [ 'list', 'grid' ],
 				],
+			]
+		);
+		
+		// Click-to-Details Modal aktivieren (v0.10.2.9)
+		$this->add_control(
+			'enable_modal',
+			[
+				'label'        => __( '👆 Click-to-Details', 'churchtools-suite' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'label_on'     => __( 'Aktiv', 'churchtools-suite' ),
+				'label_off'    => __( 'Aus', 'churchtools-suite' ),
+				'return_value' => 'yes',
+				'default'      => 'yes',
+				'description'  => __( 'Öffnet Event-Details in einem Modal beim Klick auf einen Termin', 'churchtools-suite' ),
+			]
+		);
+		
+		// Click-to-Details Modal aktivieren
+		$this->add_control(
+			'enable_modal',
+			[
+				'label'        => __( '👆 Click-to-Details', 'churchtools-suite' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'label_on'     => __( 'Aktiv', 'churchtools-suite' ),
+				'label_off'    => __( 'Aus', 'churchtools-suite' ),
+				'return_value' => 'yes',
+				'default'      => 'yes',
+				'description'  => __( 'Öffnet Event-Details in einem Modal beim Klick auf einen Termin', 'churchtools-suite' ),
 			]
 		);
 		
@@ -722,6 +755,9 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 			if ( isset( $settings['limit'] ) ) {
 				$atts['limit'] = absint( $settings['limit'] );
 			}
+			
+			// Click-to-Details Modal (v0.10.2.9)
+			$atts['enable_modal'] = ( ! empty( $settings['enable_modal'] ) && $settings['enable_modal'] === 'yes' ) ? 'true' : 'false';
 			
 			// Sprint 1: Anzeige-Parameter
 			$atts['show_description'] = ( ! empty( $settings['show_description'] ) && $settings['show_description'] === 'yes' );

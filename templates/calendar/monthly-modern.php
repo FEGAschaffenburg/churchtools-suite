@@ -82,7 +82,10 @@ foreach ( $events as $event ) {
 					<?php if ( $has_events ) : ?>
 						<div class="cts-day-events">
 							<?php foreach ( array_slice( $events_by_date[ $date ], 0, 3 ) as $event ) : ?>
-								<div class="cts-event-dot" style="background-color: <?php echo esc_attr( $event['calendar_color'] ?? '#667eea' ); ?>" title="<?php echo esc_attr( $event['start_day'] . '. ' . $event['start_month'] . ' ' . $event['start_year'] . ' - ' . $event['title'] ); ?>">
+								<div class="cts-event-dot <?php echo ( $args['enable_modal'] ?? true ) ? 'cts-event-clickable' : ''; ?>" 
+								     <?php if ( $args['enable_modal'] ?? true ) : ?>data-event-id="<?php echo esc_attr( $event['id'] ); ?>"<?php endif; ?>
+								     style="background-color: <?php echo esc_attr( $event['calendar_color'] ?? '#667eea' ); ?>" 
+								     title="<?php echo esc_attr( $event['start_day'] . '. ' . $event['start_month'] . ' ' . $event['start_year'] . ' - ' . $event['title'] ); ?>">
 									<span class="cts-event-time"><?php echo esc_html( $event['start_time'] ); ?></span>
 									<span class="cts-event-title-small"><?php echo esc_html( wp_trim_words( $event['title'], 3 ) ); ?></span>
 								</div>

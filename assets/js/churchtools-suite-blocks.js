@@ -28,7 +28,10 @@
 		list: [
 			{ label: '--- Standard Views ---', value: '', disabled: true },
 			{ label: 'Classic', value: 'classic' },
-			{ label: 'Medium', value: 'medium' }
+			{ label: 'Medium', value: 'medium' },
+			{ label: 'Compact', value: 'compact' },
+			{ label: 'Fluent', value: 'fluent' },
+			{ label: 'Modern', value: 'modern' }
 		],
 		calendar: [
 			{ label: '--- Standard Views ---', value: '', disabled: true },
@@ -36,7 +39,9 @@
 		],
 		grid: [
 			{ label: '--- Standard Views ---', value: '', disabled: true },
-			{ label: 'Simple', value: 'simple' }
+			{ label: 'Simple', value: 'simple' },
+			{ label: 'Modern', value: 'modern' },
+			{ label: 'Colorful', value: 'colorful' }
 		],
 		search: [
 			{ label: '--- Standard Views ---', value: '', disabled: true },
@@ -160,6 +165,7 @@
 			calendar: { type: 'string', default: '' },
 			limit: { type: 'number', default: 5 },
 			columns: { type: 'number', default: 3 },
+			enable_modal: { type: 'boolean', default: true },
 			show_description: { type: 'boolean', default: true },
 			show_location: { type: 'boolean', default: true },
 			show_services: { type: 'boolean', default: true },
@@ -320,6 +326,13 @@
 							help: __('Anzahl der Spalten im Raster (1-4)', 'churchtools-suite')
 						})
 					),
+					// Click-to-Details Toggle
+					el(ToggleControl, {
+						label: __('👆 Click-to-Details', 'churchtools-suite'),
+						checked: attributes.enable_modal,
+						onChange: function(value) { setAttributes({ enable_modal: value }); },
+						help: __('Öffnet Event-Details in einem Modal beim Klick auf einen Termin', 'churchtools-suite')
+					}),
 					// === PANEL 3: Anzeige-Optionen ===
 					!isPresetView && el(PanelBody, { 
 						title: __('👁️ Anzeige-Optionen', 'churchtools-suite'), 
