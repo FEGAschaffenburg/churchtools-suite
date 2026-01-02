@@ -184,18 +184,14 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 						   $next = (int) $timestamps[0];
 						   $count = count( $timestamps );
 						   $overdue = $next < time();
-						   $label = $hook_name;
-						   $desc = '';
-						   if ( $hook_name === 'churchtools_suite_auto_sync' ) {
-							   $label = __( 'Event-Sync', 'churchtools-suite' );
-							   $desc = __( 'Synchronisiert Events automatisch gemäß Zeitplan.', 'churchtools-suite' );
-						   } elseif ( $hook_name === 'churchtools_suite_session_keepalive' ) {
-							   $label = __( 'Session Keepalive', 'churchtools-suite' );
-							   $desc = __( 'Verlängert die ChurchTools-Session.', 'churchtools-suite' );
-						   } elseif ( $hook_name === 'churchtools_suite_auto_update' ) {
-							   $label = __( 'Auto-Update', 'churchtools-suite' );
-							   $desc = __( 'Prüft und installiert Updates automatisch.', 'churchtools-suite' );
-						   }
+					   
+					   // Use ChurchTools_Suite_Cron_Display helper for consistent labels
+					   $label = class_exists( 'ChurchTools_Suite_Cron_Display' ) 
+						   ? ChurchTools_Suite_Cron_Display::get_cron_display_name( $hook_name )
+						   : $hook_name;
+					   $desc = class_exists( 'ChurchTools_Suite_Cron_Display' )
+						   ? ChurchTools_Suite_Cron_Display::get_cron_description( $hook_name )
+						   : '';
 					   ?>
 					   <div class="cts-cronjob-card" style="background:#f8f9fa; border:1px solid #e0e0e0; border-radius:7px; padding:16px; min-width:220px; max-width:320px; flex:1 1 220px; box-shadow:0 1px 2px rgba(0,0,0,0.03);">
 						   <div style="font-weight:600; font-size:16px; margin-bottom:4px; color:#2271b1; display:flex; align-items:center; gap:6px;">
