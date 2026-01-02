@@ -21,7 +21,8 @@
 	const ServerSideRender = wp.serverSideRender || wp.components.ServerSideRender;
 	
 	/**
-	 * View Options by Type (Standard + Presets)
+	 * View Options by Type (nur implementierte Views)
+	 * TODO: slider, masonry, agenda, timetable, carousel, countdown, cover, map später hinzufügen
 	 */
 	const standardViewOptions = {
 		list: [
@@ -50,38 +51,6 @@
 		widget: [
 			{ label: '--- Standard Views ---', value: '', disabled: true },
 			{ label: 'Upcoming', value: 'upcoming' }
-		],
-		slider: [
-			{ label: '--- Standard Views ---', value: '', disabled: true },
-			{ label: 'Classic', value: 'classic' }
-		],
-		masonry: [
-			{ label: '--- Standard Views ---', value: '', disabled: true },
-			{ label: 'Classic', value: 'classic' }
-		],
-		agenda: [
-			{ label: '--- Standard Views ---', value: '', disabled: true },
-			{ label: 'Classic', value: 'classic' }
-		],
-		timetable: [
-			{ label: '--- Standard Views ---', value: '', disabled: true },
-			{ label: 'Classic', value: 'classic' }
-		],
-		carousel: [
-			{ label: '--- Standard Views ---', value: '', disabled: true },
-			{ label: 'Classic', value: 'classic' }
-		],
-		countdown: [
-			{ label: '--- Standard Views ---', value: '', disabled: true },
-			{ label: 'Classic', value: 'classic' }
-		],
-		cover: [
-			{ label: '--- Standard Views ---', value: '', disabled: true },
-			{ label: 'Classic', value: 'classic' }
-		],
-		map: [
-			{ label: '--- Standard Views ---', value: '', disabled: true },
-			{ label: 'Classic', value: 'classic' }
 		]
 	};
 	
@@ -162,15 +131,7 @@
 			calendar: 'monthly-modern',
 			grid: 'simple',
 			search: 'classic',
-			widget: 'upcoming',
-			slider: 'classic',
-			masonry: 'classic',
-			agenda: 'classic',
-			timetable: 'classic',
-			carousel: 'classic',
-			countdown: 'classic',
-			cover: 'classic',
-			map: 'classic'
+			widget: 'upcoming'
 		};
 		return defaults[viewType] || 'classic';
 	}
@@ -184,15 +145,7 @@
 			calendar: '📅',
 			grid: '▦',
 			search: '🔍',
-			widget: '📱',
-			slider: '🎬',
-			masonry: '🧱',
-			agenda: '📒',
-			timetable: '🏢',
-			carousel: '🎠',
-			countdown: '⏱️',
-			cover: '🏞️',
-			map: '🗺️'
+			widget: '📱'
 		};
 		return icons[viewType] || '📋';
 	}
