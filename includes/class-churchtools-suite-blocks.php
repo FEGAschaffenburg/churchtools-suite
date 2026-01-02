@@ -155,6 +155,13 @@ class ChurchTools_Suite_Blocks {
 			if ( ! isset( $parsed_block['attrs']['show_location'] ) ) {
 				$parsed_block['attrs']['show_location'] = true;
 			}
+			// v0.10.3.27: Tooltip options
+			if ( ! isset( $parsed_block['attrs']['show_time'] ) ) {
+				$parsed_block['attrs']['show_time'] = true;
+			}
+			if ( ! isset( $parsed_block['attrs']['show_calendar_name'] ) ) {
+				$parsed_block['attrs']['show_calendar_name'] = false;
+			}
 			
 			self::block_log( '🔄 Block attributes normalized: ' . json_encode( $parsed_block['attrs'] ) );
 		}

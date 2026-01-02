@@ -211,7 +211,8 @@ class ChurchTools_Suite_Shortcodes {
 	/**
 	 * Calendar Shortcode
 	 * 
-	 * TEST VERSION: Direct HTML output to isolate problem
+	 * Usage:
+	 * [cts_calendar view="monthly-modern" show_time="true" show_description="true"]
 	 * 
 	 * @param array $atts Shortcode attributes
 	 * @return string HTML output
@@ -224,29 +225,23 @@ class ChurchTools_Suite_Shortcodes {
 			'from' => '',
 			'to' => '',
 			'class' => '',
-			'show_services' => true,
-			'show_description' => true,
-			'show_location' => true,
+			// Tooltip Display Options (v0.10.3.26)
+			'show_time' => true,
+			'show_description' => false,
+			'show_location' => false,
+			'show_services' => false,
+			'show_calendar_name' => false,
 		], $atts, 'cts_calendar' );
 		
 		// Apply preset configuration if view is a preset slug
 		$atts = self::apply_preset_config( $atts, 'cts_calendar' );
 		
-		// Ensure boolean keys exist with defaults
-		if ( ! isset( $atts['show_services'] ) ) {
-			$atts['show_services'] = true;
-		}
-		if ( ! isset( $atts['show_description'] ) ) {
-			$atts['show_description'] = true;
-		}
-		if ( ! isset( $atts['show_location'] ) ) {
-			$atts['show_location'] = true;
-		}
-		
 		// Convert string boolean values to actual booleans
-		$atts['show_services'] = self::parse_boolean( $atts['show_services'] );
+		$atts['show_time'] = self::parse_boolean( $atts['show_time'] );
 		$atts['show_description'] = self::parse_boolean( $atts['show_description'] );
 		$atts['show_location'] = self::parse_boolean( $atts['show_location'] );
+		$atts['show_services'] = self::parse_boolean( $atts['show_services'] );
+		$atts['show_calendar_name'] = self::parse_boolean( $atts['show_calendar_name'] );
 		
 		// Get events
 		$events = self::get_events( $atts );
