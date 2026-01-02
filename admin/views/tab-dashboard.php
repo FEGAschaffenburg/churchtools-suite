@@ -61,6 +61,7 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 	if ( is_array( $update_info ) && ! empty( $update_info['is_update'] ) ) :
 		// Auto-Update Konfiguration prüfen
 		$auto_update_enabled = get_option( 'churchtools_suite_auto_update_enabled', 0 );
+		$auto_update_level = get_option( 'churchtools_suite_auto_update_level', 'major_minor_patch' );
 		
 		// Versions-Typ ermitteln (Major.Minor.Patch.Build)
 		$current_version = CHURCHTOOLS_SUITE_VERSION;
@@ -99,6 +100,23 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 			$update_label = __( 'Patch Update', 'churchtools-suite' );
 			$update_desc = __( 'Bugfixes und kleinere Verbesserungen', 'churchtools-suite' );
 		}
+		
+		// Prüfen ob Update-Typ gemäß Konfiguration erlaubt ist (v0.10.3.3)
+		$update_allowed = false;
+		switch ( $auto_update_level ) {
+			case 'major':
+				$update_allowed = ( $update_type === 'major' );
+				break;
+			case 'major_minor':
+				$update_allowed = in_array( $update_type, [ 'major', 'minor' ], true );
+				break;
+			case 'major_minor_patch':
+				$update_allowed = in_array( $update_type, [ 'major', 'minor', 'patch' ], true );
+				break;
+			case 'all':
+				$update_allowed = true; // Alle Updates erlaubt
+				break;
+		}
 	?>
 	<div class="cts-card" style="border-left:4px solid <?php echo esc_attr( $update_color ); ?>; margin-top:16px;">
 		<div class="cts-card-header">
@@ -127,16 +145,31 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 					); 
 					?>
 				</p>
+			<?php elseif ( $auto_update_enabled && ! $update_allowed ) : ?>
+				<p style="margin:8px 0 0; padding:8px 12px; background:#e0f2fe; border-radius:4px; font-size:13px; color:#0c4a6e;">
+					ℹ️ <?php 
+					printf(
+						esc_html__( 'Dieses Update wird nicht automatisch installiert (Stufe: %s). %sEinstellungen ändern%s', 'churchtools-suite' ),
+						'<strong>' . esc_html( $auto_update_level ) . '</strong>',
+						'<a href="?page=churchtools-suite&tab=settings&subtab=advanced">',
+						'</a>'
+					); 
+					?>
+				</p>
 			<?php endif; ?>
 		</div>
 		<div class="cts-card-footer">
-			<?php if ( $auto_update_enabled ) : ?>
+			<?php if ( $auto_update_enabled && $update_allowed ) : ?>
 				<button id="cts_install_update_btn" class="cts-button cts-button-danger">
 					<?php echo $update_icon; ?> <?php esc_html_e( 'Jetzt installieren', 'churchtools-suite' ); ?>
 				</button>
 			<?php else : ?>
 				<a href="?page=churchtools-suite&tab=settings&subtab=advanced" class="cts-button cts-button-secondary">
-					⚙️ <?php esc_html_e( 'Auto-Update aktivieren', 'churchtools-suite' ); ?>
+					<?php if ( ! $auto_update_enabled ) : ?>
+						⚙️ <?php esc_html_e( 'Auto-Update aktivieren', 'churchtools-suite' ); ?>
+					<?php else : ?>
+						⚙️ <?php esc_html_e( 'Update-Stufe anpassen', 'churchtools-suite' ); ?>
+					<?php endif; ?>
 				</a>
 			<?php endif; ?>
 			<a href="?page=churchtools-suite&tab=settings" class="cts-button" style="margin-left:8px;"><?php esc_html_e( 'Einstellungen', 'churchtools-suite' ); ?></a>
