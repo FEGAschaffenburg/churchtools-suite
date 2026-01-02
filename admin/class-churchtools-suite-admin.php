@@ -54,6 +54,10 @@ class ChurchTools_Suite_Admin {
 				return;
 			}
 
+			// Cache leeren damit Update-Meldung nach Installation verschwindet (v0.10.3.2)
+			delete_transient( 'churchtools_suite_update_info' );
+			delete_transient( 'churchtools_suite_release_info' );
+
 			wp_send_json_success( [ 'message' => $result['message'] ?? __( 'Update gestartet.', 'churchtools-suite' ) ] );
 		} catch ( Exception $e ) {
 			wp_send_json_error( [ 'message' => __( 'Fehler: ', 'churchtools-suite' ) . $e->getMessage() ] );

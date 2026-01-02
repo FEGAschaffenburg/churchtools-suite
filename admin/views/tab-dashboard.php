@@ -463,9 +463,8 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 		return r.json();
 	}).then(function(data){
 		if (data.success) {
-			alert( data.data && data.data.message ? data.data.message : '<?php echo esc_js( __( 'Update erfolgreich! Sie werden zur Plugin-Seite weitergeleitet...', 'churchtools-suite' ) ); ?>' );
-			// Weiterleitung zur Plugin-Seite nach erfolgreichem Update
-			window.location.href = '<?php echo esc_url( admin_url( 'plugins.php' ) ); ?>';
+			// Dashboard neu laden nach erfolgreichem Update (v0.10.3.2)
+			window.location.reload();
 		} else {
 			alert( data.data && data.data.message ? data.data.message : (data.message || '<?php echo esc_js( __( 'Fehler beim Update', 'churchtools-suite' ) ); ?>') );
 			installBtn.disabled = false;
