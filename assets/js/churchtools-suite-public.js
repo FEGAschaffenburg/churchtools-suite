@@ -14,6 +14,7 @@
 		initCalendarViews();
 		initGridButtons();
 		initModalViews();
+		initClickableEvents(); // v0.10.3.0: Click-to-details
 	});
 
 	/**
@@ -217,6 +218,32 @@
 		$(document).on('keydown', function(e) {
 			if (e.keyCode === 27 && $('#cts-modal-overlay').hasClass('active')) {
 				closeModal();
+			}
+		});
+	}
+
+	/**
+	 * Initialize clickable events (v0.10.3.0)
+	 * Macht alle Events mit .cts-event-clickable klickbar
+	 */
+	function initClickableEvents() {
+		// Event-Delegation für dynamisch geladene Events
+		$(document).on('click', '.cts-event-clickable', function(e) {
+			e.preventDefault();
+			const eventId = $(this).data('event-id');
+			if (eventId) {
+				showEventModal(eventId);
+			}
+		});
+		
+		// Keyboard accessibility (Enter/Space)
+		$(document).on('keydown', '.cts-event-clickable', function(e) {
+			if (e.keyCode === 13 || e.keyCode === 32) { // Enter or Space
+				e.preventDefault();
+				const eventId = $(this).data('event-id');
+				if (eventId) {
+					showEventModal(eventId);
+				}
 			}
 		});
 	}
