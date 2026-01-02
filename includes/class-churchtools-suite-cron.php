@@ -174,14 +174,15 @@ class ChurchTools_Suite_Cron {
 			default:
 				// Fallback: 1 hour from now
 				return time() + HOUR_IN_SECONDS;
-    }
-    
-    /**
-     * Session Keep-Alive: Ping ChurchTools API
-     * 
-     * Wird stündlich ausgeführt um die Session am Leben zu halten
-     */
-    public static function session_keepalive() {
+		}
+	}
+	
+	/**
+	 * Session Keep-Alive: Ping ChurchTools API
+	 * 
+	 * Wird stündlich ausgeführt um die Session am Leben zu halten
+	 */
+	public static function session_keepalive() {
         // Nur ausführen wenn konfiguriert
         $ct_url = get_option('churchtools_suite_ct_url', '');
         $ct_username = get_option('churchtools_suite_ct_username', '');
