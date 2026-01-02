@@ -12,10 +12,24 @@
 	// DOM Ready
 	$(function() {
 		console.log('[ChurchTools Suite] Public JS loaded');
+		
+		// Check if we're in editor mode (Gutenberg or Elementor)
+		const isEditor = $('body').hasClass('block-editor-page') || 
+		                 typeof elementor !== 'undefined' ||
+		                 $('body').hasClass('elementor-editor-active');
+		
+		if (isEditor) {
+			console.log('[ChurchTools Suite] Editor mode detected - skipping click handlers');
+		} else {
+			console.log('[ChurchTools Suite] Frontend mode - initializing click handlers');
+			initClickableEvents(); // v0.10.3.0: Click-to-details (nur im Frontend!)
+		}
+		
+		// Always initialize these (needed in editor too)
 		initCalendarViews();
 		initGridButtons();
 		initModalViews();
-		initClickableEvents(); // v0.10.3.0: Click-to-details
+		
 		console.log('[ChurchTools Suite] Init complete');
 	});
 
@@ -149,7 +163,11 @@
 		// Extract shortcode attributes from calendar element
 		const calendarIds = $calendar.data('calendar-ids') || '';
 		const limit = $calendar.data('limit') || 100;
-		const enableModal = $calendar.data('enable-modal') !== undefined ? $calendar.data('enable-modal') : true;
+		const enableModalAttr = $calendar.data('enable-modal');
+		// Convert string "true"/"false" to boolean
+		const enableModal = enableModalAttr === 'false' ? false : (enableModalAttr === 'true' || enableModalAttr === true || enableModalAttr === undefined);
+		
+		console.log('[Calendar] Loading month:', year, month, 'enableModal:', enableModal, 'raw:', enableModalAttr);
 		
 		$.ajax({
 			url: churchtoolsSuitePublic.ajaxUrl,
@@ -164,6 +182,7 @@
 				enable_modal: enableModal
 			},
 			success: function(response) {
+				console.log('[Calendar] AJAX success:', response);
 				if (response.success && response.data.html) {
 					// Replace calendar content
 					$calendar.replaceWith(response.data.html);
@@ -177,7 +196,10 @@
 				}
 			},
 			error: function(xhr, status, error) {
-				console.error('AJAX error loading calendar:', error);
+				console.error('AJAX error loading calendar:', xhr, status, error);
+				console.error('Response:', xhr.responseText);
+				alert('Netzwerkfehler beim Laden des Kalenders: ' + error);
+			},
 				alert('Netzwerkfehler beim Laden des Kalenders');
 			},
 			complete: function() {
