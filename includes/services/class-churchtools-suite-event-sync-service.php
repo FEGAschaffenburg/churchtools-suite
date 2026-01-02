@@ -236,10 +236,8 @@ class ChurchTools_Suite_Event_Sync_Service {
             'direction' => 'forward',
             'from' => $args['from'],
             'to' => $args['to'],
-            // v0.10.2.0: Include eventServices for service import
-            'include' => [
-                'eventServices',
-            ],
+            // v0.10.2.4: Include eventServices (als String, nicht Array!)
+            'include' => 'eventServices',
         ];
         
         // v0.7.1.0: Incremental sync - only fetch modified events
