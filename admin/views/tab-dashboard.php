@@ -347,14 +347,26 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 			method: 'POST',
 			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 			body: new URLSearchParams({ action: 'cts_trigger_manual_sync', nonce: churchtoolsSuite.nonce })
-		}).then(r => r.json()).then(data => {
-			if (data.success) {
-				if (result) result.innerHTML = '<span style="color:#0a0">' + (data.data.message || '✅ Synchronisation abgeschlossen') + '</span>';
-			} else {
-				if (result) result.innerHTML = '<span style="color:#d63638">' + (data.data?.message || data.message || 'Fehler beim Sync') + '</span>';
-			}
-		}).catch(err => {
-			if (result) result.innerHTML = '<span style="color:#d63638">Fehler: ' + err.message + '</span>';
+	}).then(function(r) {
+		if (!r.ok) throw new Error('Server-Fehler: ' + r.status);
+		const contentType = r.headers.get('content-type');
+		if (!contentType || !contentType.includes('application/json')) {
+			return r.text().then(text => {
+				console.error('Non-JSON Response:', text.substring(0, 500));
+				throw new Error('Server hat keine gültige JSON-Antwort gesendet');
+			});
+		}
+		return r.json();
+	}).then(data => {
+		if (data.success) {
+			if (result) result.innerHTML = '<span style="color:#0a0">' + (data.data.message || '✅ Synchronisation abgeschlossen') + '</span>';
+			// Seite neu laden nach erfolgreicher Sync
+			setTimeout(() => window.location.reload(), 1500);
+		} else {
+			if (result) result.innerHTML = '<span style="color:#d63638">' + (data.data?.message || data.message || 'Fehler beim Sync') + '</span>';
+		}
+	}).catch(err => {
+		if (result) result.innerHTML = '<span style="color:#d63638">❌ ' + err.message + '</span>';
 		}).finally(() => {
 			btn.disabled = false;
 			btn.innerHTML = original;
@@ -378,14 +390,24 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 			method: 'POST',
 			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 			body: new URLSearchParams({ action: 'cts_run_update', nonce: churchtoolsSuite.nonce })
-		}).then(r => r.json()).then(function(data){
-			if (data.success) {
-				alert( data.data && data.data.message ? data.data.message : '<?php echo esc_js( __( 'Update gestartet', 'churchtools-suite' ) ); ?>' );
-			} else {
-				alert( data.data && data.data.message ? data.data.message : (data.message || '<?php echo esc_js( __( 'Fehler beim Update', 'churchtools-suite' ) ); ?>') );
-			}
-		}).catch(function(err){
-			alert('Netzwerkfehler: ' + err.message);
+	}).then(function(r) {
+		if (!r.ok) throw new Error('Server-Fehler: ' + r.status);
+		const contentType = r.headers.get('content-type');
+		if (!contentType || !contentType.includes('application/json')) {
+			return r.text().then(text => {
+				console.error('Non-JSON Response:', text.substring(0, 500));
+				throw new Error('Server hat keine gültige JSON-Antwort gesendet');
+			});
+		}
+		return r.json();
+	}).then(function(data){
+		if (data.success) {
+			alert( data.data && data.data.message ? data.data.message : '<?php echo esc_js( __( 'Update gestartet', 'churchtools-suite' ) ); ?>' );
+		} else {
+			alert( data.data && data.data.message ? data.data.message : (data.message || '<?php echo esc_js( __( 'Fehler beim Update', 'churchtools-suite' ) ); ?>') );
+		}
+	}).catch(function(err){
+		alert('❌ Netzwerkfehler: ' + err.message);
 		}).finally(function(){
 			installBtn.disabled = false;
 			installBtn.innerHTML = orig;

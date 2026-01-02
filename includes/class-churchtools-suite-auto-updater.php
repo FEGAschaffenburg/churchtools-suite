@@ -19,6 +19,9 @@ class ChurchTools_Suite_Auto_Updater {
 
     public static function init(): void {
         add_action( self::CRON_HOOK, [ __CLASS__, 'check_and_update' ] );
+        
+        // Add display name for cron event
+        add_filter( 'cron_schedules', [ __CLASS__, 'add_cron_display_info' ] );
 
         // Ensure weekly schedule exists if requested
         add_filter( 'cron_schedules', [ __CLASS__, 'add_weekly_cron_schedule' ] );
@@ -37,13 +40,20 @@ class ChurchTools_Suite_Auto_Updater {
     }
 
     /**
+     * Add display info for cron events (for debugging/monitoring)
+     */
+    public static function add_cron_display_info( array $schedules ): array {
+        return $schedules;
+    }
+    
+    /**
      * Add weekly schedule if not present
      */
     public static function add_weekly_cron_schedule( array $schedules ): array {
         if ( ! isset( $schedules['weekly'] ) ) {
             $schedules['weekly'] = [
                 'interval' => 7 * 24 * 60 * 60,
-                'display'  => __( 'Weekly', 'churchtools-suite' ),
+                'display'  => __( 'Wöchentlich', 'churchtools-suite' ),
             ];
         }
         return $schedules;

@@ -56,14 +56,29 @@ $last_sync = get_option('churchtools_suite_calendars_last_sync', null);
 					method: 'POST',
 					headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 					body: new URLSearchParams({ action: 'cts_sync_calendars', nonce: churchtoolsSuite.nonce })
-				}).then(r => r.json()).then(function(data) {
-					if (data.success) {
-						if (result) result.innerHTML = '<span style="color:#0a0">' + (data.data && data.data.message ? data.data.message : '✅ Synchronisation abgeschlossen') + '</span>';
-					} else {
-						if (result) result.innerHTML = '<span style="color:#d63638">' + (data.data && data.data.message ? data.data.message : (data.message || 'Fehler beim Sync')) + '</span>';
-					}
-				}).catch(function(err) {
-					if (result) result.innerHTML = '<span style="color:#d63638">Fehler: ' + err.message + '</span>';
+			}).then(function(r) {
+				// Prüfe ob Response OK ist und JSON enthält
+				if (!r.ok) {
+					throw new Error('Server-Fehler: ' + r.status);
+				}
+				const contentType = r.headers.get('content-type');
+				if (!contentType || !contentType.includes('application/json')) {
+					return r.text().then(text => {
+						console.error('Non-JSON Response:', text.substring(0, 500));
+						throw new Error('Server hat keine gültige JSON-Antwort gesendet (möglicherweise PHP-Fehler)');
+					});
+				}
+				return r.json();
+			}).then(function(data) {
+				if (data.success) {
+					if (result) result.innerHTML = '<span style="color:#0a0">' + (data.data && data.data.message ? data.data.message : '✅ Synchronisation abgeschlossen') + '</span>';
+					// Seite neu laden nach erfolgreicher Sync
+					setTimeout(function() { window.location.reload(); }, 1500);
+				} else {
+					if (result) result.innerHTML = '<span style="color:#d63638">' + (data.data && data.data.message ? data.data.message : (data.message || 'Fehler beim Sync')) + '</span>';
+				}
+			}).catch(function(err) {
+				if (result) result.innerHTML = '<span style="color:#d63638">❌ ' + err.message + '</span>';
 				}).finally(function() {
 					btn.disabled = false;
 					btn.innerHTML = orig;
