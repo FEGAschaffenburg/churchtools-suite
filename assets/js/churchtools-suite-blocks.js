@@ -166,9 +166,10 @@
 			limit: { type: 'number', default: 5 },
 			columns: { type: 'number', default: 3 },
 			enable_modal: { type: 'boolean', default: true },
-			show_description: { type: 'boolean', default: true },
-			show_location: { type: 'boolean', default: true },
-			show_services: { type: 'boolean', default: true },
+		// v0.10.3.28: Tooltip options - defaults MUST match PHP (only show_time=true)
+		show_description: { type: 'boolean', default: false },
+		show_location: { type: 'boolean', default: false },
+		show_services: { type: 'boolean', default: false },
 			show_calendar_name: { type: 'boolean', default: false },
 			show_time: { type: 'boolean', default: true },
 			order: { type: 'string', default: 'asc' },

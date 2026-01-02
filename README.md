@@ -1,6 +1,6 @@
 # ChurchTools Suite
 
-**Aktuelle Version:** 0.10.3.27
+**Aktuelle Version:** 0.10.3.28
 
 Professionelle WordPress-Integration für ChurchTools.
 
