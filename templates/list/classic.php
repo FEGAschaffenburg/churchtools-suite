@@ -114,4 +114,11 @@ $show_time = isset( $args['show_time'] ) ? ChurchTools_Suite_Shortcodes::parse_b
 				</div>
 			<?php endif; ?>
 
+		</div>
+		
+		<?php endforeach; ?>
+		
+	<?php endif; ?>
+	
+</div>
 </div>
