@@ -149,13 +149,33 @@ class ChurchTools_Suite_Admin {
 	 * Enqueue admin scripts
 	 * 
 	 * @since 0.6.1.0 Always load (no conditional check)
+	 * @since 0.10.2.9 Load public JS too (for calendar navigation in demos)
 	 */
 	public function enqueue_scripts() {
+		// Load public JS first (for frontend features like calendar navigation)
+		wp_enqueue_script(
+			'churchtools-suite-public',
+			CHURCHTOOLS_SUITE_URL . 'assets/js/churchtools-suite-public.js',
+			[ 'jquery' ],
+			$this->version,
+			true
+		);
+		
+		// Localize public script (needed for AJAX calendar navigation)
+		wp_localize_script(
+			'churchtools-suite-public',
+			'churchtoolsSuitePublic',
+			[
+				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+				'nonce'   => wp_create_nonce( 'churchtools_suite_public' ),
+			]
+		);
+		
 		// Main admin script (jQuery-based)
 		wp_enqueue_script(
 			'churchtools-suite-admin',
 			CHURCHTOOLS_SUITE_URL . 'assets/js/churchtools-suite-admin.js',
-			[ 'jquery' ],
+			[ 'jquery', 'churchtools-suite-public' ],
 			$this->version,
 			true
 		);

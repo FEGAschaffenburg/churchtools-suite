@@ -142,8 +142,10 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 		$last_sync_stats = get_option( 'churchtools_suite_last_sync_stats', [] );
 		$auto_sync_interval = get_option( 'churchtools_suite_auto_sync_interval', 'daily' );
 		
-		// Intervall-Namen
+		// Intervall-Namen (für Referenz, aktuell nicht verwendet da Cron-Display verwendet wird)
 		$interval_names = [
+			'hourly' => __( 'Stündlich', 'churchtools-suite' ),
+			'twicedaily' => __( 'Zweimal täglich', 'churchtools-suite' ),
 			'daily' => __( 'Täglich', 'churchtools-suite' ),
 			'cts_2days' => __( 'Alle 2 Tage', 'churchtools-suite' ),
 			'cts_3days' => __( 'Alle 3 Tage', 'churchtools-suite' ),

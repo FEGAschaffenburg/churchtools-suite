@@ -81,6 +81,8 @@ class ChurchTools_Suite {
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-auto-updater.php';
 		// Update checker (injects GitHub release into WP update transient)
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-update-checker.php';
+		// Cron display helper (user-friendly cron job names)
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-cron-display.php';
 		
 		$this->loader = new ChurchTools_Suite_Loader();
 	}
