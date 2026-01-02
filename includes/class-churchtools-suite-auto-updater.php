@@ -19,9 +19,6 @@ class ChurchTools_Suite_Auto_Updater {
 
     public static function init(): void {
         add_action( self::CRON_HOOK, [ __CLASS__, 'check_and_update' ] );
-        
-        // Add display names for cron hooks
-        add_filter( 'cron_request', [ __CLASS__, 'add_cron_hook_display_name' ], 10, 2 );
 
         // Ensure weekly schedule exists if requested
         add_filter( 'cron_schedules', [ __CLASS__, 'add_weekly_cron_schedule' ] );
@@ -37,16 +34,6 @@ class ChurchTools_Suite_Auto_Updater {
             // Map weekly to 'weekly' (added above)
             wp_schedule_event( time(), $schedule_key === 'weekly' ? 'weekly' : $schedule_key, self::CRON_HOOK );
         }
-    }
-
-    /**
-     * Add human-readable display name for cron hook
-     * WordPress doesn't have a built-in filter for this, so we use a workaround
-     */
-    public static function add_cron_hook_display_name( $cron_request, $doing_wp_cron ): array {
-        // This is a workaround - WP doesn't support custom hook display names natively
-        // The best we can do is ensure our hook has a descriptive name
-        return $cron_request;
     }
     
     /**
