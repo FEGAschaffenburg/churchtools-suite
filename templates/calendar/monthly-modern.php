@@ -32,7 +32,12 @@ foreach ( $events as $event ) {
      data-view="calendar-monthly"
      data-calendar-ids="<?php echo esc_attr( $args['calendar'] ?? '' ); ?>"
      data-limit="<?php echo esc_attr( $args['limit'] ?? 100 ); ?>"
-     data-enable-modal="<?php echo esc_attr( $args['enable_modal'] ?? true ? 'true' : 'false' ); ?>">
+     data-enable-modal="<?php echo esc_attr( $args['enable_modal'] ?? true ? 'true' : 'false' ); ?>"
+     data-show-time="<?php echo esc_attr( ( $args['show_time'] ?? true ) ? 'true' : 'false' ); ?>"
+     data-show-description="<?php echo esc_attr( ( $args['show_description'] ?? false ) ? 'true' : 'false' ); ?>"
+     data-show-location="<?php echo esc_attr( ( $args['show_location'] ?? false ) ? 'true' : 'false' ); ?>"
+     data-show-services="<?php echo esc_attr( ( $args['show_services'] ?? false ) ? 'true' : 'false' ); ?>"
+     data-show-calendar-name="<?php echo esc_attr( ( $args['show_calendar_name'] ?? false ) ? 'true' : 'false' ); ?>">
 	
 	<div class="cts-calendar-header">
 		<button class="cts-nav-btn cts-prev-month" aria-label="<?php esc_attr_e( 'Vorheriger Monat', 'churchtools-suite' ); ?>">‹</button>
@@ -105,11 +110,53 @@ foreach ( $events as $event ) {
 					<div class="cts-day-number"><?php echo $day; ?></div>
 					<?php if ( $has_events ) : ?>
 						<div class="cts-day-events">
-							<?php foreach ( array_slice( $events_by_date[ $date ], 0, 3 ) as $event ) : ?>
+							<?php foreach ( array_slice( $events_by_date[ $date ], 0, 3 ) as $event ) : 
+								// Baue Tooltip-Text basierend auf Optionen
+								$tooltip_parts = [];
+								
+								// Immer: Datum + Titel
+								$tooltip_parts[] = $event['start_day'] . '. ' . $event['start_month'] . ' ' . $event['start_year'] . ' - ' . $event['title'];
+								
+								// Optional: Uhrzeit
+								if ( ! isset( $args['show_time'] ) || $args['show_time'] !== false ) {
+									if ( ! empty( $event['time_display'] ) ) {
+										$tooltip_parts[] = '🕐 ' . $event['time_display'];
+									}
+								}
+								
+								// Optional: Ort
+								if ( ( $args['show_location'] ?? false ) && ! empty( $event['location_name'] ) ) {
+									$tooltip_parts[] = '📍 ' . $event['location_name'];
+								}
+								
+								// Optional: Kalender-Name
+								if ( ( $args['show_calendar_name'] ?? false ) && ! empty( $event['calendar_name'] ) ) {
+									$tooltip_parts[] = '📅 ' . $event['calendar_name'];
+								}
+								
+								// Optional: Services
+								if ( ( $args['show_services'] ?? false ) && ! empty( $event['services'] ) ) {
+									$service_names = array_map( function( $service ) {
+										return $service['person_name'] ? $service['service_name'] . ': ' . $service['person_name'] : $service['service_name'];
+									}, array_slice( $event['services'], 0, 3 ) );
+									if ( ! empty( $service_names ) ) {
+										$tooltip_parts[] = '👤 ' . implode( ', ', $service_names );
+									}
+								}
+								
+								// Optional: Beschreibung (gekürzt)
+								if ( ( $args['show_description'] ?? false ) && ! empty( $event['description'] ) ) {
+									$desc = wp_strip_all_tags( $event['description'] );
+									$desc = wp_trim_words( $desc, 15, '...' );
+									$tooltip_parts[] = '📝 ' . $desc;
+								}
+								
+								$tooltip = implode( "\n", $tooltip_parts );
+							?>
 								<div class="cts-event-dot <?php echo ( $args['enable_modal'] ?? true ) ? 'cts-event-clickable' : ''; ?>" 
 								     <?php if ( $args['enable_modal'] ?? true ) : ?>data-event-id="<?php echo esc_attr( $event['id'] ); ?>"<?php endif; ?>
 								     style="background-color: <?php echo esc_attr( $event['calendar_color'] ?? '#667eea' ); ?>" 
-								     title="<?php echo esc_attr( $event['start_day'] . '. ' . $event['start_month'] . ' ' . $event['start_year'] . ' - ' . $event['title'] ); ?>">
+								     title="<?php echo esc_attr( $tooltip ); ?>">
 									<span class="cts-event-time"><?php echo esc_html( $event['start_time'] ); ?></span>
 									<span class="cts-event-title-small"><?php echo esc_html( wp_trim_words( $event['title'], 3 ) ); ?></span>
 								</div>

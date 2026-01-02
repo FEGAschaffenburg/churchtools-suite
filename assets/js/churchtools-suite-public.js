@@ -198,6 +198,13 @@
 		// Convert string "true"/"false" to boolean
 		const enableModal = enableModalAttr === 'false' ? false : (enableModalAttr === 'true' || enableModalAttr === true || enableModalAttr === undefined);
 		
+		// Extract display options
+		const showTime = $calendar.data('show-time') !== false;
+		const showDescription = $calendar.data('show-description') === true;
+		const showLocation = $calendar.data('show-location') === true;
+		const showServices = $calendar.data('show-services') === true;
+		const showCalendarName = $calendar.data('show-calendar-name') === true;
+		
 		console.log('[Calendar] Loading month:', year, month, 'enableModal:', enableModal, 'raw:', enableModalAttr);
 		
 		// Variable für neuen Kalender (wird in success gesetzt)
@@ -213,7 +220,12 @@
 				month: month,
 				calendar_ids: calendarIds,
 				limit: limit,
-				enable_modal: enableModal
+				enable_modal: enableModal,
+				show_time: showTime,
+				show_description: showDescription,
+				show_location: showLocation,
+				show_services: showServices,
+				show_calendar_name: showCalendarName
 			},
 			success: function(response) {
 				console.log('[Calendar] AJAX success:', response);

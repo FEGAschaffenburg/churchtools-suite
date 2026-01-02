@@ -2069,6 +2069,13 @@ class ChurchTools_Suite_Admin {
 			$limit = isset( $_POST['limit'] ) ? absint( $_POST['limit'] ) : 100;
 			$enable_modal = isset( $_POST['enable_modal'] ) ? filter_var( $_POST['enable_modal'], FILTER_VALIDATE_BOOLEAN ) : true;
 			
+			// Anzeige-Optionen (für Tooltip-Infos)
+			$show_time = isset( $_POST['show_time'] ) ? filter_var( $_POST['show_time'], FILTER_VALIDATE_BOOLEAN ) : true;
+			$show_description = isset( $_POST['show_description'] ) ? filter_var( $_POST['show_description'], FILTER_VALIDATE_BOOLEAN ) : false;
+			$show_location = isset( $_POST['show_location'] ) ? filter_var( $_POST['show_location'], FILTER_VALIDATE_BOOLEAN ) : false;
+			$show_services = isset( $_POST['show_services'] ) ? filter_var( $_POST['show_services'], FILTER_VALIDATE_BOOLEAN ) : false;
+			$show_calendar_name = isset( $_POST['show_calendar_name'] ) ? filter_var( $_POST['show_calendar_name'], FILTER_VALIDATE_BOOLEAN ) : false;
+			
 			// Berechne Datumsbereich für den Monat
 			$from_date = sprintf( '%04d-%02d-01', $year, $month );
 			$to_date = date( 'Y-m-t', strtotime( $from_date ) );
@@ -2089,6 +2096,11 @@ class ChurchTools_Suite_Admin {
 				'enable_modal' => $enable_modal,
 				'year' => $year,   // AJAX-spezifisch: Jahr für Titel
 				'month' => $month, // AJAX-spezifisch: Monat für Titel
+				'show_time' => $show_time,
+				'show_description' => $show_description,
+				'show_location' => $show_location,
+				'show_services' => $show_services,
+				'show_calendar_name' => $show_calendar_name,
 			];
 			
 			if ( ! empty( $calendar_ids ) ) {
