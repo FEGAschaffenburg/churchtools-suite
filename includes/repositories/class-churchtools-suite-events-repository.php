@@ -297,6 +297,90 @@ class ChurchTools_Suite_Events_Repository extends ChurchTools_Suite_Repository_B
     }
     
     /**
+     * Get events in date range with calendar filter (AJAX calendar navigation)
+     * 
+     * Used by ajax_load_calendar_month() for calendar navigation.
+     * 
+     * @param string $start_date Start date (Y-m-d H:i:s)
+     * @param string $end_date End date (Y-m-d H:i:s)
+     * @param array $calendar_ids Optional calendar IDs filter
+     * @param int|null $limit Optional limit
+     * @param string $orderby Order by column
+     * @param string $order Order direction
+     * @return array Array of event objects
+     */
+    public function get_events_in_range(string $start_date, string $end_date, array $calendar_ids = [], ?int $limit = null, string $orderby = 'start_datetime', string $order = 'ASC'): array {
+        $order = strtoupper($order) === 'DESC' ? 'DESC' : 'ASC';
+        $orderby = sanitize_key($orderby);
+        
+        // Debug Logging
+        if (class_exists('ChurchTools_Suite_Logger')) {
+            ChurchTools_Suite_Logger::debug('repository', 'get_events_in_range called', [
+                'start_date' => $start_date,
+                'end_date' => $end_date,
+                'calendar_ids' => $calendar_ids,
+                'limit' => $limit,
+            ]);
+        }
+        
+        $sql = "SELECT * FROM {$this->table_name} WHERE start_datetime >= %s AND start_datetime <= %s";
+        $params = [$start_date, $end_date];
+        
+        // Add calendar filter if specified
+        if (!empty($calendar_ids) && is_array($calendar_ids)) {
+            $placeholders = implode(',', array_fill(0, count($calendar_ids), '%s'));
+            $sql .= " AND calendar_id IN ($placeholders)";
+            $params = array_merge($params, $calendar_ids);
+        }
+        
+        $sql .= " ORDER BY {$orderby} {$order}";
+        
+        // Add limit if specified
+        if ($limit !== null && $limit > 0) {
+            $sql .= " LIMIT %d";
+            $params[] = $limit;
+        }
+        
+        // Debug Logging
+        if (class_exists('ChurchTools_Suite_Logger')) {
+            ChurchTools_Suite_Logger::debug('repository', 'Executing SQL query', [
+                'sql' => $sql,
+                'params' => $params,
+            ]);
+        }
+        
+        $prepared = $this->db->prepare($sql, ...$params);
+        
+        // Debug Logging
+        if (class_exists('ChurchTools_Suite_Logger')) {
+            ChurchTools_Suite_Logger::debug('repository', 'Prepared SQL', [
+                'query' => $prepared,
+            ]);
+        }
+        
+        $results = $this->db->get_results($prepared);
+        
+        // Error Logging
+        if ($this->db->last_error && class_exists('ChurchTools_Suite_Logger')) {
+            ChurchTools_Suite_Logger::error('repository', 'SQL error in get_events_in_range', [
+                'error' => $this->db->last_error,
+                'query' => $this->db->last_query,
+            ]);
+        }
+        
+        // Debug Logging
+        if (class_exists('ChurchTools_Suite_Logger')) {
+            ChurchTools_Suite_Logger::debug('repository', 'Query results', [
+                'count' => is_array($results) ? count($results) : 0,
+                'is_array' => is_array($results),
+                'type' => gettype($results),
+            ]);
+        }
+        
+        return is_array($results) ? $results : [];
+    }
+    
+    /**
      * Delete events older than specified date
      *
      * @param string $before_date Date before which to delete (Y-m-d H:i:s)
