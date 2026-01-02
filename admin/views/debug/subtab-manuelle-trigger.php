@@ -36,28 +36,145 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 	</div>
 </div>
-<!-- <script>
-jQuery(function($){
-	$('#cts_clear_logs_btn').on('click', function(e){
-		e.preventDefault();
-		if (!confirm('<?php esc_html_e( 'Alle Plugin-Logs unwiderruflich löschen?', 'churchtools-suite' ); ?>')) return;
+
+<script>
+jQuery(function($) {
+	// Manual Sync Trigger
+	$('#cts-trigger-manual-sync').on('click', function() {
 		var $btn = $(this);
-		$btn.prop('disabled', true).text('⏳ <?php esc_html_e( 'Lösche...', 'churchtools-suite' ); ?>');
-		$.post(ajaxurl, {
-			action: 'cts_clear_logs',
-			nonce: '<?php echo wp_create_nonce('churchtools_suite_admin'); ?>'
-		}).done(function(resp){
-			if (resp.success) {
-				alert('<?php esc_html_e( 'Logs wurden gelöscht.', 'churchtools-suite' ); ?>');
-				location.reload();
-			} else {
-				alert((resp.data && resp.data.message) ? resp.data.message : 'Fehler beim Löschen der Logs.');
+		var $result = $('#cts-manual-trigger-result');
+		
+		$btn.prop('disabled', true).html('<span>⏳</span> Sync läuft...');
+		$result.html('<div style="padding: 12px; background: #f0f9ff; border-radius: 4px;">🔄 Event-Sync gestartet...</div>');
+		
+		$.ajax({
+			url: ajaxurl,
+			type: 'POST',
+			data: {
+				action: 'cts_sync_events',
+				nonce: '<?php echo wp_create_nonce('churchtools_suite_admin'); ?>'
+			},
+			success: function(response) {
+				if (response.success) {
+					$result.html(
+						'<div style="padding: 12px; background: #d1fae5; border-radius: 4px; border: 1px solid #10b981;">' +
+						'✅ <strong>Sync erfolgreich!</strong><br>' +
+						'Kalender: ' + (response.data.calendars_processed || 0) + '<br>' +
+						'Events: ' + (response.data.events_inserted || 0) + ' neu, ' + 
+						(response.data.events_updated || 0) + ' aktualisiert<br>' +
+						'Services: ' + (response.data.services_imported || 0) +
+						'</div>'
+					);
+					setTimeout(function() { location.reload(); }, 2000);
+				} else {
+					$result.html(
+						'<div style="padding: 12px; background: #fee2e2; border-radius: 4px; border: 1px solid #dc2626;">' +
+						'❌ <strong>Fehler:</strong> ' + (response.data.message || 'Unbekannter Fehler') +
+						'</div>'
+					);
+				}
+			},
+			error: function() {
+				$result.html(
+					'<div style="padding: 12px; background: #fee2e2; border-radius: 4px; border: 1px solid #dc2626;">' +
+					'❌ <strong>Netzwerkfehler</strong> - Bitte erneut versuchen' +
+					'</div>'
+				);
+			},
+			complete: function() {
+				$btn.prop('disabled', false).html('<span>🔄</span> Event-Sync jetzt ausführen');
 			}
-		}).fail(function(){
-			alert('Netzwerkfehler beim Löschen der Logs.');
-		}).always(function(){
-			$btn.prop('disabled', false).text('🗑️ <?php esc_html_e( 'Log löschen', 'churchtools-suite' ); ?>');
+		});
+	});
+	
+	// Keepalive Trigger
+	$('#cts-trigger-keepalive').on('click', function() {
+		var $btn = $(this);
+		var $result = $('#cts-manual-trigger-result');
+		
+		$btn.prop('disabled', true).html('<span>⏳</span> Teste...');
+		$result.html('<div style="padding: 12px; background: #f0f9ff; border-radius: 4px;">💓 Session Keepalive läuft...</div>');
+		
+		$.ajax({
+			url: ajaxurl,
+			type: 'POST',
+			data: {
+				action: 'cts_keepalive_ping',
+				nonce: '<?php echo wp_create_nonce('churchtools_suite_admin'); ?>'
+			},
+			success: function(response) {
+				if (response.success) {
+					$result.html(
+						'<div style="padding: 12px; background: #d1fae5; border-radius: 4px; border: 1px solid #10b981;">' +
+						'✅ <strong>Keepalive erfolgreich!</strong> Session ist aktiv.' +
+						'</div>'
+					);
+				} else {
+					$result.html(
+						'<div style="padding: 12px; background: #fee2e2; border-radius: 4px; border: 1px solid #dc2626;">' +
+						'❌ ' + (response.data.message || 'Session-Fehler') +
+						'</div>'
+					);
+				}
+			},
+			error: function() {
+				$result.html(
+					'<div style="padding: 12px; background: #fee2e2; border-radius: 4px; border: 1px solid #dc2626;">' +
+					'❌ <strong>Netzwerkfehler</strong>' +
+					'</div>'
+				);
+			},
+			complete: function() {
+				$btn.prop('disabled', false).html('<span>💓</span> Session Keepalive');
+			}
+		});
+	});
+	
+	// Manual Update Check
+	$('#cts-manual-update').on('click', function() {
+		var $btn = $(this);
+		
+		$btn.prop('disabled', true).html('<span>⏳</span> Update wird geprüft...');
+		
+		// Use WordPress native update mechanism
+		// Trigger the update check by navigating to update-core.php with force-check parameter
+		window.location.href = '<?php echo admin_url('update-core.php?force-check=1'); ?>';
+		
+		// Note: Page will reload, so no completion callback needed
+	});
+	
+	// Clear Logs
+	$('#cts-clear-logs').on('click', function() {
+		if (!confirm('<?php esc_html_e('Alle Plugin-Logs unwiderruflich löschen?', 'churchtools-suite'); ?>')) {
+			return;
+		}
+		
+		var $btn = $(this);
+		
+		$btn.prop('disabled', true).html('<span>⏳</span> Lösche...');
+		
+		$.ajax({
+			url: ajaxurl,
+			type: 'POST',
+			data: {
+				action: 'cts_clear_logs',
+				nonce: '<?php echo wp_create_nonce('churchtools_suite_admin'); ?>'
+			},
+			success: function(response) {
+				if (response.success) {
+					alert('✅ Logs wurden gelöscht.');
+					location.reload();
+				} else {
+					alert('❌ ' + (response.data.message || 'Fehler beim Löschen der Logs'));
+				}
+			},
+			error: function() {
+				alert('❌ Netzwerkfehler beim Löschen der Logs');
+			},
+			complete: function() {
+				$btn.prop('disabled', false).html('<span>🗑️</span> Log löschen');
+			}
 		});
 	});
 });
-</script> -->
+</script>

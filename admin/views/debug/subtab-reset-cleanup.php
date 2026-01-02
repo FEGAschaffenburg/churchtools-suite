@@ -59,14 +59,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</button>
 		</div>
 
-		<!-- Full Reset -->
+		<!-- Full Reset (Daten) -->
 		<div style="padding: 15px; background: #fff3cd; border: 2px solid #ffc107; border-radius: 5px;">
-			<h4 style="margin: 0 0 10px 0;">⚠️ <?php esc_html_e('Kompletter Reset', 'churchtools-suite'); ?></h4>
+			<h4 style="margin: 0 0 10px 0;">⚠️ <?php esc_html_e( 'Kompletter Reset (Daten)', 'churchtools-suite' ); ?></h4>
 			<p style="font-size: 13px; color: #856404; margin-bottom: 10px;">
-				<?php esc_html_e('Löscht ALLE Daten (Events, Kalender, Services, Sync-Historie). Einstellungen bleiben erhalten.', 'churchtools-suite'); ?>
+				<?php esc_html_e( 'Löscht ALLE Daten (Events, Kalender, Services, Sync-Historie). Einstellungen bleiben erhalten.', 'churchtools-suite' ); ?>
 			</p>
 			<button type="button" class="button button-primary" id="cts-full-reset" style="width: 100%; background: #d63638; border-color: #d63638;">
-				<?php esc_html_e('Komplett zurücksetzen', 'churchtools-suite'); ?>
+				<?php esc_html_e( 'Daten zurücksetzen', 'churchtools-suite' ); ?>
+			</button>
+		</div>
+
+		<!-- Complete Reset (Daten + Einstellungen) -->
+		<div style="padding: 15px; background: #f8d7da; border: 2px solid #dc3545; border-radius: 5px;">
+			<h4 style="margin: 0 0 10px 0;">🚨 <?php esc_html_e( 'WIRKLICH ALLES reseten', 'churchtools-suite' ); ?></h4>
+			<p style="font-size: 13px; color: #721c24; margin-bottom: 10px;">
+				<?php esc_html_e( 'Löscht ALLES: Daten, Einstellungen, Cookies, Logindaten. Plugin wird komplett zurückgesetzt.', 'churchtools-suite' ); ?>
+			</p>
+			<button type="button" class="button button-primary" id="cts-complete-reset" style="width: 100%; background: #721c24; border-color: #721c24;">
+				<?php esc_html_e( 'WIRKLICH ALLES löschen', 'churchtools-suite' ); ?>
 			</button>
 		</div>
 
@@ -142,8 +153,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 		$('#cts-full-reset').on('click', function() {
 			performReset(
 				'cts_full_reset',
-				'<?php esc_html_e('ACHTUNG: Wirklich ALLE Daten löschen (Events, Kalender, Services, Sync-Historie)?\n\nDiese Aktion kann nicht rückgängig gemacht werden!\n\nEinstellungen bleiben erhalten und müssen separat unter Einstellungen gelöscht werden.', 'churchtools-suite'); ?>',
-				'<?php esc_html_e('Plugin erfolgreich zurückgesetzt!', 'churchtools-suite'); ?>'
+				'<?php esc_html_e('ACHTUNG: Wirklich ALLE Daten löschen (Events, Kalender, Services, Sync-Historie)?\n\nDiese Aktion kann nicht rückgängig gemacht werden!\n\nEinstellungen bleiben erhalten.', 'churchtools-suite'); ?>',
+				'<?php esc_html_e('Daten erfolgreich zurückgesetzt!', 'churchtools-suite'); ?>'
+			);
+		});
+		
+		$('#cts-complete-reset').on('click', function() {
+			performReset(
+				'cts_complete_reset',
+				'<?php esc_html_e('🚨 KRITISCHE WARNUNG 🚨\n\nWirklich ALLES KOMPLETT LÖSCHEN?\n\n- Alle Daten (Events, Kalender, Services, etc.)\n- Alle Einstellungen (ChurchTools URL, Login, Cookies)\n- Kompletter Plugin-Reset\n\nSie müssen danach alles neu konfigurieren!\n\nDiese Aktion kann NICHT rückgängig gemacht werden!', 'churchtools-suite'); ?>',
+				'<?php esc_html_e('Plugin komplett zurückgesetzt! Bitte neu konfigurieren.', 'churchtools-suite'); ?>'
 			);
 		});
 	});

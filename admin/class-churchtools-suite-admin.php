@@ -305,6 +305,7 @@ class ChurchTools_Suite_Admin {
 		add_action( 'wp_ajax_cts_clear_services', [ $this, 'ajax_clear_services' ] );
 		add_action( 'wp_ajax_cts_clear_sync_history', [ $this, 'ajax_clear_sync_history' ] );
 		add_action( 'wp_ajax_cts_full_reset', [ $this, 'ajax_full_reset' ] );
+		add_action( 'wp_ajax_cts_complete_reset', [ $this, 'ajax_complete_reset' ] ); // v0.10.1.4
 		
 		// Public AJAX (for frontend modal)
 		add_action( 'wp_ajax_cts_get_modal_template', [ $this, 'ajax_get_modal_template' ] );
@@ -1931,9 +1932,74 @@ class ChurchTools_Suite_Admin {
 		
 		wp_send_json_success( [
 			'message' => sprintf(
-				__( 'Plugin erfolgreich zurückgesetzt! %d Einträge aus %d Tabellen gelöscht.', 'churchtools-suite' ),
+				__( 'Daten erfolgreich zurückgesetzt! %d Einträge aus %d Tabellen gelöscht.', 'churchtools-suite' ),
 				$total_deleted,
 				count( $tables )
+			)
+		] );
+	}
+	
+	/**
+	 * AJAX Handler: Complete Reset (v0.10.1.4)
+	 * Löscht ALLES: Daten + Einstellungen + Cookies
+	 */
+	public function ajax_complete_reset() {
+		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
+		
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => __( 'Keine Berechtigung', 'churchtools-suite' ) ] );
+		}
+		
+		global $wpdb;
+		
+		// 1. Delete all data from all tables (same as full_reset)
+		$tables = [
+			$wpdb->prefix . 'cts_event_services',
+			$wpdb->prefix . 'cts_events',
+			$wpdb->prefix . 'cts_calendars',
+			$wpdb->prefix . 'cts_services',
+			$wpdb->prefix . 'cts_service_groups',
+			$wpdb->prefix . 'cts_sync_history',
+		];
+		
+		$total_deleted = 0;
+		foreach ( $tables as $table ) {
+			$deleted = $wpdb->query( "DELETE FROM {$table}" );
+			$total_deleted += $deleted;
+		}
+		
+		// 2. Delete all plugin settings from wp_options
+		$settings_deleted = 0;
+		$settings_keys = [
+			'churchtools_suite_ct_url',
+			'churchtools_suite_ct_username',
+			'churchtools_suite_ct_password',
+			'churchtools_suite_ct_cookies',
+			'churchtools_suite_sync_days_past',
+			'churchtools_suite_sync_days_future',
+			'churchtools_suite_auto_sync_enabled',
+			'churchtools_suite_auto_sync_interval',
+			'churchtools_suite_advanced_mode',
+			'churchtools_suite_events_last_sync',
+			'churchtools_suite_last_sync_timestamp',
+			'churchtools_suite_db_version',
+			'churchtools_suite_session_keepalive',
+		];
+		
+		foreach ( $settings_keys as $key ) {
+			if ( delete_option( $key ) ) {
+				$settings_deleted++;
+			}
+		}
+		
+		// 3. Clear all transients
+		delete_transient( 'churchtools_suite_update_info' );
+		
+		wp_send_json_success( [
+			'message' => sprintf(
+				__( 'Plugin komplett zurückgesetzt!\n\n- %d Datenbank-Einträge gelöscht\n- %d Einstellungen gelöscht\n- Cookies gelöscht\n\nBitte Plugin neu konfigurieren.', 'churchtools-suite' ),
+				$total_deleted,
+				$settings_deleted
 			)
 		] );
 	}

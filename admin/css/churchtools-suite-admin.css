@@ -1,3 +1,28 @@
+/* Settings Subtab-Navigation */
+.cts-sub-tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.cts-sub-tab {
+  display: inline-block;
+  padding: 8px 18px;
+  background: #f6f8fa;
+  border-radius: 4px 4px 0 0;
+  color: #1e293b;
+  text-decoration: none;
+  font-weight: 500;
+  border: 1px solid #e5e7eb;
+  border-bottom: none;
+  transition: background 0.15s, color 0.15s;
+}
+.cts-sub-tab.active, .cts-sub-tab:hover {
+  background: #fff;
+  color: #2563eb;
+  border-bottom: 2px solid #2563eb;
+  font-weight: 600;
+}
+
 /* Debug/Erweitert Subtab-Navigation */
 .cts-subtab-nav {
   display: flex;
@@ -28,3 +53,4 @@
   border-radius: 0 0 6px 6px;
   padding: 24px 24px 12px 24px;
 }
+
