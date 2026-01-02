@@ -20,6 +20,9 @@ class ChurchTools_Suite_Update_Checker {
         // Hook both pre_set and site_transient variants to ensure compatibility
         add_filter( 'pre_set_site_transient_update_plugins', [ __CLASS__, 'check_for_update' ] );
         add_filter( 'site_transient_update_plugins', [ __CLASS__, 'check_for_update' ] );
+        
+        // Hook for after update completion
+        add_action( 'upgrader_process_complete', [ __CLASS__, 'after_update' ], 10, 2 );
     }
 
     /**
@@ -147,5 +150,59 @@ class ChurchTools_Suite_Update_Checker {
 
         // fallback
         return CHURCHTOOLS_SUITE_BASENAME;
+    }
+    
+    /**
+     * Handle after update completion
+     * 
+     * Clears caches and ensures proper WordPress redirect/refresh
+     *
+     * @param WP_Upgrader $upgrader
+     * @param array $hook_extra
+     */
+    public static function after_update( $upgrader, $hook_extra ): void {
+        // Check if this is a plugin update
+        if ( ! isset( $hook_extra['type'] ) || $hook_extra['type'] !== 'plugin' ) {
+            return;
+        }
+        
+        // Check if this is an update (not install)
+        if ( ! isset( $hook_extra['action'] ) || $hook_extra['action'] !== 'update' ) {
+            return;
+        }
+        
+        // Check if our plugin was updated
+        $our_plugin = false;
+        if ( isset( $hook_extra['plugins'] ) && is_array( $hook_extra['plugins'] ) ) {
+            foreach ( $hook_extra['plugins'] as $plugin ) {
+                if ( $plugin === CHURCHTOOLS_SUITE_BASENAME || strpos( $plugin, 'churchtools-suite.php' ) !== false ) {
+                    $our_plugin = true;
+                    break;
+                }
+            }
+        } elseif ( isset( $hook_extra['plugin'] ) && ( $hook_extra['plugin'] === CHURCHTOOLS_SUITE_BASENAME || strpos( $hook_extra['plugin'], 'churchtools-suite.php' ) !== false ) ) {
+            $our_plugin = true;
+        }
+        
+        if ( ! $our_plugin ) {
+            return;
+        }
+        
+        // Clear our cache
+        delete_transient( self::TRANSIENT_KEY );
+        
+        // Log successful update
+        if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+            ChurchTools_Suite_Logger::info( 'update_checker', 'Plugin updated successfully', [
+                'new_version' => CHURCHTOOLS_SUITE_VERSION,
+                'hook_extra' => $hook_extra,
+            ] );
+        }
+        
+        // Force WordPress to refresh the plugins page
+        // This ensures the "Successfully updated" message is shown
+        if ( ! wp_doing_ajax() ) {
+            wp_cache_flush();
+        }
     }
 }
