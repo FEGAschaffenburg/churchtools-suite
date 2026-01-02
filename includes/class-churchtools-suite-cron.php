@@ -125,11 +125,28 @@ class ChurchTools_Suite_Cron {
     }
     
     /**
-	 * Update auto-sync schedule based on settings (v0.10.1.5)
+	 * Update auto-sync schedule based on settings (v0.10.1.5, v0.10.2.3: Robust cleanup)
 	 */
 	public static function update_sync_schedule() {
 		$auto_sync_enabled = get_option('churchtools_suite_auto_sync_enabled', 0);
 		$interval = get_option('churchtools_suite_auto_sync_interval', 'daily'); // v0.10.2.0: Default 'daily' (nicht 'hourly'!)
+		
+		// v0.10.2.3: ALLE existierenden Schedules löschen (nicht nur den nächsten!)
+		// wp_clear_scheduled_hook() ist manchmal unzuverlässig, direkter Zugriff auf Cron-Array
+		$crons = _get_cron_array();
+		if ( is_array( $crons ) ) {
+			foreach ( $crons as $timestamp => $cron ) {
+				if ( isset( $cron['churchtools_suite_auto_sync'] ) ) {
+					unset( $crons[ $timestamp ]['churchtools_suite_auto_sync'] );
+					if ( empty( $crons[ $timestamp ] ) ) {
+						unset( $crons[ $timestamp ] );
+					}
+				}
+			}
+			_set_cron_array( $crons );
+		}
+		
+		// Schedule new job if enabled
 		if ($auto_sync_enabled) {
 			// Calculate next run time based on interval
 			$next_run = self::calculate_next_run_time($interval);
