@@ -211,6 +211,7 @@ class ChurchTools_Suite_Blocks {
 				'limit'            => [ 'type' => 'number', 'default' => 5 ],
 				'columns'          => [ 'type' => 'number', 'default' => 3 ],
 				// Sprint 1: Anzeige-Parameter
+				'enable_modal'     => [ 'type' => 'boolean', 'default' => true ],
 				'show_description' => [ 'type' => 'boolean', 'default' => true ],
 				'show_location'    => [ 'type' => 'boolean', 'default' => true ],
 				// Sprint 3: Weitere Anzeige-Parameter
