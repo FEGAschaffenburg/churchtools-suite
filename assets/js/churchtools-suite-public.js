@@ -41,20 +41,32 @@
 	 * Initialize Calendar Views
 	 */
 	function initCalendarViews() {
-		// Initialize monthly modern calendar
+		// Initialize monthly modern calendar (only NEW calendars, not already initialized)
 		$('.cts-calendar-monthly').each(function() {
-			setupCalendarNavigation($(this));
+			const $calendar = $(this);
+			// Skip if already initialized
+			if ($calendar.data('calendar-initialized')) {
+				console.log('[Calendar] Already initialized, skipping');
+				return;
+			}
+			$calendar.data('calendar-initialized', true);
+			setupCalendarNavigation($calendar);
 		});
 		
 		// Legacy calendar view support
 		$('.cts-calendar-view').each(function() {
 			const $calendar = $(this);
+			// Skip if already initialized
+			if ($calendar.data('calendar-initialized')) {
+				return;
+			}
 			const eventsData = $calendar.find('.cts-calendar-grid').data('events');
 			
 			if (!eventsData || !eventsData.length) {
 				return;
 			}
 			
+			$calendar.data('calendar-initialized', true);
 			renderCalendarGrid($calendar, eventsData);
 			setupCalendarNavigation($calendar);
 		});
@@ -191,6 +203,9 @@
 					// Replace calendar content
 					const $newCalendar = $(response.data.html);
 					$calendar.replaceWith($newCalendar);
+					
+					// Mark as initialized to prevent duplicate setup
+					$newCalendar.data('calendar-initialized', true);
 					
 					// Re-initialize ALL event handlers for new calendar
 					console.log('[Calendar] Re-initializing event handlers for new calendar');
