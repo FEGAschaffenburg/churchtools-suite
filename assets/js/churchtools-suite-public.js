@@ -189,11 +189,36 @@
 				console.log('[Calendar] AJAX success:', response);
 				if (response.success && response.data.html) {
 					// Replace calendar content
-					$calendar.replaceWith(response.data.html);
+					const $newCalendar = $(response.data.html);
+					$calendar.replaceWith($newCalendar);
 					
-					// Re-initialize navigation for new calendar
-					const $newCalendar = $('.cts-calendar-monthly').last();
+					// Re-initialize ALL event handlers for new calendar
+					console.log('[Calendar] Re-initializing event handlers for new calendar');
 					setupCalendarNavigation($newCalendar);
+					
+					// Re-initialize clickable events if modal enabled
+					const enableModalCheck = $newCalendar.data('enable-modal');
+					const isModalEnabled = enableModalCheck === 'false' ? false : (enableModalCheck === 'true' || enableModalCheck === true || enableModalCheck === undefined);
+					
+					console.log('[Calendar] Modal enabled check:', isModalEnabled, 'data attr:', enableModalCheck);
+					
+					if (isModalEnabled) {
+						// Re-attach click handlers for events in new calendar
+						$newCalendar.find('[data-event-id]').each(function() {
+							const $event = $(this);
+							if (!$event.data('click-handler-attached')) {
+								$event.on('click', function(e) {
+									e.preventDefault();
+									const eventId = $(this).data('event-id');
+									console.log('[Calendar] Event clicked:', eventId);
+									openEventModal(eventId);
+								});
+								$event.data('click-handler-attached', true);
+							}
+						});
+					}
+					
+					console.log('[Calendar] Month loaded successfully');
 				} else {
 					console.error('Failed to load calendar month:', response);
 					alert('Fehler beim Laden des Kalenders');
