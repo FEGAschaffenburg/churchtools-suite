@@ -55,21 +55,29 @@ jQuery(function($) {
 				nonce: '<?php echo wp_create_nonce('churchtools_suite_admin'); ?>'
 			},
 			success: function(response) {
-				if (response.success) {
+				if (response && response.success) {
+					// response.data.stats enthält die Sync-Statistiken
+					var stats = response.data.stats || response.data || {};
 					$result.html(
 						'<div style="padding: 12px; background: #d1fae5; border-radius: 4px; border: 1px solid #10b981;">' +
 						'✅ <strong>Sync erfolgreich!</strong><br>' +
-						'Kalender: ' + (response.data.calendars_processed || 0) + '<br>' +
-						'Events: ' + (response.data.events_inserted || 0) + ' neu, ' + 
-						(response.data.events_updated || 0) + ' aktualisiert<br>' +
-						'Services: ' + (response.data.services_imported || 0) +
+						'Kalender: ' + (stats.calendars_processed || 0) + '<br>' +
+						'Events: ' + (stats.events_inserted || 0) + ' neu, ' + 
+						(stats.events_updated || 0) + ' aktualisiert<br>' +
+						'Services: ' + (stats.services_imported || 0) +
 						'</div>'
 					);
 					setTimeout(function() { location.reload(); }, 2000);
 				} else {
+					var errorMsg = 'Unbekannter Fehler';
+					if (response && response.data && response.data.message) {
+						errorMsg = response.data.message;
+					} else if (response && response.data && response.data.error) {
+						errorMsg = response.data.error;
+					}
 					$result.html(
 						'<div style="padding: 12px; background: #fee2e2; border-radius: 4px; border: 1px solid #dc2626;">' +
-						'❌ <strong>Fehler:</strong> ' + (response.data.message || 'Unbekannter Fehler') +
+						'❌ <strong>Fehler:</strong> ' + errorMsg +
 						'</div>'
 					);
 				}

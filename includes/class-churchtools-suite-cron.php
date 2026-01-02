@@ -119,22 +119,61 @@ class ChurchTools_Suite_Cron {
     }
     
     /**
-     * Update auto-sync schedule based on settings
-     */
-    public static function update_sync_schedule() {
-        $auto_sync_enabled = get_option('churchtools_suite_auto_sync_enabled', 0);
-        $interval = get_option('churchtools_suite_auto_sync_interval', 'hourly');
-        
-        // Clear all existing schedules for this hook to avoid duplicates
-        if ( has_action( 'churchtools_suite_auto_sync' ) || true ) {
-            wp_clear_scheduled_hook( 'churchtools_suite_auto_sync' );
-        }
-        
-        // Schedule new job if enabled
-        if ($auto_sync_enabled) {
-            // Schedule new job starting now
-            wp_schedule_event(time(), $interval, 'churchtools_suite_auto_sync');
-        }
+	 * Update auto-sync schedule based on settings (v0.10.1.5)
+	 */
+	public static function update_sync_schedule() {
+		$auto_sync_enabled = get_option('churchtools_suite_auto_sync_enabled', 0);
+		$interval = get_option('churchtools_suite_auto_sync_interval', 'hourly');
+		
+		// Clear all existing schedules for this hook to avoid duplicates
+		wp_clear_scheduled_hook( 'churchtools_suite_auto_sync' );
+		
+		// Schedule new job if enabled
+		if ($auto_sync_enabled) {
+			// Calculate next run time based on interval
+			$next_run = self::calculate_next_run_time($interval);
+			
+			wp_schedule_event($next_run, $interval, 'churchtools_suite_auto_sync');
+			
+			// Log schedule update
+			if (class_exists('ChurchTools_Suite_Logger')) {
+				ChurchTools_Suite_Logger::info('cron', 'Auto-sync schedule updated', [
+					'interval' => $interval,
+					'next_run' => date('Y-m-d H:i:s', $next_run),
+					'next_run_timestamp' => $next_run,
+				]);
+			}
+		}
+	}
+	
+	/**
+	 * Calculate next run time based on interval (v0.10.1.5)
+	 * 
+	 * @param string $interval Interval (hourly, twicedaily, daily)
+	 * @return int Timestamp for next run
+	 */
+	private static function calculate_next_run_time($interval) {
+		switch ($interval) {
+			case 'hourly':
+				// Run at top of next hour
+				return strtotime('+1 hour', strtotime(date('Y-m-d H:00:00')));
+			
+			case 'twicedaily':
+				// Run at midnight and noon
+				$current_hour = (int) date('H');
+				if ($current_hour < 12) {
+					return strtotime('today 12:00:00');
+				} else {
+					return strtotime('tomorrow 00:00:00');
+				}
+			
+			case 'daily':
+				// Run at 3 AM tomorrow
+				return strtotime('tomorrow 03:00:00');
+			
+			default:
+				// Fallback: 1 hour from now
+				return time() + HOUR_IN_SECONDS;
     }
     
     /**
