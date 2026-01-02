@@ -2096,12 +2096,10 @@ class ChurchTools_Suite_Admin {
 			$events = ChurchTools_Suite_Template_Data_Provider::format_events_for_template( $raw_events );
 			
 			// Lade Template
-			ChurchTools_Suite_Template_Loader::load_template( 'calendar', 'monthly-modern', [
+			$html = ChurchTools_Suite_Template_Loader::render_template( 'calendar/monthly-modern.php', [
 				'events' => $events,
 				'args' => $atts,
-			] );
-			
-			$html = ob_get_clean();
+			], false );
 			
 			wp_send_json_success( [
 				'html' => $html,
