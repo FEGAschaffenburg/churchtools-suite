@@ -40,7 +40,7 @@ $show_services = isset( $args['show_services'] ) ? ChurchTools_Suite_Shortcodes:
 		
 		<?php foreach ( $events as $event ) : ?>
 			
-			<div class="cts-event-modern" data-event-id="<?php echo esc_attr( $event['id'] ); ?>">
+			<div class="cts-event-modern cts-event-clickable" data-event-id="<?php echo esc_attr( $event['id'] ); ?>" role="button" tabindex="0" aria-label="<?php echo esc_attr( sprintf( __( 'Details für %s anzeigen', 'churchtools-suite' ), $event['title'] ) ); ?>">
 				
 				<!-- Header kompakt -->
 				<div class="cts-event-header" style="background: <?php echo ! empty( $event['calendar_color'] ) ? 'linear-gradient(135deg, ' . esc_attr( $event['calendar_color'] ) . ' 0%, ' . esc_attr( $event['calendar_color'] ) . 'dd 100%)' : 'var(--wp--preset--color--primary, var(--wp-admin-theme-color, #2271b1))'; ?>;">
