@@ -931,11 +931,11 @@ class ChurchTools_Suite_Shortcodes {
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-repository-base.php';
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-events-repository.php';
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-calendars-repository.php';
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-event-services-repository.php';
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/services/class-churchtools-suite-template-data.php';
 		
-		$events_repo = new ChurchTools_Suite_Events_Repository();
+		$template_data = new ChurchTools_Suite_Template_Data();
 		$calendars_repo = new ChurchTools_Suite_Calendars_Repository();
-		$template_data = new ChurchTools_Suite_Template_Data( $events_repo, $calendars_repo );
 		
 		// Fetch events for date range
 		$calendar_ids = $calendars_repo->get_selected_calendar_ids();
