@@ -115,12 +115,8 @@
 	 * Setup calendar navigation
 	 */
 	function setupCalendarNavigation($calendar) {
-		// Verhindere mehrfache Handler-Registrierung
-		if ($calendar.data('navigation-setup')) {
-			console.log('[Calendar] Navigation already set up, skipping');
-			return;
-		}
-		$calendar.data('navigation-setup', true);
+		// Remove old handlers to prevent duplicates
+		$calendar.find('.cts-prev-month, .cts-next-month').off('click');
 		
 		console.log('[Calendar] Setting up navigation for calendar');
 		
@@ -234,6 +230,10 @@
 					// Replace only the grid (not the whole calendar)
 					const $grid = $calendar.find('.cts-calendar-grid');
 					$grid.html(response.data.html);
+					
+					// CRITICAL: Re-attach navigation handlers (Buttons need event handlers!)
+					console.log('[Calendar] Re-attaching navigation handlers');
+					setupCalendarNavigation($calendar);
 					
 					// Re-initialize clickable events if modal enabled
 					const enableModalCheck = $calendar.data('enable-modal');
