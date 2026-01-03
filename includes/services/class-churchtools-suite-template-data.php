@@ -186,12 +186,12 @@ class ChurchTools_Suite_Template_Data {
 	}
 	
 	/**
-	 * Format event data for templates
+	 * Format event data for templates (v0.10.3.36: Made public for AJAX handlers)
 	 * 
 	 * @param array $event Raw event data from database
 	 * @return array Formatted event data
 	 */
-	private function format_event( array $event ): array {
+	public function format_event( array $event ): array {
 		// Get calendar info
 		$calendar = null;
 		if ( ! empty( $event['calendar_id'] ) ) {
