@@ -40,7 +40,7 @@ foreach ( $events as $event ) {
      data-show-calendar-name="<?php echo esc_attr( ( $args['show_calendar_name'] ?? false ) ? 'true' : 'false' ); ?>">
 	
 	<div class="cts-calendar-header">
-		<button class="cts-nav-btn cts-prev-month" aria-label="<?php esc_attr_e( 'Vorheriger Monat', 'churchtools-suite' ); ?>">‹</button>
+		<button class="cts-nav-btn cts-prev-month" aria-label="<?php esc_attr_e( 'Vorheriger Monat', 'churchtools-suite' ); ?>">←</button>
 		<h2 class="cts-calendar-title">
 			<?php 
 			// Use year/month from AJAX if available, otherwise current date
@@ -54,7 +54,7 @@ foreach ( $events as $event ) {
 			}
 			?>
 		</h2>
-		<button class="cts-nav-btn cts-next-month" aria-label="<?php esc_attr_e( 'Nächster Monat', 'churchtools-suite' ); ?>">›</button>
+		<button class="cts-nav-btn cts-next-month" aria-label="<?php esc_attr_e( 'Nächster Monat', 'churchtools-suite' ); ?>">→</button>
 	</div>
 	
 	<?php if ( empty( $events ) ) : ?>
