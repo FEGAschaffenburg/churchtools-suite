@@ -1039,6 +1039,28 @@
 	margin-top: 2px;
 }
 
+/* Info Popup Icon */
+.cts-info-popup {
+	display: inline-block;
+	width: 18px;
+	height: 18px;
+	line-height: 18px;
+	text-align: center;
+	background: #667eea;
+	color: #fff;
+	border-radius: 50%;
+	font-size: 12px;
+	font-weight: bold;
+	cursor: help;
+	margin-left: 4px;
+	vertical-align: middle;
+	transition: background 0.2s;
+}
+
+.cts-info-popup:hover {
+	background: #5568d3;
+}
+
 .cts-modal-description {
 	margin-bottom: 24px;
 	font-size: 16px;

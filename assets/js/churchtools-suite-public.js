@@ -256,7 +256,7 @@
 									e.preventDefault();
 									const eventId = $(this).data('event-id');
 									console.log('[Calendar] Event clicked:', eventId);
-									openEventModal(eventId);
+								showEventModal(eventId, $newCalendar);
 								});
 								$event.data('click-handler-attached', true);
 							}
@@ -297,7 +297,9 @@
 				e.preventDefault();
 				e.stopPropagation();
 				const eventId = $(this).data('event-id');
-				showEventModal(eventId);
+				// Find parent container with settings
+				const $container = $(this).closest('[data-show-description]');
+				showEventModal(eventId, $container);
 			}
 		});
 	}
@@ -348,7 +350,9 @@
 			const eventId = $(this).data('event-id');
 			console.log('[ChurchTools Suite] Event clicked, ID:', eventId);
 			if (eventId) {
-				showEventModal(eventId);
+				// Find parent container with settings
+				const $container = $(this).closest('[data-show-description]');
+				showEventModal(eventId, $container);
 			} else {
 				console.error('[ChurchTools Suite] No event-id attribute found!');
 			}
@@ -361,7 +365,9 @@
 				const eventId = $(this).data('event-id');
 				console.log('[ChurchTools Suite] Keyboard event, ID:', eventId);
 				if (eventId) {
-					showEventModal(eventId);
+					// Find parent container with settings
+					const $container = $(this).closest('[data-show-description]');
+					showEventModal(eventId, $container);
 				}
 			}
 		});
@@ -369,8 +375,10 @@
 
 	/**
 	 * Show event detail modal
+	 * @param {string} eventId - Event ID to display
+	 * @param {jQuery} $container - Optional container element with display settings (e.g., calendar)
 	 */
-	function showEventModal(eventId) {
+	function showEventModal(eventId, $container) {
 		console.log('[ChurchTools Suite] showEventModal() called with ID:', eventId);
 		
 		// Show modal overlay
@@ -402,7 +410,7 @@
 						$('body').append(response.data.html);
 						$overlay = $('#cts-modal-overlay');
 						console.log('[ChurchTools Suite] Modal template appended to body');
-						loadEventData(eventId, $overlay);
+					loadEventData(eventId, $overlay, $container);
 					} else {
 						console.error('[ChurchTools Suite] Invalid modal template response');
 						console.error('[ChurchTools Suite] Missing html in response.data!');
@@ -414,14 +422,14 @@
 				}
 			});
 		} else {
-			loadEventData(eventId, $overlay);
-		}
-	}
-
+		loadEventData(eventId, $overlay, $container);
 	/**
 	 * Load event data into modal
+	 * @param {string} eventId - Event ID to load
+	 * @param {jQuery} $overlay - Modal overlay element
+	 * @param {jQuery} $container - Optional container element with display settings
 	 */
-	function loadEventData(eventId, $overlay) {
+	function loadEventData(eventId, $overlay, $container) {
 		// Show modal
 		$overlay.addClass('active');
 		$('body').css('overflow', 'hidden');
@@ -444,7 +452,7 @@
 				$('#cts-modal-loading').hide();
 				
 				if (response.success && response.data) {
-					displayEventData(response.data);
+					displayEventData(response.data, $container);
 				} else {
 					$('#cts-modal-error').show();
 				}
@@ -458,14 +466,28 @@
 
 	/**
 	 * Display event data in modal
+	 * @param {object} event - Event data from backend
+	 * @param {jQuery} $container - Optional container element with display settings
 	 */
-	function displayEventData(event) {
+	function displayEventData(event, $container) {
+		// Extract display options from container (calendar/grid/list view)
+		const showDescription = $container ? ($container.data('show-description') === true) : true;
+		const showLocation = $container ? ($container.data('show-location') === true) : true;
+		const showServices = $container ? ($container.data('show-services') === true) : true;
+		const showCalendarName = $container ? ($container.data('show-calendar-name') === true) : true;
+		
+		console.log('[Modal] Display options:', {showDescription, showLocation, showServices, showCalendarName});
+		
 		// Title
 		$('#cts-modal-title').text(event.title);
 		
-		// Calendar Badge
-		$('#cts-modal-calendar').text(event.calendar_name)
-			.css('background', event.calendar_color || '#3498db');
+		// Calendar Badge (nur wenn enabled)
+		if (showCalendarName && event.calendar_name) {
+			$('#cts-modal-calendar').text(event.calendar_name)
+				.css('background', event.calendar_color || '#3498db').show();
+		} else {
+			$('#cts-modal-calendar').hide();
+		}
 		
 		// Date & Time (use pre-formatted time_display from backend)
 		$('#cts-modal-date').text(event.start_date);
@@ -487,7 +509,8 @@
 		if (event.address_city) infoParts.push(event.address_city);
 		var infoStr = infoParts.join(', ');
 
-		if (loc) {
+		// Location (nur wenn enabled UND vorhanden)
+		if (showLocation && loc) {
 			$('#cts-modal-location').text(loc);
 			$('#cts-modal-location-wrapper').show();
 			if (infoStr) {
@@ -497,24 +520,17 @@
 		} else {
 			$('#cts-modal-location-wrapper').hide();
 		}
-
-		if (loc) {
-			$('#cts-modal-location').text(loc);
-			$('#cts-modal-location-wrapper').show();
-		} else {
-			$('#cts-modal-location-wrapper').hide();
-		}
 		
-		// Description
-		if (event.description) {
+		// Description (nur wenn enabled UND vorhanden)
+		if (showDescription && event.description) {
 			$('#cts-modal-description').html(event.description);
 			$('#cts-modal-description-wrapper').show();
 		} else {
 			$('#cts-modal-description-wrapper').hide();
 		}
 		
-		// Services
-		if (event.services && event.services.length > 0) {
+		// Services (nur wenn enabled UND vorhanden)
+		if (showServices && event.services && event.services.length > 0) {
 			const $servicesList = $('#cts-modal-services');
 			$servicesList.empty();
 			
@@ -590,7 +606,9 @@
 		if (events.length === 1) {
 			// Single event - show modal
 			const eventId = events.first().data('event-id');
-			showEventModal(eventId);
+			// Find parent calendar with settings
+			const $container = $(this).closest('.cts-calendar');
+			showEventModal(eventId, $container);
 		} else {
 			// Multiple events - show day view
 			showDayEventsModal(date, events);
@@ -643,7 +661,9 @@
 		
 		const eventId = $(this).data('event-id');
 		if (eventId) {
-			showEventModal(eventId);
+			// Find parent container with settings
+			const $container = $(this).closest('[data-show-description]');
+			showEventModal(eventId, $container);
 		}
 	});
 
