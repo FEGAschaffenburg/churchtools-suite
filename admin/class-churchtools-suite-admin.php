@@ -2154,30 +2154,90 @@ class ChurchTools_Suite_Admin {
 				'count' => count( $events ),
 			] );
 			
-			ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Events formatted', [
-				'count' => count( $events ),
-			] );
+			// Group events by date
+			$events_by_date = [];
+			foreach ( $events as $event ) {
+				$date = date( 'Y-m-d', strtotime( $event['start_datetime'] ) );
+				if ( ! isset( $events_by_date[ $date ] ) ) {
+					$events_by_date[ $date ] = [];
+				}
+				$events_by_date[ $date ][] = $event;
+			}
 			
-			// Lade Template
-			ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Rendering template', [
-				'template' => 'calendar/monthly-modern.php',
-				'events_count' => count( $events ),
-				'args' => $atts,
-			] );
+			// Generate GRID HTML only (not full template!)
+			ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Generating grid HTML' );
 			
-			$html = ChurchTools_Suite_Template_Loader::render_template( 'calendar/monthly-modern.php', [
-				'events' => $events,
-				'args' => $atts,
-			], false );
+			ob_start();
 			
-			ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Template rendered', [
+			// Weekdays
+			echo '<div class="cts-weekday">' . esc_html__( 'Mo', 'churchtools-suite' ) . '</div>';
+			echo '<div class="cts-weekday">' . esc_html__( 'Di', 'churchtools-suite' ) . '</div>';
+			echo '<div class="cts-weekday">' . esc_html__( 'Mi', 'churchtools-suite' ) . '</div>';
+			echo '<div class="cts-weekday">' . esc_html__( 'Do', 'churchtools-suite' ) . '</div>';
+			echo '<div class="cts-weekday">' . esc_html__( 'Fr', 'churchtools-suite' ) . '</div>';
+			echo '<div class="cts-weekday">' . esc_html__( 'Sa', 'churchtools-suite' ) . '</div>';
+			echo '<div class="cts-weekday">' . esc_html__( 'So', 'churchtools-suite' ) . '</div>';
+			
+			// Calculate calendar grid
+			$start_weekday = date( 'N', strtotime( $from_date ) );
+			$days_in_month = date( 't', strtotime( $from_date ) );
+			
+			// Empty cells before first day
+			for ( $i = 1; $i < $start_weekday; $i++ ) {
+				echo '<div class="cts-day cts-day-empty"></div>';
+			}
+			
+			// Days of month
+			for ( $day = 1; $day <= $days_in_month; $day++ ) {
+				$date = sprintf( '%04d-%02d-%02d', $year, $month, $day );
+				$has_events = isset( $events_by_date[ $date ] );
+				$is_today = $date === date( 'Y-m-d' );
+				
+				$classes = [ 'cts-day' ];
+				if ( $is_today ) $classes[] = 'cts-day-today';
+				if ( $has_events ) $classes[] = 'cts-day-has-events';
+				
+				echo '<div class="' . esc_attr( implode( ' ', $classes ) ) . '" data-date="' . esc_attr( $date ) . '">';
+				echo '<div class="cts-day-number">' . $day . '</div>';
+				
+				if ( $has_events ) {
+					echo '<div class="cts-day-events">';
+					foreach ( array_slice( $events_by_date[ $date ], 0, 3 ) as $event ) {
+						$color = $event['calendar_color'] ?? '#667eea';
+						$title = $event['start_day'] . '. ' . $event['start_month'] . ' ' . $event['start_year'] . ' - ' . $event['title'];
+						
+						// Event needs data-event-id for modal
+						$event_id = $event['id'] ?? '';
+						
+						echo '<div class="cts-event-dot" style="background-color: ' . esc_attr( $color ) . '" title="' . esc_attr( $title ) . '" data-event-id="' . esc_attr( $event_id ) . '">';
+						echo '<span class="cts-event-time">' . esc_html( $event['start_time'] ) . '</span>';
+						echo '<span class="cts-event-title-small">' . esc_html( wp_trim_words( $event['title'], 3 ) ) . '</span>';
+						echo '</div>';
+					}
+					if ( count( $events_by_date[ $date ] ) > 3 ) {
+						echo '<div class="cts-more-events">+' . ( count( $events_by_date[ $date ] ) - 3 ) . '</div>';
+					}
+					echo '</div>';
+				}
+				
+				echo '</div>';
+			}
+			
+			$html = ob_get_clean();
+			
+			ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Grid HTML generated', [
 				'html_length' => strlen( $html ),
 			] );
+			
+			// Generate month name for JavaScript
+			$timestamp = mktime( 0, 0, 0, $month, 1, $year );
+			$month_name = date_i18n( 'F Y', $timestamp );
 			
 			wp_send_json_success( [
 				'html' => $html,
 				'month' => $month,
 				'year' => $year,
+				'month_name' => $month_name,
 			] );
 			
 		} catch ( Exception $e ) {
