@@ -939,12 +939,30 @@ class ChurchTools_Suite_Shortcodes {
 		
 		// Fetch events for date range
 		$calendar_ids = $calendars_repo->get_selected_calendar_ids();
+		
+		// Debug logging
+		if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+			ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Before get_events', [
+				'calendar_ids' => $calendar_ids,
+				'from' => $first_day . ' 00:00:00',
+				'to' => $last_day . ' 23:59:59',
+			] );
+		}
+		
 		$events = $template_data->get_events( [
 			'from' => $first_day . ' 00:00:00',
 			'to' => $last_day . ' 23:59:59',
 			'calendar_ids' => $calendar_ids,
 			'limit' => 1000, // Calendar needs all events in month
 		] );
+		
+		// Debug logging
+		if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+			ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'After get_events', [
+				'events_count' => count( $events ),
+				'first_event' => ! empty( $events ) ? array_keys( $events[0] ) : [],
+			] );
+		}
 		
 		// Group events by date
 		$events_by_date = [];
@@ -954,6 +972,13 @@ class ChurchTools_Suite_Shortcodes {
 				$events_by_date[ $date ] = [];
 			}
 			$events_by_date[ $date ][] = $event;
+		}
+		
+		// Debug logging
+		if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+			ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Events grouped by date', [
+				'dates_count' => count( $events_by_date ),
+			] );
 		}
 		
 		// Generate calendar grid HTML
@@ -991,6 +1016,14 @@ class ChurchTools_Suite_Shortcodes {
 			echo '<div class="cts-day-number">' . $day . '</div>';
 			
 			if ( $has_events ) {
+				// Debug logging
+				if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+					ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Rendering events for date', [
+						'date' => $date,
+						'events_count' => count( $events_by_date[ $date ] ),
+					] );
+				}
+				
 				echo '<div class="cts-day-events">';
 				foreach ( array_slice( $events_by_date[ $date ], 0, 3 ) as $event ) {
 					$color = $event['calendar_color'] ?? '#667eea';
