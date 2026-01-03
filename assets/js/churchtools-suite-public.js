@@ -207,9 +207,6 @@
 		
 		console.log('[Calendar] Loading month:', year, month, 'enableModal:', enableModal, 'raw:', enableModalAttr);
 		
-		// Variable für neuen Kalender (wird in success gesetzt)
-		let $newCalendar = null;
-		
 		$.ajax({
 			url: churchtoolsSuitePublic.ajaxUrl,
 			type: 'POST',
@@ -230,33 +227,30 @@
 			success: function(response) {
 				console.log('[Calendar] AJAX success:', response);
 				if (response.success && response.data.html) {
-					// Replace calendar content
-					$newCalendar = $(response.data.html);
-					$calendar.replaceWith($newCalendar);
+					// Update calendar title
+					const monthName = response.data.month_name;
+					$calendar.find('.cts-calendar-title').text(monthName);
 					
-					// Mark as initialized to prevent duplicate setup
-					$newCalendar.data('calendar-initialized', true);
-					
-					// Re-initialize ALL event handlers for new calendar
-					console.log('[Calendar] Re-initializing event handlers for new calendar');
-					setupCalendarNavigation($newCalendar);
+					// Replace only the grid (not the whole calendar)
+					const $grid = $calendar.find('.cts-calendar-grid');
+					$grid.html(response.data.html);
 					
 					// Re-initialize clickable events if modal enabled
-					const enableModalCheck = $newCalendar.data('enable-modal');
+					const enableModalCheck = $calendar.data('enable-modal');
 					const isModalEnabled = enableModalCheck === 'false' ? false : (enableModalCheck === 'true' || enableModalCheck === true || enableModalCheck === undefined);
 					
 					console.log('[Calendar] Modal enabled check:', isModalEnabled, 'data attr:', enableModalCheck);
 					
 					if (isModalEnabled) {
-						// Re-attach click handlers for events in new calendar
-						$newCalendar.find('[data-event-id]').each(function() {
+						// Re-attach click handlers for events in new grid
+						$grid.find('[data-event-id]').each(function() {
 							const $event = $(this);
 							if (!$event.data('click-handler-attached')) {
 								$event.on('click', function(e) {
 									e.preventDefault();
 									const eventId = $(this).data('event-id');
 									console.log('[Calendar] Event clicked:', eventId);
-								showEventModal(eventId, $newCalendar);
+									showEventModal(eventId, $calendar);
 								});
 								$event.data('click-handler-attached', true);
 							}
@@ -275,13 +269,8 @@
 				alert('Netzwerkfehler beim Laden des Kalenders: ' + error);
 			},
 			complete: function() {
-				// Loading-State vom NEUEN Kalender entfernen (falls ersetzt)
-				if ($newCalendar && $newCalendar.length) {
-					$newCalendar.removeClass('cts-loading');
-				} else {
-					// Fallback: Versuche Loading-State vom alten zu entfernen
-					$calendar.removeClass('cts-loading');
-				}
+				// Loading-State entfernen
+				$calendar.removeClass('cts-loading');
 			}
 		});
 	}

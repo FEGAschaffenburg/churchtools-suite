@@ -1006,10 +1006,15 @@ class ChurchTools_Suite_Shortcodes {
 		
 		$html = ob_get_clean();
 		
+		// Generate month name
+		$timestamp = mktime( 0, 0, 0, $month, 1, $year );
+		$month_name = date_i18n( 'F Y', $timestamp );
+		
 		wp_send_json_success( [
 			'html' => $html,
 			'month' => $month,
 			'year' => $year,
+			'month_name' => $month_name,
 		] );
 	}
 }

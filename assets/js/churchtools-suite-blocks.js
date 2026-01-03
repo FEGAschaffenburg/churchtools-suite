@@ -326,8 +326,8 @@
 						onChange: function(value) { setAttributes({ enable_modal: value }); },
 						help: __('Öffnet Event-Details in einem Modal beim Klick auf einen Termin', 'churchtools-suite')
 					}),
-					// === PANEL 3: Anzeige-Optionen ===
-					!isPresetView && el(PanelBody, { 
+					// === PANEL 3: Anzeige-Optionen (NICHT für Calendar!) ===
+					!isPresetView && attributes.viewType !== 'calendar' && el(PanelBody, { 
 						title: __('👁️ Anzeige-Optionen', 'churchtools-suite'), 
 						initialOpen: false 
 					},
