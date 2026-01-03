@@ -939,7 +939,12 @@ class ChurchTools_Suite_Shortcodes {
 		
 		// Fetch events for date range
 		$calendar_ids = $calendars_repo->get_selected_calendar_ids();
-		$events = $template_data->get_events_by_date_range( $first_day, $last_day, $calendar_ids );
+		$events = $template_data->get_events( [
+			'from' => $first_day . ' 00:00:00',
+			'to' => $last_day . ' 23:59:59',
+			'calendar_ids' => $calendar_ids,
+			'limit' => 1000, // Calendar needs all events in month
+		] );
 		
 		// Group events by date
 		$events_by_date = [];
