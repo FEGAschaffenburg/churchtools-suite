@@ -411,7 +411,10 @@
 				}
 			});
 		} else {
-		loadEventData(eventId, $overlay, $container);
+			loadEventData(eventId, $overlay, $container);
+		}
+	}
+	
 	/**
 	 * Load event data into modal
 	 * @param {string} eventId - Event ID to load
