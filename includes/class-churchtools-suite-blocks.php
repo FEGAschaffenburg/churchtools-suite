@@ -229,8 +229,8 @@ class ChurchTools_Suite_Blocks {
 				'order'            => [ 'type' => 'string', 'default' => 'asc' ],
 				'date_from'        => [ 'type' => 'string', 'default' => '' ],
 				'date_to'          => [ 'type' => 'string', 'default' => '' ],
-				// Live Preview Toggle
-				'enableLivePreview' => [ 'type' => 'boolean', 'default' => false ],
+			// Live Preview Toggle (v0.10.3.47: Default auf true)
+			'enableLivePreview' => [ 'type' => 'boolean', 'default' => true ],
 			],
 			'render_callback' => [ __CLASS__, 'render_events_block' ],
 		] );

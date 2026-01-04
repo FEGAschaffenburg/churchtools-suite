@@ -474,15 +474,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 			[
 				'label'     => __( '👁️ Was anzeigen?', 'churchtools-suite' ),
 				'tab'       => \Elementor\Controls_Manager::TAB_CONTENT,
-				'condition' => [
-					'preset_source' => 'standard',
-				],
-			]
-		);
-		
-		// Sprint 1: Beschreibung anzeigen
-		$this->add_control(
-			'show_description',
+			// v0.10.3.47: Condition entfernt - Toggles sollen auch bei Presets verfügbar sein
 			[
 				'label'        => __( 'Beschreibung anzeigen', 'churchtools-suite' ),
 				'type'         => \Elementor\Controls_Manager::SWITCHER,
