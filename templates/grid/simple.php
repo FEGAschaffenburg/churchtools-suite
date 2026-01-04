@@ -22,6 +22,8 @@ $columns = isset( $args['columns'] ) ? absint( $args['columns'] ) : 3;
 $show_location = isset( $args['show_location'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_location'] ) : true;
 $show_description = isset( $args['show_description'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_description'] ) : true;
 $show_time = isset( $args['show_time'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_time'] ) : true;
+$show_services = isset( $args['show_services'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_services'] ) : true;
+$show_calendar_name = isset( $args['show_calendar_name'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_calendar_name'] ) : false;
 ?>
 
 <div class="churchtools-suite-wrapper">
@@ -91,7 +93,7 @@ $show_time = isset( $args['show_time'] ) ? ChurchTools_Suite_Shortcodes::parse_b
 				</div>
 				
 				<!-- Services Footer -->
-				<?php if ( ! empty( $event['services'] ) ) : ?>
+				<?php if ( $show_services && ! empty( $event['services'] ) ) : ?>
 					<div class="cts-card-footer">
 						<?php foreach ( array_slice( $event['services'], 0, 2 ) as $service ) : ?>
 							<span class="cts-service-tag">
