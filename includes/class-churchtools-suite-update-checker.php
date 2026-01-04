@@ -191,6 +191,9 @@ class ChurchTools_Suite_Update_Checker {
         // Clear our cache
         delete_transient( self::TRANSIENT_KEY );
         
+        // Cleanup old update directories (v0.10.3.50)
+        self::cleanup_old_update_directories();
+        
         // Log successful update
         if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
             ChurchTools_Suite_Logger::info( 'update_checker', 'Plugin updated successfully', [
@@ -203,6 +206,63 @@ class ChurchTools_Suite_Update_Checker {
         // This ensures the "Successfully updated" message is shown
         if ( ! wp_doing_ajax() ) {
             wp_cache_flush();
+        }
+    }
+    
+    /**
+     * Cleanup old update directories left behind by WordPress updater
+     * 
+     * WordPress sometimes leaves temporary plugin directories when updating
+     * from GitHub releases. This method removes them.
+     * 
+     * Pattern: FEGAschaffenburg-churchtools-suite-{commit-hash}
+     * 
+     * @since 0.10.3.50
+     * @return void
+     */
+    private static function cleanup_old_update_directories(): void {
+        $plugins_dir = WP_PLUGIN_DIR;
+        
+        if ( ! is_dir( $plugins_dir ) ) {
+            return;
+        }
+        
+        $dirs = glob( $plugins_dir . '/FEGAschaffenburg-churchtools-suite-*' );
+        
+        if ( empty( $dirs ) || ! is_array( $dirs ) ) {
+            return;
+        }
+        
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+        
+        $deleted_count = 0;
+        
+        foreach ( $dirs as $dir ) {
+            // Safety check: Only delete directories matching the pattern exactly
+            if ( ! is_dir( $dir ) || ! preg_match( '/FEGAschaffenburg-churchtools-suite-[a-f0-9]{7,}$/i', basename( $dir ) ) ) {
+                continue;
+            }
+            
+            // Use WordPress filesystem API for safe deletion
+            global $wp_filesystem;
+            
+            if ( WP_Filesystem() ) {
+                if ( $wp_filesystem->delete( $dir, true ) ) {
+                    $deleted_count++;
+                    
+                    if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+                        ChurchTools_Suite_Logger::debug( 'update_checker', 'Deleted old update directory', [
+                            'directory' => basename( $dir ),
+                        ] );
+                    }
+                }
+            }
+        }
+        
+        if ( $deleted_count > 0 && class_exists( 'ChurchTools_Suite_Logger' ) ) {
+            ChurchTools_Suite_Logger::info( 'update_checker', 'Cleanup completed', [
+                'deleted_directories' => $deleted_count,
+            ] );
         }
     }
 }
