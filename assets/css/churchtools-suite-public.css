@@ -477,12 +477,12 @@
 
 .cts-arrow-left::before {
 	border-width: 6px 10px 6px 0 !important;
-	border-color: transparent #fff transparent transparent !important;
+	border-color: transparent rgba(0,0,0,0.7) transparent transparent !important;
 }
 
 .cts-arrow-right::before {
 	border-width: 6px 0 6px 10px !important;
-	border-color: transparent transparent transparent #fff !important;
+	border-color: transparent transparent transparent rgba(0,0,0,0.7) !important;
 }
 
 .cts-calendar-weekdays {
