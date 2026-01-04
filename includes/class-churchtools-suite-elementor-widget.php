@@ -743,14 +743,14 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 			// Click-to-Details Modal (v0.10.2.9)
 			$atts['enable_modal'] = ( ! empty( $settings['enable_modal'] ) && $settings['enable_modal'] === 'yes' ) ? 'true' : 'false';
 			
-			// Sprint 1: Anzeige-Parameter
-		$atts['show_description'] = ( isset( $settings['show_description'] ) && $settings['show_description'] === 'yes' );
-		$atts['show_location'] = ( isset( $settings['show_location'] ) && $settings['show_location'] === 'yes' );
+			// Sprint 1: Anzeige-Parameter (v0.10.3.51: Als String 'true'/'false' für Template-Kompatibilität)
+		$atts['show_description'] = ( isset( $settings['show_description'] ) && $settings['show_description'] === 'yes' ) ? 'true' : 'false';
+		$atts['show_location'] = ( isset( $settings['show_location'] ) && $settings['show_location'] === 'yes' ) ? 'true' : 'false';
 		
-		// Sprint 3: Weitere Anzeige-Parameter (v0.10.3.45: isset statt !empty für korrekte false-Werte)
-		$atts['show_services'] = ( isset( $settings['show_services'] ) && $settings['show_services'] === 'yes' );
-		$atts['show_calendar_name'] = ( isset( $settings['show_calendar_name'] ) && $settings['show_calendar_name'] === 'yes' );
-		$atts['show_time'] = ( isset( $settings['show_time'] ) && $settings['show_time'] === 'yes' );
+		// Sprint 3: Weitere Anzeige-Parameter (v0.10.3.51: Als String für Template-Kompatibilität)
+		$atts['show_services'] = ( isset( $settings['show_services'] ) && $settings['show_services'] === 'yes' ) ? 'true' : 'false';
+		$atts['show_calendar_name'] = ( isset( $settings['show_calendar_name'] ) && $settings['show_calendar_name'] === 'yes' ) ? 'true' : 'false';
+		$atts['show_time'] = ( isset( $settings['show_time'] ) && $settings['show_time'] === 'yes' ) ? 'true' : 'false';
 			// Sprint 4: Filter-Parameter
 			if ( isset( $settings['order'] ) ) {
 				$atts['order'] = sanitize_text_field( $settings['order'] );

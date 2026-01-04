@@ -278,6 +278,14 @@ class ChurchTools_Suite_Blocks {
 		// Update last render time
 		self::update_render_time( 'churchtools-suite/events' );
 		
+		// v0.10.3.51: Convert boolean toggles to string 'true'/'false' for template compatibility
+		$boolean_toggles = [ 'enable_modal', 'show_description', 'show_location', 'show_services', 'show_calendar_name', 'show_time' ];
+		foreach ( $boolean_toggles as $toggle ) {
+			if ( isset( $attributes[ $toggle ] ) ) {
+				$attributes[ $toggle ] = $attributes[ $toggle ] ? 'true' : 'false';
+			}
+		}
+		
 		// Determine which shortcode to call based on viewType
 		$view_type = $attributes['viewType'] ?? 'list';
 		
