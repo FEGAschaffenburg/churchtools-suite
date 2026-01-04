@@ -97,7 +97,7 @@ $show_calendar_name = isset( $args['show_calendar_name'] ) ? ChurchTools_Suite_S
 							</div>
 						<?php endif; ?>
 						
-						<?php if ( ! empty( $event['calendar_name'] ) ) : ?>
+						<?php if ( $show_calendar_name && ! empty( $event['calendar_name'] ) : ?>
 							<div class="cts-detail-item">
 								<span class="cts-detail-icon">📅</span>
 								<span class="cts-detail-text"><?php echo esc_html( $event['calendar_name'] ); ?></span>
@@ -107,7 +107,7 @@ $show_calendar_name = isset( $args['show_calendar_name'] ) ? ChurchTools_Suite_S
 					</div>
 					
 					<!-- Services -->
-					<?php if ( ! empty( $event['services'] ) ) : ?>
+					<?php if ( $show_services && ! empty( $event['services'] ) : ?>
 						<div class="cts-services-colorful">
 							<?php foreach ( array_slice( $event['services'], 0, 3 ) as $service ) : ?>
 								<span class="cts-service-pill">
