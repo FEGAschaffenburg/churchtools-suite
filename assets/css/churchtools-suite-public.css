@@ -464,16 +464,25 @@
 	background: rgba(255, 255, 255, 0.3);
 }
 
-/* Navigation Button Icons - Prevent Override (v0.10.3.40) */
-.cts-nav-btn {
-	font-size: 18px !important;
-	line-height: 1 !important;
-	font-family: Arial, sans-serif !important;
+/* CSS Arrow Navigation (v0.10.3.42) - Border-Technik */
+.cts-arrow-left::before,
+.cts-arrow-right::before {
+	content: '' !important;
+	display: inline-block !important;
+	width: 0 !important;
+	height: 0 !important;
+	border-style: solid !important;
+	vertical-align: middle !important;
 }
 
-.cts-nav-btn::before,
-.cts-nav-btn::after {
-	content: none !important; /* Prevent pseudo-elements from theme/plugins */
+.cts-arrow-left::before {
+	border-width: 6px 10px 6px 0 !important;
+	border-color: transparent #fff transparent transparent !important;
+}
+
+.cts-arrow-right::before {
+	border-width: 6px 0 6px 10px !important;
+	border-color: transparent transparent transparent #fff !important;
 }
 
 .cts-calendar-weekdays {
