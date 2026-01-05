@@ -725,6 +725,11 @@ class ChurchTools_Suite_Admin {
 	 * AJAX Handler: Sync Events from ChurchTools
 	 */
 	public function ajax_sync_events() {
+		// v0.10.4.23: Clean any output before JSON (fixes "keine gültige JSON-Antwort")
+		if ( ob_get_level() === 0 ) {
+			ob_start();
+		}
+		
 		// v0.7.2.6: Register shutdown handler to catch fatal errors
 		register_shutdown_function( function() {
 			$error = error_get_last();
@@ -821,6 +826,7 @@ class ChurchTools_Suite_Admin {
 					$history_repo->complete_sync( $sync_id, [], $result->get_error_message() );
 				}
 				
+				ob_end_clean(); // v0.10.4.23
 				wp_send_json_error( [
 					'message' => $result->get_error_message()
 				] );
@@ -832,6 +838,7 @@ class ChurchTools_Suite_Admin {
 				$history_repo->complete_sync( $sync_id, $result, null );
 			}
 			
+			ob_end_clean(); // v0.10.4.23
 			wp_send_json_success( [
 				'message' => sprintf(
 					__( 'Synchronisation erfolgreich! %d Kalender verarbeitet, %d Events gefunden, %d Appointments gefunden, %d neu, %d aktualisiert, %d übersprungen, %d Fehler.', 'churchtools-suite' ),
@@ -852,6 +859,7 @@ class ChurchTools_Suite_Admin {
 				$history_repo->complete_sync( $sync_id, [], $e->getMessage() );
 			}
 			
+			ob_end_clean(); // v0.10.4.23
 			wp_send_json_error( [
 				'message' => __( 'Fehler: ', 'churchtools-suite' ) . $e->getMessage()
 			] );

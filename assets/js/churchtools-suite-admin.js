@@ -1,6 +1,6 @@
 /**
  * ChurchTools Suite Admin JS
- * Eigenständiges JavaScript ohne jQuery
+ * Eigenstï¿½ndiges JavaScript ohne jQuery
  *
  * @package ChurchTools_Suite
  * @since   0.2.1.0
@@ -66,7 +66,7 @@
 			syncButton.disabled = true;
 			syncButton.textContent = 'Synchronisiere...';
 
-			// AJAX call (wird später implementiert)
+			// AJAX call (wird spï¿½ter implementiert)
 			fetch(ajaxurl, {
 				method: 'POST',
 				headers: {
@@ -194,7 +194,7 @@
 
 				if (!valid) {
 					e.preventDefault();
-					alert('Bitte füllen Sie alle erforderlichen Felder aus.');
+					alert('Bitte fï¿½llen Sie alle erforderlichen Felder aus.');
 				}
 			});
 		});
@@ -237,7 +237,7 @@
 					if (data.success) {
 						let message = data.data.message || 'Verbindung erfolgreich!';
 						
-						// User-Info anzeigen wenn verfügbar
+						// User-Info anzeigen wenn verfï¿½gbar
 						if (data.data.user_info) {
 							const user = data.data.user_info;
 							message += '<br><br><strong>Eingeloggt als:</strong><br>';
@@ -849,7 +849,7 @@
 		// Force full sync (v0.7.1.0)
 		if (forceFullSyncButton) {
 			forceFullSyncButton.addEventListener('click', function() {
-				if (!confirm('Vollständigen Sync erzwingen?\n\nDies wird ALLE Termine erneut synchronisieren, unabhängig vom letzten Änderungsdatum. Der normale inkrementelle Sync ist in den meisten Fällen ausreichend.\n\nFortfahren?')) {
+				if (!confirm('Vollstï¿½ndigen Sync erzwingen?\n\nDies wird ALLE Termine erneut synchronisieren, unabhï¿½ngig vom letzten ï¿½nderungsdatum. Der normale inkrementelle Sync ist in den meisten Fï¿½llen ausreichend.\n\nFortfahren?')) {
 					return;
 				}
 				performEventSync(true);
@@ -871,7 +871,7 @@
 			
 			button.disabled = true;
 			const originalText = button.innerHTML;
-			const syncType = forceFull ? 'Vollständigen Sync' : 'Synchronisiere';
+			const syncType = forceFull ? 'Vollstï¿½ndigen Sync' : 'Synchronisiere';
 			button.innerHTML = '<span class="dashicons dashicons-' + (forceFull ? 'backup' : 'calendar') + '"></span> ' + syncType + '...';
 
 			fetch(churchtoolsSuite.ajaxUrl, {
@@ -895,7 +895,7 @@
 					const preview = text.substring(0, 200);
 					
 					if (response.status === 500) {
-						throw new Error('WordPress 500 Internal Server Error. Mögliche Ursachen: PHP Fatal Error, Memory Limit erreicht, Plugin-Konflikt. Prüfen Sie den Debug-Tab unter "Logs" für Details.');
+						throw new Error('WordPress 500 Internal Server Error. Mï¿½gliche Ursachen: PHP Fatal Error, Memory Limit erreicht, Plugin-Konflikt. Prï¿½fen Sie den Debug-Tab unter "Logs" fï¿½r Details.');
 					}
 					
 					throw new Error(`Server lieferte HTML statt JSON (HTTP ${response.status}). Vorschau: ${preview}`);
@@ -1070,7 +1070,7 @@
 					if (resultDiv) { resultDiv.style.display = 'none'; resultDiv.innerHTML = ''; }
 					manualUpdateButton.disabled = true;
 					const originalText = manualUpdateButton.innerHTML;
-					manualUpdateButton.innerHTML = '<span class="dashicons dashicons-update"></span> Prüfe...';
+					manualUpdateButton.innerHTML = '<span class="dashicons dashicons-update"></span> Prï¿½fe...';
 
 					fetch(churchtoolsSuite.ajaxUrl, {
 						method: 'POST',
@@ -1081,9 +1081,9 @@
 					.then(data => {
 						if (resultDiv) { resultDiv.style.display = 'block'; }
 						if (data.success) {
-							if (resultDiv) resultDiv.innerHTML = '<div class="cts-notice cts-notice-success"><p>' + (data.data.message || 'Update-Prüfung abgeschlossen') + '</p></div>';
+							if (resultDiv) resultDiv.innerHTML = '<div class="cts-notice cts-notice-success"><p>' + (data.data.message || 'Update-Prï¿½fung abgeschlossen') + '</p></div>';
 						} else {
-							if (resultDiv) resultDiv.innerHTML = '<div class="cts-notice cts-notice-error"><p>' + (data.data?.message || 'Update-Prüfung fehlgeschlagen') + '</p></div>';
+							if (resultDiv) resultDiv.innerHTML = '<div class="cts-notice cts-notice-error"><p>' + (data.data?.message || 'Update-Prï¿½fung fehlgeschlagen') + '</p></div>';
 						}
 					})
 					.catch(err => {
@@ -1110,7 +1110,7 @@
 			reloadButton.addEventListener('click', function() {
 				reloadButton.disabled = true;
 				const originalText = reloadButton.innerHTML;
-				reloadButton.innerHTML = '<span>?</span> Lädt...';
+				reloadButton.innerHTML = '<span>?</span> Lï¿½dt...';
 				
 				fetch(churchtoolsSuite.ajaxUrl, {
 					method: 'POST',
@@ -1142,13 +1142,13 @@
 		
 		if (clearButton && logContent) {
 			clearButton.addEventListener('click', function() {
-				if (!confirm('Möchten Sie wirklich alle Logs löschen?')) {
+				if (!confirm('Mï¿½chten Sie wirklich alle Logs lï¿½schen?')) {
 					return;
 				}
 				
 				clearButton.disabled = true;
 				const originalText = clearButton.innerHTML;
-				clearButton.innerHTML = '<span>?</span> Löscht...';
+				clearButton.innerHTML = '<span>?</span> Lï¿½scht...';
 				
 				fetch(churchtoolsSuite.ajaxUrl, {
 					method: 'POST',
@@ -1167,7 +1167,7 @@
 					}
 				})
 				.catch(error => {
-					console.error('Fehler beim Löschen der Logs:', error);
+					console.error('Fehler beim Lï¿½schen der Logs:', error);
 				})
 				.finally(() => {
 					clearButton.disabled = false;
