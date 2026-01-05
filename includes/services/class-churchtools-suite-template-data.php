@@ -253,8 +253,10 @@ class ChurchTools_Suite_Template_Data {
 			
 			// Basic data
 			'title' => $event['title'] ?? __( 'Unbenannt', 'churchtools-suite' ),
-			// v0.10.4.1: Bevorzuge appointment_description (appointment-spezifisch), Fallback auf description (kombiniert)
-			'description' => $event['appointment_description'] ?? $event['description'] ?? '',
+			// v0.10.4.10: Beide Descriptions verfügbar machen (KEIN kombiniertes Feld mehr!)
+			'event_description' => $event['event_description'] ?? '',
+			'appointment_description' => $event['appointment_description'] ?? '',
+			'description' => $event['appointment_description'] ?? $event['event_description'] ?? '', // Backward compat: Bevorzuge appointment
 			'location_name' => $event['location_name'] ?? '',
 			// Structured address fields (preferred)
 			'address_name' => $event['address_name'] ?? '',

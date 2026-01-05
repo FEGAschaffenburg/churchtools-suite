@@ -788,18 +788,9 @@ class ChurchTools_Suite_Event_Sync_Service {
             $appointment_modified = $this->format_datetime($event['appointment']['modifiedDate']);
         }
         
-        // v0.9.1.0: Separate descriptions instead of combining
+        // v0.9.1.0: Separate descriptions (v0.10.4.10: Removed combined field)
         $event_description = $event['note'] ?? '';
         $appointment_description = $event['appointment']['note'] ?? '';
-        
-        // v0.8.1.0: Keep combined for backward compatibility (deprecated)
-        $description = $event_description;
-        if (!empty($appointment_description)) {
-            if (!empty($description)) {
-                $description .= "\n\n--- Termindetails ---\n\n";
-            }
-            $description .= $appointment_description;
-        }
         
         // v0.9.2.0: Extract address details (v0.9.2.2: Fixed nested path like in extract_appointment_data)
         $address = $event['appointment']['base']['address'] ?? $event['appointment']['address'] ?? $event['address'] ?? null;
@@ -828,7 +819,7 @@ class ChurchTools_Suite_Event_Sync_Service {
             'calendar_id' => $calendar_id,
             'appointment_id' => $appointment_id,
             'title' => $event['name'] ?? $event['designation'] ?? __('Unbenannt', 'churchtools-suite'),
-            'description' => $description, // v0.8.1.0: Combined (deprecated)
+            'description' => null, // v0.10.4.10: Removed combined field - use event_description/appointment_description
             'event_description' => $event_description, // v0.9.1.0: Event-level
             'appointment_description' => $appointment_description, // v0.9.1.0: Appointment-level
             'start_datetime' => $this->format_datetime($event['startDate'] ?? ''),
@@ -997,7 +988,7 @@ class ChurchTools_Suite_Event_Sync_Service {
             'calendar_id' => $calendar_id,
             'appointment_id' => (string) $appointment_id,
             'title' => $title,
-            'description' => $combined_description, // v0.8.1.0: Combined (deprecated)
+            'description' => null, // v0.10.4.10: Removed combined field - use event_description/appointment_description
             'event_description' => null, // v0.9.1.0: Standalone appointments have no event
             'appointment_description' => $combined_description, // v0.9.1.0: Appointment-level
             'start_datetime' => $this->format_datetime($start_date),
