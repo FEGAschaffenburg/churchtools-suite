@@ -75,6 +75,7 @@ class ChurchTools_Suite {
 		// Debug helper (v0.5.8.2+)
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 			require_once CHURCHTOOLS_SUITE_PATH . 'includes/debug-blocks-shortcode.php';
+			require_once CHURCHTOOLS_SUITE_PATH . 'debug-css-enqueue.php'; // v0.10.4.34
 		}
 
 		// Auto updater (checks GitHub releases and installs ZIP)

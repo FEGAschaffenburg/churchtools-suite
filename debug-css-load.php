@@ -94,19 +94,29 @@ header('Content-Type: text/html; charset=utf-8');
     ?>
     
     <h2>5. WordPress CSS Enqueue Check</h2>
+    <p><strong>⚠️ HINWEIS:</strong> Diese Datei wird direkt aufgerufen, daher läuft <code>wp_enqueue_scripts</code> noch nicht!</p>
+    <p>✅ <strong>Besser:</strong> Gehe zu einer echten Seite und prüfe im Browser:</p>
+    <ol>
+        <li>F12 drücken → <strong>Network Tab</strong></li>
+        <li>Seite neu laden (Ctrl+Shift+R)</li>
+        <li>Suche nach: <code>churchtools-suite-public.css</code></li>
+        <li>Wenn gefunden: ✅ CSS wird geladen</li>
+        <li>Wenn nicht: ❌ Enqueue-Problem</li>
+    </ol>
+    
     <?php
     global $wp_styles;
     if (isset($wp_styles->registered['churchtools-suite-public'])) {
         $style = $wp_styles->registered['churchtools-suite-public'];
-        echo '<p class="success">✅ CSS ist in WordPress registriert</p>';
+        echo '<p class="success">✅ CSS ist in WordPress registriert (wird später geladen)</p>';
         echo '<pre>';
         echo 'Handle: ' . $style->handle . "\n";
         echo 'Source: ' . $style->src . "\n";
         echo 'Version: ' . $style->ver . "\n";
         echo '</pre>';
     } else {
-        echo '<p class="error">❌ CSS ist NICHT in WordPress registriert!</p>';
-        echo '<p>Verfügbare Styles: ' . implode(', ', array_keys($wp_styles->registered)) . '</p>';
+        echo '<p class="warning">⚠️ CSS noch nicht registriert (normal bei direktem Aufruf)</p>';
+        echo '<p><strong>Prüfe stattdessen:</strong> Browser DevTools → Network → Suche "churchtools-suite-public.css"</p>';
     }
     ?>
     
