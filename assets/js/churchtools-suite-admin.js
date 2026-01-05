@@ -1,6 +1,6 @@
-Ôªø/**
+/**
  * ChurchTools Suite Admin JS
- * Eigenst√§ndiges JavaScript ohne jQuery
+ * Eigenst‰ndiges JavaScript ohne jQuery
  *
  * @package ChurchTools_Suite
  * @since   0.2.1.0
@@ -66,7 +66,7 @@
 			syncButton.disabled = true;
 			syncButton.textContent = 'Synchronisiere...';
 
-			// AJAX call (wird sp√§ter implementiert)
+			// AJAX call (wird sp‰ter implementiert)
 			fetch(ajaxurl, {
 				method: 'POST',
 				headers: {
@@ -98,8 +98,9 @@
 			.catch(error => {
 				if (progress) progress.style.display = 'none';
 				if (result) {
+					const errorMsg = error?.message || 'Unbekannter Fehler';
 					result.innerHTML = '<div class="cts-notice cts-notice-error"><p>Fehler: ' + 
-						error.message + 
+						errorMsg + 
 						'</p></div>';
 				}
 			})
@@ -151,7 +152,8 @@
 				}
 			})
 			.catch(err => {
-				if (result) { result.style.display = 'block'; result.innerHTML = '<div class="cts-notice cts-notice-error" role="alert"><p>Fehler: ' + err.message + '</p></div>'; }
+				const errorMsg = err?.message || 'Unbekannter Fehler';
+				if (result) { result.style.display = 'block'; result.innerHTML = '<div class="cts-notice cts-notice-error" role="alert"><p>Fehler: ' + errorMsg + '</p></div>'; }
 			})
 			.finally(() => {
 				dataBtn.disabled = false;
@@ -192,7 +194,7 @@
 
 				if (!valid) {
 					e.preventDefault();
-					alert('Bitte f√ºllen Sie alle erforderlichen Felder aus.');
+					alert('Bitte f¸llen Sie alle erforderlichen Felder aus.');
 				}
 			});
 		});
@@ -215,7 +217,7 @@
 			
 			testButton.disabled = true;
 			const originalText = testButton.innerHTML;
-			testButton.innerHTML = '<span>‚è≥</span> Teste Verbindung...';
+			testButton.innerHTML = '<span>?</span> Teste Verbindung...';
 
 			fetch(churchtoolsSuite.ajaxUrl, {
 				method: 'POST',
@@ -235,7 +237,7 @@
 					if (data.success) {
 						let message = data.data.message || 'Verbindung erfolgreich!';
 						
-						// User-Info anzeigen wenn verf√ºgbar
+						// User-Info anzeigen wenn verf¸gbar
 						if (data.data.user_info) {
 							const user = data.data.user_info;
 							message += '<br><br><strong>Eingeloggt als:</strong><br>';
@@ -258,10 +260,11 @@
 				}
 			})
 			.catch(error => {
+				const errorMsg = error?.message || 'Unbekannter Fehler';
 				if (resultDiv) {
 					resultDiv.style.display = 'block';
 					resultDiv.innerHTML = '<div class="cts-notice cts-notice-error"><p>Fehler: ' + 
-						error.message + 
+						errorMsg + 
 						'</p></div>';
 				}
 			})
@@ -326,7 +329,7 @@
 				if (resultDiv) {
 					resultDiv.style.display = 'block';
 					resultDiv.innerHTML = '<div class="notice notice-error inline"><p>Fehler: ' + 
-						error.message + 
+						error?.message || 'Unbekannter Fehler' + 
 						'</p></div>';
 				}
 			})
@@ -425,7 +428,7 @@
 				if (resultDiv) {
 					resultDiv.style.display = 'block';
 					resultDiv.innerHTML = '<div class="notice notice-error inline"><p>Fehler: ' + 
-						error.message + 
+						error?.message || 'Unbekannter Fehler' + 
 						'</p></div>';
 				}
 			})
@@ -492,7 +495,7 @@
 				if (resultDiv) {
 					resultDiv.style.display = 'block';
 					resultDiv.innerHTML = '<div class="notice notice-error inline"><p>Fehler: ' + 
-						error.message + 
+						error?.message || 'Unbekannter Fehler' + 
 						'</p></div>';
 				}
 			})
@@ -620,7 +623,7 @@
 				if (resultDiv) {
 					resultDiv.style.display = 'block';
 					resultDiv.innerHTML = '<div class="notice notice-error inline"><p>Fehler: ' + 
-						error.message + 
+						error?.message || 'Unbekannter Fehler' + 
 						'</p></div>';
 				}
 			})
@@ -687,7 +690,7 @@
 				if (resultDiv) {
 					resultDiv.style.display = 'block';
 					resultDiv.innerHTML = '<div class="notice notice-error inline"><p>Fehler: ' + 
-						error.message + 
+						error?.message || 'Unbekannter Fehler' + 
 						'</p></div>';
 				}
 			})
@@ -815,7 +818,7 @@
 				if (resultDiv) {
 					resultDiv.style.display = 'block';
 					resultDiv.innerHTML = '<div class="notice notice-error inline"><p>Fehler: ' + 
-						error.message + 
+						error?.message || 'Unbekannter Fehler' + 
 						'</p></div>';
 				}
 			})
@@ -846,7 +849,7 @@
 		// Force full sync (v0.7.1.0)
 		if (forceFullSyncButton) {
 			forceFullSyncButton.addEventListener('click', function() {
-				if (!confirm('Vollst√§ndigen Sync erzwingen?\n\nDies wird ALLE Termine erneut synchronisieren, unabh√§ngig vom letzten √Ñnderungsdatum. Der normale inkrementelle Sync ist in den meisten F√§llen ausreichend.\n\nFortfahren?')) {
+				if (!confirm('Vollst‰ndigen Sync erzwingen?\n\nDies wird ALLE Termine erneut synchronisieren, unabh‰ngig vom letzten ƒnderungsdatum. Der normale inkrementelle Sync ist in den meisten F‰llen ausreichend.\n\nFortfahren?')) {
 					return;
 				}
 				performEventSync(true);
@@ -868,7 +871,7 @@
 			
 			button.disabled = true;
 			const originalText = button.innerHTML;
-			const syncType = forceFull ? 'Vollst√§ndigen Sync' : 'Synchronisiere';
+			const syncType = forceFull ? 'Vollst‰ndigen Sync' : 'Synchronisiere';
 			button.innerHTML = '<span class="dashicons dashicons-' + (forceFull ? 'backup' : 'calendar') + '"></span> ' + syncType + '...';
 
 			fetch(churchtoolsSuite.ajaxUrl, {
@@ -892,7 +895,7 @@
 					const preview = text.substring(0, 200);
 					
 					if (response.status === 500) {
-						throw new Error('WordPress 500 Internal Server Error. M√∂gliche Ursachen: PHP Fatal Error, Memory Limit erreicht, Plugin-Konflikt. Pr√ºfen Sie den Debug-Tab unter "Logs" f√ºr Details.');
+						throw new Error('WordPress 500 Internal Server Error. Mˆgliche Ursachen: PHP Fatal Error, Memory Limit erreicht, Plugin-Konflikt. Pr¸fen Sie den Debug-Tab unter "Logs" f¸r Details.');
 					}
 					
 					throw new Error(`Server lieferte HTML statt JSON (HTTP ${response.status}). Vorschau: ${preview}`);
@@ -931,7 +934,7 @@
 				if (resultDiv) {
 					resultDiv.style.display = 'block';
 					resultDiv.innerHTML = '<div class="notice notice-error inline"><p>Fehler: ' + 
-						error.message + 
+						error?.message || 'Unbekannter Fehler' + 
 						'</p></div>';
 				}
 			})
@@ -959,7 +962,7 @@
 				
 				syncButton.disabled = true;
 				const originalText = syncButton.innerHTML;
-				syncButton.innerHTML = '<span>‚è≥</span> Synchronisiere...';
+				syncButton.innerHTML = '<span>?</span> Synchronisiere...';
 
 				fetch(churchtoolsSuite.ajaxUrl, {
 					method: 'POST',
@@ -996,7 +999,7 @@
 					if (resultDiv) {
 						resultDiv.style.display = 'block';
 						resultDiv.innerHTML = '<div class="cts-notice cts-notice-error"><p>Fehler: ' + 
-							error.message + 
+							error?.message || 'Unbekannter Fehler' + 
 							'</p></div>';
 					}
 				})
@@ -1016,7 +1019,7 @@
 				
 				keepaliveButton.disabled = true;
 				const originalText = keepaliveButton.innerHTML;
-				keepaliveButton.innerHTML = '<span>‚è≥</span> Keepalive...';
+				keepaliveButton.innerHTML = '<span>?</span> Keepalive...';
 
 				fetch(churchtoolsSuite.ajaxUrl, {
 					method: 'POST',
@@ -1048,7 +1051,7 @@
 					if (resultDiv) {
 						resultDiv.style.display = 'block';
 						resultDiv.innerHTML = '<div class="cts-notice cts-notice-error"><p>Fehler: ' + 
-							error.message + 
+							error?.message || 'Unbekannter Fehler' + 
 							'</p></div>';
 					}
 				})
@@ -1067,7 +1070,7 @@
 					if (resultDiv) { resultDiv.style.display = 'none'; resultDiv.innerHTML = ''; }
 					manualUpdateButton.disabled = true;
 					const originalText = manualUpdateButton.innerHTML;
-					manualUpdateButton.innerHTML = '<span class="dashicons dashicons-update"></span> Pr√ºfe...';
+					manualUpdateButton.innerHTML = '<span class="dashicons dashicons-update"></span> Pr¸fe...';
 
 					fetch(churchtoolsSuite.ajaxUrl, {
 						method: 'POST',
@@ -1078,9 +1081,9 @@
 					.then(data => {
 						if (resultDiv) { resultDiv.style.display = 'block'; }
 						if (data.success) {
-							if (resultDiv) resultDiv.innerHTML = '<div class="cts-notice cts-notice-success"><p>' + (data.data.message || 'Update-Pr√ºfung abgeschlossen') + '</p></div>';
+							if (resultDiv) resultDiv.innerHTML = '<div class="cts-notice cts-notice-success"><p>' + (data.data.message || 'Update-Pr¸fung abgeschlossen') + '</p></div>';
 						} else {
-							if (resultDiv) resultDiv.innerHTML = '<div class="cts-notice cts-notice-error"><p>' + (data.data?.message || 'Update-Pr√ºfung fehlgeschlagen') + '</p></div>';
+							if (resultDiv) resultDiv.innerHTML = '<div class="cts-notice cts-notice-error"><p>' + (data.data?.message || 'Update-Pr¸fung fehlgeschlagen') + '</p></div>';
 						}
 					})
 					.catch(err => {
@@ -1107,7 +1110,7 @@
 			reloadButton.addEventListener('click', function() {
 				reloadButton.disabled = true;
 				const originalText = reloadButton.innerHTML;
-				reloadButton.innerHTML = '<span>‚è≥</span> L√§dt...';
+				reloadButton.innerHTML = '<span>?</span> L‰dt...';
 				
 				fetch(churchtoolsSuite.ajaxUrl, {
 					method: 'POST',
@@ -1139,13 +1142,13 @@
 		
 		if (clearButton && logContent) {
 			clearButton.addEventListener('click', function() {
-				if (!confirm('M√∂chten Sie wirklich alle Logs l√∂schen?')) {
+				if (!confirm('Mˆchten Sie wirklich alle Logs lˆschen?')) {
 					return;
 				}
 				
 				clearButton.disabled = true;
 				const originalText = clearButton.innerHTML;
-				clearButton.innerHTML = '<span>‚è≥</span> L√∂scht...';
+				clearButton.innerHTML = '<span>?</span> Lˆscht...';
 				
 				fetch(churchtoolsSuite.ajaxUrl, {
 					method: 'POST',
@@ -1164,7 +1167,7 @@
 					}
 				})
 				.catch(error => {
-					console.error('Fehler beim L√∂schen der Logs:', error);
+					console.error('Fehler beim Lˆschen der Logs:', error);
 				})
 				.finally(() => {
 					clearButton.disabled = false;
@@ -1388,7 +1391,7 @@
 				
 				navigator.clipboard.writeText(shortcode).then(() => {
 					const originalText = this.textContent;
-					this.textContent = '‚úì Kopiert!';
+					this.textContent = '? Kopiert!';
 					
 					setTimeout(() => {
 						this.textContent = originalText;
