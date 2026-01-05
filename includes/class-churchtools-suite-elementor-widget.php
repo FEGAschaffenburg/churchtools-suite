@@ -548,6 +548,20 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 			]
 		);
 		
+		// v0.10.4.11: Tags anzeigen
+		$this->add_control(
+			'show_tags',
+			[
+				'label'        => __( 'Tags anzeigen', 'churchtools-suite' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'label_on'     => __( 'Ja', 'churchtools-suite' ),
+				'label_off'    => __( 'Nein', 'churchtools-suite' ),
+				'return_value' => 'yes',
+				'default'      => '',
+				'description'  => __( 'ChurchTools-Tags als farbige Badges anzeigen', 'churchtools-suite' ),
+			]
+		);
+		
 		$this->end_controls_section();
 		
 		// === SECTION: Filter & Sortierung ===
@@ -602,6 +616,17 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 					'dateFormat' => 'Y-m-d',
 				],
 				'description' => __( 'End-Datum für Filter', 'churchtools-suite' ),
+			]
+		);
+		
+		// v0.10.4.11: Tag-Filter (AND-Logik)
+		$this->add_control(
+			'filter_tags',
+			[
+				'label'       => __( 'Nach Tags filtern', 'churchtools-suite' ),
+				'type'        => \Elementor\Controls_Manager::TEXT,
+				'placeholder' => __( 'z.B. Gottesdienst,Alpha', 'churchtools-suite' ),
+				'description' => __( 'Komma-separierte Tag-Namen (AND-Logik: Event muss ALLE Tags haben)', 'churchtools-suite' ),
 			]
 		);
 		
@@ -738,6 +763,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 		$atts['show_services'] = ( isset( $settings['show_services'] ) && $settings['show_services'] === 'yes' ) ? 'true' : 'false';
 		$atts['show_calendar_name'] = ( isset( $settings['show_calendar_name'] ) && $settings['show_calendar_name'] === 'yes' ) ? 'true' : 'false';
 		$atts['show_time'] = ( isset( $settings['show_time'] ) && $settings['show_time'] === 'yes' ) ? 'true' : 'false';
+		$atts['show_tags'] = ( isset( $settings['show_tags'] ) && $settings['show_tags'] === 'yes' ) ? 'true' : 'false';
 		
 		// Add calendar selection nur bei Standard-Modus
 		if ( $preset_source === 'standard' ) {
@@ -757,6 +783,9 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 			}
 			if ( ! empty( $settings['date_to'] ) ) {
 				$atts['date_to'] = sanitize_text_field( $settings['date_to'] );
+			}
+			if ( ! empty( $settings['filter_tags'] ) ) {
+				$atts['filter_tags'] = sanitize_text_field( $settings['filter_tags'] );
 			}
 			
 			// Sprint 2: Layout-Parameter hinzufügen
