@@ -219,8 +219,8 @@ class ChurchTools_Suite_Blocks {
 				'columns'          => [ 'type' => 'number', 'default' => 3 ],
 				// Sprint 1: Anzeige-Parameter
 				'enable_modal'     => [ 'type' => 'boolean', 'default' => true ],
-				'show_event_description' => [ 'type' => 'boolean', 'default' => false ],
-				'show_appointment_description' => [ 'type' => 'boolean', 'default' => false ],
+			'show_event_description' => [ 'type' => 'boolean', 'default' => true ],
+			'show_appointment_description' => [ 'type' => 'boolean', 'default' => true ],
 				'show_location'    => [ 'type' => 'boolean', 'default' => true ],
 				// Sprint 3: Weitere Anzeige-Parameter
 				'show_services'    => [ 'type' => 'boolean', 'default' => true ],
