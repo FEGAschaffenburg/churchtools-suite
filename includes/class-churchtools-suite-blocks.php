@@ -288,11 +288,27 @@ class ChurchTools_Suite_Blocks {
 		}
 		
 		// v0.10.3.51: Convert boolean toggles to string 'true'/'false' for template compatibility
+		// v0.10.4.35: Set defaults BEFORE conversion (Gutenberg doesn't save default values)
 		$boolean_toggles = [ 'enable_modal', 'show_event_description', 'show_appointment_description', 'show_location', 'show_services', 'show_calendar_name', 'show_time', 'show_tags' ];
+		$toggle_defaults = [
+			'enable_modal' => true,
+			'show_event_description' => true,
+			'show_appointment_description' => true,
+			'show_location' => false,
+			'show_services' => false,
+			'show_calendar_name' => false,
+			'show_time' => true,
+			'show_tags' => true,
+		];
+		
 		foreach ( $boolean_toggles as $toggle ) {
-			if ( isset( $attributes[ $toggle ] ) ) {
-				$attributes[ $toggle ] = $attributes[ $toggle ] ? 'true' : 'false';
+			// If attribute not set (Gutenberg optimization - default values not saved), use default
+			if ( ! isset( $attributes[ $toggle ] ) ) {
+				$attributes[ $toggle ] = $toggle_defaults[ $toggle ];
 			}
+			
+			// Convert boolean to string 'true'/'false'
+			$attributes[ $toggle ] = $attributes[ $toggle ] ? 'true' : 'false';
 		}
 		
 		// Determine which shortcode to call based on viewType
