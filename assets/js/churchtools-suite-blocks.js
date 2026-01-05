@@ -28,10 +28,7 @@
 		list: [
 			{ label: '--- Standard Views ---', value: '', disabled: true },
 			{ label: 'Classic', value: 'classic' },
-			{ label: 'Medium', value: 'medium' },
-			{ label: 'Compact', value: 'compact' },
-			{ label: 'Fluent', value: 'fluent' },
-			{ label: 'Modern', value: 'modern' }
+			{ label: 'Medium', value: 'medium' }
 		],
 		calendar: [
 			{ label: '--- Standard Views ---', value: '', disabled: true },

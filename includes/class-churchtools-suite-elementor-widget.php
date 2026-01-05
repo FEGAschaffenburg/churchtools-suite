@@ -142,13 +142,10 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 			]
 		);
 		
-		// List Views (nur Standard)
+		// List Views (nur Standard - v0.10.4.13: Nur Classic und Medium verfügbar)
 		$list_options = [
 			'classic' => __( 'Classic', 'churchtools-suite' ),
 			'medium'  => __( 'Medium', 'churchtools-suite' ),
-			'compact' => __( 'Compact', 'churchtools-suite' ),
-			'fluent'  => __( 'Fluent', 'churchtools-suite' ),
-			'modern'  => __( 'Modern', 'churchtools-suite' ),
 		];
 		
 		$this->add_control(
