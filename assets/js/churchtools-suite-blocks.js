@@ -11,7 +11,7 @@
 (function() {
 	'use strict';
 	
-	console.log('✅ ChurchTools Suite Blocks JS geladen! Version 0.6.5.7 - Collapsible Panels!');
+	console.log('✅ ChurchTools Suite Blocks JS geladen! Version 0.10.4.13 - List Views Cleanup!');
 	
 	const { registerBlockType } = wp.blocks;
 	const { InspectorControls, useBlockProps } = wp.blockEditor || wp.editor;
