@@ -149,8 +149,12 @@ class ChurchTools_Suite_Blocks {
 			if ( ! isset( $parsed_block['attrs']['show_services'] ) ) {
 				$parsed_block['attrs']['show_services'] = true;
 			}
-			if ( ! isset( $parsed_block['attrs']['show_description'] ) ) {
-				$parsed_block['attrs']['show_description'] = true;
+			// v0.10.4.39: Separate description toggles (Event vs Appointment)
+			if ( ! isset( $parsed_block['attrs']['show_event_description'] ) ) {
+				$parsed_block['attrs']['show_event_description'] = true;
+			}
+			if ( ! isset( $parsed_block['attrs']['show_appointment_description'] ) ) {
+				$parsed_block['attrs']['show_appointment_description'] = true;
 			}
 			if ( ! isset( $parsed_block['attrs']['show_location'] ) ) {
 				$parsed_block['attrs']['show_location'] = true;
