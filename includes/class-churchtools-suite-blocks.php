@@ -226,8 +226,7 @@ class ChurchTools_Suite_Blocks {
 				'show_services'    => [ 'type' => 'boolean', 'default' => true ],
 				'show_calendar_name' => [ 'type' => 'boolean', 'default' => false ],
 				'show_time'        => [ 'type' => 'boolean', 'default' => true ],
-				'show_tags'        => [ 'type' => 'boolean', 'default' => true ],
-				// Sprint 4: Filter-Parameter
+				'show_tags'        => [ 'type' => 'boolean', 'default' => true ],			'show_past'        => [ 'type' => 'boolean', 'default' => false ],				// Sprint 4: Filter-Parameter
 				'order'            => [ 'type' => 'string', 'default' => 'asc' ],
 				'date_from'        => [ 'type' => 'string', 'default' => '' ],
 				'date_to'          => [ 'type' => 'string', 'default' => '' ],
@@ -279,6 +278,14 @@ class ChurchTools_Suite_Blocks {
 		
 		// Update last render time
 		self::update_render_time( 'churchtools-suite/events' );
+		
+		// v0.10.4.28: Handle show_past toggle - convert to date_from parameter
+		if ( ! empty( $attributes['show_past'] ) && $attributes['show_past'] === true ) {
+			// User wants to see past events - set date_from to one month ago
+			if ( empty( $attributes['date_from'] ) ) {
+				$attributes['date_from'] = date( 'Y-m-d', strtotime( '-1 month' ) );
+			}
+		}
 		
 		// v0.10.3.51: Convert boolean toggles to string 'true'/'false' for template compatibility
 		$boolean_toggles = [ 'enable_modal', 'show_event_description', 'show_appointment_description', 'show_location', 'show_services', 'show_calendar_name', 'show_time', 'show_tags' ];

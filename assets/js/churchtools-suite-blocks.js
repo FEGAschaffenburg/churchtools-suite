@@ -139,6 +139,7 @@
 			show_calendar_name: { type: 'boolean', default: false },
 			show_time: { type: 'boolean', default: true },
 			show_tags: { type: 'boolean', default: true },
+			show_past: { type: 'boolean', default: false },
 			order: { type: 'string', default: 'asc' },
 			date_from: { type: 'string', default: '' },
 			date_to: { type: 'string', default: '' },
@@ -338,6 +339,14 @@
 							onChange: function(value) { setAttributes({ date_to: value }); },
 							placeholder: 'YYYY-MM-DD',
 							help: __('End-Datum für Filter (z.B. 2025-12-31)', 'churchtools-suite')
+						}),
+						el(ToggleControl, {
+							label: __('Vergangenheit anzeigen', 'churchtools-suite'),
+							help: __('Zeigt auch vergangene Termine (Standard: nur Zukunft)', 'churchtools-suite'),
+							checked: attributes.show_past,
+							onChange: function(value) {
+								setAttributes({ show_past: value });
+							}
 						})
 					),
 					// Live Preview Toggle

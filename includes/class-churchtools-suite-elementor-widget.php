@@ -641,20 +641,20 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 			]
 		);
 		
-		$this->end_controls_section();
-		
-		// === SECTION: Layout-Optionen ===
-		$this->start_controls_section(
-			'layout_section',
-			[
-				'label'     => __( '🎨 Layout-Optionen', 'churchtools-suite' ),
-				'tab'       => \Elementor\Controls_Manager::TAB_CONTENT,
-				'conditions' => [
-					'relation' => 'and',
-					'terms'    => [
-						[
-							'name'     => 'preset_source',
-							'operator' => '===',
+	// v0.10.4.28: Vergangenheit anzeigen Toggle
+	$this->add_control(
+		'show_past',
+		[
+			'label'        => __( 'Vergangenheit anzeigen', 'churchtools-suite' ),
+			'type'         => \Elementor\Controls_Manager::SWITCHER,
+			'label_on'     => __( 'Ja', 'churchtools-suite' ),
+			'label_off'    => __( 'Nein', 'churchtools-suite' ),
+			'return_value' => 'yes',
+			'default'      => '',
+			'description'  => __( 'Auch vergangene Termine anzeigen (Standard: nur Zukunft)', 'churchtools-suite' ),
+		]
+	);
+	
 							'value'    => 'standard',
 						],
 						[
@@ -776,6 +776,14 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 		$atts['show_calendar_name'] = ( isset( $settings['show_calendar_name'] ) && $settings['show_calendar_name'] === 'yes' ) ? 'true' : 'false';
 		$atts['show_time'] = ( isset( $settings['show_time'] ) && $settings['show_time'] === 'yes' ) ? 'true' : 'false';
 		$atts['show_tags'] = ( isset( $settings['show_tags'] ) && $settings['show_tags'] === 'yes' ) ? 'true' : 'false';
+		
+		// v0.10.4.28: Handle show_past toggle
+		if ( ! empty( $settings['show_past'] ) && $settings['show_past'] === 'yes' ) {
+			// User wants past events - set date_from to one month ago if not already set
+			if ( empty( $settings['date_from'] ) ) {
+				$atts['date_from'] = date( 'Y-m-d', strtotime( '-1 month' ) );
+			}
+		}
 		
 		// Add calendar selection nur bei Standard-Modus
 		if ( $preset_source === 'standard' ) {

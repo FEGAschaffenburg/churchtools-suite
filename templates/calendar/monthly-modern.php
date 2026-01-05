@@ -16,6 +16,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// Parse boolean parameters
+$show_event_description = isset( $args['show_event_description'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_event_description'] ) : true;
+$show_appointment_description = isset( $args['show_appointment_description'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_appointment_description'] ) : true;
+
 // Gruppiere Events nach Datum
 $events_by_date = [];
 foreach ( $events as $event ) {
