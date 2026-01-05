@@ -59,6 +59,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <script>
 jQuery(function($){
+	// Logs neu laden Button (v0.10.4.8)
+	$('#cts-reload-logs').on('click', function(e){
+		e.preventDefault();
+		location.reload();
+	});
+	
+	// Logs löschen Button
 	$('#cts_clear_logs_btn').on('click', function(e){
 		e.preventDefault();
 		if (!confirm('<?php esc_html_e( 'Alle Plugin-Logs unwiderruflich löschen?', 'churchtools-suite' ); ?>')) return;
