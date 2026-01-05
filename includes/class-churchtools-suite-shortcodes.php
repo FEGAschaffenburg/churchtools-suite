@@ -295,10 +295,12 @@ class ChurchTools_Suite_Shortcodes {
 			'show_services' => true,
 			'show_calendar_name' => false,
 			'show_time' => true,
+			'show_tags' => false, // v0.10.4.11: Tags anzeigen
 			// Sprint 4: Filter-Parameter
 			'order' => 'asc',
 			'date_from' => '',
 			'date_to' => '',
+			'filter_tags' => '', // v0.10.4.11: Filter nach Tags (komma-separiert)
 		], $atts, 'cts_list' );
 		
 		// Convert string boolean values to actual booleans
@@ -307,6 +309,7 @@ class ChurchTools_Suite_Shortcodes {
 		$atts['show_services'] = self::parse_boolean( $atts['show_services'] );
 		$atts['show_calendar_name'] = self::parse_boolean( $atts['show_calendar_name'] );
 		$atts['show_time'] = self::parse_boolean( $atts['show_time'] );
+		$atts['show_tags'] = self::parse_boolean( $atts['show_tags'] ); // v0.10.4.11
 		
 		// Validate order (asc/desc)
 		if ( ! in_array( $atts['order'], [ 'asc', 'desc' ], true ) ) {
@@ -351,10 +354,12 @@ class ChurchTools_Suite_Shortcodes {
 			'show_services' => true,
 			'show_calendar_name' => false,
 			'show_time' => true,
+			'show_tags' => false, // v0.10.4.11: Tags anzeigen
 			// Sprint 4: Filter-Parameter
 			'order' => 'asc',
 			'date_from' => '',
 			'date_to' => '',
+			'filter_tags' => '', // v0.10.4.11: Filter nach Tags (komma-separiert)
 		], $atts, 'cts_grid' );
 		
 		// Validate columns (1-4)
@@ -369,6 +374,7 @@ class ChurchTools_Suite_Shortcodes {
 		$atts['show_services'] = self::parse_boolean( $atts['show_services'] );
 		$atts['show_calendar_name'] = self::parse_boolean( $atts['show_calendar_name'] );
 		$atts['show_time'] = self::parse_boolean( $atts['show_time'] );
+		$atts['show_tags'] = self::parse_boolean( $atts['show_tags'] ); // v0.10.4.11
 		
 		// Validate order (asc/desc)
 		if ( ! in_array( $atts['order'], [ 'asc', 'desc' ], true ) ) {
@@ -745,6 +751,11 @@ class ChurchTools_Suite_Shortcodes {
 			$filters['to'] = $atts['date_to'];
 		}
 		
+		// v0.10.4.11: Add tag filter
+		if ( ! empty( $atts['filter_tags'] ) ) {
+			$filters['filter_tags'] = self::parse_tag_filter( $atts['filter_tags'] );
+		}
+		
 		// Debug output (only when WP_DEBUG is enabled)
 		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 			error_log( 'ChurchTools Suite Shortcode: Getting events with filters: ' . print_r( $filters, true ) );
@@ -817,6 +828,26 @@ class ChurchTools_Suite_Shortcodes {
 		$ids = array_filter( $ids );
 		
 		return $ids;
+	}
+	
+	/**
+	 * Parse tag filter string into array (v0.10.4.11)
+	 * 
+	 * Converts "Gottesdienst,Alpha,Workshop" to ["Gottesdienst", "Alpha", "Workshop"]
+	 * 
+	 * @param string $filter_tags Comma-separated tag names
+	 * @return array Array of tag names
+	 */
+	private static function parse_tag_filter( string $filter_tags ): array {
+		if ( empty( $filter_tags ) ) {
+			return [];
+		}
+		
+		$tags = explode( ',', $filter_tags );
+		$tags = array_map( 'trim', $tags );
+		$tags = array_filter( $tags );
+		
+		return $tags;
 	}
 	
 	/**

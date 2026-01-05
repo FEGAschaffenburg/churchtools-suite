@@ -46,7 +46,7 @@ class ChurchTools_Suite_Template_Data {
 	}
 	
 	/**
-	 * Get events with filters (v0.10.0.0: Added filter hook for extensibility)
+	 * Get events with filters (v0.10.0.0: Added filter hook for extensibility, v0.10.4.11: Tag filtering)
 	 * 
 	 * @param array $filters {
 	 *     Optional. Query filters.
@@ -56,6 +56,7 @@ class ChurchTools_Suite_Template_Data {
 	 *     @type string $from         Start date (Y-m-d H:i:s)
 	 *     @type string $to           End date (Y-m-d H:i:s)
 	 *     @type string $order        Sort order (ASC|DESC)
+	 *     @type array  $filter_tags  Filter by tag names (AND logic - event must have ALL tags)
 	 * }
 	 * @return array Formatted events data
 	 */
@@ -66,6 +67,7 @@ class ChurchTools_Suite_Template_Data {
 			'from' => '',
 			'to' => '',
 			'order' => 'ASC',
+			'filter_tags' => [], // v0.10.4.11: Tag filter
 		];
 		
 		$filters = wp_parse_args( $filters, $defaults );
@@ -129,6 +131,11 @@ class ChurchTools_Suite_Template_Data {
 			foreach ( $results as $row ) {
 				$events[] = $this->format_event( $row );
 			}
+		}
+		
+		// v0.10.4.11: Apply tag filter (post-processing after formatting)
+		if ( ! empty( $filters['filter_tags'] ) && is_array( $filters['filter_tags'] ) ) {
+			$events = $this->filter_events_by_tags( $events, $filters['filter_tags'] );
 		}
 		
 		// Debug logging before filter
@@ -265,7 +272,9 @@ class ChurchTools_Suite_Template_Data {
 			'address_city' => $event['address_city'] ?? '',
 			'address_latitude' => $event['address_latitude'] ?? null,
 			'address_longitude' => $event['address_longitude'] ?? null,
-			'tags' => $event['tags'] ?? null,
+			// v0.10.4.11: Tags als Array + JSON (für Filterung + Display)
+			'tags' => $event['tags'] ?? null, // JSON string (raw from DB)
+			'tags_array' => $this->parse_tags( $event['tags'] ?? null ), // Parsed array für Templates
 			'status' => $event['status'] ?? 'active',
 			
 			// Dates
@@ -516,4 +525,70 @@ class ChurchTools_Suite_Template_Data {
 		}
 		
 		return $formatted_events;
-	}}
+	}
+	
+	/**
+	 * Filter events by tags (v0.10.4.11)
+	 * 
+	 * AND logic: Event must have ALL specified tags to pass filter.
+	 * 
+	 * @param array $events Formatted events array
+	 * @param array $filter_tags Tag names to filter by
+	 * @return array Filtered events
+	 */
+	private function filter_events_by_tags( array $events, array $filter_tags ): array {
+		if ( empty( $filter_tags ) ) {
+			return $events;
+		}
+		
+		return array_filter( $events, function( $event ) use ( $filter_tags ) {
+			// No tags field or empty tags
+			if ( empty( $event['tags'] ) ) {
+				return false;
+			}
+			
+			// Decode JSON tags
+			$event_tags = json_decode( $event['tags'], true );
+			if ( ! is_array( $event_tags ) || empty( $event_tags ) ) {
+				return false;
+			}
+			
+			// Extract tag names from event
+			$event_tag_names = array_map( function( $tag ) {
+				return strtolower( trim( $tag['name'] ?? '' ) );
+			}, $event_tags );
+			
+			// Check if event has ALL required tags (AND logic)
+			foreach ( $filter_tags as $required_tag ) {
+				$required_tag_lower = strtolower( trim( $required_tag ) );
+				if ( ! in_array( $required_tag_lower, $event_tag_names, true ) ) {
+					return false; // Missing required tag
+				}
+			}
+			
+			return true; // Has all required tags
+		} );
+	}
+	
+	/**
+	 * Parse tags JSON into array (v0.10.4.11)
+	 * 
+	 * Converts JSON string to array of tag objects.
+	 * 
+	 * @param string|null $tags_json Tags JSON string from database
+	 * @return array Array of tag objects
+	 */
+	private function parse_tags( ?string $tags_json ): array {
+		if ( empty( $tags_json ) ) {
+			return [];
+		}
+		
+		$tags = json_decode( $tags_json, true );
+		
+		if ( ! is_array( $tags ) ) {
+			return [];
+		}
+		
+		return $tags;
+	}
+}

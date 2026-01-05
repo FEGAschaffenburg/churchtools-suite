@@ -123,6 +123,25 @@
 	text-align: right;
 }
 
+/* Tags Badges (v0.10.4.11) */
+.cts-list-tags {
+	display: flex;
+	gap: 6px;
+	flex-wrap: wrap;
+	margin-top: 4px;
+}
+
+.cts-tag-badge {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 12px;
+	font-size: 11px;
+	font-weight: 500;
+	color: #fff;
+	background-color: #6b7280;
+	white-space: nowrap;
+}
+
 @media (max-width: 1024px) {
 	.cts-list-classic .cts-services {
 		display: none;
