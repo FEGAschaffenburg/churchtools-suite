@@ -471,9 +471,9 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 			[
 				'label'     => __( '👁️ Was anzeigen?', 'churchtools-suite' ),
 				'tab'       => \Elementor\Controls_Manager::TAB_CONTENT,
-			// v0.10.3.47: Condition entfernt - Toggles sollen auch bei Presets verfügbar sein
-		]
-	);
+				// v0.10.3.47: Condition entfernt - Toggles sollen auch bei Presets verfügbar sein
+			]
+		);
 
 		// v0.10.4.18: Event-Beschreibung anzeigen
 		$this->add_control(
