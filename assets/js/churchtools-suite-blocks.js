@@ -131,13 +131,14 @@
 			limit: { type: 'number', default: 5 },
 			columns: { type: 'number', default: 3 },
 			enable_modal: { type: 'boolean', default: true },
-		// v0.10.3.28: Tooltip options - defaults MUST match PHP (only show_time=true)
-		show_event_description: { type: 'boolean', default: false },
-		show_appointment_description: { type: 'boolean', default: false },
-		show_location: { type: 'boolean', default: false },
-		show_services: { type: 'boolean', default: false },
+			// v0.10.3.28: Tooltip options - defaults MUST match PHP (only show_time=true)
+			show_event_description: { type: 'boolean', default: false },
+			show_appointment_description: { type: 'boolean', default: false },
+			show_location: { type: 'boolean', default: false },
+			show_services: { type: 'boolean', default: false },
 			show_calendar_name: { type: 'boolean', default: false },
 			show_time: { type: 'boolean', default: true },
+			show_tags: { type: 'boolean', default: true },
 			order: { type: 'string', default: 'asc' },
 			date_from: { type: 'string', default: '' },
 			date_to: { type: 'string', default: '' },
@@ -314,6 +315,12 @@
 							checked: attributes.show_time,
 							onChange: function(value) { setAttributes({ show_time: value }); },
 							help: __('Start- und Endzeit des Termins anzeigen', 'churchtools-suite')
+						}),
+						el(ToggleControl, {
+							label: __('Tags anzeigen', 'churchtools-suite'),
+							checked: attributes.show_tags,
+							onChange: function(value) { setAttributes({ show_tags: value }); },
+							help: __('ChurchTools-Tags als farbige Badges anzeigen', 'churchtools-suite')
 						})
 					),
 					// === PANEL 4: Filter & Sortierung ===
