@@ -219,18 +219,20 @@ class ChurchTools_Suite_Blocks {
 				'columns'          => [ 'type' => 'number', 'default' => 3 ],
 				// Sprint 1: Anzeige-Parameter
 				'enable_modal'     => [ 'type' => 'boolean', 'default' => true ],
-				'show_description' => [ 'type' => 'boolean', 'default' => true ],
+				'show_event_description' => [ 'type' => 'boolean', 'default' => false ],
+				'show_appointment_description' => [ 'type' => 'boolean', 'default' => false ],
 				'show_location'    => [ 'type' => 'boolean', 'default' => true ],
 				// Sprint 3: Weitere Anzeige-Parameter
 				'show_services'    => [ 'type' => 'boolean', 'default' => true ],
 				'show_calendar_name' => [ 'type' => 'boolean', 'default' => false ],
 				'show_time'        => [ 'type' => 'boolean', 'default' => true ],
+				'show_tags'        => [ 'type' => 'boolean', 'default' => true ],
 				// Sprint 4: Filter-Parameter
 				'order'            => [ 'type' => 'string', 'default' => 'asc' ],
 				'date_from'        => [ 'type' => 'string', 'default' => '' ],
 				'date_to'          => [ 'type' => 'string', 'default' => '' ],
-			// Live Preview Toggle (v0.10.3.47: Default auf true)
-			'enableLivePreview' => [ 'type' => 'boolean', 'default' => true ],
+				// Live Preview Toggle (v0.10.3.47: Default auf true)
+				'enableLivePreview' => [ 'type' => 'boolean', 'default' => true ],
 			],
 			'render_callback' => [ __CLASS__, 'render_events_block' ],
 		] );
