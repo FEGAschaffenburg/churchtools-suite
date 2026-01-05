@@ -18,7 +18,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $show_time = isset( $args['show_time'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_time'] ) : true;
 $show_location = isset( $args['show_location'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_location'] ) : false;
-$show_description = isset( $args['show_description'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_description'] ) : false;
+$show_event_description = isset( $args['show_event_description'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_event_description'] ) : false;
+$show_appointment_description = isset( $args['show_appointment_description'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_appointment_description'] ) : false;
 $show_services = isset( $args['show_services'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_services'] ) : false;
 $show_calendar_name = isset( $args['show_calendar_name'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_calendar_name'] ) : false;
 ?>
@@ -54,9 +55,14 @@ $show_calendar_name = isset( $args['show_calendar_name'] ) ? ChurchTools_Suite_S
 							<div class="cts-widget-location">📍 <?php echo esc_html( $event['location'] ); ?></div>
 						<?php endif; ?>
 						
-						<?php if ( $show_description && ! empty( $event['description'] ) ) : ?>
+						<?php if ( $show_event_description && ! empty( $event['event_description'] ) ) : ?>
 							<div class="cts-widget-description" style="font-size: 0.875rem; color: #6b7280; margin-top: 0.375rem;">
-								<?php echo esc_html( wp_trim_words( $event['description'], 10 ) ); ?>
+								<?php echo esc_html( wp_trim_words( $event['event_description'], 10 ) ); ?>
+							</div>
+						<?php endif; ?>
+						<?php if ( $show_appointment_description && ! empty( $event['appointment_description'] ) ) : ?>
+							<div class="cts-widget-description" style="font-size: 0.875rem; color: #6b7280; margin-top: 0.375rem;">
+								<?php echo esc_html( wp_trim_words( $event['appointment_description'], 10 ) ); ?>
 							</div>
 						<?php endif; ?>
 						

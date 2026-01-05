@@ -17,7 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $show_location = isset( $args['show_location'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_location'] ) : true;
-$show_description = isset( $args['show_description'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_description'] ) : true;
+$show_event_description = isset( $args['show_event_description'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_event_description'] ) : false;
+$show_appointment_description = isset( $args['show_appointment_description'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_appointment_description'] ) : false;
 $show_time = isset( $args['show_time'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_time'] ) : true;
 $show_services = isset( $args['show_services'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_services'] ) : false;
 $show_calendar_name = isset( $args['show_calendar_name'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_calendar_name'] ) : false;
@@ -67,9 +68,14 @@ $show_calendar_name = isset( $args['show_calendar_name'] ) ? ChurchTools_Suite_S
 							</div>
 						<?php endif; ?>
 						
-						<?php if ( $show_description && ! empty( $event['description'] ) ) : ?>
+						<?php if ( $show_event_description && ! empty( $event['event_description'] ) ) : ?>
 							<div class="cts-search-description">
-								<?php echo wp_kses_post( wp_trim_words( $event['description'], 15 ) ); ?>
+								<?php echo wp_kses_post( wp_trim_words( $event['event_description'], 15 ) ); ?>
+							</div>
+						<?php endif; ?>
+						<?php if ( $show_appointment_description && ! empty( $event['appointment_description'] ) ) : ?>
+							<div class="cts-search-description">
+								<?php echo wp_kses_post( wp_trim_words( $event['appointment_description'], 15 ) ); ?>
 							</div>
 						<?php endif; ?>
 						

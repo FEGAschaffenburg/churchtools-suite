@@ -34,7 +34,8 @@ foreach ( $events as $event ) {
      data-limit="<?php echo esc_attr( $args['limit'] ?? 100 ); ?>"
      data-enable-modal="<?php echo esc_attr( $args['enable_modal'] ?? true ? 'true' : 'false' ); ?>"
      data-show-time="<?php echo esc_attr( ( $args['show_time'] ?? true ) ? 'true' : 'false' ); ?>"
-     data-show-description="<?php echo esc_attr( ( $args['show_description'] ?? false ) ? 'true' : 'false' ); ?>"
+     data-show-event-description="<?php echo esc_attr( ( $args['show_event_description'] ?? false ) ? 'true' : 'false' ); ?>"
+     data-show-appointment-description="<?php echo esc_attr( ( $args['show_appointment_description'] ?? false ) ? 'true' : 'false' ); ?>"
      data-show-location="<?php echo esc_attr( ( $args['show_location'] ?? false ) ? 'true' : 'false' ); ?>"
      data-show-services="<?php echo esc_attr( ( $args['show_services'] ?? false ) ? 'true' : 'false' ); ?>"
      data-show-calendar-name="<?php echo esc_attr( ( $args['show_calendar_name'] ?? false ) ? 'true' : 'false' ); ?>">
@@ -144,9 +145,16 @@ foreach ( $events as $event ) {
 									}
 								}
 								
-								// Optional: Beschreibung (gekürzt)
-								if ( ( $args['show_description'] ?? false ) && ! empty( $event['description'] ) ) {
-									$desc = wp_strip_all_tags( $event['description'] );
+								// Optional: Event-Beschreibung (gekürzt)
+								if ( ( $args['show_event_description'] ?? false ) && ! empty( $event['event_description'] ) ) {
+									$desc = wp_strip_all_tags( $event['event_description'] );
+									$desc = wp_trim_words( $desc, 15, '...' );
+									$tooltip_parts[] = '📝 ' . $desc;
+								}
+								
+								// Optional: Termin-Beschreibung (gekürzt)
+								if ( ( $args['show_appointment_description'] ?? false ) && ! empty( $event['appointment_description'] ) ) {
+									$desc = wp_strip_all_tags( $event['appointment_description'] );
 									$desc = wp_trim_words( $desc, 15, '...' );
 									$tooltip_parts[] = '📝 ' . $desc;
 								}

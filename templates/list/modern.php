@@ -21,7 +21,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 // Normalize boolean args (support strings from Gutenberg)
 $show_time = isset( $args['show_time'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_time'] ) : true;
 $show_location = isset( $args['show_location'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_location'] ) : true;
-$show_description = isset( $args['show_description'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_description'] ) : true;
+$show_event_description = isset( $args['show_event_description'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_event_description'] ) : false;
+$show_appointment_description = isset( $args['show_appointment_description'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_appointment_description'] ) : false;
 $show_services = isset( $args['show_services'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_services'] ) : true;
 ?>
 
@@ -64,9 +65,14 @@ $show_services = isset( $args['show_services'] ) ? ChurchTools_Suite_Shortcodes:
 					<h3 class="cts-event-title"><?php echo esc_html( $event['title'] ); ?></h3>
 					
 					<!-- Beschreibung -->
-					<?php if ( $show_description && ! empty( $event['description'] ) ) : ?>
+					<?php if ( $show_event_description && ! empty( $event['event_description'] ) ) : ?>
 						<div class="cts-event-description">
-							<?php echo esc_html( wp_trim_words( $event['description'], 20 ) ); ?>
+							<?php echo esc_html( wp_trim_words( $event['event_description'], 20 ) ); ?>
+						</div>
+					<?php endif; ?>
+					<?php if ( $show_appointment_description && ! empty( $event['appointment_description'] ) ) : ?>
+						<div class="cts-event-description">
+							<?php echo esc_html( wp_trim_words( $event['appointment_description'], 20 ) ); ?>
 						</div>
 					<?php endif; ?>
 					

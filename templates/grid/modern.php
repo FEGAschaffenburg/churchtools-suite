@@ -20,7 +20,8 @@ $columns = isset( $args['columns'] ) ? absint( $args['columns'] ) : 3;
 // Normalize boolean args (support strings from Gutenberg)
 $show_time = isset( $args['show_time'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_time'] ) : true;
 $show_location = isset( $args['show_location'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_location'] ) : true;
-$show_description = isset( $args['show_description'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_description'] ) : true;
+$show_event_description = isset( $args['show_event_description'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_event_description'] ) : false;
+$show_appointment_description = isset( $args['show_appointment_description'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_appointment_description'] ) : false;
 $show_services = isset( $args['show_services'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_services'] ) : true;
 $show_calendar_name = isset( $args['show_calendar_name'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_calendar_name'] ) : false;
 ?>
@@ -63,9 +64,14 @@ $show_calendar_name = isset( $args['show_calendar_name'] ) ? ChurchTools_Suite_S
 					
 					<h3 class="cts-card-title"><?php echo esc_html( $event['title'] ); ?></h3>
 					
-					<?php if ( $show_description && ! empty( $event['description'] ) ) : ?>
+					<?php if ( $show_event_description && ! empty( $event['event_description'] ) ) : ?>
 						<p class="cts-card-description">
-							<?php echo esc_html( wp_trim_words( $event['description'], 25 ) ); ?>
+							<?php echo esc_html( wp_trim_words( $event['event_description'], 25 ) ); ?>
+						</p>
+					<?php endif; ?>
+					<?php if ( $show_appointment_description && ! empty( $event['appointment_description'] ) ) : ?>
+						<p class="cts-card-description">
+							<?php echo esc_html( wp_trim_words( $event['appointment_description'], 25 ) ); ?>
 						</p>
 					<?php endif; ?>
                     
