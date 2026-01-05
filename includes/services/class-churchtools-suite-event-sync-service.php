@@ -550,11 +550,19 @@ class ChurchTools_Suite_Event_Sync_Service {
         }
         
         $appointments = $response['data'];
-        
-        $stats = [
-            'appointments_found' => count($appointments),
-            'events_inserted' => 0,
-            'events_updated' => 0,
+		
+		// v0.10.4.3: Log first appointment (sample) to debug tags
+		if (!empty($appointments)) {
+			ChurchTools_Suite_Logger::debug(
+				'api_request',
+				sprintf('FIRST APPOINTMENT SAMPLE (Calendar %s)', $calendar_id),
+				[
+					'sample_appointment' => $appointments[0], // Full structure
+					'sample_keys' => array_keys($appointments[0]),
+					'total_appointments' => count($appointments),
+				]
+			);
+		}
             'events_skipped' => 0,
         ];
         
@@ -854,13 +862,18 @@ class ChurchTools_Suite_Event_Sync_Service {
             return new WP_Error('missing_id', __('Appointment hat keine ID', 'churchtools-suite'));
         }
         
-        // v0.9.2.1: Debug logging für API-Struktur
-        ChurchTools_Suite_Logger::debug(
-            'event_sync',
-            sprintf('Extracting appointment %s', $appointment_id),
-            [
-                'has_appointment_key' => isset($appointment['appointment']),
-                'has_base_key' => isset($appointment['base']),
+		// v0.10.4.3: Log RAW appointment data to debug tags
+		ChurchTools_Suite_Logger::debug(
+			'event_sync',
+			sprintf('RAW APPOINTMENT DATA for ID %s', $appointment_id),
+			[
+				'raw_appointment' => $appointment, // FULL payload
+				'has_tags_key' => isset($appointment['tags']),
+				'tags_value' => $appointment['tags'] ?? 'NOT_SET',
+				'appointment_keys' => array_keys($appointment),
+			]
+		);
+		
                 'has_tags' => isset($appointment['tags']),
                 'appointment_keys' => array_keys($appointment),
                 'base_keys' => isset($appointment['base']) ? array_keys($appointment['base']) : [],
