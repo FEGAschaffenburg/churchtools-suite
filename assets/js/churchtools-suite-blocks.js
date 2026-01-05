@@ -51,44 +51,12 @@
 	};
 	
 	/**
-	 * Hook to fetch presets from REST API
-	 */
-	function usePresets() {
-		const [presets, setPresets] = wp.element.useState({});
-		const [loading, setLoading] = wp.element.useState(true);
-		
-		wp.element.useEffect(function() {
-			wp.apiFetch({ path: '/churchtools-suite/v1/presets' })
-				.then(function(data) {
-					setPresets(data);
-					setLoading(false);
-				})
-				.catch(function(error) {
-					console.error('Fehler beim Laden der Presets:', error);
-					setLoading(false);
-				});
-		}, []);
-		
-		return { presets: presets, loading: loading };
-	}
-	
-	/**
-	 * Get combined view options (standard + presets)
+	 * Get combined view options (standard only - v0.10.4.15: Presets deaktiviert)
 	 */
 	function getViewOptions(viewType, presets) {
 		const standard = standardViewOptions[viewType] || [];
-		const presetList = presets[viewType] || [];
-		
-		if (presetList.length === 0) {
-			return standard;
-		}
-		
-		// Add separator and presets
-		return [
-			...standard,
-			{ label: '--- Meine Presets ---', value: '', disabled: true },
-			...presetList
-		];
+		// v0.10.4.15: Shortcode Manager deaktiviert, daher keine Presets mehr
+		return standard;
 	}
 	
 	/**
@@ -179,23 +147,11 @@
 			const { attributes, setAttributes } = props;
 			const blockProps = useBlockProps();
 			
-			// Fetch presets and calendars
-			const { presets, loading: presetsLoading } = usePresets();
-			const { calendars, loading: calendarsLoading } = useCalendars();
-			const loading = calendarsLoading;
+			// v0.10.4.15: Nur noch Calendars, keine Presets mehr
+			const { calendars, loading } = useCalendars();
 			
 			// Parse selected calendar IDs
 			const selectedIds = attributes.calendar ? attributes.calendar.split(',').filter(function(id) { return id; }) : [];
-			
-			// Check if current view is a STANDARD view (not a preset)
-			const isStandardView = standardViewOptions[attributes.viewType] && standardViewOptions[attributes.viewType].some(function(option) {
-				return option.value === attributes.view;
-			});
-			
-			// Check if current view is a preset (nur wenn Presets geladen sind UND kein Standard-View)
-			const isPresetView = !isStandardView && !presetsLoading && presets[attributes.viewType] && presets[attributes.viewType].some(function(preset) {
-				return preset.value === attributes.view;
-			});
 			
 			// Handle calendar toggle
 			function handleCalendarToggle(calendarId) {
@@ -244,11 +200,9 @@
 						el(SelectControl, {
 							label: __('Variante', 'churchtools-suite'),
 							value: attributes.view,
-							options: getViewOptions(attributes.viewType, presets),
+						options: getViewOptions(attributes.viewType),
 							onChange: function(value) { setAttributes({ view: value }); }
 						}),
-						// Hinweis bei Presets
-						isPresetView && el('div', { 
 							style: { 
 								padding: '12px', 
 								background: '#e0f2fe', 
@@ -259,17 +213,14 @@
 								color: '#0c4a6e'
 							}
 						},
-							el('strong', {}, '⚙️ Preset-Modus'),
 							el('p', { style: { margin: '4px 0 0' } },
-								__('Alle Einstellungen über Shortcode-Manager ändern.', 'churchtools-suite')
 							)
 						),
 						// Kalender-Auswahl
-						!isPresetView && el('hr', { style: { margin: '16px 0', border: 'none', borderTop: '1px solid #ddd' } }),
-						!isPresetView && el('h4', { style: { fontSize: '13px', fontWeight: '600', marginBottom: '8px' } }, __('Kalender-Auswahl', 'churchtools-suite')),
-						!isPresetView && (
-							loading ? el('p', {}, __('Lade Kalender...', 'churchtools-suite')) :
-							calendars.length === 0 ? el('p', {}, __('Keine Kalender verfügbar', 'churchtools-suite')) :
+					el('hr', { style: { margin: '16px 0', border: 'none', borderTop: '1px solid #ddd' } }),
+					el('h4', { style: { fontSize: '13px', fontWeight: '600', marginBottom: '8px' } }, __('Kalender-Auswahl', 'churchtools-suite')),
+					loading ? el('p', {}, __('Lade Kalender...', 'churchtools-suite')) :
+					calendars.length === 0 ? el('p', {}, __('Keine Kalender verfügbar', 'churchtools-suite')) :
 							el('div', {},
 								calendars.map(function(calendar) {
 									return el('div', { key: calendar.id, style: { marginBottom: '8px' } },
@@ -288,10 +239,9 @@
 									__('Keine Auswahl = alle Kalender', 'churchtools-suite')
 								)
 							)
-						)
 					),
 					// === PANEL 2: Basis-Einstellungen ===
-					!isPresetView && el(PanelBody, { 
+					el(PanelBody, {
 						title: __('⚙️ Basis-Einstellungen', 'churchtools-suite'), 
 						initialOpen: false 
 					},
@@ -324,7 +274,7 @@
 						help: __('Öffnet Event-Details in einem Modal beim Klick auf einen Termin', 'churchtools-suite')
 					}),
 					// === PANEL 3: Anzeige-Optionen (NICHT für Calendar!) ===
-					!isPresetView && attributes.viewType !== 'calendar' && el(PanelBody, { 
+				attributes.viewType !== 'calendar' && el(PanelBody, {
 						title: __('👁️ Anzeige-Optionen', 'churchtools-suite'), 
 						initialOpen: false 
 					},
@@ -360,7 +310,7 @@
 						})
 					),
 					// === PANEL 4: Filter & Sortierung ===
-					!isPresetView && el(PanelBody, { 
+					el(PanelBody, { 
 						title: __('🔍 Filter & Sortierung', 'churchtools-suite'), 
 						initialOpen: false 
 					},
@@ -444,14 +394,14 @@
 						attributes.calendar && el('p', { 
 							style: { margin: '4px 0 0', fontSize: '13px', opacity: '0.8' } 
 						}, __('Kalender: ', 'churchtools-suite') + (selectedIds.length + ' ausgewählt')),
-						!isPresetView && el('p', { 
-							style: { margin: '8px 0 0', fontSize: '12px', opacity: '0.75', borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: '8px' } 
-						}, 
-							(attributes.viewType !== 'calendar' ? ('Limit: ' + attributes.limit + ' | ') : '') +
-							'Beschreibung: ' + (attributes.show_description ? '✓' : '✗') + ' | ' +
-							'Ort: ' + (attributes.show_location ? '✓' : '✗')
-						),
-						!isPresetView && attributes.viewType === 'grid' && el('p', { 
+					el('p', { 
+						style: { margin: '8px 0 0', fontSize: '12px', opacity: '0.75', borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: '8px' } 
+					}, 
+						(attributes.viewType !== 'calendar' ? ('Limit: ' + attributes.limit + ' | ') : '') +
+						'Beschreibung: ' + (attributes.show_description ? '✓' : '✗') + ' | ' +
+						'Ort: ' + (attributes.show_location ? '✓' : '✗')
+					),
+					attributes.viewType === 'grid' && el('p', {
 							style: { margin: '4px 0 0', fontSize: '11px', opacity: '0.65' } 
 						}, 
 							'Spalten: ' + attributes.columns

@@ -528,9 +528,9 @@ class ChurchTools_Suite_Template_Data {
 	}
 	
 	/**
-	 * Filter events by tags (v0.10.4.11)
+	 * Filter events by tags (v0.10.4.12)
 	 * 
-	 * AND logic: Event must have ALL specified tags to pass filter.
+	 * OR logic: Event must have AT LEAST ONE of the specified tags to pass filter.
 	 * 
 	 * @param array $events Formatted events array
 	 * @param array $filter_tags Tag names to filter by
@@ -558,15 +558,15 @@ class ChurchTools_Suite_Template_Data {
 				return strtolower( trim( $tag['name'] ?? '' ) );
 			}, $event_tags );
 			
-			// Check if event has ALL required tags (AND logic)
+			// Check if event has AT LEAST ONE required tag (OR logic)
 			foreach ( $filter_tags as $required_tag ) {
 				$required_tag_lower = strtolower( trim( $required_tag ) );
-				if ( ! in_array( $required_tag_lower, $event_tag_names, true ) ) {
-					return false; // Missing required tag
+				if ( in_array( $required_tag_lower, $event_tag_names, true ) ) {
+					return true; // Found matching tag
 				}
 			}
 			
-			return true; // Has all required tags
+			return false; // No matching tags found
 		} );
 	}
 	
