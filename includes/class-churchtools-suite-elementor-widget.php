@@ -484,7 +484,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 				'label_on'     => __( 'Ja', 'churchtools-suite' ),
 				'label_off'    => __( 'Nein', 'churchtools-suite' ),
 				'return_value' => 'yes',
-				'default'      => '',
+				'default'      => 'yes',
 				'description'  => __( 'Beschreibung der Event-Serie anzeigen', 'churchtools-suite' ),
 			]
 		);
@@ -498,7 +498,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 				'label_on'     => __( 'Ja', 'churchtools-suite' ),
 				'label_off'    => __( 'Nein', 'churchtools-suite' ),
 				'return_value' => 'yes',
-				'default'      => '',
+				'default'      => 'yes',
 				'description'  => __( 'Beschreibung des einzelnen Termins anzeigen', 'churchtools-suite' ),
 			]
 		);
