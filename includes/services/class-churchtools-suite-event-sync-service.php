@@ -563,8 +563,13 @@ class ChurchTools_Suite_Event_Sync_Service {
 				]
 			);
 		}
-            'events_skipped' => 0,
-        ];
+		
+		$stats = [
+			'appointments_found' => count($appointments),
+			'events_inserted' => 0,
+			'events_updated' => 0,
+			'events_skipped' => 0,
+		];
         
         ChurchTools_Suite_Logger::log(
             sprintf('Calendar %s - Phase 2 start: %d appointments found (UPDATE ALL events with appointment data)', 
