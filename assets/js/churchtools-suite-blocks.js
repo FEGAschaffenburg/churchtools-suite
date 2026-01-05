@@ -202,22 +202,9 @@
 						el(SelectControl, {
 							label: __('Variante', 'churchtools-suite'),
 							value: attributes.view,
-						options: getViewOptions(attributes.viewType),
+							options: getViewOptions(attributes.viewType),
 							onChange: function(value) { setAttributes({ view: value }); }
 						}),
-							style: { 
-								padding: '12px', 
-								background: '#e0f2fe', 
-								border: '1px solid #0284c7', 
-								borderRadius: '4px', 
-								marginTop: '12px',
-								fontSize: '13px',
-								color: '#0c4a6e'
-							}
-						},
-							el('p', { style: { margin: '4px 0 0' } },
-							)
-						),
 						// Kalender-Auswahl
 					el('hr', { style: { margin: '16px 0', border: 'none', borderTop: '1px solid #ddd' } }),
 					el('h4', { style: { fontSize: '13px', fontWeight: '600', marginBottom: '8px' } }, __('Kalender-Auswahl', 'churchtools-suite')),
