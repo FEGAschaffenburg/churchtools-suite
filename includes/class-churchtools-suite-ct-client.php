@@ -293,6 +293,7 @@ class ChurchTools_Suite_CT_Client {
                 'url' => $url,
                 'method' => $method,
                 'data_keys' => !empty($data) ? array_keys($data) : [],
+                'final_url' => $url, // v0.10.4.9: Log final URL with parameters
             ]
         );
         

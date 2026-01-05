@@ -584,10 +584,11 @@ class ChurchTools_Suite_Event_Sync_Service {
         $skipped_outside_range = 0;
         
         foreach ($appointments as $appointment_data) {
-            // Extract appointment from nested structure
-            $appointment = isset($appointment_data['appointment']) ? $appointment_data['appointment'] : $appointment_data;
+            // v0.10.4.9: Keep FULL appointment_data (includes tags, bookings, etc.)
+            // Do NOT extract only appointment - tags are on outer level!
             
-            // Get appointment ID
+            // Get appointment ID from nested structure
+            $appointment = $appointment_data['appointment'] ?? $appointment_data;
             $appointment_id = $appointment['base']['id'] ?? null;
             
             if (!$appointment_id) {
@@ -613,7 +614,8 @@ class ChurchTools_Suite_Event_Sync_Service {
             // COMPOSITE KEY (appointment_id + start_datetime) handles duplicates
             // If already imported in Phase 1 → updates with appointment-specific data
             // If standalone → inserts new row
-            $result = $this->process_appointment($appointment, $calendar_id);
+            // v0.10.4.9: Pass FULL appointment_data (includes tags!)
+            $result = $this->process_appointment($appointment_data, $calendar_id);
             
             if (is_wp_error($result)) {
                 $stats['events_skipped']++;
@@ -685,18 +687,18 @@ class ChurchTools_Suite_Event_Sync_Service {
     }
     
     /**
-     * Process a standalone appointment (without event) (v0.9.0.0, v0.9.2.5: Enhanced)
+     * Process a standalone appointment (without event) (v0.9.0.0, v0.9.2.5: Enhanced, v0.10.4.9: Full data)
      * 
      * Updates ALL appointments with appointment-specific data (address, tags, appointment_description).
      * - If from Phase 1 (event-based) → Updates existing event with appointment data
      * - If standalone → Inserts new row
      *
-     * @param array $appointment Appointment data from API
+     * @param array $appointment_data RAW appointment data from API (includes tags, bookings on outer level!)
      * @param string $calendar_id ChurchTools calendar ID
      * @return array|WP_Error
      */
-    private function process_appointment(array $appointment, string $calendar_id) {
-        $event_data = $this->extract_appointment_data($appointment, $calendar_id);
+    private function process_appointment(array $appointment_data, string $calendar_id) {
+        $event_data = $this->extract_appointment_data($appointment_data, $calendar_id);
         
         if (is_wp_error($event_data)) {
             return $event_data;
@@ -847,7 +849,7 @@ class ChurchTools_Suite_Event_Sync_Service {
     }
     
     /**
-     * Extract appointment data for database (v0.9.0.0)
+     * Extract appointment data for database (v0.9.0.0, v0.10.4.9: Extract from FULL appointment_data)
      * 
      * Extracts ALL available appointment fields:
      * - title, subtitle (note)
@@ -855,35 +857,39 @@ class ChurchTools_Suite_Event_Sync_Service {
      * - address (location)
      * - link, image
      * - dates (calculated preferred, fallback to base)
+     * - tags (on outer level, not in appointment.base!)
      *
-     * @param array $appointment Raw appointment data from API
+     * @param array $appointment_data RAW appointment data from API (includes appointment, tags, bookings)
      * @param string $calendar_id ChurchTools calendar ID
      * @return array|WP_Error
      */
-    private function extract_appointment_data(array $appointment, string $calendar_id) {
+    private function extract_appointment_data(array $appointment_data, string $calendar_id) {
+        // v0.10.4.9: Extract nested appointment structure
+        $appointment = $appointment_data['appointment'] ?? $appointment_data;
+        
         $appointment_id = $appointment['base']['id'] ?? null;
         
         if (!$appointment_id) {
             return new WP_Error('missing_id', __('Appointment hat keine ID', 'churchtools-suite'));
         }
         
-		// v0.10.4.3: Log RAW appointment data to debug tags
-		ChurchTools_Suite_Logger::debug(
-			'event_sync',
-			sprintf('RAW APPOINTMENT DATA for ID %s', $appointment_id),
-			[
-				'raw_appointment' => $appointment, // FULL payload
-				'has_tags_key' => isset($appointment['tags']),
-				'tags_value' => $appointment['tags'] ?? 'NOT_SET',
-				'appointment_keys' => array_keys($appointment),
-			]
-		);
-		
-		// Extract all available fields from base (v0.9.2.7: Support both nested and flat structure)
+        // v0.10.4.9: Log RAW appointment_data (includes tags on outer level!)
+        ChurchTools_Suite_Logger::debug(
+            'event_sync',
+            sprintf('RAW APPOINTMENT DATA for ID %s', $appointment_id),
+            [
+                'raw_appointment_data' => $appointment_data, // FULL outer object
+                'has_tags_key_outer' => isset($appointment_data['tags']),
+                'tags_value_outer' => $appointment_data['tags'] ?? 'NOT_SET',
+                'appointment_data_keys' => array_keys($appointment_data),
+            ]
+        );
+        
+        // Extract all available fields from base (v0.9.2.7: Support both nested and flat structure)
         // Newer API: appointment.base (nested)
         // Older/deprecated: base (flat, alias)
-        $base = $appointment['appointment']['base'] ?? $appointment['base'] ?? [];
-        $calc = $appointment['appointment']['calculated'] ?? $appointment['calculated'] ?? [];
+        $base = $appointment['base'] ?? [];
+        $calc = $appointment['calculated'] ?? [];
         
         // Title (caption in API)
         $title = $base['title'] ?? $base['caption'] ?? $calc['caption'] ?? __('Unbenannt', 'churchtools-suite');
@@ -936,19 +942,19 @@ class ChurchTools_Suite_Event_Sync_Service {
             $location = $base['address'] ?? '';
         }
         
-        // v0.9.2.0: Extract tags from appointment (tags sind auf oberster Ebene, nicht in base!)
+        // v0.10.4.9: Extract tags from appointment_data (tags are on OUTER level, not in appointment.base!)
         $tags = null;
-        if (isset($appointment['tags']) && is_array($appointment['tags']) && !empty($appointment['tags'])) {
+        if (isset($appointment_data['tags']) && is_array($appointment_data['tags']) && !empty($appointment_data['tags'])) {
             // v0.10.4.0: Normalize color values
-            $tags = wp_json_encode($this->normalize_tag_colors($appointment['tags']));
+            $tags = wp_json_encode($this->normalize_tag_colors($appointment_data['tags']));
             
             // v0.10.4.2: Debug logging für Tags
             ChurchTools_Suite_Logger::debug(
                 'event_sync',
                 sprintf('Appointment %s - Tags gefunden und normalisiert', $appointment_id),
                 [
-                    'raw_tags' => $appointment['tags'],
-                    'normalized_count' => count($this->normalize_tag_colors($appointment['tags'])),
+                    'raw_tags' => $appointment_data['tags'],
+                    'normalized_count' => count($this->normalize_tag_colors($appointment_data['tags'])),
                     'json_length' => strlen($tags),
                 ]
             );
@@ -958,10 +964,10 @@ class ChurchTools_Suite_Event_Sync_Service {
                 'event_sync',
                 sprintf('Appointment %s - KEINE TAGS in API-Response', $appointment_id),
                 [
-                    'has_tags_key' => isset($appointment['tags']),
-                    'tags_is_array' => isset($appointment['tags']) && is_array($appointment['tags']),
-                    'tags_empty' => isset($appointment['tags']) ? empty($appointment['tags']) : 'NOT_SET',
-                    'appointment_keys' => array_keys($appointment),
+                    'has_tags_key' => isset($appointment_data['tags']),
+                    'tags_is_array' => isset($appointment_data['tags']) && is_array($appointment_data['tags']),
+                    'tags_empty' => isset($appointment_data['tags']) ? empty($appointment_data['tags']) : 'NOT_SET',
+                    'appointment_data_keys' => array_keys($appointment_data),
                 ]
             );
         }
