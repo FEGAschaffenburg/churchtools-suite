@@ -267,8 +267,22 @@ class ChurchTools_Suite_CT_Client {
         
         // Add query parameters for GET requests
         if ($method === 'GET' && !empty($data)) {
-            // include bleibt Array, damit add_query_arg include[]=... erzeugt
-            $url = add_query_arg($data, $url);
+            // v0.10.4.7: Build query string manually to support array parameters like include[]=tags
+            $query_parts = [];
+            foreach ($data as $key => $value) {
+                if (is_array($value)) {
+                    // Array parameters: include[] => ['tags', 'event'] becomes include[]=tags&include[]=event
+                    foreach ($value as $item) {
+                        $query_parts[] = urlencode($key) . '[]=' . urlencode($item);
+                    }
+                } else {
+                    // Simple parameters: from => '2024-01-01' becomes from=2024-01-01
+                    $query_parts[] = urlencode($key) . '=' . urlencode($value);
+                }
+            }
+            if (!empty($query_parts)) {
+                $url .= '?' . implode('&', $query_parts);
+            }
         }
         
         // Log API request
