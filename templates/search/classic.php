@@ -18,6 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $show_location = isset( $args['show_location'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_location'] ) : true;
 $show_description = isset( $args['show_description'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_description'] ) : true;
+$show_time = isset( $args['show_time'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_time'] ) : true;
+$show_services = isset( $args['show_services'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_services'] ) : false;
+$show_calendar_name = isset( $args['show_calendar_name'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_calendar_name'] ) : false;
 ?>
 
 <div class="churchtools-suite-wrapper">
@@ -68,6 +71,46 @@ $show_description = isset( $args['show_description'] ) ? ChurchTools_Suite_Short
 							<div class="cts-search-description">
 								<?php echo wp_kses_post( wp_trim_words( $event['description'], 15 ) ); ?>
 							</div>
+						<?php endif; ?>
+						
+						<?php if ( $show_services && ! empty( $event['services'] ) ) : ?>
+							<div class="cts-search-services" style="font-size: 0.875rem; color: #6b7280; margin-top: 0.5rem;">
+								<?php
+								$service_items = array();
+								foreach ( array_slice( $event['services'], 0, 2 ) as $s ) {
+									if ( ! empty( $s['person_name'] ) ) {
+										$service_items[] = $s['service_name'] . ': ' . $s['person_name'];
+									} else {
+										$service_items[] = $s['service_name'];
+									}
+								}
+								echo esc_html( implode( ' | ', $service_items ) );
+								if ( count( $event['services'] ) > 2 ) {
+									echo ' <span style="font-weight: 600;">+' . ( count( $event['services'] ) - 2 ) . '</span>';
+								}
+								?>
+							</div>
+						<?php endif; ?>
+						
+						<?php if ( $show_calendar_name && ! empty( $event['calendar_name'] ) ) : ?>
+							<div class="cts-search-calendar" style="font-size: 0.875rem; color: #9ca3af; margin-top: 0.5rem;">
+								📅 <?php echo esc_html( $event['calendar_name'] ); ?>
+							</div>
+						<?php endif; ?>
+						
+						<?php if ( ! empty( $event['tags'] ) ) : ?>
+							<?php
+							$tags = is_string( $event['tags'] ) ? json_decode( $event['tags'], true ) : $event['tags'];
+							if ( is_array( $tags ) && ! empty( $tags ) ) :
+							?>
+							<div class="cts-search-tags" style="margin-top: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+								<?php foreach ( $tags as $tag ) : ?>
+									<span class="cts-tag" style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; background-color: <?php echo esc_attr( $tag['color'] ?? '#6b7280' ); ?>; color: #fff;">
+										<?php echo esc_html( $tag['name'] ?? '' ); ?>
+									</span>
+								<?php endforeach; ?>
+							</div>
+							<?php endif; ?>
 						<?php endif; ?>
 						
 					</div>

@@ -236,8 +236,8 @@ class ChurchTools_Suite_Event_Sync_Service {
             'direction' => 'forward',
             'from' => $args['from'],
             'to' => $args['to'],
-            // v0.10.2.4: Include eventServices (als String, nicht Array!)
-            'include' => 'eventServices',
+            // v0.10.4.0: Include eventServices + tags
+            'include' => 'eventServices,tags',
         ];
         
         // v0.7.1.0: Incremental sync - only fetch modified events
@@ -807,9 +807,11 @@ class ChurchTools_Suite_Event_Sync_Service {
         // v0.9.2.0: Extract tags
         $tags = null;
         if (isset($event['tags']) && is_array($event['tags']) && !empty($event['tags'])) {
-            $tags = wp_json_encode($event['tags']);
+            // v0.10.4.0: Normalize color values (ChurchTools uses color names, we need hex codes)
+            $tags = wp_json_encode($this->normalize_tag_colors($event['tags']));
         } elseif (isset($event['appointment']['tags']) && is_array($event['appointment']['tags']) && !empty($event['appointment']['tags'])) {
-            $tags = wp_json_encode($event['appointment']['tags']);
+            // v0.10.4.0: Normalize color values
+            $tags = wp_json_encode($this->normalize_tag_colors($event['appointment']['tags']));
         }
         
         return [
@@ -931,7 +933,8 @@ class ChurchTools_Suite_Event_Sync_Service {
         // v0.9.2.0: Extract tags from appointment (tags sind auf oberster Ebene, nicht in base!)
         $tags = null;
         if (isset($appointment['tags']) && is_array($appointment['tags']) && !empty($appointment['tags'])) {
-            $tags = wp_json_encode($appointment['tags']);
+            // v0.10.4.0: Normalize color values
+            $tags = wp_json_encode($this->normalize_tag_colors($appointment['tags']));
         }
         
         // v0.9.2.1: Debug logging für extrahierte Daten
@@ -1367,5 +1370,50 @@ class ChurchTools_Suite_Event_Sync_Service {
      */
     public function get_last_sync_time(): ?string {
         return get_option('churchtools_suite_events_last_sync', null);
+    }
+    
+    /**
+     * Normalize tag colors from ChurchTools color names to hex codes (v0.10.4.0)
+     * 
+     * ChurchTools uses predefined color names like "basic", "red", "blue".
+     * We need hex codes for CSS styling.
+     * 
+     * @param array $tags Array of tag objects with 'color' field
+     * @return array Normalized tags with hex color codes
+     */
+    private function normalize_tag_colors(array $tags): array {
+        // ChurchTools color name → Hex code mapping
+        $color_map = [
+            'basic' => '#6b7280',      // Gray-500
+            'red' => '#ef4444',        // Red-500
+            'orange' => '#f97316',     // Orange-500
+            'yellow' => '#eab308',     // Yellow-500
+            'green' => '#22c55e',      // Green-500
+            'blue' => '#3b82f6',       // Blue-500
+            'indigo' => '#6366f1',     // Indigo-500
+            'purple' => '#a855f7',     // Purple-500
+            'pink' => '#ec4899',       // Pink-500
+            'gray' => '#6b7280',       // Gray-500
+            'grey' => '#6b7280',       // Gray-500
+        ];
+        
+        foreach ($tags as &$tag) {
+            if (isset($tag['color'])) {
+                $color = strtolower($tag['color']);
+                
+                // If color is already hex code, keep it
+                if (preg_match('/^#[0-9a-f]{6}$/i', $tag['color'])) {
+                    continue;
+                }
+                
+                // Map color name to hex code
+                $tag['color'] = $color_map[$color] ?? '#6b7280'; // Default gray
+            } else {
+                // No color specified, use default
+                $tag['color'] = '#6b7280';
+            }
+        }
+        
+        return $tags;
     }
 }

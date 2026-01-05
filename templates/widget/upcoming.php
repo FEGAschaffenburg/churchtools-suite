@@ -18,6 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $show_time = isset( $args['show_time'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_time'] ) : true;
 $show_location = isset( $args['show_location'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_location'] ) : false;
+$show_description = isset( $args['show_description'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_description'] ) : false;
+$show_services = isset( $args['show_services'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_services'] ) : false;
+$show_calendar_name = isset( $args['show_calendar_name'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_calendar_name'] ) : false;
 ?>
 
 <div class="churchtools-suite-wrapper">
@@ -49,6 +52,51 @@ $show_location = isset( $args['show_location'] ) ? ChurchTools_Suite_Shortcodes:
 						
 						<?php if ( $show_location && ! empty( $event['location'] ) ) : ?>
 							<div class="cts-widget-location">📍 <?php echo esc_html( $event['location'] ); ?></div>
+						<?php endif; ?>
+						
+						<?php if ( $show_description && ! empty( $event['description'] ) ) : ?>
+							<div class="cts-widget-description" style="font-size: 0.875rem; color: #6b7280; margin-top: 0.375rem;">
+								<?php echo esc_html( wp_trim_words( $event['description'], 10 ) ); ?>
+							</div>
+						<?php endif; ?>
+						
+						<?php if ( $show_services && ! empty( $event['services'] ) ) : ?>
+							<div class="cts-widget-services" style="font-size: 0.875rem; color: #6b7280; margin-top: 0.375rem;">
+								<?php
+								$first_service = $event['services'][0];
+								echo esc_html( $first_service['service_name'] );
+								if ( ! empty( $first_service['person_name'] ) ) {
+									echo ': ' . esc_html( $first_service['person_name'] );
+								}
+								if ( count( $event['services'] ) > 1 ) {
+									echo ' <span style="font-weight: 600;">+' . ( count( $event['services'] ) - 1 ) . '</span>';
+								}
+								?>
+							</div>
+						<?php endif; ?>
+						
+						<?php if ( $show_calendar_name && ! empty( $event['calendar_name'] ) ) : ?>
+							<div class="cts-widget-calendar" style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.375rem;">
+								📅 <?php echo esc_html( $event['calendar_name'] ); ?>
+							</div>
+						<?php endif; ?>
+						
+						<?php if ( ! empty( $event['tags'] ) ) : ?>
+							<?php
+							$tags = is_string( $event['tags'] ) ? json_decode( $event['tags'], true ) : $event['tags'];
+							if ( is_array( $tags ) && ! empty( $tags ) ) :
+							?>
+							<div class="cts-widget-tags" style="margin-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.375rem;">
+								<?php foreach ( array_slice( $tags, 0, 2 ) as $tag ) : ?>
+									<span class="cts-tag" style="display: inline-block; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.625rem; font-weight: 600; background-color: <?php echo esc_attr( $tag['color'] ?? '#6b7280' ); ?>; color: #fff;">
+										<?php echo esc_html( $tag['name'] ?? '' ); ?>
+									</span>
+								<?php endforeach; ?>
+								<?php if ( count( $tags ) > 2 ) : ?>
+									<span style="font-size: 0.625rem; color: #9ca3af;">+<?php echo count( $tags ) - 2; ?></span>
+								<?php endif; ?>
+							</div>
+							<?php endif; ?>
 						<?php endif; ?>
 					</div>
 					

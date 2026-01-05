@@ -89,6 +89,27 @@ $show_calendar_name = isset( $args['show_calendar_name'] ) ? ChurchTools_Suite_S
 					?>
 				</span>
 			<?php endif; ?>
+			
+			<?php if ( $show_calendar_name && ! empty( $event['calendar_name'] ) ) : ?>
+				<span class="cts-meta-calendar" style="display: block; margin-top: 0.5rem; font-size: 0.875rem; color: #6b7280;">
+					📅 <?php echo esc_html( $event['calendar_name'] ); ?>
+				</span>
+			<?php endif; ?>
+			
+			<?php if ( ! empty( $event['tags'] ) ) : ?>
+				<?php
+				$tags = is_string( $event['tags'] ) ? json_decode( $event['tags'], true ) : $event['tags'];
+				if ( is_array( $tags ) && ! empty( $tags ) ) :
+				?>
+				<div class="cts-event-tags" style="margin-top: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+					<?php foreach ( $tags as $tag ) : ?>
+						<span class="cts-tag" style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; background-color: <?php echo esc_attr( $tag['color'] ?? '#6b7280' ); ?>; color: #fff;">
+							<?php echo esc_html( $tag['name'] ?? '' ); ?>
+						</span>
+					<?php endforeach; ?>
+				</div>
+				<?php endif; ?>
+			<?php endif; ?>
 			</div>
 			
 		</div>

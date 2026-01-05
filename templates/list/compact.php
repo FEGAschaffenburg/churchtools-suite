@@ -16,8 +16,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// v0.10.4.0: Alle Toggles unterstützen
 $show_time = isset( $args['show_time'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_time'] ) : true;
 $show_location = isset( $args['show_location'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_location'] ) : false;
+$show_description = isset( $args['show_description'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_description'] ) : false;
+$show_services = isset( $args['show_services'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_services'] ) : false;
+$show_calendar_name = isset( $args['show_calendar_name'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_calendar_name'] ) : false;
 ?>
 
 <div class="churchtools-suite-wrapper">
@@ -48,6 +52,47 @@ $show_location = isset( $args['show_location'] ) ? ChurchTools_Suite_Shortcodes:
 						<div class="cts-list-item-time">
 							<?php echo esc_html( $event['start_time'] ); ?>
 						</div>
+					<?php endif; ?>
+					
+					<?php if ( $show_description && ! empty( $event['description'] ) ) : ?>
+						<div class="cts-list-item-description">
+							<?php echo esc_html( wp_trim_words( $event['description'], 15 ) ); ?>
+						</div>
+					<?php endif; ?>
+					
+					<?php if ( $show_location && ! empty( $event['location'] ) ) : ?>
+						<div class="cts-list-item-location">
+							📍 <?php echo esc_html( $event['location'] ); ?>
+						</div>
+					<?php endif; ?>
+					
+					<?php if ( $show_services && ! empty( $event['services'] ) ) : ?>
+						<div class="cts-list-item-services">
+							<?php foreach ( $event['services'] as $service ) : ?>
+								<span class="cts-service-badge"><?php echo esc_html( $service['service_name'] ); ?>: <?php echo esc_html( $service['person_name'] ); ?></span>
+							<?php endforeach; ?>
+						</div>
+					<?php endif; ?>
+					
+					<?php if ( $show_calendar_name && ! empty( $event['calendar_name'] ) ) : ?>
+						<div class="cts-list-item-calendar">
+							📅 <?php echo esc_html( $event['calendar_name'] ); ?>
+						</div>
+					<?php endif; ?>
+					
+					<?php if ( ! empty( $event['tags'] ) ) : ?>
+						<?php
+						$tags = is_string( $event['tags'] ) ? json_decode( $event['tags'], true ) : $event['tags'];
+						if ( is_array( $tags ) && ! empty( $tags ) ) :
+						?>
+						<div class="cts-event-tags">
+							<?php foreach ( $tags as $tag ) : ?>
+								<span class="cts-tag" style="background-color: <?php echo esc_attr( $tag['color'] ?? '#6b7280' ); ?>;">
+									<?php echo esc_html( $tag['name'] ?? '' ); ?>
+								</span>
+							<?php endforeach; ?>
+						</div>
+						<?php endif; ?>
 					<?php endif; ?>
 					
 				</li>

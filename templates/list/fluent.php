@@ -18,11 +18,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 
 <?php
-// Normalize boolean args (support strings from Gutenberg)
+// v0.10.4.0: Alle Toggles unterstützen
 $show_time = isset( $args['show_time'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_time'] ) : true;
 $show_location = isset( $args['show_location'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_location'] ) : true;
 $show_description = isset( $args['show_description'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_description'] ) : true;
 $show_services = isset( $args['show_services'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_services'] ) : true;
+$show_calendar_name = isset( $args['show_calendar_name'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_calendar_name'] ) : false;
 ?>
 
 <div class="churchtools-suite-wrapper">
@@ -123,6 +124,30 @@ $show_services = isset( $args['show_services'] ) ? ChurchTools_Suite_Shortcodes:
 								<?php endforeach; ?>
 							</div>
 						<?php endif; ?>
+						
+						<!-- Calendar Name -->
+						<?php if ( $show_calendar_name && ! empty( $event['calendar_name'] ) ) : ?>
+							<div class="cts-event-calendar" style="margin-top: 0.75rem; font-size: 0.875rem; color: #6b7280;">
+								📅 <?php echo esc_html( $event['calendar_name'] ); ?>
+							</div>
+						<?php endif; ?>
+						
+						<!-- Tags -->
+						<?php if ( ! empty( $event['tags'] ) ) : ?>
+							<?php
+							$tags = is_string( $event['tags'] ) ? json_decode( $event['tags'], true ) : $event['tags'];
+							if ( is_array( $tags ) && ! empty( $tags ) ) :
+							?>
+							<div class="cts-event-tags" style="margin-top: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+								<?php foreach ( $tags as $tag ) : ?>
+									<span class="cts-tag" style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 500; background-color: <?php echo esc_attr( $tag['color'] ?? '#6b7280' ); ?>; color: #fff;">
+										<?php echo esc_html( $tag['name'] ?? '' ); ?>
+									</span>
+								<?php endforeach; ?>
+							</div>
+							<?php endif; ?>
+						<?php endif; ?>
+						
 				<div class="cts-reveal-border"></div>
 				
 			</div>
