@@ -82,7 +82,9 @@ class ChurchTools_Suite_Events_Repository extends ChurchTools_Suite_Repository_B
         
         if ($existing_id) {
             // Selective Update: Nur appointment-spezifische Felder überschreiben
+            // v0.10.4.2: description wird ebenfalls aktualisiert (für saubere Appointment-Descriptions)
             $appointment_fields = [
+                'description', // v0.10.4.2: Kombinierte description bei Appointments aktualisieren
                 'appointment_description',
                 'address_name',
                 'address_street',

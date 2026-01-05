@@ -929,6 +929,29 @@ class ChurchTools_Suite_Event_Sync_Service {
         if (isset($appointment['tags']) && is_array($appointment['tags']) && !empty($appointment['tags'])) {
             // v0.10.4.0: Normalize color values
             $tags = wp_json_encode($this->normalize_tag_colors($appointment['tags']));
+            
+            // v0.10.4.2: Debug logging für Tags
+            ChurchTools_Suite_Logger::debug(
+                'event_sync',
+                sprintf('Appointment %s - Tags gefunden und normalisiert', $appointment_id),
+                [
+                    'raw_tags' => $appointment['tags'],
+                    'normalized_count' => count($this->normalize_tag_colors($appointment['tags'])),
+                    'json_length' => strlen($tags),
+                ]
+            );
+        } else {
+            // v0.10.4.2: Log wenn Tags NICHT vorhanden sind
+            ChurchTools_Suite_Logger::warning(
+                'event_sync',
+                sprintf('Appointment %s - KEINE TAGS in API-Response', $appointment_id),
+                [
+                    'has_tags_key' => isset($appointment['tags']),
+                    'tags_is_array' => isset($appointment['tags']) && is_array($appointment['tags']),
+                    'tags_empty' => isset($appointment['tags']) ? empty($appointment['tags']) : 'NOT_SET',
+                    'appointment_keys' => array_keys($appointment),
+                ]
+            );
         }
         
         // v0.9.2.1: Debug logging für extrahierte Daten
