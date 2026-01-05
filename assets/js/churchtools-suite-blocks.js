@@ -132,7 +132,6 @@
 			columns: { type: 'number', default: 3 },
 			enable_modal: { type: 'boolean', default: true },
 		// v0.10.3.28: Tooltip options - defaults MUST match PHP (only show_time=true)
-		show_description: { type: 'boolean', default: false },
 		show_location: { type: 'boolean', default: false },
 		show_services: { type: 'boolean', default: false },
 			show_calendar_name: { type: 'boolean', default: false },
@@ -279,12 +278,6 @@
 						initialOpen: false 
 					},
 						el(ToggleControl, {
-							label: __('Beschreibung anzeigen', 'churchtools-suite'),
-							checked: attributes.show_description,
-							onChange: function(value) { setAttributes({ show_description: value }); },
-							help: __('Event-Beschreibung unter dem Titel anzeigen', 'churchtools-suite')
-						}),
-						el(ToggleControl, {
 							label: __('Ort anzeigen', 'churchtools-suite'),
 							checked: attributes.show_location,
 							onChange: function(value) { setAttributes({ show_location: value }); },
@@ -398,7 +391,6 @@
 						style: { margin: '8px 0 0', fontSize: '12px', opacity: '0.75', borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: '8px' } 
 					}, 
 						(attributes.viewType !== 'calendar' ? ('Limit: ' + attributes.limit + ' | ') : '') +
-						'Beschreibung: ' + (attributes.show_description ? '✓' : '✗') + ' | ' +
 						'Ort: ' + (attributes.show_location ? '✓' : '✗')
 					),
 					attributes.viewType === 'grid' && el('p', {
