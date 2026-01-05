@@ -287,6 +287,14 @@ class ChurchTools_Suite_Blocks {
 			}
 		}
 		
+		// v0.10.4.36: CRITICAL FIX - Map old show_description to new separate parameters
+		// Old blocks use: show_description
+		// New templates expect: show_event_description + show_appointment_description
+		if ( isset( $attributes['show_description'] ) && ! isset( $attributes['show_event_description'] ) ) {
+			$attributes['show_event_description'] = $attributes['show_description'];
+			$attributes['show_appointment_description'] = $attributes['show_description'];
+		}
+		
 		// v0.10.3.51: Convert boolean toggles to string 'true'/'false' for template compatibility
 		// v0.10.4.35: Set defaults BEFORE conversion (Gutenberg doesn't save default values)
 		$boolean_toggles = [ 'enable_modal', 'show_event_description', 'show_appointment_description', 'show_location', 'show_services', 'show_calendar_name', 'show_time', 'show_tags' ];
