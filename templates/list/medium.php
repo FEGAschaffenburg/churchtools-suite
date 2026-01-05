@@ -25,6 +25,7 @@ $show_services = isset( $args['show_services'] ) ? ChurchTools_Suite_Shortcodes:
 $show_location = isset( $args['show_location'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_location'] ) : true;
 $show_time = isset( $args['show_time'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_time'] ) : true;
 $show_calendar_name = isset( $args['show_calendar_name'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_calendar_name'] ) : false;
+$show_tags = isset( $args['show_tags'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_tags'] ) : true;
 ?>
 
 <div class="churchtools-suite-wrapper">
@@ -100,7 +101,7 @@ $show_calendar_name = isset( $args['show_calendar_name'] ) ? ChurchTools_Suite_S
 				</span>
 			<?php endif; ?>
 			
-			<?php if ( ! empty( $event['tags'] ) ) : ?>
+			<?php if ( $show_tags && ! empty( $event['tags'] ) ) : ?>
 				<?php
 				$tags = is_string( $event['tags'] ) ? json_decode( $event['tags'], true ) : $event['tags'];
 				if ( is_array( $tags ) && ! empty( $tags ) ) :
