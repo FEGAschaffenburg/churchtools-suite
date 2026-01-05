@@ -236,8 +236,8 @@ class ChurchTools_Suite_Event_Sync_Service {
             'direction' => 'forward',
             'from' => $args['from'],
             'to' => $args['to'],
-            // v0.10.4.0: Include eventServices + tags
-            'include' => 'eventServices,tags',
+            // v0.10.4.0: Include eventServices (tags nur bei Appointments!)
+            'include' => 'eventServices',
         ];
         
         // v0.7.1.0: Incremental sync - only fetch modified events
@@ -804,15 +804,9 @@ class ChurchTools_Suite_Event_Sync_Service {
             $address_longitude = isset($address['longitude']) ? (float) $address['longitude'] : null;
         }
         
-        // v0.9.2.0: Extract tags
+        // v0.10.4.0: Tags gibt es NUR bei Appointments, nicht bei Events!
+        // Tags werden in Phase 2 (Appointments API) importiert
         $tags = null;
-        if (isset($event['tags']) && is_array($event['tags']) && !empty($event['tags'])) {
-            // v0.10.4.0: Normalize color values (ChurchTools uses color names, we need hex codes)
-            $tags = wp_json_encode($this->normalize_tag_colors($event['tags']));
-        } elseif (isset($event['appointment']['tags']) && is_array($event['appointment']['tags']) && !empty($event['appointment']['tags'])) {
-            // v0.10.4.0: Normalize color values
-            $tags = wp_json_encode($this->normalize_tag_colors($event['appointment']['tags']));
-        }
         
         return [
             'event_id' => (string) $event['id'],
