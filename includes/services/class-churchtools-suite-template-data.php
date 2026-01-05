@@ -85,11 +85,12 @@ class ChurchTools_Suite_Template_Data {
 			$where[] = $wpdb->prepare( "calendar_id IN ($calendar_placeholders)", $filters['calendar_ids'] );
 		}
 		
-		// Date range filter - if not specified, show upcoming events (from now)
+		// Date range filter
 		if ( ! empty( $filters['from'] ) ) {
+			// User has explicitly set a start date - respect it (can be past!)
 			$where[] = $wpdb->prepare( 'start_datetime >= %s', $filters['from'] );
 		} else {
-			// Default: show events from today onwards
+			// Default: show events from today onwards (no past events)
 			$where[] = $wpdb->prepare( 'start_datetime >= %s', current_time( 'mysql' ) );
 		}
 		
