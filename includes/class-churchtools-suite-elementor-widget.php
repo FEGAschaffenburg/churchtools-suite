@@ -654,18 +654,6 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 			'description'  => __( 'Auch vergangene Termine anzeigen (Standard: nur Zukunft)', 'churchtools-suite' ),
 		]
 	);
-	
-							'value'    => 'standard',
-						],
-						[
-							'name'     => 'view_type',
-							'operator' => '===',
-							'value'    => 'grid',
-						],
-					],
-				],
-			]
-		);
 		
 		// Sprint 2: Spalten (nur Grid)
 		$this->add_control(
