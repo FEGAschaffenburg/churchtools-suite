@@ -879,13 +879,7 @@ class ChurchTools_Suite_Event_Sync_Service {
 			]
 		);
 		
-                'has_tags' => isset($appointment['tags']),
-                'appointment_keys' => array_keys($appointment),
-                'base_keys' => isset($appointment['base']) ? array_keys($appointment['base']) : [],
-            ]
-        );
-        
-        // Extract all available fields from base (v0.9.2.7: Support both nested and flat structure)
+		// Extract all available fields from base (v0.9.2.7: Support both nested and flat structure)
         // Newer API: appointment.base (nested)
         // Older/deprecated: base (flat, alias)
         $base = $appointment['appointment']['base'] ?? $appointment['base'] ?? [];
