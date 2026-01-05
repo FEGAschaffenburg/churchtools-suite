@@ -209,6 +209,30 @@ class ChurchTools_Suite_Shortcodes {
 	}
 	
 	/**
+	 * Map old show_description to new separate parameters
+	 * 
+	 * v0.10.4.37: Backward compatibility for old shortcodes/blocks
+	 * Old: show_description (both Event + Appointment)
+	 * New: show_event_description + show_appointment_description (separate)
+	 * 
+	 * @param array $atts Shortcode attributes
+	 * @return array Modified attributes with mapping applied
+	 */
+	private static function map_legacy_description_param( array $atts ): array {
+		// If old show_description exists and new params don't, map it
+		if ( isset( $atts['show_description'] ) ) {
+			if ( ! isset( $atts['show_event_description'] ) ) {
+				$atts['show_event_description'] = $atts['show_description'];
+			}
+			if ( ! isset( $atts['show_appointment_description'] ) ) {
+				$atts['show_appointment_description'] = $atts['show_description'];
+			}
+		}
+		
+		return $atts;
+	}
+	
+	/**
 	 * Calendar Shortcode
 	 * 
 	 * Usage:
@@ -235,6 +259,9 @@ class ChurchTools_Suite_Shortcodes {
 		
 		// Apply preset configuration if view is a preset slug
 		$atts = self::apply_preset_config( $atts, 'cts_calendar' );
+		
+		// v0.10.4.37: Map legacy show_description to new separate params
+		$atts = self::map_legacy_description_param( $atts );
 		
 		// Convert string boolean values to actual booleans
 		$atts['show_time'] = self::parse_boolean( $atts['show_time'] );
@@ -319,6 +346,9 @@ class ChurchTools_Suite_Shortcodes {
 		// Apply preset configuration if view is a preset slug
 		$atts = self::apply_preset_config( $atts, 'cts_list' );
 		
+		// v0.10.4.37: Map legacy show_description to new separate params
+		$atts = self::map_legacy_description_param( $atts );
+		
 		$events = self::get_events( $atts );
 		
 		// Use base view for template if preset
@@ -367,6 +397,9 @@ class ChurchTools_Suite_Shortcodes {
 		if ( $atts['columns'] < 1 || $atts['columns'] > 4 ) {
 			$atts['columns'] = 3;
 		}
+		
+		// v0.10.4.37: Map legacy show_description to new separate params
+		$atts = self::map_legacy_description_param( $atts );
 		
 		// Convert string boolean values to actual booleans
 		$atts['show_description'] = self::parse_boolean( $atts['show_description'] );
