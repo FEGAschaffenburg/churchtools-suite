@@ -25,10 +25,36 @@ $show_calendar_name = isset( $args['show_calendar_name'] ) ? ChurchTools_Suite_S
 $show_time = isset( $args['show_time'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_time'] ) : true;
 $show_tags = isset( $args['show_tags'] ) ? ChurchTools_Suite_Shortcodes::parse_boolean( $args['show_tags'] ) : false;
 
-// === DEBUG OUTPUT (v0.10.4.33) ===
+// === DEBUG OUTPUT (v0.10.4.39 - ENHANCED) ===
 if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 	echo '<div style="background: #fff3cd; border: 3px solid #ffc107; padding: 20px; margin: 20px 0; font-family: monospace; font-size: 13px; border-radius: 8px;">';
 	echo '<h2 style="margin-top:0; color: #856404;">🔍 ChurchTools Suite DEBUG - list/classic.php</h2>';
+	
+	// CRITICAL: Version Check
+	$current_version = defined( 'CHURCHTOOLS_SUITE_VERSION' ) ? CHURCHTOOLS_SUITE_VERSION : 'UNKNOWN';
+	$is_correct_version = version_compare( $current_version, '0.10.4.39', '>=' );
+	$bg_color = $is_correct_version ? '#d4edda' : '#f8d7da';
+	$border_color = $is_correct_version ? '#28a745' : '#dc3545';
+	$text_color = $is_correct_version ? '#155724' : '#721c24';
+	
+	echo '<div style="background: ' . $bg_color . '; border: 2px solid ' . $border_color . '; padding: 12px; margin-bottom: 15px; border-radius: 4px;">';
+	echo '<strong style="font-size: 16px; color: ' . $text_color . ';">Plugin Version: ' . esc_html( $current_version ) . '</strong>';
+	if ( ! $is_correct_version ) {
+		echo '<p style="margin: 8px 0 0 0; color: ' . $text_color . '; font-weight: bold;">❌ ALTE VERSION! Bitte v0.10.4.39 hochladen!</p>';
+		echo '<p style="margin: 4px 0 0 0; font-size: 11px;">WordPress Cache leeren + Plugin neu installieren!</p>';
+	} else {
+		echo '<p style="margin: 8px 0 0 0; color: ' . $text_color . '; font-weight: bold;">✅ Korrekte Version installiert</p>';
+	}
+	echo '</div>';
+	
+	// CRITICAL: show_description Detection
+	if ( isset( $args['show_description'] ) ) {
+		echo '<div style="background: #f8d7da; border: 2px solid #dc3545; padding: 12px; margin-bottom: 15px; border-radius: 4px;">';
+		echo '<strong style="color: #721c24;">⚠️ WARNUNG: show_description gefunden!</strong><br>';
+		echo '<span style="font-size: 11px;">Das ist das ALTE Attribut! Sollte NICHT mehr verwendet werden.<br>';
+		echo 'Gutenberg Block sendet falsche Parameter ODER normalize_block_attributes() Bug ist noch aktiv!</span>';
+		echo '</div>';
+	}
 	
 	echo '<h3 style="color: #856404;">1. Übergebene Argumente ($args):</h3>';
 	echo '<pre style="background: #f8f9fa; padding: 12px; overflow-x: auto; border-radius: 4px; max-height: 200px;">';
