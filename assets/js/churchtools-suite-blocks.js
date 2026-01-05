@@ -132,6 +132,8 @@
 			columns: { type: 'number', default: 3 },
 			enable_modal: { type: 'boolean', default: true },
 		// v0.10.3.28: Tooltip options - defaults MUST match PHP (only show_time=true)
+		show_event_description: { type: 'boolean', default: false },
+		show_appointment_description: { type: 'boolean', default: false },
 		show_location: { type: 'boolean', default: false },
 		show_services: { type: 'boolean', default: false },
 			show_calendar_name: { type: 'boolean', default: false },
@@ -277,6 +279,18 @@
 						title: __('👁️ Anzeige-Optionen', 'churchtools-suite'), 
 						initialOpen: false 
 					},
+						el(ToggleControl, {
+							label: __('Event-Beschreibung anzeigen', 'churchtools-suite'),
+							checked: attributes.show_event_description,
+							onChange: function(value) { setAttributes({ show_event_description: value }); },
+							help: __('Beschreibung der Event-Serie anzeigen', 'churchtools-suite')
+						}),
+						el(ToggleControl, {
+							label: __('Termin-Beschreibung anzeigen', 'churchtools-suite'),
+							checked: attributes.show_appointment_description,
+							onChange: function(value) { setAttributes({ show_appointment_description: value }); },
+							help: __('Beschreibung des einzelnen Termins anzeigen', 'churchtools-suite')
+						}),
 						el(ToggleControl, {
 							label: __('Ort anzeigen', 'churchtools-suite'),
 							checked: attributes.show_location,

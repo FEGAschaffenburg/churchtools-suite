@@ -475,6 +475,33 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 		]
 	);
 
+		// v0.10.4.18: Event-Beschreibung anzeigen
+		$this->add_control(
+			'show_event_description',
+			[
+				'label'        => __( 'Event-Beschreibung anzeigen', 'churchtools-suite' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'label_on'     => __( 'Ja', 'churchtools-suite' ),
+				'label_off'    => __( 'Nein', 'churchtools-suite' ),
+				'return_value' => 'yes',
+				'default'      => '',
+				'description'  => __( 'Beschreibung der Event-Serie anzeigen', 'churchtools-suite' ),
+			]
+		);
+		
+		// v0.10.4.18: Termin-Beschreibung anzeigen
+		$this->add_control(
+			'show_appointment_description',
+			[
+				'label'        => __( 'Termin-Beschreibung anzeigen', 'churchtools-suite' ),
+				'type'         => \Elementor\Controls_Manager::SWITCHER,
+				'label_on'     => __( 'Ja', 'churchtools-suite' ),
+				'label_off'    => __( 'Nein', 'churchtools-suite' ),
+				'return_value' => 'yes',
+				'default'      => '',
+				'description'  => __( 'Beschreibung des einzelnen Termins anzeigen', 'churchtools-suite' ),
+			]
+		);
 
 		// Sprint 1: Ort anzeigen
 		$this->add_control(
@@ -742,6 +769,8 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 		
 		// v0.10.3.52: Anzeige-Toggles IMMER übergeben (auch bei Presets)
 		$atts['enable_modal'] = ( ! empty( $settings['enable_modal'] ) && $settings['enable_modal'] === 'yes' ) ? 'true' : 'false';
+		$atts['show_event_description'] = ( isset( $settings['show_event_description'] ) && $settings['show_event_description'] === 'yes' ) ? 'true' : 'false';
+		$atts['show_appointment_description'] = ( isset( $settings['show_appointment_description'] ) && $settings['show_appointment_description'] === 'yes' ) ? 'true' : 'false';
 		$atts['show_location'] = ( isset( $settings['show_location'] ) && $settings['show_location'] === 'yes' ) ? 'true' : 'false';
 		$atts['show_services'] = ( isset( $settings['show_services'] ) && $settings['show_services'] === 'yes' ) ? 'true' : 'false';
 		$atts['show_calendar_name'] = ( isset( $settings['show_calendar_name'] ) && $settings['show_calendar_name'] === 'yes' ) ? 'true' : 'false';
