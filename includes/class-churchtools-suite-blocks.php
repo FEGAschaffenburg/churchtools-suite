@@ -279,7 +279,7 @@ class ChurchTools_Suite_Blocks {
 		self::update_render_time( 'churchtools-suite/events' );
 		
 		// v0.10.3.51: Convert boolean toggles to string 'true'/'false' for template compatibility
-		$boolean_toggles = [ 'enable_modal', 'show_description', 'show_location', 'show_services', 'show_calendar_name', 'show_time' ];
+		$boolean_toggles = [ 'enable_modal', 'show_event_description', 'show_appointment_description', 'show_location', 'show_services', 'show_calendar_name', 'show_time', 'show_tags' ];
 		foreach ( $boolean_toggles as $toggle ) {
 			if ( isset( $attributes[ $toggle ] ) ) {
 				$attributes[ $toggle ] = $attributes[ $toggle ] ? 'true' : 'false';
@@ -295,6 +295,12 @@ class ChurchTools_Suite_Blocks {
 				break;
 			case 'grid':
 				$output = ChurchTools_Suite_Shortcodes::grid_shortcode( $attributes );
+				break;
+			case 'widget':
+				$output = ChurchTools_Suite_Shortcodes::widget_shortcode( $attributes );
+				break;
+			case 'search':
+				$output = ChurchTools_Suite_Shortcodes::search_shortcode( $attributes );
 				break;
 			case 'list':
 			default:
