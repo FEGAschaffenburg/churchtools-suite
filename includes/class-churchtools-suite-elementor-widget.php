@@ -475,20 +475,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 		]
 	);
 
-	// Sprint 1: Beschreibung anzeigen
-	$this->add_control(
-		'show_description',
-		[
-				'label'        => __( 'Beschreibung anzeigen', 'churchtools-suite' ),
-				'type'         => \Elementor\Controls_Manager::SWITCHER,
-				'label_on'     => __( 'Ja', 'churchtools-suite' ),
-				'label_off'    => __( 'Nein', 'churchtools-suite' ),
-				'return_value' => 'yes',
-				'default'      => 'yes',
-				'description'  => __( 'Event-Beschreibung unter dem Titel anzeigen', 'churchtools-suite' ),
-			]
-		);
-		
+
 		// Sprint 1: Ort anzeigen
 		$this->add_control(
 			'show_location',
@@ -755,7 +742,6 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 		
 		// v0.10.3.52: Anzeige-Toggles IMMER übergeben (auch bei Presets)
 		$atts['enable_modal'] = ( ! empty( $settings['enable_modal'] ) && $settings['enable_modal'] === 'yes' ) ? 'true' : 'false';
-		$atts['show_description'] = ( isset( $settings['show_description'] ) && $settings['show_description'] === 'yes' ) ? 'true' : 'false';
 		$atts['show_location'] = ( isset( $settings['show_location'] ) && $settings['show_location'] === 'yes' ) ? 'true' : 'false';
 		$atts['show_services'] = ( isset( $settings['show_services'] ) && $settings['show_services'] === 'yes' ) ? 'true' : 'false';
 		$atts['show_calendar_name'] = ( isset( $settings['show_calendar_name'] ) && $settings['show_calendar_name'] === 'yes' ) ? 'true' : 'false';
