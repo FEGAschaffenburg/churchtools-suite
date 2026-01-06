@@ -144,6 +144,20 @@ class ChurchTools_Suite_Blocks {
 				$parsed_block['attrs'] = [];
 			}
 			
+			// v0.10.4.42: MIGRATION - Convert old show_description to new separate toggles
+			if ( isset( $parsed_block['attrs']['show_description'] ) ) {
+				$old_value = $parsed_block['attrs']['show_description'];
+				
+				// Set both new toggles to the old value
+				$parsed_block['attrs']['show_event_description'] = $old_value;
+				$parsed_block['attrs']['show_appointment_description'] = $old_value;
+				
+				// Remove old attribute
+				unset( $parsed_block['attrs']['show_description'] );
+				
+				self::block_log( '🔄 MIGRATION: show_description (' . ( $old_value ? 'true' : 'false' ) . ') → show_event_description + show_appointment_description' );
+			}
+			
 			// Add missing boolean attributes with defaults
 			// These were added in v0.5.11.12 and may be missing in old blocks
 			if ( ! isset( $parsed_block['attrs']['show_services'] ) ) {
