@@ -123,8 +123,8 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 			]
 		);
 		
-		// View Type - einheitliches Control für beide Modi
-		// Options werden dynamisch basierend auf preset_source gefiltert
+		// v1.0.0.0 - CLEAN SLATE: Only list/classic active
+		// View Type - Only list available
 		$this->add_control(
 			'view_type',
 			[
@@ -132,20 +132,21 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 				'type'    => \Elementor\Controls_Manager::SELECT,
 				'default' => 'list',
 				'options' => [
-					'list'      => __( '📋 Liste', 'churchtools-suite' ),
-					'calendar'  => __( '📅 Kalender', 'churchtools-suite' ),
-					'grid'      => __( '▦ Raster', 'churchtools-suite' ),
-					'search'    => __( '🔍 Suche', 'churchtools-suite' ),
-					'widget'    => __( '📱 Widget', 'churchtools-suite' ),
-					// TODO: slider, masonry, agenda, timetable, carousel, countdown, cover, map später
+					'list' => __( '📋 Liste', 'churchtools-suite' ),
+					// DEACTIVATED in v1.0.0:
+					// 'calendar' => __( '📅 Kalender', 'churchtools-suite' ),
+					// 'grid' => __( '▦ Raster', 'churchtools-suite' ),
+					// 'search' => __( '🔍 Suche', 'churchtools-suite' ),
+					// 'widget' => __( '📱 Widget', 'churchtools-suite' ),
 				],
 			]
 		);
 		
-		// List Views (nur Standard - v0.10.4.13: Nur Classic und Medium verfügbar)
+		// List Views - Only classic available (v1.0.0)
 		$list_options = [
 			'classic' => __( 'Classic', 'churchtools-suite' ),
-			'medium'  => __( 'Medium', 'churchtools-suite' ),
+			// DEACTIVATED in v1.0.0:
+			// 'medium' => __( 'Medium', 'churchtools-suite' ),
 		];
 		
 		$this->add_control(
@@ -173,6 +174,8 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 			]
 		);
 		
+		// v1.0.0.0: DEACTIVATED - Calendar/Grid/Search/Widget Controls
+		/*
 		// List Presets (nur Preset-Modus)
 		if ( ! empty( $list_presets ) ) {
 			$this->add_control(
@@ -374,6 +377,7 @@ class ChurchTools_Suite_Elementor_Widget extends \Elementor\Widget_Base {
 				],
 			]
 		);
+		*/ // END v1.0.0.0 DEACTIVATED
 		
 		// Calendar Selection (nur bei Standard-Modus)
 		$calendars = $this->get_calendars();

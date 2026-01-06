@@ -35,12 +35,12 @@ echo '<p style="color: green;">✅ WordPress Object Cache geleert</p>';
 
 echo '<h2>NÄCHSTE SCHRITTE:</h2>';
 echo '<ol>';
-echo '<li><strong>Seite neu laden:</strong> <a href="' . home_url('/guthenberg-test/') . '?nocache=' . time() . '" target="_blank">https://test2-aschaffenburg.feg.de/guthenberg-test/</a></li>';
-echo '<li><strong>Hard Reload:</strong> Strg+Shift+R</li>';
-echo '<li><strong>Debug prüfen:</strong> show_description Warnung sollte WEG sein!</li>';
+echo '<li><strong>Seite neu laden:</strong> <a href="' . home_url() . '?nocache=' . time() . '" target="_blank">Zur Website</a></li>';
+echo '<li><strong>Hard Reload:</strong> Strg+Shift+R im Browser</li>';
+echo '<li><strong>Block Editor testen:</strong> Gutenberg Block prüfen</li>';
 echo '</ol>';
 
-echo '<h2>DEBUG-INFO:</h2>';
+echo '<h2>SYSTEM-INFO:</h2>';
 echo '<pre>';
 echo 'Plugin Version: ' . (defined('CHURCHTOOLS_SUITE_VERSION') ? CHURCHTOOLS_SUITE_VERSION : 'NICHT GELADEN') . "\n";
 echo 'OPcache aktiv: ' . (function_exists('opcache_get_status') ? 'JA' : 'NEIN') . "\n";

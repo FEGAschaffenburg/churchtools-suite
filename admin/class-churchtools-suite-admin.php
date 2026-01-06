@@ -2290,4 +2290,5 @@ class ChurchTools_Suite_Admin {
 			exit;
 		}
 	}
+	
 }

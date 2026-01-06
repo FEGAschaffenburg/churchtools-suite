@@ -54,7 +54,11 @@ $ExcludeItems = @(
     'composer.json',
     'composer.lock',
     'package.json',
-    'package-lock.json'
+    'package-lock.json',
+    'clear-cache.php',
+    'clear-opcache.php',
+    'RELEASE-NOTES*.md',
+    'release-notes*.md'
 )
 
 Write-Host "Copying files..."

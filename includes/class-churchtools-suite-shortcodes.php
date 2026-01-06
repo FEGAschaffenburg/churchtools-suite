@@ -45,54 +45,26 @@ class ChurchTools_Suite_Shortcodes {
 		// Add modal template to footer
 		add_action( 'wp_footer', [ __CLASS__, 'add_modal_template' ] );
 		
-		// Register AJAX handlers
-		add_action( 'wp_ajax_cts_load_calendar_month', [ __CLASS__, 'ajax_load_calendar_month' ] );
-		add_action( 'wp_ajax_nopriv_cts_load_calendar_month', [ __CLASS__, 'ajax_load_calendar_month' ] );
+		// v1.0.0.0 - CLEAN SLATE: Only list/classic active
+		// All other views deactivated for incremental rollout
 		
-		// DEBUG: Test shortcode
-		add_shortcode( 'cts_debug_test', [ __CLASS__, 'debug_test_shortcode' ] );
-		
-		// Calendar Views
-		add_shortcode( 'cts_calendar', [ __CLASS__, 'calendar_shortcode' ] );
-		
-		// List Views
+		// List Views (only classic active)
 		add_shortcode( 'cts_list', [ __CLASS__, 'list_shortcode' ] );
 		
-		// Grid Views
-		add_shortcode( 'cts_grid', [ __CLASS__, 'grid_shortcode' ] );
-		
-		// Modal Single Event
-		add_shortcode( 'cts_modal', [ __CLASS__, 'modal_shortcode' ] );
-		
-		// Slider Views
-		add_shortcode( 'cts_slider', [ __CLASS__, 'slider_shortcode' ] );
-		
-		// Countdown Views
-		add_shortcode( 'cts_countdown', [ __CLASS__, 'countdown_shortcode' ] );
-		
-		// Cover Views
-		add_shortcode( 'cts_cover', [ __CLASS__, 'cover_shortcode' ] );
-		
-		// Timetable Views
-		add_shortcode( 'cts_timetable', [ __CLASS__, 'timetable_shortcode' ] );
-		
-		// Carousel Views
-		add_shortcode( 'cts_carousel', [ __CLASS__, 'carousel_shortcode' ] );
-		
-		// Single Event
-		add_shortcode( 'cts_single', [ __CLASS__, 'single_shortcode' ] );
-		
-		// Map Views
-		add_shortcode( 'cts_map', [ __CLASS__, 'map_shortcode' ] );
-		
-		// Search
-		add_shortcode( 'cts_search', [ __CLASS__, 'search_shortcode' ] );
-		
-		// Widgets
-		add_shortcode( 'cts_widget', [ __CLASS__, 'widget_shortcode' ] );
-		
-		// Legacy compatibility
-		add_shortcode( 'cts_events', [ __CLASS__, 'legacy_events_shortcode' ] );
+		// DEACTIVATED VIEWS (v1.0.0.0 Clean Start):
+		// add_shortcode( 'cts_calendar', [ __CLASS__, 'calendar_shortcode' ] );
+		// add_shortcode( 'cts_grid', [ __CLASS__, 'grid_shortcode' ] );
+		// add_shortcode( 'cts_slider', [ __CLASS__, 'slider_shortcode' ] );
+		// add_shortcode( 'cts_countdown', [ __CLASS__, 'countdown_shortcode' ] );
+		// add_shortcode( 'cts_cover', [ __CLASS__, 'cover_shortcode' ] );
+		// add_shortcode( 'cts_timetable', [ __CLASS__, 'timetable_shortcode' ] );
+		// add_shortcode( 'cts_carousel', [ __CLASS__, 'carousel_shortcode' ] );
+		// add_shortcode( 'cts_single', [ __CLASS__, 'single_shortcode' ] );
+		// add_shortcode( 'cts_map', [ __CLASS__, 'map_shortcode' ] );
+		// add_shortcode( 'cts_search', [ __CLASS__, 'search_shortcode' ] );
+		// add_shortcode( 'cts_widget', [ __CLASS__, 'widget_shortcode' ] );
+		// add_shortcode( 'cts_modal', [ __CLASS__, 'modal_shortcode' ] );
+		// add_shortcode( 'cts_events', [ __CLASS__, 'legacy_events_shortcode' ] );
 	}
 	
 	/**
@@ -315,50 +287,56 @@ class ChurchTools_Suite_Shortcodes {
 			'from' => '',
 			'to' => '',
 			'class' => '',
-			// Sprint 1: Anzeige-Parameter
-			'show_description' => true,
+			// v1.0.0: Separate description parameters
+			'show_event_description' => true,
+			'show_appointment_description' => true,
 			'show_location' => true,
-			// Sprint 3: Weitere Anzeige-Parameter
-			'show_services' => true,
-			'show_calendar_name' => false,
+			'show_services' => false,
 			'show_time' => true,
-			'show_tags' => false, // v0.10.4.11: Tags anzeigen
-			// Sprint 4: Filter-Parameter
+			'show_tags' => true,
+			// Legacy (deprecated in v1.0.0)
+			'show_description' => null,
+			'show_calendar_name' => false,
+			// Filter parameters
 			'order' => 'asc',
 			'date_from' => '',
 			'date_to' => '',
-			'filter_tags' => '', // v0.10.4.11: Filter nach Tags (komma-separiert)
+			'filter_tags' => '',
 		], $atts, 'cts_list' );
 		
-		// Convert string boolean values to actual booleans
-		$atts['show_description'] = self::parse_boolean( $atts['show_description'] );
+		// v1.0.0.0 - CLEAN SLATE: Only classic view allowed
+		if ( $atts['view'] !== 'classic' ) {
+			return '<p style="padding: 12px; background: #fef3c7; border-radius: 4px;">⚠️ <strong>View nicht verfügbar:</strong> Nur "classic" ist in v1.0.0 aktiv. View "' . esc_html( $atts['view'] ) . '" wird in zukünftigen Updates aktiviert.</p>';
+		}
+		
+		// Convert boolean values
+		$atts['show_event_description'] = self::parse_boolean( $atts['show_event_description'] );
+		$atts['show_appointment_description'] = self::parse_boolean( $atts['show_appointment_description'] );
 		$atts['show_location'] = self::parse_boolean( $atts['show_location'] );
 		$atts['show_services'] = self::parse_boolean( $atts['show_services'] );
 		$atts['show_calendar_name'] = self::parse_boolean( $atts['show_calendar_name'] );
 		$atts['show_time'] = self::parse_boolean( $atts['show_time'] );
-		$atts['show_tags'] = self::parse_boolean( $atts['show_tags'] ); // v0.10.4.11
+		$atts['show_tags'] = self::parse_boolean( $atts['show_tags'] );
 		
-		// Validate order (asc/desc)
+		// Legacy show_description fallback
+		if ( $atts['show_description'] !== null ) {
+			$show_desc = self::parse_boolean( $atts['show_description'] );
+			$atts['show_event_description'] = $show_desc;
+			$atts['show_appointment_description'] = $show_desc;
+		}
+		
+		// Validate order
 		if ( ! in_array( $atts['order'], [ 'asc', 'desc' ], true ) ) {
 			$atts['order'] = 'asc';
 		}
 		
-		// Apply preset configuration if view is a preset slug
-		$atts = self::apply_preset_config( $atts, 'cts_list' );
-		
-		// v0.10.4.37: Map legacy show_description to new separate params
-		$atts = self::map_legacy_description_param( $atts );
-		
 		$events = self::get_events( $atts );
 		
-		// Use base view for template if preset
-		$template_view = isset( $atts['_preset_base_view'] ) ? $atts['_preset_base_view'] : $atts['view'];
-		
-		return self::render_template( "list/{$template_view}", $events, $atts );
+		return self::render_template( 'list/classic', $events, $atts );
 	}
 	
 	/**
-	 * Grid Shortcode
+	 * Grid Shortcode (DEACTIVATED in v1.0.0)
 	 * 
 	 * Usage:
 	 * [cts_grid view="simple" columns="3"]
