@@ -133,8 +133,26 @@ class ChurchTools_Suite_Single_Event_Shortcode {
 			}
 		}
 		
+		// v0.9.9.86: Log which template file is actually being loaded
+		if ( ! class_exists( 'ChurchTools_Suite_Logger' ) ) {
+			require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-logger.php';
+		}
+		
+		ChurchTools_Suite_Logger::debug( 'single_event_shortcode', 'Loading single event template', [
+			'template_name' => $template,
+			'template_path' => $template_path,
+			'file_exists' => file_exists( $template_path ),
+			'is_theme_override' => ! empty( $theme_template ),
+			'event_id' => $data['event']->id ?? 'unknown',
+		] );
+		
 		// Check if template exists
 		if ( ! file_exists( $template_path ) ) {
+			ChurchTools_Suite_Logger::error( 'single_event_shortcode', 'Template file not found', [
+				'template_name' => $template,
+				'template_path' => $template_path,
+			] );
+			
 			return '<div class="cts-error">' . 
 				sprintf( __( 'Fehler: Template "%s" nicht gefunden.', 'churchtools-suite' ), esc_html( $template ) ) . 
 				'</div>';
