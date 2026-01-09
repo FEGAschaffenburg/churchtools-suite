@@ -1559,6 +1559,9 @@ class ChurchTools_Suite_Admin {
 		// Check nonce
 		check_ajax_referer( 'churchtools_suite_public', 'nonce' );
 		
+		// Load logger
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-logger.php';
+		
 		// Load template loader
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-template-loader.php';
 		
@@ -1577,11 +1580,15 @@ class ChurchTools_Suite_Admin {
 		$modal_template = 'professional'; // Default (v0.9.9.69: changed from event-detail)
 		if ( $current_view && isset( $view_to_modal_map[ $current_view ] ) ) {
 			$modal_template = $view_to_modal_map[ $current_view ];
-			error_log( '[ChurchTools Suite] Using ' . $current_view . ' modal template: ' . $modal_template );
+			ChurchTools_Suite_Logger::debug( 'ajax_modal', 'Using template for view: ' . $current_view, [
+				'template' => $modal_template,
+			] );
 		} else {
 			// Fallback to global setting
 			$modal_template = get_option( 'churchtools_suite_modal_template', 'professional' );
-			error_log( '[ChurchTools Suite] No current view provided, using global modal template: ' . $modal_template );
+			ChurchTools_Suite_Logger::debug( 'ajax_modal', 'No current view provided, using global modal template', [
+				'template' => $modal_template,
+			] );
 		}
 		
 		// v1.4.0: Neue Template-Struktur (views/event-modal/)
@@ -1591,15 +1598,25 @@ class ChurchTools_Suite_Admin {
 		// (using ob_start() with $echo=true doesn't work because output is sent directly)
 		$html = ChurchTools_Suite_Template_Loader::render_template( $template_path, [], false );
 		
-		// v0.9.9.75: Enhanced error debugging
+		// v0.9.9.75: Enhanced logging using plugin logger
 		$is_error_comment = strpos( $html, '<!--' ) === 0;
-		error_log( '[AJAX Modal] Template: ' . $template_path . ' | HTML Length: ' . strlen( $html ) . ' | Is Error: ' . ( $is_error_comment ? 'YES' : 'NO' ) );
+		ChurchTools_Suite_Logger::debug( 'ajax_modal', 'Template rendering result', [
+			'template_path' => $template_path,
+			'html_length' => strlen( $html ),
+			'is_error' => $is_error_comment,
+			'first_chars' => substr( $html, 0, 50 ),
+		] );
 		
+		// If error, log details
 		if ( $is_error_comment ) {
-			error_log( '[AJAX Modal] Error Comment: ' . substr( $html, 0, 200 ) );
-			// Also log full path check
 			$full_path = CHURCHTOOLS_SUITE_PATH . 'templates/' . $template_path;
-			error_log( '[AJAX Modal] Full Path: ' . $full_path . ' | Exists: ' . ( file_exists( $full_path ) ? 'YES' : 'NO' ) );
+			ChurchTools_Suite_Logger::warning( 'ajax_modal', 'Template not found or render error', [
+				'template_path' => $template_path,
+				'full_path' => $full_path,
+				'file_exists' => file_exists( $full_path ),
+				'churchtools_suite_path' => CHURCHTOOLS_SUITE_PATH,
+				'error_message' => substr( $html, 4, 300 ), // Remove <!-- and get message
+			] );
 		}
 		
 		// v0.10.3.6: Debug - Prüfe ob HTML vorhanden ist
@@ -1611,13 +1628,19 @@ class ChurchTools_Suite_Admin {
 				'debug' => [
 					'template_path' => CHURCHTOOLS_SUITE_PATH . 'templates/views/event-modal/' . $modal_template . '.php',
 					'exists' => file_exists( CHURCHTOOLS_SUITE_PATH . 'templates/views/event-modal/' . $modal_template . '.php' ),
-					'current_view' => $current_view, // v0.9.9.66: Log received view
-					'selected_modal' => $modal_template, // v0.9.9.66: Log selected template
+					'current_view' => $current_view,
+					'selected_modal' => $modal_template,
 					'churchtools_suite_path' => CHURCHTOOLS_SUITE_PATH,
 				],
 			] );
 			return;
 		}
+		
+		// Success - log it
+		ChurchTools_Suite_Logger::info( 'ajax_modal', 'Modal template loaded successfully', [
+			'template_path' => $template_path,
+			'html_length' => strlen( $html ),
+		] );
 		
 		wp_send_json_success( [
 			'html' => $html
