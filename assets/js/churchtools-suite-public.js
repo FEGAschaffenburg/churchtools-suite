@@ -262,7 +262,7 @@
 									e.preventDefault();
 									const eventId = $(this).data('event-id');
 									console.log('[Calendar] Event clicked:', eventId);
-									showEventModal(eventId, $calendar);
+								showEventModal(eventId, $calendar, 'calendar');
 								});
 								$event.data('click-handler-attached', true);
 							}
@@ -300,7 +300,18 @@
 				const eventId = $(this).data('event-id');
 				// Find parent container with settings
 				const $container = $(this).closest('[data-show-description]');
-				showEventModal(eventId, $container);
+				
+				// v0.9.9.80: Detect current view type
+				let currentView = null;
+				if ($container.length > 0) {
+					const classes = $container.attr('class') || '';
+					if (classes.includes('cts-grid-')) currentView = 'grid';
+					else if (classes.includes('cts-list')) currentView = 'list';
+					else if (classes.includes('cts-calendar')) currentView = 'calendar';
+					else if (classes.includes('cts-single')) currentView = 'single';
+				}
+				
+				showEventModal(eventId, $container, currentView);
 			}
 		});
 	}
@@ -699,7 +710,7 @@
 			const eventId = events.first().data('event-id');
 			// Find parent calendar with settings
 			const $container = $(this).closest('.cts-calendar');
-			showEventModal(eventId, $container);
+			showEventModal(eventId, $container, 'calendar');
 		} else {
 			// Multiple events - show day view
 			showDayEventsModal(date, events);
@@ -744,6 +755,7 @@
 	/**
 	 * Event click handler (in list/grid views)
 	 * v0.9.3.1: Support for event_action modes (modal/page/none)
+	 * v0.9.9.80: Always pass currentView for template selection
 	 */
 	$(document).on('click', '.cts-event-clickable', function(e) {
 		// Modal action - open modal
@@ -752,7 +764,18 @@
 		const eventId = $(this).data('event-id');
 		if (eventId) {
 			const $container = $(this).closest('[data-show-description]');
-			showEventModal(eventId, $container);
+			
+			// v0.9.9.80: Detect current view type
+			let currentView = null;
+			if ($container.length > 0) {
+				const classes = $container.attr('class') || '';
+				if (classes.includes('cts-grid-')) currentView = 'grid';
+				else if (classes.includes('cts-list')) currentView = 'list';
+				else if (classes.includes('cts-calendar')) currentView = 'calendar';
+				else if (classes.includes('cts-single')) currentView = 'single';
+			}
+			
+			showEventModal(eventId, $container, currentView);
 		}
 	});
 	
