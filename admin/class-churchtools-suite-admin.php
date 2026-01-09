@@ -1568,73 +1568,63 @@ class ChurchTools_Suite_Admin {
 		// v0.9.9.66: Get current view from client (if available)
 		$current_view = isset( $_POST['current_view'] ) ? sanitize_text_field( $_POST['current_view'] ) : null;
 		
-		// v0.9.9.78: Log dashboard settings
+		// v0.9.9.83: SIMPLIFIED - Only load modal template (no separate single template)
 		$global_modal_setting = get_option( 'churchtools_suite_modal_template', 'professional' );
-		$global_single_setting = get_option( 'churchtools_suite_single_template', 'professional' );
 		
 		ChurchTools_Suite_Logger::debug( 'ajax_modal', 'Dashboard settings loaded', [
 			'churchtools_suite_modal_template' => $global_modal_setting,
-			'churchtools_suite_single_template' => $global_single_setting,
 			'current_view' => $current_view,
 		] );
 		
-		// v0.9.9.82: DYNAMIC template discovery - scan filesystem instead of hardcoding
+		// v0.9.9.83: SIMPLIFIED LOGIC - Use single global template for ALL views
+		// Scan filesystem for available templates
 		$valid_modal_templates = self::get_available_modal_templates();
-		$valid_single_templates = self::get_available_single_templates();
 		
-		// Fallback templates if none found
+		// Fallback if no templates found
 		if ( empty( $valid_modal_templates ) ) {
 			$valid_modal_templates = [ 'professional' ];
 		}
-		if ( empty( $valid_single_templates ) ) {
-			$valid_single_templates = [ 'professional' ];
-		}
 		
-		// Check if dashboard settings reference non-existent templates
+		// Check if dashboard setting references valid template
 		if ( ! in_array( $global_modal_setting, $valid_modal_templates, true ) ) {
-			ChurchTools_Suite_Logger::warning( 'ajax_modal', 'Dashboard modal template does not exist - using fallback', [
+			ChurchTools_Suite_Logger::warning( 'ajax_modal', 'Dashboard template does not exist - using fallback', [
 				'requested_template' => $global_modal_setting,
 				'fallback_template' => $valid_modal_templates[0],
 				'valid_templates' => $valid_modal_templates,
+				'available_in_filesystem' => $valid_modal_templates,
 			] );
-			$global_modal_setting = $valid_modal_templates[0]; // Use first available template
+			$global_modal_setting = $valid_modal_templates[0];
 		}
 		
-		if ( ! in_array( $global_single_setting, $valid_single_templates, true ) ) {
-			ChurchTools_Suite_Logger::warning( 'ajax_modal', 'Dashboard single template does not exist - using fallback', [
-				'requested_template' => $global_single_setting,
-				'fallback_template' => $valid_single_templates[0],
-				'valid_templates' => $valid_single_templates,
-			] );
-			$global_single_setting = $valid_single_templates[0]; // Use first available template
+		// v0.9.9.83: UNIFIED - Same template for ALL views (list, grid, calendar, single)
+		// Optional: Block can override with template_override parameter
+		$modal_template = $global_modal_setting;
+		
+		// Check for template override from Block (v0.9.9.83: NEW)
+		if ( isset( $_POST['template_override'] ) && ! empty( $_POST['template_override'] ) ) {
+			$override_template = sanitize_text_field( wp_unslash( $_POST['template_override'] ) );
+			
+			// Validate override template exists
+			if ( in_array( $override_template, $valid_modal_templates, true ) ) {
+				$modal_template = $override_template;
+				ChurchTools_Suite_Logger::debug( 'ajax_modal', 'Using block override template', [
+					'block_override' => $override_template,
+					'default_global_template' => $global_modal_setting,
+				] );
+			} else {
+				ChurchTools_Suite_Logger::warning( 'ajax_modal', 'Block override template does not exist', [
+					'requested_override' => $override_template,
+					'valid_templates' => $valid_modal_templates,
+					'using_default' => $global_modal_setting,
+				] );
+			}
 		}
 		
-		// Map view type to modal template (v0.9.9.66, v0.9.9.69: updated to professional)
-		$view_to_modal_map = [
-			'list' => $global_modal_setting,
-			'grid' => $global_modal_setting,
-			'calendar' => $global_modal_setting,
-			'single' => $global_single_setting,
-		];
-		
-		// Select modal template based on current view
-		$modal_template = 'professional'; // Default (v0.9.9.69: changed from event-detail)
-		if ( $current_view && isset( $view_to_modal_map[ $current_view ] ) ) {
-			$modal_template = $view_to_modal_map[ $current_view ];
-			ChurchTools_Suite_Logger::debug( 'ajax_modal', 'Template selected for current view', [
-				'current_view' => $current_view,
-				'selected_template' => $modal_template,
-				'from_setting' => $current_view === 'single' ? 'churchtools_suite_single_template' : 'churchtools_suite_modal_template',
-			] );
-		} else {
-			// Fallback to global setting
-			$modal_template = $global_modal_setting;
-			ChurchTools_Suite_Logger::debug( 'ajax_modal', 'No current view provided, using global modal template', [
-				'template' => $modal_template,
-				'from_setting' => 'churchtools_suite_modal_template',
-				'current_view' => $current_view,
-			] );
-		}
+		ChurchTools_Suite_Logger::debug( 'ajax_modal', 'Template selected', [
+			'selected_template' => $modal_template,
+			'source' => isset( $_POST['template_override'] ) ? 'block_override' : 'dashboard_global',
+			'current_view' => $current_view,
+		] );
 		
 		// v1.4.0: Neue Template-Struktur (views/event-modal/)
 		$template_path = 'views/event-modal/' . sanitize_file_name( $modal_template ) . '.php';
@@ -2551,36 +2541,6 @@ class ChurchTools_Suite_Admin {
 	 */
 	private static function get_available_modal_templates(): array {
 		$template_dir = CHURCHTOOLS_SUITE_PATH . 'templates/views/event-modal/';
-		
-		if ( ! is_dir( $template_dir ) ) {
-			return [];
-		}
-		
-		$templates = [];
-		$files = scandir( $template_dir );
-		
-		if ( is_array( $files ) ) {
-			foreach ( $files as $file ) {
-				// Only PHP files, exclude dotfiles
-				if ( substr( $file, -4 ) === '.php' && $file[0] !== '.' ) {
-					// Remove .php extension to get template name
-					$templates[] = substr( $file, 0, -4 );
-				}
-			}
-		}
-		
-		sort( $templates ); // Alphabetical order
-		return $templates;
-	}
-	
-	/**
-	 * Get available single templates by scanning filesystem
-	 * 
-	 * @since 0.9.9.82
-	 * @return array List of available template names (e.g., ['professional'])
-	 */
-	private static function get_available_single_templates(): array {
-		$template_dir = CHURCHTOOLS_SUITE_PATH . 'templates/views/event-single/';
 		
 		if ( ! is_dir( $template_dir ) ) {
 			return [];
