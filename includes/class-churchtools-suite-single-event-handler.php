@@ -42,46 +42,22 @@ class ChurchTools_Suite_Single_Event_Handler {
 			return $content;
 		}
 		
-		// Parse display settings from query parameters
-		$show_event_description = isset( $_GET['show_event_description'] ) && $_GET['show_event_description'] === '1';
-		$show_appointment_description = isset( $_GET['show_appointment_description'] ) && $_GET['show_appointment_description'] === '1';
-		$show_location = isset( $_GET['show_location'] ) && $_GET['show_location'] === '1';
-		$show_services = isset( $_GET['show_services'] ) && $_GET['show_services'] === '1';
-		$show_time = isset( $_GET['show_time'] ) && $_GET['show_time'] === '1';
-		$show_tags = isset( $_GET['show_tags'] ) && $_GET['show_tags'] === '1';
-		$show_calendar_name = isset( $_GET['show_calendar_name'] ) && $_GET['show_calendar_name'] === '1';
-		
-		// Hole Template-Einstellung aus Option, falls kein Parameter gesetzt
-		$template = isset($_GET['template']) ? sanitize_file_name($_GET['template']) : get_option('churchtools_suite_single_template', 'professional');
+		// Use template from settings (v1.0: Simplified - no individual parameters)
+		// Later versions will add per-event customization
+		$template = get_option('churchtools_suite_single_template', 'professional');
 
-		// Build shortcode attributes
+		// Build shortcode attributes (simplified for v1.0)
 		$atts = [
 			'id' => $event_id,
 			'template' => $template,
-			'show_event_description' => $show_event_description,
-			'show_appointment_description' => $show_appointment_description,
-			'show_location' => $show_location,
-			'show_services' => $show_services,
-			'show_time' => $show_time,
-			'show_tags' => $show_tags,
-			'show_calendar_name' => $show_calendar_name,
 		];
 		
 		// Render single event
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/shortcodes/class-churchtools-suite-single-event-shortcode.php';
 		$single_event = ChurchTools_Suite_Single_Event_Shortcode::render( $atts );
 		
-		// Add back button
-		$back_link = remove_query_arg( [
-			'event_id',
-			'show_event_description',
-			'show_appointment_description',
-			'show_location',
-			'show_services',
-			'show_time',
-			'show_tags',
-			'show_calendar_name',
-		] );
+		// Add back button (simplified URL without parameters)
+		$back_link = remove_query_arg( [ 'event_id' ] );
 		
 		$back_button = sprintf(
 			'<div class="cts-back-button-wrapper"><a href="%s" class="cts-back-button">← %s</a></div>',

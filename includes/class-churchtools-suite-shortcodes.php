@@ -766,16 +766,16 @@ class ChurchTools_Suite_Shortcodes {
 		}
 		
 		// v0.9.6.18: Always load modal (needed for Gutenberg blocks)
-		// Old condition was too restrictive - Gutenberg blocks don't use shortcodes
-		// Check if any CTS content exists (shortcodes OR blocks)
+		// v1.0: Also load on single event pages (event_id parameter)
 		global $post;
 		if ( ! $post ) {
 			return;
 		}
 		
-		// Check for shortcodes OR Gutenberg blocks
+		// Check for shortcodes OR Gutenberg blocks OR single event view
 		$has_cts_content = has_shortcode( $post->post_content, 'cts_' ) || 
-		                   has_block( 'churchtools-suite/events-block', $post );
+		                   has_block( 'churchtools-suite/events-block', $post ) ||
+		                   ( isset( $_GET['event_id'] ) && absint( $_GET['event_id'] ) > 0 ); // v1.0: Single event pages
 		
 		if ( ! $has_cts_content ) {
 			return;
@@ -788,7 +788,7 @@ class ChurchTools_Suite_Shortcodes {
 		}
 		
 		// Render modal template
-		self::$template_loader::render_template( 'modal/event-detail.php', [], true );
+		self::$template_loader::render_template( 'views/event-modal/professional.php', [], true );
 		
 		self::$modal_loaded = true;
 	}
