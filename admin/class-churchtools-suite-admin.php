@@ -1568,26 +1568,40 @@ class ChurchTools_Suite_Admin {
 		// v0.9.9.66: Get current view from client (if available)
 		$current_view = isset( $_POST['current_view'] ) ? sanitize_text_field( $_POST['current_view'] ) : null;
 		
+		// v0.9.9.78: Log dashboard settings
+		$global_modal_setting = get_option( 'churchtools_suite_modal_template', 'professional' );
+		$global_single_setting = get_option( 'churchtools_suite_single_template', 'professional' );
+		
+		ChurchTools_Suite_Logger::debug( 'ajax_modal', 'Dashboard settings loaded', [
+			'churchtools_suite_modal_template' => $global_modal_setting,
+			'churchtools_suite_single_template' => $global_single_setting,
+			'current_view' => $current_view,
+		] );
+		
 		// Map view type to modal template (v0.9.9.66, v0.9.9.69: updated to professional)
 		$view_to_modal_map = [
-			'list' => get_option( 'churchtools_suite_modal_template', 'professional' ),
-			'grid' => get_option( 'churchtools_suite_modal_template', 'professional' ),
-			'calendar' => get_option( 'churchtools_suite_modal_template', 'professional' ),
-			'single' => get_option( 'churchtools_suite_single_template', 'professional' ), // Single views use single template
+			'list' => $global_modal_setting,
+			'grid' => $global_modal_setting,
+			'calendar' => $global_modal_setting,
+			'single' => $global_single_setting,
 		];
 		
 		// Select modal template based on current view
 		$modal_template = 'professional'; // Default (v0.9.9.69: changed from event-detail)
 		if ( $current_view && isset( $view_to_modal_map[ $current_view ] ) ) {
 			$modal_template = $view_to_modal_map[ $current_view ];
-			ChurchTools_Suite_Logger::debug( 'ajax_modal', 'Using template for view: ' . $current_view, [
-				'template' => $modal_template,
+			ChurchTools_Suite_Logger::debug( 'ajax_modal', 'Template selected for current view', [
+				'current_view' => $current_view,
+				'selected_template' => $modal_template,
+				'from_setting' => $current_view === 'single' ? 'churchtools_suite_single_template' : 'churchtools_suite_modal_template',
 			] );
 		} else {
 			// Fallback to global setting
-			$modal_template = get_option( 'churchtools_suite_modal_template', 'professional' );
+			$modal_template = $global_modal_setting;
 			ChurchTools_Suite_Logger::debug( 'ajax_modal', 'No current view provided, using global modal template', [
 				'template' => $modal_template,
+				'from_setting' => 'churchtools_suite_modal_template',
+				'current_view' => $current_view,
 			] );
 		}
 		
@@ -1616,6 +1630,9 @@ class ChurchTools_Suite_Admin {
 				'file_exists' => file_exists( $full_path ),
 				'churchtools_suite_path' => CHURCHTOOLS_SUITE_PATH,
 				'error_message' => substr( $html, 4, 300 ), // Remove <!-- and get message
+				'dashboard_modal_setting' => $global_modal_setting,
+				'dashboard_single_setting' => $global_single_setting,
+				'current_view' => $current_view,
 			] );
 		}
 		
@@ -1631,6 +1648,8 @@ class ChurchTools_Suite_Admin {
 					'current_view' => $current_view,
 					'selected_modal' => $modal_template,
 					'churchtools_suite_path' => CHURCHTOOLS_SUITE_PATH,
+					'dashboard_modal_setting' => $global_modal_setting,
+					'dashboard_single_setting' => $global_single_setting,
 				],
 			] );
 			return;
@@ -1639,7 +1658,9 @@ class ChurchTools_Suite_Admin {
 		// Success - log it
 		ChurchTools_Suite_Logger::info( 'ajax_modal', 'Modal template loaded successfully', [
 			'template_path' => $template_path,
+			'selected_template' => $modal_template,
 			'html_length' => strlen( $html ),
+			'dashboard_setting_used' => $current_view === 'single' ? 'churchtools_suite_single_template' : 'churchtools_suite_modal_template',
 		] );
 		
 		wp_send_json_success( [
