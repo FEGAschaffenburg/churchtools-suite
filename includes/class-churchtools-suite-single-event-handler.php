@@ -42,9 +42,10 @@ class ChurchTools_Suite_Single_Event_Handler {
 			return $content;
 		}
 		
-		// Use template from settings (v1.0: Simplified - no individual parameters)
-		// Later versions will add per-event customization
-		$template = get_option('churchtools_suite_single_template', 'professional');
+		// v0.9.9.86: Read template from URL parameter OR Dashboard setting
+		$template = isset( $_GET['template'] ) && ! empty( $_GET['template'] )
+			? sanitize_text_field( wp_unslash( $_GET['template'] ) )
+			: get_option( 'churchtools_suite_single_template', 'professional' );
 
 		// Build shortcode attributes (simplified for v1.0)
 		$atts = [
