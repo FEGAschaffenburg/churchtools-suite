@@ -109,7 +109,7 @@ $full_description = wpautop( wp_kses_post( $full_description ) );
 		
 		<!-- Main Content (Left) -->
 		<div class="cts-single-main">
-			
+			echo "Pro";
 			<!-- Hero Image -->
 			<?php if ( ! empty( $image_url ) ) : ?>
 				<div class="cts-single-hero">
@@ -121,7 +121,7 @@ $full_description = wpautop( wp_kses_post( $full_description ) );
 			
 			<!-- Event Title -->
 			<h1 class="cts-single-title">
-				<?php echo esc_html( $event->title ?? __( 'Untitled Event', 'churchtools-suite' ) ); ?>
+				<?php echo esc_html( 'pro'. $event->title ?? __( 'Untitled Event', 'churchtools-suite' ) ); ?>
 			</h1>
 			
 			<!-- Event Description -->

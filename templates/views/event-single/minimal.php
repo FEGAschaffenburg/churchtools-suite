@@ -80,7 +80,7 @@ $full_description = wpautop( wp_kses_post( $full_description ) );
 	<?php endif; ?>
 	
 	<!-- Title -->
-	<h1 class="cts-title"><?php echo esc_html( $event->title ); ?></h1>
+	<h1 class="cts-title"><?php echo esc_html( 'Minimal ' . $event->title ); ?></h1>
 	
 	<!-- Date & Time -->
 	<div class="cts-datetime">

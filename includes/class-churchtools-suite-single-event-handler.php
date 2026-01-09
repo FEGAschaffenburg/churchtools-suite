@@ -46,6 +46,21 @@ class ChurchTools_Suite_Single_Event_Handler {
 		$template = isset( $_GET['template'] ) && ! empty( $_GET['template'] )
 			? sanitize_text_field( wp_unslash( $_GET['template'] ) )
 			: get_option( 'churchtools_suite_single_template', 'professional' );
+		
+		// v0.9.9.86: Log template selection for debugging
+		// Load logger explicitly
+		if ( ! class_exists( 'ChurchTools_Suite_Logger' ) ) {
+			require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-logger.php';
+		}
+		
+		ChurchTools_Suite_Logger::debug( 'single_event_handler', 'Template selected for single event', [
+			'event_id' => $event_id,
+			'template_name' => $template,
+			'source' => isset( $_GET['template'] ) ? 'URL parameter' : 'Dashboard setting',
+			'url_param' => $_GET['template'] ?? 'not set',
+			'dashboard_setting' => get_option( 'churchtools_suite_single_template', 'professional' ),
+			'expected_path' => 'templates/views/event-single/' . $template . '.php',
+		] );
 
 		// Build shortcode attributes (simplified for v1.0)
 		$atts = [

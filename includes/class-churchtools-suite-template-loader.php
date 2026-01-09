@@ -111,8 +111,12 @@ class ChurchTools_Suite_Template_Loader {
 		
 		if ( $plugin_exists ) {
 			if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
-				ChurchTools_Suite_Logger::debug( 'template_loader', 'Template found in plugin (RETURNING)', [
-					'path' => $plugin_template,
+				// v0.9.9.86: Extract template name from path for better debugging
+				$template_name_extracted = basename( $template_name, '.php' );
+				ChurchTools_Suite_Logger::debug( 'template_loader', 'Template found in plugin', [
+					'template_name' => $template_name_extracted,
+					'full_path' => $plugin_template,
+					'relative_path' => 'templates/' . $template_name,
 					'filesize' => $plugin_size,
 					'is_readable' => $plugin_readable,
 				] );
