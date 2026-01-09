@@ -34,10 +34,23 @@ class ChurchTools_Suite_Template_Loader {
 		// v0.9.9.44: Template-Pfad-Migration (Kompatibilitäts-Layer)
 		$template_name = self::migrate_template_path( $template_name );
 		
+		// Load logger for debugging
+		if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+			ChurchTools_Suite_Logger::debug( 'template_loader', 'Locating template', [
+				'template_name' => $template_name,
+				'churchtools_suite_path' => CHURCHTOOLS_SUITE_PATH,
+			] );
+		}
+		
 		// Check in theme first
 		$theme_template = get_stylesheet_directory() . '/' . self::THEME_TEMPLATE_DIR . '/' . $template_name;
 		
 		if ( file_exists( $theme_template ) ) {
+			if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+				ChurchTools_Suite_Logger::debug( 'template_loader', 'Template found in theme', [
+					'path' => $theme_template,
+				] );
+			}
 			return $theme_template;
 		}
 		
@@ -46,6 +59,11 @@ class ChurchTools_Suite_Template_Loader {
 			$parent_template = get_template_directory() . '/' . self::THEME_TEMPLATE_DIR . '/' . $template_name;
 			
 			if ( file_exists( $parent_template ) ) {
+				if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+					ChurchTools_Suite_Logger::debug( 'template_loader', 'Template found in parent theme', [
+						'path' => $parent_template,
+					] );
+				}
 				return $parent_template;
 			}
 		}
@@ -53,8 +71,31 @@ class ChurchTools_Suite_Template_Loader {
 		// Fallback to plugin templates
 		$plugin_template = CHURCHTOOLS_SUITE_PATH . 'templates/' . $template_name;
 		
+		if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+			ChurchTools_Suite_Logger::debug( 'template_loader', 'Checking plugin template', [
+				'path' => $plugin_template,
+				'exists' => file_exists( $plugin_template ),
+			] );
+		}
+		
 		if ( file_exists( $plugin_template ) ) {
+			if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+				ChurchTools_Suite_Logger::debug( 'template_loader', 'Template found in plugin', [
+					'path' => $plugin_template,
+				] );
+			}
 			return $plugin_template;
+		}
+		
+		if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+			ChurchTools_Suite_Logger::warning( 'template_loader', 'Template not found in any location', [
+				'template_name' => $template_name,
+				'theme_template' => $theme_template,
+				'plugin_template' => $plugin_template,
+				'plugin_exists' => file_exists( $plugin_template ),
+				'churchtools_suite_path_defined' => defined( 'CHURCHTOOLS_SUITE_PATH' ),
+				'churchtools_suite_path' => CHURCHTOOLS_SUITE_PATH,
+			] );
 		}
 		
 		return false;
