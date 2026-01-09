@@ -159,6 +159,9 @@ class ChurchTools_Suite_Admin {
 	 * @since 0.10.2.9 Load public JS too (for calendar navigation in demos)
 	 */
 	public function enqueue_scripts() {
+		// Ensure media library is available for calendar image picker
+		wp_enqueue_media();
+
 		// Load public JS first (for frontend features like calendar navigation)
 		wp_enqueue_script(
 			'churchtools-suite-public',
@@ -314,6 +317,7 @@ class ChurchTools_Suite_Admin {
 		add_action( 'wp_ajax_cts_clear_sync_history', [ $this, 'ajax_clear_sync_history' ] );
 		add_action( 'wp_ajax_cts_full_reset', [ $this, 'ajax_full_reset' ] );
 		add_action( 'wp_ajax_cts_complete_reset', [ $this, 'ajax_complete_reset' ] ); // v0.10.1.4
+		add_action( 'wp_ajax_cts_rebuild_database', [ $this, 'ajax_rebuild_database' ] ); // v0.9.0.1
 		
 		// Public AJAX (for frontend modal)
 		add_action( 'wp_ajax_cts_get_modal_template', [ $this, 'ajax_get_modal_template' ] );
@@ -466,24 +470,44 @@ class ChurchTools_Suite_Admin {
 		try {
 			// Get selected calendar IDs
 			$selected_ids = isset( $_POST['selected_ids'] ) ? array_map( 'intval', $_POST['selected_ids'] ) : [];
-			
+
+			// Capture calendar fallback images (calendar_id => attachment_id)
+			$calendar_images = [];
+			if ( isset( $_POST['calendar_images'] ) && is_array( $_POST['calendar_images'] ) ) {
+				foreach ( $_POST['calendar_images'] as $calendar_id => $attachment_id ) {
+					$calendar_id_sanitized = sanitize_text_field( wp_unslash( $calendar_id ) );
+					$attachment_id_int = absint( $attachment_id );
+					if ( $calendar_id_sanitized && $attachment_id_int > 0 ) {
+						$calendar_images[ $calendar_id_sanitized ] = $attachment_id_int;
+					}
+				}
+			}
+
 			// Load repository
 			require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-repository-base.php';
 			require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-calendars-repository.php';
-			
+
 			$calendars_repo = new ChurchTools_Suite_Calendars_Repository();
 			$result = $calendars_repo->update_selected( $selected_ids );
-			
+
 			if ( ! $result ) {
 				wp_send_json_error( [
 					'message' => __( 'Fehler beim Speichern der Auswahl.', 'churchtools-suite' )
 				] );
 				return;
 			}
-			
+
+			// Update calendar_image_id in table (v0.9.9.58)
+			foreach ( $calendar_images as $calendar_id => $attachment_id ) {
+				$calendars_repo->update_calendar_image_by_calendar_id( $calendar_id, $attachment_id );
+			}
+
+			// Persist fallback images option (keep for backward compatibility)
+			update_option( 'churchtools_suite_calendar_images', $calendar_images, false );
+
 			$selected_count = count( $selected_ids );
 			$total_count = $calendars_repo->count();
-			
+
 			wp_send_json_success( [
 				'message' => sprintf(
 					__( 'Auswahl gespeichert: %d von %d Kalendern ausgewählt.', 'churchtools-suite' ),
@@ -882,13 +906,13 @@ class ChurchTools_Suite_Admin {
 		$to = isset( $_POST['to'] ) ? sanitize_text_field( wp_unslash( $_POST['to'] ) ) : '';
 		$calendar_filter = isset( $_POST['calendar_id'] ) ? sanitize_text_field( wp_unslash( $_POST['calendar_id'] ) ) : '';
 		$page = max( 1, (int) ( $_POST['paged'] ?? 1 ) );
-		$limit = 50;
+		$limit = 200;
 		$offset = ( $page - 1 ) * $limit;
 
 		$prefix = $wpdb->prefix . CHURCHTOOLS_SUITE_DB_PREFIX;
 		$table = $prefix . 'events';
 
-		$sql = "SELECT id, event_id, appointment_id, calendar_id, title, description, event_description, appointment_description, start_datetime, end_datetime, is_all_day, location_name, address_name, address_street, address_zip, address_city, address_latitude, address_longitude, tags FROM {$table} WHERE 1=1";
+		$sql = "SELECT id, event_id, appointment_id, calendar_id, title, description, event_description, appointment_description, start_datetime, end_datetime, is_all_day, location_name, address_name, address_street, address_zip, address_city, address_latitude, address_longitude, tags, status, raw_payload, last_modified, appointment_modified, created_at, updated_at FROM {$table} WHERE 1=1";
 		$count_sql = "SELECT COUNT(*) FROM {$table} WHERE 1=1";
 		$where = [];
 		$params = [];
@@ -940,6 +964,7 @@ class ChurchTools_Suite_Admin {
 							<th><?php esc_html_e( 'Ort / Adresse', 'churchtools-suite' ); ?></th>
 							<th><?php esc_html_e( 'Tags', 'churchtools-suite' ); ?></th>
 							<th><?php esc_html_e( 'Typ', 'churchtools-suite' ); ?></th>
+							<th><?php esc_html_e( 'Status', 'churchtools-suite' ); ?></th>
 							<th><?php esc_html_e( 'Services', 'churchtools-suite' ); ?></th>
 							<th><?php esc_html_e( 'Details', 'churchtools-suite' ); ?></th>
 						</tr>
@@ -951,6 +976,13 @@ class ChurchTools_Suite_Admin {
 						$is_all_day = (bool) $event->is_all_day;
 						$type_label = ! empty( $event->appointment_id ) ? __( 'Termin', 'churchtools-suite' ) : __( 'Event', 'churchtools-suite' );
 						$type_icon = ! empty( $event->appointment_id ) ? '📅' : '🎯';
+						$raw = ! empty( $event->raw_payload ) ? json_decode( $event->raw_payload, true ) : [];
+						$base = $raw['appointment']['base'] ?? $raw['base'] ?? $raw;
+						$link = $base['link'] ?? '';
+						$image_url = $base['image'] ?? '';
+						$is_canceled = (bool) ( $base['isCanceled'] ?? $raw['isCanceled'] ?? false );
+						$last_modified = ! empty( $event->last_modified ) ? get_date_from_gmt( $event->last_modified ) : '';
+						$appointment_modified = ! empty( $event->appointment_modified ) ? get_date_from_gmt( $event->appointment_modified ) : '';
 						?>
 						<tr>
 							<td class="cts-event-date">
@@ -973,8 +1005,44 @@ class ChurchTools_Suite_Admin {
 								<?php if ( ! empty( $event->tags ) ) { $tags = json_decode( $event->tags, true ); if ( is_array( $tags ) && ! empty( $tags ) ) { foreach ( $tags as $tag ) { ?><span class="cts-tag">🏷️ <?php echo esc_html( $tag['name'] ?? '' ); ?></span><?php } } else { echo '<span class="cts-muted">—</span>'; } } else { echo '<span class="cts-muted">—</span>'; } ?>
 							</td>
 							<td class="cts-event-type"><span class="cts-type-badge"><?php echo esc_html( $type_icon . ' ' . $type_label ); ?></span></td>
+							<td class="cts-event-status">
+								<?php if ( $is_canceled ) : ?>
+									<span class="cts-status-badge cts-status-canceled">⛔ <?php esc_html_e( 'Abgesagt', 'churchtools-suite' ); ?></span>
+								<?php else : ?>
+									<span class="cts-status-badge cts-status-active">✅ <?php esc_html_e( 'Aktiv', 'churchtools-suite' ); ?></span>
+								<?php endif; ?>
+							</td>
 							<td class="cts-event-services"><span class="cts-muted">—</span></td>
-							<td class="cts-event-details"><span class="cts-muted">—</span></td>
+							<td class="cts-event-details">
+								<?php if ( $link || $image_url || $event->raw_payload ) : ?>
+									<div class="cts-description-section cts-meta-grid" style="margin-bottom:8px;">
+										<?php if ( ! empty( $event->event_id ) ) : ?><div><strong>Event ID:</strong> <?php echo esc_html( $event->event_id ); ?></div><?php endif; ?>
+										<?php if ( ! empty( $event->appointment_id ) ) : ?><div><strong>Appointment ID:</strong> <?php echo esc_html( $event->appointment_id ); ?></div><?php endif; ?>
+										<div><strong>Status:</strong> <?php echo $is_canceled ? esc_html__( 'Abgesagt', 'churchtools-suite' ) : esc_html__( 'Aktiv', 'churchtools-suite' ); ?></div>
+										<div><strong><?php esc_html_e( 'Start', 'churchtools-suite' ); ?>:</strong> <?php echo esc_html( $event->start_datetime ); ?></div>
+										<div><strong><?php esc_html_e( 'Ende', 'churchtools-suite' ); ?>:</strong> <?php echo esc_html( $event->end_datetime ?: '—' ); ?></div>
+										<div><strong><?php esc_html_e( 'Last Modified', 'churchtools-suite' ); ?>:</strong> <?php echo esc_html( $last_modified ?: '—' ); ?></div>
+										<div><strong><?php esc_html_e( 'Appointment Modified', 'churchtools-suite' ); ?>:</strong> <?php echo esc_html( $appointment_modified ?: '—' ); ?></div>
+									</div>
+									<?php if ( $link ) : ?>
+										<div class="cts-description-section" style="margin-bottom:6px;">
+											<strong>🔗 <?php esc_html_e( 'Link', 'churchtools-suite' ); ?>:</strong> <a href="<?php echo esc_url( $link ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( $link ); ?></a>
+										</div>
+									<?php endif; ?>
+									<?php if ( $image_url ) : ?>
+										<div class="cts-description-section cts-image-preview">
+											<img src="<?php echo esc_url( $image_url ); ?>" alt="" />
+										</div>
+									<?php endif; ?>
+									<?php if ( $event->raw_payload ) : ?>
+										<div class="cts-description-section">
+											<strong>🧾 <?php esc_html_e( 'Raw Payload', 'churchtools-suite' ); ?>:</strong> <?php printf( esc_html__( '%d Zeichen JSON', 'churchtools-suite' ), strlen( $event->raw_payload ) ); ?>
+										</div>
+									<?php endif; ?>
+								<?php else : ?>
+									<span class="cts-muted">—</span>
+								<?php endif; ?>
+							</td>
 						</tr>
 					<?php endforeach; ?>
 					</tbody>
@@ -985,7 +1053,7 @@ class ChurchTools_Suite_Admin {
 
 		// Pagination HTML
 		if ( $total_pages > 1 ) {
-			$pagination = '<div class="cts-pagination">';
+				$pagination = '<div class="cts-pagination">';
 			if ( $page > 1 ) {
 				$pagination .= '<button data-paged="' . ( $page - 1 ) . '" class="cts-ajax-page cts-btn cts-btn-secondary">← ' . __( 'Zurück', 'churchtools-suite' ) . '</button>';
 			}
@@ -1494,9 +1562,34 @@ class ChurchTools_Suite_Admin {
 		// Load template loader
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-template-loader.php';
 		
+		// v0.9.9.66: Get current view from client (if available)
+		$current_view = isset( $_POST['current_view'] ) ? sanitize_text_field( $_POST['current_view'] ) : null;
+		
+		// Map view type to modal template (v0.9.9.66, v0.9.9.69: updated to professional)
+		$view_to_modal_map = [
+			'list' => get_option( 'churchtools_suite_modal_template', 'professional' ),
+			'grid' => get_option( 'churchtools_suite_modal_template', 'professional' ),
+			'calendar' => get_option( 'churchtools_suite_modal_template', 'professional' ),
+			'single' => get_option( 'churchtools_suite_single_template', 'professional' ), // Single views use single template
+		];
+		
+		// Select modal template based on current view
+		$modal_template = 'professional'; // Default (v0.9.9.69: changed from event-detail)
+		if ( $current_view && isset( $view_to_modal_map[ $current_view ] ) ) {
+			$modal_template = $view_to_modal_map[ $current_view ];
+			error_log( '[ChurchTools Suite] Using ' . $current_view . ' modal template: ' . $modal_template );
+		} else {
+			// Fallback to global setting
+			$modal_template = get_option( 'churchtools_suite_modal_template', 'professional' );
+			error_log( '[ChurchTools Suite] No current view provided, using global modal template: ' . $modal_template );
+		}
+		
+		// v1.4.0: Neue Template-Struktur (views/event-modal/)
+		$template_path = 'views/event-modal/' . sanitize_file_name( $modal_template ) . '.php';
+		
 		// Render modal template (echo=true, da wir mit ob_start() den Output fangen)
 		ob_start();
-		ChurchTools_Suite_Template_Loader::render_template( 'modal/event-detail.php', [], true );
+		ChurchTools_Suite_Template_Loader::render_template( $template_path, [], true );
 		$html = ob_get_clean();
 		
 		// v0.10.3.6: Debug - Prüfe ob HTML vorhanden ist
@@ -1506,8 +1599,10 @@ class ChurchTools_Suite_Admin {
 				'message' => 'Modal-Template konnte nicht geladen werden',
 				'html' => $html, // Sende trotzdem für Debugging
 				'debug' => [
-					'template_path' => CHURCHTOOLS_SUITE_PATH . 'templates/modal/event-detail.php',
-					'exists' => file_exists( CHURCHTOOLS_SUITE_PATH . 'templates/modal/event-detail.php' ),
+					'template_path' => CHURCHTOOLS_SUITE_PATH . 'templates/views/event-modal/event-detail.php',
+					'exists' => file_exists( CHURCHTOOLS_SUITE_PATH . 'templates/views/event-modal/event-detail.php' ),
+					'current_view' => $current_view, // v0.9.9.66: Log received view
+					'selected_modal' => $modal_template, // v0.9.9.66: Log selected template
 				],
 			] );
 			return;
@@ -1593,16 +1688,30 @@ class ChurchTools_Suite_Admin {
 		$response = [
 			'id' => $event->id,
 			'title' => $event->title,
-			'description' => wpautop( $event->description ),
+			'event_description' => ! empty( $event->event_description ) ? wpautop( $event->event_description ) : '',
+			'appointment_description' => ! empty( $event->appointment_description ) ? wpautop( $event->appointment_description ) : '',
 			'start_date' => date_i18n( $date_format, $start_timestamp ),
 			'start_time' => $start_time_formatted,
 			'end_time' => $end_time_formatted,
 			'time_display' => $time_display,
 			'location_name' => $event->location_name,
+			'address_name' => $event->address_name,
+			'address_street' => $event->address_street,
+			'address_zip' => $event->address_zip,
+			'address_city' => $event->address_city,
 			'calendar_name' => $calendar ? $calendar->name : '',
 			'calendar_color' => $calendar ? $calendar->color : '#3498db',
+			'tags' => [],
 			'services' => []
 		];
+		
+		// Parse tags
+		if ( ! empty( $event->tags ) ) {
+			$tags_data = json_decode( $event->tags, true );
+			if ( is_array( $tags_data ) ) {
+				$response['tags'] = $tags_data;
+			}
+		}
 		
 		// Format services
 		if ( $services ) {
@@ -2002,8 +2111,10 @@ class ChurchTools_Suite_Admin {
 		$settings_deleted = 0;
 		$settings_keys = [
 			'churchtools_suite_ct_url',
+			'churchtools_suite_ct_auth_method',
 			'churchtools_suite_ct_username',
 			'churchtools_suite_ct_password',
+			'churchtools_suite_ct_token',
 			'churchtools_suite_ct_cookies',
 			'churchtools_suite_sync_days_past',
 			'churchtools_suite_sync_days_future',
@@ -2030,6 +2141,61 @@ class ChurchTools_Suite_Admin {
 				__( 'Plugin komplett zurückgesetzt!\n\n- %d Datenbank-Einträge gelöscht\n- %d Einstellungen gelöscht\n- Cookies gelöscht\n\nBitte Plugin neu konfigurieren.', 'churchtools-suite' ),
 				$total_deleted,
 				$settings_deleted
+			)
+		] );
+	}
+	
+	/**
+	 * AJAX Handler: Rebuild Database (v0.9.0.1)
+	 * Löscht ALLE Tabellen und erstellt sie komplett neu
+	 * Nützlich bei DB-Strukturproblemen nach Updates
+	 */
+	public function ajax_rebuild_database() {
+		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
+		
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => __( 'Keine Berechtigung', 'churchtools-suite' ) ] );
+		}
+		
+		global $wpdb;
+		
+		// 1. Drop ALL plugin tables
+		$tables = [
+			$wpdb->prefix . 'cts_event_services',
+			$wpdb->prefix . 'cts_events',
+			$wpdb->prefix . 'cts_calendars',
+			$wpdb->prefix . 'cts_services',
+			$wpdb->prefix . 'cts_service_groups',
+			$wpdb->prefix . 'cts_sync_history',
+			$wpdb->prefix . 'cts_schedule',
+			$wpdb->prefix . 'cts_shortcode_presets',
+		];
+		
+		$tables_dropped = 0;
+		foreach ( $tables as $table ) {
+			// Check if table exists before dropping
+			$table_exists = $wpdb->get_var( "SHOW TABLES LIKE '{$table}'" );
+			if ( $table_exists ) {
+				$wpdb->query( "DROP TABLE IF EXISTS {$table}" );
+				$tables_dropped++;
+			}
+		}
+		
+		// 2. Reset DB version to force migration
+		delete_option( 'churchtools_suite_db_version' );
+		
+		// 3. Run migrations to recreate tables
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-migrations.php';
+		ChurchTools_Suite_Migrations::run_migrations();
+		
+		// 4. Get new DB version
+		$new_version = get_option( 'churchtools_suite_db_version', '0.0' );
+		
+		wp_send_json_success( [
+			'message' => sprintf(
+				__( 'Datenbank erfolgreich neu aufgebaut!\n\n- %d Tabellen gelöscht\n- Alle Tabellen neu erstellt (DB Version %s)\n- Alle Daten verloren\n\nBitte Daten neu synchronisieren.', 'churchtools-suite' ),
+				$tables_dropped,
+				$new_version
 			)
 		] );
 	}

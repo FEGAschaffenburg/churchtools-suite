@@ -27,9 +27,19 @@ class ChurchTools_Suite_CT_Client {
      * Password
      */
     private $password;
+
+    /**
+     * API token (auth method: token)
+     */
+    private $token;
     
     /**
-     * Session cookies
+     * Selected auth method (password|token)
+     */
+    private $auth_method;
+    
+    /**
+     * Session cookies (auth method: password)
      */
     private $cookies;
     
@@ -40,16 +50,35 @@ class ChurchTools_Suite_CT_Client {
         $this->url = get_option('churchtools_suite_ct_url', '');
         $this->username = get_option('churchtools_suite_ct_username', '');
         $this->password = get_option('churchtools_suite_ct_password', '');
+        $this->token = get_option('churchtools_suite_ct_token', '');
+        $this->auth_method = get_option('churchtools_suite_ct_auth_method', 'password');
         $this->cookies = get_option('churchtools_suite_ct_cookies', []);
     }
     
     /**
-     * Login to ChurchTools and get authentication token
+     * Authenticate against ChurchTools (password: create session, token: quick validation)
      *
      * @return array Success status and message
      */
     public function login() {
-        // Validate required fields
+        // Token mode: no login request needed
+        if ($this->auth_method === 'token') {
+            if (empty($this->url) || empty($this->token)) {
+                return [
+                    'success' => false,
+                    'message' => 'ChurchTools URL und API-Token sind erforderlich.'
+                ];
+            }
+
+            update_option('churchtools_suite_ct_last_login', current_time('mysql'));
+
+            return [
+                'success' => true,
+                'message' => 'API-Token wird verwendet – keine Anmeldung nötig.'
+            ];
+        }
+
+        // Validate required fields for username/password
         if (empty($this->url) || empty($this->username) || empty($this->password)) {
             return [
                 'success' => false,
@@ -157,23 +186,28 @@ class ChurchTools_Suite_CT_Client {
      * @return array Success status and message
      */
     public function test_connection() {
-        // First try to login
+        // Ensure auth is available
         $login_result = $this->login();
-        
         if (!$login_result['success']) {
             return $login_result;
         }
         
         // Test API access by fetching whoami
         $whoami_url = trailingslashit($this->url) . 'api/whoami';
+
+        $args = [
+            'timeout' => 30,
+        ];
+
+        if ($this->auth_method === 'token') {
+            $args['headers'] = [
+                'Authorization' => 'Bearer ' . $this->token,
+            ];
+        } else {
+            $args['cookies'] = $this->prepare_cookies_for_request();
+        }
         
-        // Prepare cookies for request
-        $wp_cookies = $this->prepare_cookies_for_request();
-        
-        $response = wp_remote_get($whoami_url, [
-            'cookies' => $wp_cookies,
-            'timeout' => 30
-        ]);
+        $response = wp_remote_get($whoami_url, $args);
         
         if (is_wp_error($response)) {
             return [
@@ -240,7 +274,13 @@ class ChurchTools_Suite_CT_Client {
             );
         }
         
-        // Check if we have valid cookies, re-login if expired
+        $using_token = ($this->auth_method === 'token');
+
+        if ($using_token && (empty($this->token) || empty($this->url))) {
+            return new WP_Error('missing_token', __('API-Token oder ChurchTools-URL fehlen.', 'churchtools-suite'));
+        }
+
+        // Ensure auth is available
         if (!$this->is_authenticated()) {
             ChurchTools_Suite_Logger::log(
                 'API: Not authenticated, attempting login',
@@ -258,7 +298,7 @@ class ChurchTools_Suite_CT_Client {
                         'error' => $login_result['message'],
                     ]
                 );
-                return new WP_Error('no_cookies', $login_result['message']);
+                return new WP_Error('no_auth', $login_result['message']);
             }
         }
         
@@ -297,18 +337,20 @@ class ChurchTools_Suite_CT_Client {
             ]
         );
         
-        // Prepare cookies for request
-        $wp_cookies = $this->prepare_cookies_for_request();
-        
         // Prepare request arguments
         $args = [
             'method' => strtoupper($method),
             'headers' => [
                 'Content-Type' => 'application/json'
             ],
-            'cookies' => $wp_cookies,
             'timeout' => 30
         ];
+
+        if ($using_token) {
+            $args['headers']['Authorization'] = 'Bearer ' . $this->token;
+        } else {
+            $args['cookies'] = $this->prepare_cookies_for_request();
+        }
         
         // Add body for POST/PUT requests
         if (in_array($method, ['POST', 'PUT', 'PATCH']) && !empty($data)) {
@@ -367,11 +409,10 @@ class ChurchTools_Suite_CT_Client {
         
         $decoded = json_decode($body, true);
         
-        // Handle 401 - try to re-login once
-        if ($status_code === 401) {
+        // Handle 401 - try to re-login once (password mode only)
+        if ($status_code === 401 && !$using_token) {
             $login_result = $this->login();
             if ($login_result['success']) {
-                // Retry request with new cookies
                 $args['cookies'] = $this->prepare_cookies_for_request();
                 $response = wp_remote_request($url, $args);
                 
@@ -382,7 +423,6 @@ class ChurchTools_Suite_CT_Client {
                 $status_code = wp_remote_retrieve_response_code($response);
                 $body = wp_remote_retrieve_body($response);
                 
-                // Check if retry response is JSON (v0.7.2.5)
                 if (preg_match('/^\s*</', $body)) {
                     return new WP_Error(
                         'invalid_json_after_retry',
@@ -452,15 +492,17 @@ class ChurchTools_Suite_CT_Client {
      * @return bool
      */
     public function is_authenticated() {
+        if ($this->auth_method === 'token') {
+            return !empty($this->token) && !empty($this->url);
+        }
+
         if (empty($this->cookies)) {
             return false;
         }
         
-        // Check if any cookie has expired
         $now = time();
         foreach ($this->cookies as $cookie) {
             if (isset($cookie['expires']) && !empty($cookie['expires'])) {
-                // If expires is set and in the past, cookies are expired
                 if ($cookie['expires'] < $now) {
                     return false;
                 }
@@ -521,11 +563,14 @@ class ChurchTools_Suite_CT_Client {
      */
     public function keepalive() {
         // Ensure we have credentials
-        if (empty($this->url) || empty($this->username) || empty($this->password)) {
+        if (empty($this->url)) {
             return new WP_Error('missing_credentials', 'ChurchTools connection not configured');
         }
 
-        // If not authenticated, attempt login
+        if ($this->auth_method === 'password' && (empty($this->username) || empty($this->password))) {
+            return new WP_Error('missing_credentials', 'ChurchTools connection not configured');
+        }
+
         if (!$this->is_authenticated()) {
             $login = $this->login();
             if (!isset($login['success']) || $login['success'] !== true) {
@@ -533,7 +578,7 @@ class ChurchTools_Suite_CT_Client {
             }
         }
 
-        // Call whoami to keep session alive
+        // Call whoami to keep session alive / validate token
         $result = $this->api_request('whoami', 'GET');
         if (is_wp_error($result)) {
             return $result;

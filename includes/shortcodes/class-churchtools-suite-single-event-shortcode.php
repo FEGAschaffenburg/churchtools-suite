@@ -29,9 +29,13 @@ class ChurchTools_Suite_Single_Event_Shortcode {
 	 * @return string HTML output
 	 */
 	public static function render( $atts ): string {
+		// Get default template from settings (v0.9.9.43)
+		// v0.9.9.x: "professional" ist das einzige aktive Template; alte Werte werden gemappt
+		$default_template = get_option( 'churchtools_suite_single_template', 'professional' );
+		
 		$atts = shortcode_atts( [
 			'id'       => 0,
-			'template' => 'classic', // classic, modern, minimal, card
+			'template' => $default_template, // Use setting, fallback to validated template
 		], $atts, 'cts_event' );
 		
 		// Validate event ID
@@ -85,8 +89,16 @@ class ChurchTools_Suite_Single_Event_Shortcode {
 	 * @return string Valid template name
 	 */
 	private static function validate_template( string $template ): string {
-		$allowed = [ 'classic', 'modern', 'minimal', 'card' ];
-		return in_array( $template, $allowed, true ) ? $template : 'classic';
+		// Nur "professional" ist aktiv; frühere Namen werden kompatibel gemappt
+		$alias_map = [
+			'professional' => 'professional',
+			'modern' => 'professional',
+			'classic' => 'professional',
+			'minimal' => 'professional',
+			'card' => 'professional',
+		];
+
+		return $alias_map[ $template ] ?? 'professional';
 	}
 	
 	/**
@@ -100,13 +112,25 @@ class ChurchTools_Suite_Single_Event_Shortcode {
 		// Extract data for template
 		extract( $data );
 		
-		// Check for theme override
-		$theme_template = locate_template( "churchtools-suite/single/{$template}.php" );
+		// v0.9.9.44: Neue Template-Struktur (views/event-single/)
+		// Check for theme override (mit Kompatibilität für alte Pfade)
+		$theme_template = locate_template( "churchtools-suite/views/event-single/{$template}.php" );
+		
+		if ( ! $theme_template ) {
+			// Fallback: Alte Struktur im Theme
+			$theme_template = locate_template( "churchtools-suite/single/{$template}.php" );
+		}
 		
 		if ( $theme_template ) {
 			$template_path = $theme_template;
 		} else {
-			$template_path = CHURCHTOOLS_SUITE_PATH . "templates/single/{$template}.php";
+			// v0.9.9.44: Neue Struktur
+			$template_path = CHURCHTOOLS_SUITE_PATH . "templates/views/event-single/{$template}.php";
+			
+			// Fallback: Alte Struktur
+			if ( ! file_exists( $template_path ) ) {
+				$template_path = CHURCHTOOLS_SUITE_PATH . "templates/single/{$template}.php";
+			}
 		}
 		
 		// Check if template exists

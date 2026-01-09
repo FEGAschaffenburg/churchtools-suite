@@ -33,13 +33,14 @@ $shortcodes = [
 		'icon' => '📋',
 		'category' => 'list',
 		'description' => 'Zeigt Events als Liste an',
-		'views' => ['classic', 'medium'], // Nur getestete Views
+		'views' => ['classic', 'classic-with-images', 'medium'], // Nur getestete Views
 		'params' => [
 			// === Ansicht & Basis ===
-			'view' => ['type' => 'select', 'label' => 'View', 'options' => ['classic', 'medium'], 'section' => '📋 Ansicht & Basis'],
+			'view' => ['type' => 'select', 'label' => 'View', 'options' => ['classic', 'classic-with-images', 'medium'], 'section' => '📋 Ansicht & Basis'],
 			'calendar' => ['type' => 'checkboxes', 'label' => 'Kalender auswählen', 'section' => '📋 Ansicht & Basis'],
 			'limit' => ['type' => 'number', 'label' => 'Anzahl Events', 'default' => '20', 'section' => '⚙️ Basis-Einstellungen'],
 			// === Anzeige-Optionen ===
+			'show_images' => ['type' => 'toggle', 'label' => 'Bilder anzeigen', 'default' => true, 'section' => '👁️ Anzeige-Optionen'],
 			'show_description' => ['type' => 'toggle', 'label' => 'Beschreibung anzeigen', 'default' => true, 'section' => '👁️ Anzeige-Optionen'],
 			'show_location' => ['type' => 'toggle', 'label' => 'Ort anzeigen', 'default' => true, 'section' => '👁️ Anzeige-Optionen'],
 			'show_services' => ['type' => 'toggle', 'label' => 'Services anzeigen', 'default' => true, 'section' => '👁️ Anzeige-Optionen'],
@@ -78,10 +79,10 @@ $shortcodes = [
 		'icon' => '🎯',
 		'category' => 'grid',
 		'description' => 'Zeigt Events als Raster an',
-		'views' => ['simple'], // Nur getestete Views
+		'views' => ['simple', 'background-images'], // v0.9.9.35: background-images added
 		'params' => [
 			// === Ansicht & Basis ===
-			'view' => ['type' => 'select', 'label' => 'View', 'options' => ['simple'], 'section' => '📋 Ansicht & Basis'],
+			'view' => ['type' => 'select', 'label' => 'View', 'options' => ['simple', 'background-images'], 'section' => '📋 Ansicht & Basis'],
 			'calendar' => ['type' => 'checkboxes', 'label' => 'Kalender auswählen', 'section' => '📋 Ansicht & Basis'],
 			'limit' => ['type' => 'number', 'label' => 'Anzahl Events', 'default' => '12', 'section' => '⚙️ Basis-Einstellungen'],
 			// === Layout ===

@@ -25,7 +25,7 @@ $from = isset( $_GET['from'] ) ? sanitize_text_field( wp_unslash( $_GET['from'] 
 $to = isset( $_GET['to'] ) ? sanitize_text_field( wp_unslash( $_GET['to'] ) ) : '';
 $calendar_filter = isset( $_GET['calendar_id'] ) ? sanitize_text_field( wp_unslash( $_GET['calendar_id'] ) ) : '';
 $page = max( 1, (int) ( $_GET['paged'] ?? 1 ) );
-$limit = 50;
+$limit = 200; // show more rows per page to avoid hidden events
 $offset = ( $page - 1 ) * $limit;
 
 // Kombinierte Abfrage
@@ -33,7 +33,33 @@ global $wpdb;
 $prefix = $wpdb->prefix . CHURCHTOOLS_SUITE_DB_PREFIX;
 $events_table = $prefix . 'events';
 
-$sql = "SELECT id, event_id, appointment_id, calendar_id, title, description, event_description, appointment_description, start_datetime, end_datetime, is_all_day, location_name, address_name, address_street, address_zip, address_city, address_latitude, address_longitude, tags FROM {$events_table} WHERE 1=1";
+// v0.9.0.3: Check if table exists
+$wpdb->suppress_errors();
+$table_exists = $wpdb->get_var( "SHOW TABLES LIKE '{$events_table}'" );
+$wpdb->show_errors();
+
+if ( ! $table_exists ) {
+	echo '<div class="notice notice-warning"><p>';
+	esc_html_e( 'Die Events-Tabelle existiert noch nicht. Bitte laden Sie die Seite neu oder bauen Sie die Datenbank im Debug-Tab neu auf.', 'churchtools-suite' );
+	echo '</p></div>';
+	return;
+}
+
+// v0.10.5.0: Check if new columns exist
+$wpdb->suppress_errors();
+$sample = $wpdb->get_row( "SELECT * FROM {$events_table} LIMIT 1", ARRAY_A );
+$wpdb->show_errors();
+
+$has_image_columns = $sample && isset( $sample['image_attachment_id'] );
+
+// Build SELECT with conditional image columns
+$select_fields = "id, event_id, appointment_id, calendar_id, title, description, event_description, appointment_description, start_datetime, end_datetime, is_all_day, location_name, address_name, address_street, address_zip, address_city, address_latitude, address_longitude, tags, status";
+if ( $has_image_columns ) {
+	$select_fields .= ", image_attachment_id, image_url";
+}
+$select_fields .= ", raw_payload, last_modified, appointment_modified, created_at, updated_at";
+
+$sql = "SELECT {$select_fields} FROM {$events_table} WHERE 1=1";
 $count_sql = "SELECT COUNT(*) FROM {$events_table} WHERE 1=1";
 $where_params = [];
 
@@ -167,10 +193,13 @@ $total_pages = ceil( $total / $limit );
 						<tr>
 							<th><?php esc_html_e( 'Datum & Zeit', 'churchtools-suite' ); ?></th>
 							<th><?php esc_html_e( 'Titel', 'churchtools-suite' ); ?></th>
+							<th><?php esc_html_e( 'Beschreibung', 'churchtools-suite' ); ?></th>
 							<th><?php esc_html_e( 'Kalender', 'churchtools-suite' ); ?></th>
 							<th><?php esc_html_e( 'Ort / Adresse', 'churchtools-suite' ); ?></th>
 							<th><?php esc_html_e( 'Tags', 'churchtools-suite' ); ?></th>
 							<th><?php esc_html_e( 'Typ', 'churchtools-suite' ); ?></th>
+							<th><?php esc_html_e( 'Ganztägig', 'churchtools-suite' ); ?></th>
+							<th><?php esc_html_e( 'Status', 'churchtools-suite' ); ?></th>
 							<th><?php esc_html_e( 'Services', 'churchtools-suite' ); ?></th>
 							<th><?php esc_html_e( 'Details', 'churchtools-suite' ); ?></th>
 						</tr>
@@ -187,6 +216,12 @@ $total_pages = ceil( $total / $limit );
 							
 							// Lade Services für dieses Event
 							$services = $event_services_repo->get_for_event( $event->id );
+
+							$raw = ! empty( $event->raw_payload ) ? json_decode( $event->raw_payload, true ) : [];
+							$base = $raw['appointment']['base'] ?? $raw['base'] ?? $raw;
+							$link = $base['link'] ?? '';
+							$image_url = $base['image'] ?? '';
+							$is_canceled = (bool) ( $base['isCanceled'] ?? $raw['isCanceled'] ?? false );
 							
 							// Konvertiere UTC zu lokaler WordPress-Zeitzone
 							$start_local = get_date_from_gmt( $event->start_datetime );
@@ -198,6 +233,13 @@ $total_pages = ceil( $total / $limit );
 								? __( 'Termin', 'churchtools-suite' ) 
 								: __( 'Event', 'churchtools-suite' );
 							$type_icon = ! empty( $event->appointment_id ) ? '📅' : '🎯';
+							$last_modified = ! empty( $event->last_modified ) ? get_date_from_gmt( $event->last_modified ) : '';
+							$appointment_modified = ! empty( $event->appointment_modified ) ? get_date_from_gmt( $event->appointment_modified ) : '';
+							$raw = ! empty( $event->raw_payload ) ? json_decode( $event->raw_payload, true ) : [];
+							$base = $raw['appointment']['base'] ?? $raw['base'] ?? $raw;
+							$link = $base['link'] ?? '';
+							$image_url = $base['image'] ?? '';
+							$is_canceled = (bool) ( $base['isCanceled'] ?? $raw['isCanceled'] ?? false );
 						?>
 							<tr>
 								<td class="cts-event-date">
@@ -224,10 +266,16 @@ $total_pages = ceil( $total / $limit );
 									<div class="cts-event-title-main">
 										<?php echo esc_html( $event->title ); ?>
 									</div>
-									<?php if ( ! empty( $event->description ) ) : ?>
-										<div class="cts-event-description">
-											<?php echo esc_html( wp_trim_words( $event->description, 15 ) ); ?>
-										</div>
+								</td>
+
+								<td class="cts-event-description">
+									<?php if ( ! empty( $event->event_description ) || ! empty( $event->appointment_description ) ) : ?>
+										<?php 
+										$desc = ! empty( $event->event_description ) ? $event->event_description : $event->appointment_description;
+										echo esc_html( wp_trim_words( $desc, 20 ) ); 
+										?>
+									<?php else : ?>
+										<span class="cts-muted">—</span>
 									<?php endif; ?>
 								</td>
 								
@@ -308,7 +356,19 @@ $total_pages = ceil( $total / $limit );
 										<?php echo esc_html( $type_icon . ' ' . $type_label ); ?>
 									</span>
 								</td>
-								
+
+								<td class="cts-event-allday">
+									<?php echo $is_all_day ? esc_html__( 'Ja', 'churchtools-suite' ) : esc_html__( 'Nein', 'churchtools-suite' ); ?>
+								</td>
+
+								<td class="cts-event-status">
+									<?php if ( $is_canceled ) : ?>
+										<span class="cts-status-badge cts-status-canceled">⛔ <?php esc_html_e( 'Abgesagt', 'churchtools-suite' ); ?></span>
+									<?php else : ?>
+										<span class="cts-status-badge cts-status-active">✅ <?php esc_html_e( 'Aktiv', 'churchtools-suite' ); ?></span>
+									<?php endif; ?>
+								</td>
+
 								<td class="cts-event-services">
 									<?php 
 									if ( ! empty( $services ) ) :
@@ -328,13 +388,75 @@ $total_pages = ceil( $total / $limit );
 								</td>
 								
 								<td class="cts-event-details">
-									<?php if ( ! empty( $event->event_description ) || ! empty( $event->appointment_description ) ) : ?>
+									<?php if ( ! empty( $event->event_description ) || ! empty( $event->appointment_description ) || $link || $image_url || $event->raw_payload ) : ?>
 										<button type="button" 
 										        class="cts-btn cts-btn-small cts-details-toggle" 
-									        onclick="var panel = document.getElementById('event-details-<?php echo esc_attr( $event->id ); ?>'); panel.classList.toggle('cts-hidden'); panel.style.display = panel.classList.contains('cts-hidden') ? 'none' : 'block';">
+										        data-event-id="<?php echo esc_attr( $event->id ); ?>"
+									        onclick="ctsSuite.openEventModal(<?php echo intval( $event->id ); ?>);">
 											📝 <?php esc_html_e( 'Infos', 'churchtools-suite' ); ?>
 										</button>
-										<div id="event-details-<?php echo esc_attr( $event->id ); ?>" class="cts-event-details-panel cts-hidden" style="display:none;">
+										<div id="event-details-<?php echo esc_attr( $event->id ); ?>" class="cts-event-details-modal-data" style="display:none;">
+											<div class="cts-description-section cts-meta-grid" data-event-title="<?php echo esc_attr( $event->title ); ?>">
+												<div><strong>ID:</strong> <?php echo esc_html( $event->id ); ?></div>
+												<div><strong><?php esc_html_e( 'Event ID', 'churchtools-suite' ); ?>:</strong> <?php echo esc_html( $event->event_id ?: '—' ); ?></div>
+												<div><strong><?php esc_html_e( 'Appointment ID', 'churchtools-suite' ); ?>:</strong> <?php echo esc_html( $event->appointment_id ?: '—' ); ?></div>
+												<div><strong><?php esc_html_e( 'Kalender', 'churchtools-suite' ); ?>:</strong> <?php echo esc_html( $event->calendar_id ); ?></div>
+												<div><strong><?php esc_html_e( 'Status', 'churchtools-suite' ); ?>:</strong> <?php echo $is_canceled ? esc_html__( 'Abgesagt', 'churchtools-suite' ) : esc_html__( 'Aktiv', 'churchtools-suite' ); ?></div>
+												<div><strong><?php esc_html_e( 'Start', 'churchtools-suite' ); ?>:</strong> <?php echo esc_html( $event->start_datetime ); ?></div>
+												<div><strong><?php esc_html_e( 'Ende', 'churchtools-suite' ); ?>:</strong> <?php echo esc_html( $event->end_datetime ?: '—' ); ?></div>
+												<div><strong><?php esc_html_e( 'All Day', 'churchtools-suite' ); ?>:</strong> <?php echo $event->is_all_day ? 'Yes' : 'No'; ?></div>
+												<div><strong><?php esc_html_e( 'Last Modified', 'churchtools-suite' ); ?>:</strong> <?php echo esc_html( $last_modified ?: '—' ); ?></div>
+												<div><strong><?php esc_html_e( 'Appointment Modified', 'churchtools-suite' ); ?>:</strong> <?php echo esc_html( $appointment_modified ?: '—' ); ?></div>
+												<div><strong><?php esc_html_e( 'Created', 'churchtools-suite' ); ?>:</strong> <?php echo esc_html( $event->created_at ?: '—' ); ?></div>
+												<div><strong><?php esc_html_e( 'Updated', 'churchtools-suite' ); ?>:</strong> <?php echo esc_html( $event->updated_at ?: '—' ); ?></div>
+											</div>
+
+											<div class="cts-description-section cts-meta-grid">
+												<div><strong><?php esc_html_e( 'Adresse Name', 'churchtools-suite' ); ?>:</strong> <?php echo esc_html( $event->address_name ?: '—' ); ?></div>
+												<div><strong><?php esc_html_e( 'Straße', 'churchtools-suite' ); ?>:</strong> <?php echo esc_html( $event->address_street ?: '—' ); ?></div>
+												<div><strong><?php esc_html_e( 'PLZ/Ort', 'churchtools-suite' ); ?>:</strong> <?php echo esc_html( trim( $event->address_zip . ' ' . $event->address_city ) ?: '—' ); ?></div>
+												<div><strong><?php esc_html_e( 'Lat', 'churchtools-suite' ); ?>:</strong> <?php echo esc_html( $event->address_latitude ?: '—' ); ?></div>
+												<div><strong><?php esc_html_e( 'Lng', 'churchtools-suite' ); ?>:</strong> <?php echo esc_html( $event->address_longitude ?: '—' ); ?></div>
+											</div>
+
+											<?php if ( $has_image_columns ) : ?>
+												<div class="cts-description-section cts-meta-grid">
+													<div><strong><?php esc_html_e( 'Bild (Attachment ID)', 'churchtools-suite' ); ?>:</strong> 
+														<?php 
+														if ( isset( $event->image_attachment_id ) && ! empty( $event->image_attachment_id ) ) {
+															echo esc_html( $event->image_attachment_id );
+															echo ' <a href="' . esc_url( admin_url( 'post.php?post=' . $event->image_attachment_id . '&action=edit' ) ) . '" target="_blank" style="font-size: 11px;">↗ Bearbeiten</a>';
+														} else {
+															echo '—';
+														}
+														?>
+													</div>
+													<div><strong><?php esc_html_e( 'Bild-URL (Fallback)', 'churchtools-suite' ); ?>:</strong> 
+														<?php 
+														if ( isset( $event->image_url ) && ! empty( $event->image_url ) ) {
+															echo '<a href="' . esc_url( $event->image_url ) . '" target="_blank" style="font-size: 11px; word-break: break-all;">' . esc_html( $event->image_url ) . '</a>';
+														} else {
+															echo '—';
+														}
+														?>
+													</div>
+												</div>
+											<?php endif; ?>
+
+											<?php if ( $link ) : ?>
+												<div class="cts-description-section">
+													<strong>🔗 <?php esc_html_e( 'Link', 'churchtools-suite' ); ?>:</strong>
+													<p><a href="<?php echo esc_url( $link ); ?>" target="_blank" rel="noopener noreferrer"><?php echo esc_html( $link ); ?></a></p>
+												</div>
+											<?php endif; ?>
+
+											<?php if ( $image_url && filter_var( $image_url, FILTER_VALIDATE_URL ) ) : ?>
+												<div class="cts-description-section">
+													<strong>🖼️ <?php esc_html_e( 'Bild', 'churchtools-suite' ); ?>:</strong>
+													<img src="<?php echo esc_url( $image_url ); ?>" alt="" class="cts-modal-image" onerror="this.style.display='none';" />
+												</div>
+											<?php endif; ?>
+
 											<?php if ( ! empty( $event->event_description ) ) : ?>
 												<div class="cts-description-section">
 													<strong>🎯 <?php esc_html_e( 'Serie / Event:', 'churchtools-suite' ); ?></strong>
@@ -345,6 +467,36 @@ $total_pages = ceil( $total / $limit );
 												<div class="cts-description-section">
 													<strong>📅 <?php esc_html_e( 'Termin-Details:', 'churchtools-suite' ); ?></strong>
 													<p><?php echo nl2br( esc_html( $event->appointment_description ) ); ?></p>
+												</div>
+											<?php endif; ?>
+
+											<?php 
+											// Zeige Bild (priorität: lokale attachment > external URL)
+											// v0.10.5.0: Only if columns exist
+											$display_image_url = null;
+											if ( $has_image_columns && isset( $event->image_attachment_id ) && ! empty( $event->image_attachment_id ) ) {
+												$display_image_url = wp_get_attachment_url( $event->image_attachment_id );
+											} elseif ( $has_image_columns && isset( $event->image_url ) && ! empty( $event->image_url ) && filter_var( $event->image_url, FILTER_VALIDATE_URL ) ) {
+												$display_image_url = $event->image_url;
+											}
+											
+											if ( $display_image_url ) :
+											?>
+												<div class="cts-description-section">
+													<strong>🖼️ <?php esc_html_e( 'Bild', 'churchtools-suite' ); ?>:</strong>
+													<img src="<?php echo esc_url( $display_image_url ); ?>" alt="" class="cts-modal-image" onerror="this.style.display='none';" />
+													<?php if ( ! empty( $event->image_attachment_id ) ) : ?>
+														<p style="color: #6b7280; font-size: 12px; margin-top: 8px;">
+															<?php esc_html_e( 'Lokales Bild (importiert)', 'churchtools-suite' ); ?>
+														</p>
+													<?php endif; ?>
+												</div>
+											<?php endif; ?>
+
+											<?php if ( $event->raw_payload ) : ?>
+												<div class="cts-description-section">
+													<strong>🧾 <?php esc_html_e( 'Raw Payload', 'churchtools-suite' ); ?>:</strong>
+													<p><?php printf( esc_html__( '%d Zeichen JSON', 'churchtools-suite' ), strlen( $event->raw_payload ) ); ?></p>
 												</div>
 											<?php endif; ?>
 										</div>
@@ -430,3 +582,199 @@ $total_pages = ceil( $total / $limit );
 	</div>
 	
 </div>
+
+<style>
+.cts-status-badge {
+	display: inline-block;
+	padding: 4px 8px;
+	border-radius: 4px;
+	font-weight: 600;
+	font-size: 12px;
+}
+.cts-status-active {
+	background: #e6ffed;
+	color: #0f5132;
+}
+.cts-status-canceled {
+	background: #ffecec;
+	color: #842029;
+}
+.cts-meta-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+	gap: 8px 12px;
+}
+.cts-image-preview img {
+	max-width: 220px;
+	height: auto;
+	border: 1px solid #e5e7eb;
+	border-radius: 4px;
+}
+
+/* Modal Styles */
+.cts-modal-overlay {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.6);
+	z-index: 9999;
+	overflow-y: auto;
+}
+
+.cts-modal-overlay.active {
+	display: block;
+}
+
+.cts-modal {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background: white;
+	border-radius: 8px;
+	box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+	max-width: 800px;
+	width: 90%;
+	max-height: 90vh;
+	overflow-y: auto;
+	z-index: 10000;
+	display: none;
+}
+
+.cts-modal.active {
+	display: block;
+}
+
+.cts-modal-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 20px;
+	border-bottom: 1px solid #e5e7eb;
+	background: #f9fafb;
+}
+
+.cts-modal-header h2 {
+	margin: 0;
+	font-size: 18px;
+	color: #1f2937;
+}
+
+.cts-modal-close {
+	background: none;
+	border: none;
+	font-size: 24px;
+	cursor: pointer;
+	color: #6b7280;
+	padding: 0;
+	width: 32px;
+	height: 32px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 4px;
+	transition: background 0.2s;
+}
+
+.cts-modal-close:hover {
+	background: #e5e7eb;
+	color: #1f2937;
+}
+
+.cts-modal-content {
+	padding: 20px;
+}
+
+.cts-description-section {
+	margin-bottom: 20px;
+}
+
+.cts-description-section strong {
+	display: block;
+	margin-bottom: 8px;
+	color: #1f2937;
+	font-weight: 600;
+}
+
+.cts-description-section p {
+	margin: 0;
+	color: #4b5563;
+	line-height: 1.5;
+}
+
+.cts-modal-image {
+	max-width: 100%;
+	height: auto;
+	border: 1px solid #e5e7eb;
+	border-radius: 4px;
+	margin: 10px 0;
+}
+</style>
+
+<!-- Modal für Event-Details -->
+<div id="cts-event-modal-overlay" class="cts-modal-overlay">
+	<div id="cts-event-modal" class="cts-modal">
+		<div class="cts-modal-header">
+			<h2 id="cts-modal-title">Event Details</h2>
+			<button class="cts-modal-close" onclick="ctsSuite.closeEventModal();">✕</button>
+		</div>
+		<div id="cts-modal-content" class="cts-modal-content">
+			<!-- Content wird via JavaScript eingefügt -->
+		</div>
+	</div>
+</div>
+
+<script>
+// Globales Modal-Management Objekt
+var ctsSuite = ctsSuite || {};
+
+ctsSuite.openEventModal = function(eventId) {
+	var dataContainer = document.getElementById('event-details-' + eventId);
+	var contentDiv = document.getElementById('cts-modal-content');
+	var modalTitle = document.getElementById('cts-modal-title');
+	
+	if (!dataContainer) return;
+	
+	// Kopiere den Inhalt in das Modal
+	contentDiv.innerHTML = dataContainer.innerHTML;
+	
+	// Setze den Titel
+	var titleEl = dataContainer.querySelector('[data-event-title]');
+	if (titleEl) {
+		modalTitle.textContent = titleEl.getAttribute('data-event-title');
+	}
+	
+	// Zeige das Modal
+	document.getElementById('cts-event-modal-overlay').classList.add('active');
+	document.getElementById('cts-event-modal').classList.add('active');
+	document.body.style.overflow = 'hidden';
+};
+
+ctsSuite.closeEventModal = function() {
+	document.getElementById('cts-event-modal-overlay').classList.remove('active');
+	document.getElementById('cts-event-modal').classList.remove('active');
+	document.body.style.overflow = 'auto';
+};
+
+// Modal schließen bei Click auf Overlay
+document.addEventListener('DOMContentLoaded', function() {
+	var overlay = document.getElementById('cts-event-modal-overlay');
+	if (overlay) {
+		overlay.addEventListener('click', function(e) {
+			if (e.target === overlay) {
+				ctsSuite.closeEventModal();
+			}
+		});
+	}
+	
+	// Escape-Taste zum Schließen
+	document.addEventListener('keydown', function(e) {
+		if (e.key === 'Escape') {
+			ctsSuite.closeEventModal();
+		}
+	});
+});
+</script>

@@ -46,25 +46,15 @@ class ChurchTools_Suite_Shortcodes {
 		add_action( 'wp_footer', [ __CLASS__, 'add_modal_template' ] );
 		
 		// v1.0.0.0 - CLEAN SLATE: Only list/classic active
-		// All other views deactivated for incremental rollout
+		
+		// Generic shortcode (v0.9.4.11) - routes to appropriate view based on viewType parameter
+		add_shortcode( 'churchtools_events', [ __CLASS__, 'generic_events_shortcode' ] );
 		
 		// List Views (only classic active)
 		add_shortcode( 'cts_list', [ __CLASS__, 'list_shortcode' ] );
 		
-		// DEACTIVATED VIEWS (v1.0.0.0 Clean Start):
-		// add_shortcode( 'cts_calendar', [ __CLASS__, 'calendar_shortcode' ] );
-		// add_shortcode( 'cts_grid', [ __CLASS__, 'grid_shortcode' ] );
-		// add_shortcode( 'cts_slider', [ __CLASS__, 'slider_shortcode' ] );
-		// add_shortcode( 'cts_countdown', [ __CLASS__, 'countdown_shortcode' ] );
-		// add_shortcode( 'cts_cover', [ __CLASS__, 'cover_shortcode' ] );
-		// add_shortcode( 'cts_timetable', [ __CLASS__, 'timetable_shortcode' ] );
-		// add_shortcode( 'cts_carousel', [ __CLASS__, 'carousel_shortcode' ] );
-		// add_shortcode( 'cts_single', [ __CLASS__, 'single_shortcode' ] );
-		// add_shortcode( 'cts_map', [ __CLASS__, 'map_shortcode' ] );
-		// add_shortcode( 'cts_search', [ __CLASS__, 'search_shortcode' ] );
-		// add_shortcode( 'cts_widget', [ __CLASS__, 'widget_shortcode' ] );
-		// add_shortcode( 'cts_modal', [ __CLASS__, 'modal_shortcode' ] );
-		// add_shortcode( 'cts_events', [ __CLASS__, 'legacy_events_shortcode' ] );
+		// Grid Views (v0.9.9.35: background-images added)
+		add_shortcode( 'cts_grid', [ __CLASS__, 'grid_shortcode' ] );
 	}
 	
 	/**
@@ -181,6 +171,43 @@ class ChurchTools_Suite_Shortcodes {
 	}
 	
 	/**
+	 * Convert HEX color to RGBA with opacity
+	 * 
+	 * Converts hex color codes (#2563eb) to RGBA format with opacity parameter.
+	 * Used for overlay colors in grid views with background images.
+	 * 
+	 * @param string $hex Hex color code (e.g., '#2563eb')
+	 * @param float $opacity Opacity value (0.0 - 1.0), default 1.0
+	 * @return string RGBA color string (e.g., 'rgba(37, 99, 235, 0.6)')
+	 */
+	public static function hex_to_rgba( string $hex, float $opacity = 1.0 ): string {
+		// Remove '#' if present
+		$hex = ltrim( $hex, '#' );
+		
+		// Check if valid hex color (6 or 3 characters)
+		if ( ! preg_match( '/^(?:[0-9a-f]{3}){1,2}$/i', $hex ) ) {
+			// Return default gray if invalid
+			return 'rgba(107, 114, 128, ' . $opacity . ')';
+		}
+		
+		// Expand shorthand (#abc → #aabbcc)
+		if ( strlen( $hex ) === 3 ) {
+			$hex = preg_replace( '/([0-9a-f])/i', '$1$1', $hex );
+		}
+		
+		// Convert hex to RGB
+		$rgb = unpack( 'N', hex2bin( str_pad( $hex, 8, 'f', STR_PAD_LEFT ) ) );
+		$r = ( $rgb[1] >> 16 ) & 255;
+		$g = ( $rgb[1] >> 8 ) & 255;
+		$b = $rgb[1] & 255;
+		
+		// Clamp opacity to 0-1 range
+		$opacity = max( 0, min( 1, floatval( $opacity ) ) );
+		
+		return "rgba({$r}, {$g}, {$b}, {$opacity})";
+	}
+	
+	/**
 	 * Map old show_description to new separate parameters
 	 * 
 	 * v0.10.4.37: Backward compatibility for old shortcodes/blocks
@@ -205,67 +232,55 @@ class ChurchTools_Suite_Shortcodes {
 	}
 	
 	/**
-	 * Calendar Shortcode
+	 * Generic Events Shortcode (v0.9.4.11)
+	 * 
+	 * Main shortcode that routes to appropriate view handler based on viewType parameter.
+	 * Compatible with Gutenberg block attributes.
 	 * 
 	 * Usage:
-	 * [cts_calendar view="monthly-modern" show_time="true" show_description="true"]
+	 * [churchtools_events limit="5"]
+	 * [churchtools_events viewType="list" view="classic" limit="10"]
 	 * 
 	 * @param array $atts Shortcode attributes
 	 * @return string HTML output
 	 */
-	public static function calendar_shortcode( $atts ): string {
+	public static function generic_events_shortcode( $atts ): string {
+		// v0.9.6.6: Use global settings as defaults (from Allgemeines tab)
+		$default_show_past = get_option( 'churchtools_suite_show_past_events', 0 );
+		$default_show_month_sep = get_option( 'churchtools_suite_show_month_separator', 1 );
+		
 		$atts = shortcode_atts( [
-			'view' => 'monthly-modern',
+			'viewType' => 'list',  // Matches Gutenberg block attribute
+			'view' => 'classic',
+			'limit' => 5,
 			'calendar' => '',
-			'limit' => 100,
-			'from' => '',
-			'to' => '',
-			'class' => '',
-			// Tooltip Display Options (v0.10.3.26)
-			'show_time' => true,
-			'show_description' => false,
-			'show_location' => false,
+			'show_event_description' => true,
+			'show_appointment_description' => true,
+			'show_location' => true,
 			'show_services' => false,
-			'show_calendar_name' => false,
-		], $atts, 'cts_calendar' );
+			'show_time' => true,
+			'show_tags' => true,
+			'show_calendar_name' => true,
+			'show_month_separator' => (bool) $default_show_month_sep,
+			'enable_modal' => true,
+			'show_past_events' => false,
+			'event_action' => 'modal',
+		], $atts, 'churchtools_events' );
 		
-		// Apply preset configuration if view is a preset slug
-		$atts = self::apply_preset_config( $atts, 'cts_calendar' );
+		// Route to appropriate view handler
+		$view_type = strtolower( $atts['viewType'] );
 		
-		// v0.10.4.37: Map legacy show_description to new separate params
-		$atts = self::map_legacy_description_param( $atts );
-		
-		// Convert string boolean values to actual booleans
-		$atts['show_time'] = self::parse_boolean( $atts['show_time'] );
-		$atts['show_description'] = self::parse_boolean( $atts['show_description'] );
-		$atts['show_location'] = self::parse_boolean( $atts['show_location'] );
-		$atts['show_services'] = self::parse_boolean( $atts['show_services'] );
-		$atts['show_calendar_name'] = self::parse_boolean( $atts['show_calendar_name'] );
-		
-		// Get events
-		$events = self::get_events( $atts );
-		
-		// Build template data
-		$data = [
-			'events' => $events,
-			'atts' => $atts,
-			'view' => $atts['view'],
-		];
-		
-		// Use base view for template if preset
-		$template_view = isset( $atts['_preset_base_view'] ) ? $atts['_preset_base_view'] : $atts['view'];
-		
-		// Render template
-		ob_start();
-		ChurchTools_Suite_Template_Loader::render_template( 'calendar/' . $template_view . '.php', $data );
-		$output = ob_get_clean();
-		
-		// Wrap with optional CSS class
-		if ( ! empty( $atts['class'] ) ) {
-			$output = '<div class="' . esc_attr( $atts['class'] ) . '">' . $output . '</div>';
+		if ( $view_type === 'list' ) {
+			return self::list_shortcode( $atts );
 		}
 		
-		return $output;
+		// v0.9.8.0: Calendar view activated
+		if ( $view_type === 'calendar' ) {
+			return self::calendar_shortcode( $atts );
+		}
+		
+		// Other view types deactivated in v1.0.0
+		return '<p style="padding: 12px; background: #fef3c7; border-radius: 4px;">⚠️ <strong>View Type nicht verfügbar:</strong> Nur "list" und "calendar" sind aktiv.</p>';
 	}
 	
 	/**
@@ -287,16 +302,30 @@ class ChurchTools_Suite_Shortcodes {
 			'from' => '',
 			'to' => '',
 			'class' => '',
-			// v1.0.0: Separate description parameters
+			// v1.0.0: All display options configured per block/shortcode
+			'show_images' => true,
 			'show_event_description' => true,
 			'show_appointment_description' => true,
 			'show_location' => true,
 			'show_services' => false,
 			'show_time' => true,
 			'show_tags' => true,
+			'show_calendar_name' => true,
+			'show_month_separator' => true,
+			'show_past_events' => false,
+			'event_action' => 'modal',
+			// v0.9.6.8: Style Management
+			'style_mode' => 'theme',
+			'use_calendar_colors' => false,
+			'custom_primary_color' => '#2563eb',
+			'custom_text_color' => '#1e293b',
+			'custom_background_color' => '#ffffff',
+			'custom_border_radius' => 6,
+			'custom_font_size' => 14,
+			'custom_padding' => 12,
+			'custom_spacing' => 8,
 			// Legacy (deprecated in v1.0.0)
 			'show_description' => null,
-			'show_calendar_name' => false,
 			// Filter parameters
 			'order' => 'asc',
 			'date_from' => '',
@@ -304,9 +333,10 @@ class ChurchTools_Suite_Shortcodes {
 			'filter_tags' => '',
 		], $atts, 'cts_list' );
 		
-		// v1.0.0.0 - CLEAN SLATE: Only classic view allowed
-		if ( $atts['view'] !== 'classic' ) {
-			return '<p style="padding: 12px; background: #fef3c7; border-radius: 4px;">⚠️ <strong>View nicht verfügbar:</strong> Nur "classic" ist in v1.0.0 aktiv. View "' . esc_html( $atts['view'] ) . '" wird in zukünftigen Updates aktiviert.</p>';
+		// v0.9.7.0 - MODERN VIEW AKTIVIERT: classic + minimal + modern + classic-with-images (v0.9.9.35)
+		$allowed_views = [ 'classic', 'minimal', 'modern', 'classic-with-images' ];
+		if ( ! in_array( $atts['view'], $allowed_views, true ) ) {
+			return '<p style="padding: 12px; background: #fef3c7; border-radius: 4px;">⚠️ <strong>View nicht verfügbar:</strong> Nur "classic", "minimal", "modern" und "classic-with-images" sind aktiv. View "' . esc_html( $atts['view'] ) . '" wird in zukünftigen Updates aktiviert.</p>';
 		}
 		
 		// Convert boolean values
@@ -317,6 +347,8 @@ class ChurchTools_Suite_Shortcodes {
 		$atts['show_calendar_name'] = self::parse_boolean( $atts['show_calendar_name'] );
 		$atts['show_time'] = self::parse_boolean( $atts['show_time'] );
 		$atts['show_tags'] = self::parse_boolean( $atts['show_tags'] );
+		$atts['show_month_separator'] = self::parse_boolean( $atts['show_month_separator'] );
+		$atts['show_past_events'] = self::parse_boolean( $atts['show_past_events'] );
 		
 		// Legacy show_description fallback
 		if ( $atts['show_description'] !== null ) {
@@ -332,16 +364,18 @@ class ChurchTools_Suite_Shortcodes {
 		
 		$events = self::get_events( $atts );
 		
-		return self::render_template( 'list/classic', $events, $atts );
+		// v0.9.9.44: New template structure (views/event-list/)
+		$template_path = 'views/event-list/' . $atts['view'];
+		
+		return self::render_template( $template_path, $events, $atts );
 	}
 	
 	/**
-	 * Grid Shortcode (DEACTIVATED in v1.0.0)
+	 * Grid Shortcode (v0.9.9.0)
 	 * 
 	 * Usage:
-	 * [cts_grid view="simple" columns="3"]
-	 * [cts_grid view="modern" columns="4" calendar="2,3"]
-	 * [cts_grid view="colorful" limit="12"]
+	 * [cts_grid view="simple"]
+	 * [cts_grid view="simple" columns="3" limit="9"]
 	 * 
 	 * @param array $atts Shortcode attributes
 	 * @return string HTML output
@@ -350,328 +384,117 @@ class ChurchTools_Suite_Shortcodes {
 		$atts = shortcode_atts( [
 			'view' => 'simple',
 			'columns' => 3,
+			'limit' => 9,
 			'calendar' => '',
-			'limit' => 20,
 			'from' => '',
 			'to' => '',
 			'class' => '',
-			// Sprint 1: Anzeige-Parameter
-			'show_description' => true,
+			'show_past_events' => false,
+			'show_event_description' => true,
+			'show_appointment_description' => true,
 			'show_location' => true,
-			// Sprint 3: Weitere Anzeige-Parameter
-			'show_services' => true,
-			'show_calendar_name' => false,
+			'show_services' => false,
 			'show_time' => true,
-			'show_tags' => false, // v0.10.4.11: Tags anzeigen
-			// Sprint 4: Filter-Parameter
-			'order' => 'asc',
-			'date_from' => '',
-			'date_to' => '',
-			'filter_tags' => '', // v0.10.4.11: Filter nach Tags (komma-separiert)
+			'show_tags' => true,
+			'show_calendar_name' => true,
+			'event_action' => 'modal',
+			// Style Management
+			'style_mode' => 'theme',
+			'use_calendar_colors' => false,
+			'custom_primary_color' => '#2563eb',
+			'custom_text_color' => '#1e293b',
+			'custom_background_color' => '#ffffff',
+			'custom_border_radius' => 6,
+			'custom_font_size' => 14,
+			'custom_padding' => 12,
+			'custom_spacing' => 16,
 		], $atts, 'cts_grid' );
 		
-		// Validate columns (1-4)
-		$atts['columns'] = absint( $atts['columns'] );
-		if ( $atts['columns'] < 1 || $atts['columns'] > 4 ) {
-			$atts['columns'] = 3;
+		// v0.9.9.66: simple + modern available (background-images removed, replaced by modern)
+		$allowed_views = [ 'simple', 'modern' ];
+		if ( ! in_array( $atts['view'], $allowed_views, true ) ) {
+			return '<p style="padding: 12px; background: #fef3c7; border-radius: 4px;">⚠️ <strong>Grid View nicht verfügbar:</strong> Nur "simple" und "modern" sind aktiv.</p>';
 		}
 		
-		// v0.10.4.37: Map legacy show_description to new separate params
-		$atts = self::map_legacy_description_param( $atts );
+		// Validate columns (1-6)
+		$atts['columns'] = max( 1, min( 6, intval( $atts['columns'] ) ) );
 		
-		// Convert string boolean values to actual booleans
-		$atts['show_description'] = self::parse_boolean( $atts['show_description'] );
+		// Convert boolean values
+		$atts['show_past_events'] = self::parse_boolean( $atts['show_past_events'] );
+		$atts['use_calendar_colors'] = self::parse_boolean( $atts['use_calendar_colors'] );
+		$atts['use_calendar_colors'] = self::parse_boolean( $atts['use_calendar_colors'] );
+		$atts['show_event_description'] = self::parse_boolean( $atts['show_event_description'] );
+		$atts['show_appointment_description'] = self::parse_boolean( $atts['show_appointment_description'] );
 		$atts['show_location'] = self::parse_boolean( $atts['show_location'] );
 		$atts['show_services'] = self::parse_boolean( $atts['show_services'] );
-		$atts['show_calendar_name'] = self::parse_boolean( $atts['show_calendar_name'] );
 		$atts['show_time'] = self::parse_boolean( $atts['show_time'] );
-		$atts['show_tags'] = self::parse_boolean( $atts['show_tags'] ); // v0.10.4.11
+		$atts['show_tags'] = self::parse_boolean( $atts['show_tags'] );
+		$atts['show_calendar_name'] = self::parse_boolean( $atts['show_calendar_name'] );
 		
-		// Validate order (asc/desc)
-		if ( ! in_array( $atts['order'], [ 'asc', 'desc' ], true ) ) {
-			$atts['order'] = 'asc';
-		}
-		
-		// Apply preset configuration if view is a preset slug
-		$atts = self::apply_preset_config( $atts, 'cts_grid' );
-		
+		// Get events
 		$events = self::get_events( $atts );
 		
-		// Use base view for template if preset
-		$template_view = isset( $atts['_preset_base_view'] ) ? $atts['_preset_base_view'] : $atts['view'];
+		// v0.9.9.44: New template structure (views/event-grid/)
+		$template_path = 'views/event-grid/' . $atts['view'];
 		
-		return self::render_template( "grid/{$template_view}", $events, $atts );
+		return self::render_template( $template_path, $events, $atts );
 	}
 	
 	/**
-	 * Modal Shortcode
+	 * Calendar Shortcode (v0.9.8.0)
 	 * 
 	 * Usage:
-	 * [cts_modal id="2026"]
-	 * [cts_modal event_id="2026" view="full-calendar"]
+	 * [cts_calendar view="monthly-simple"]
+	 * [cts_calendar view="monthly-simple" calendar="2"]
 	 * 
 	 * @param array $atts Shortcode attributes
 	 * @return string HTML output
 	 */
-	public static function modal_shortcode( $atts ): string {
+	public static function calendar_shortcode( $atts ): string {
 		$atts = shortcode_atts( [
-			'id' => 0,
-			'event_id' => '',
-			'view' => 'single-event',
-			'class' => '',
-		], $atts, 'cts_modal' );
-		
-		// Get single event by ID
-		$events = self::get_event_by_id( $atts['id'] ?: $atts['event_id'] );
-		
-		return self::render_template( "modal/{$atts['view']}", $events, $atts );
-	}
-	
-	/**
-	 * Slider Shortcode
-	 * 
-	 * Usage:
-	 * [cts_slider view="type-1" limit="5"]
-	 * [cts_slider view="type-3" autoplay="true"]
-	 * 
-	 * @param array $atts Shortcode attributes
-	 * @return string HTML output
-	 */
-	public static function slider_shortcode( $atts ): string {
-		$atts = shortcode_atts( [
-			'view' => 'type-1',
+			'view' => 'monthly-simple',
 			'calendar' => '',
-			'limit' => 5,
-			'autoplay' => false,
-			'interval' => 5000,
-			'class' => '',
-		], $atts, 'cts_slider' );
-		
-		$events = self::get_events( $atts );
-		
-		return self::render_template( "slider/{$atts['view']}", $events, $atts );
-	}
-	
-	/**
-	 * Countdown Shortcode
-	 * 
-	 * Usage:
-	 * [cts_countdown view="type-1"]
-	 * [cts_countdown view="type-2" event_id="2026"]
-	 * 
-	 * @param array $atts Shortcode attributes
-	 * @return string HTML output
-	 */
-	public static function countdown_shortcode( $atts ): string {
-		$atts = shortcode_atts( [
-			'view' => 'type-1',
-			'event_id' => '',
-			'calendar' => '',
-			'class' => '',
-		], $atts, 'cts_countdown' );
-		
-		// Get next upcoming event
-		if ( empty( $atts['event_id'] ) ) {
-			$events = self::get_next_event( $atts );
-		} else {
-			$events = self::get_event_by_id( $atts['event_id'] );
-		}
-		
-		return self::render_template( "countdown/{$atts['view']}", $events, $atts );
-	}
-	
-	/**
-	 * Cover Shortcode
-	 * 
-	 * Usage:
-	 * [cts_cover view="classic"]
-	 * [cts_cover view="modern" calendar="2"]
-	 * 
-	 * @param array $atts Shortcode attributes
-	 * @return string HTML output
-	 */
-	public static function cover_shortcode( $atts ): string {
-		$atts = shortcode_atts( [
-			'view' => 'classic',
-			'event_id' => '',
-			'calendar' => '',
-			'class' => '',
-		], $atts, 'cts_cover' );
-		
-		// Get next upcoming event
-		if ( empty( $atts['event_id'] ) ) {
-			$events = self::get_next_event( $atts );
-		} else {
-			$events = self::get_event_by_id( $atts['event_id'] );
-		}
-		
-		return self::render_template( "cover/{$atts['view']}", $events, $atts );
-	}
-	
-	/**
-	 * Timetable Shortcode
-	 * 
-	 * Usage:
-	 * [cts_timetable view="modern"]
-	 * [cts_timetable view="timeline" from="2025-12-01" to="2025-12-31"]
-	 * 
-	 * @param array $atts Shortcode attributes
-	 * @return string HTML output
-	 */
-	public static function timetable_shortcode( $atts ): string {
-		$atts = shortcode_atts( [
-			'view' => 'modern',
-			'calendar' => '',
+			'limit' => 100, // Higher limit for calendar views
 			'from' => '',
 			'to' => '',
 			'class' => '',
-		], $atts, 'cts_timetable' );
+			'show_past_events' => false,
+			'event_action' => 'modal',
+			// Style Management
+			'style_mode' => 'theme',
+			'use_calendar_colors' => false,
+			'custom_primary_color' => '#2563eb',
+			'custom_text_color' => '#1e293b',
+			'custom_background_color' => '#ffffff',
+			'custom_border_radius' => 6,
+			'custom_font_size' => 14,
+			'custom_padding' => 8,
+			'custom_spacing' => 0,
+		], $atts, 'cts_calendar' );
 		
+		// v0.9.8.6: Debug - Check what view value we received
+		if ( WP_DEBUG ) {
+			error_log( 'Calendar Shortcode - Received view: ' . var_export( $atts['view'], true ) );
+			error_log( 'Calendar Shortcode - All atts: ' . var_export( $atts, true ) );
+		}
+		
+		// v0.9.8.0: Only monthly-simple activated
+		$allowed_views = [ 'monthly-simple' ];
+		if ( ! in_array( $atts['view'], $allowed_views, true ) ) {
+			return '<p style="padding: 12px; background: #fef3c7; border-radius: 4px;">⚠️ <strong>Calendar View nicht verfügbar:</strong> Nur "monthly-simple" ist aktiv. (Erhalten: "' . esc_html( $atts['view'] ) . '")</p>';
+		}
+		
+		// Convert boolean values
+		$atts['show_past_events'] = self::parse_boolean( $atts['show_past_events'] );
+		$atts['use_calendar_colors'] = self::parse_boolean( $atts['use_calendar_colors'] );
+		
+		// Get events
 		$events = self::get_events( $atts );
 		
-		return self::render_template( "timetable/{$atts['view']}", $events, $atts );
-	}
-	
-	/**
-	 * Carousel Shortcode
-	 * 
-	 * Usage:
-	 * [cts_carousel view="type-1" limit="10"]
-	 * [cts_carousel view="type-3" autoplay="true"]
-	 * 
-	 * @param array $atts Shortcode attributes
-	 * @return string HTML output
-	 */
-	public static function carousel_shortcode( $atts ): string {
-		$atts = shortcode_atts( [
-			'view' => 'type-1',
-			'calendar' => '',
-			'limit' => 10,
-			'autoplay' => false,
-			'interval' => 5000,
-			'class' => '',
-		], $atts, 'cts_carousel' );
+		// v0.9.9.44: New template structure (views/event-calendar/)
+		$template_path = 'views/event-calendar/' . $atts['view'];
 		
-		$events = self::get_events( $atts );
-		
-		return self::render_template( "carousel/{$atts['view']}", $events, $atts );
-	}
-	
-	/**
-	 * Single Event Shortcode
-	 * 
-	 * Usage:
-	 * [cts_single id="2026"]
-	 * [cts_single event_id="2026" view="fluent"]
-	 * 
-	 * @param array $atts Shortcode attributes
-	 * @return string HTML output
-	 */
-	public static function single_shortcode( $atts ): string {
-		$atts = shortcode_atts( [
-			'id' => 0,
-			'event_id' => '',
-			'view' => 'default',
-			'class' => '',
-		], $atts, 'cts_single' );
-		
-		$events = self::get_event_by_id( $atts['id'] ?: $atts['event_id'] );
-		
-		return self::render_template( "single/{$atts['view']}", $events, $atts );
-	}
-	
-	/**
-	 * Map Shortcode
-	 * 
-	 * Usage:
-	 * [cts_map view="standard"]
-	 * [cts_map view="advanced" calendar="2,3"]
-	 * 
-	 * @param array $atts Shortcode attributes
-	 * @return string HTML output
-	 */
-	public static function map_shortcode( $atts ): string {
-		$atts = shortcode_atts( [
-			'view' => 'standard',
-			'calendar' => '',
-			'zoom' => 12,
-			'center' => '',
-			'class' => '',
-		], $atts, 'cts_map' );
-		
-		$events = self::get_events( $atts );
-		
-		return self::render_template( "map/{$atts['view']}", $events, $atts );
-	}
-	
-	/**
-	 * Search Shortcode
-	 * 
-	 * Usage:
-	 * [cts_search view="bar"]
-	 * [cts_search view="advanced" calendar="2"]
-	 * 
-	 * @param array $atts Shortcode attributes
-	 * @return string HTML output
-	 */
-	public static function search_shortcode( $atts ): string {
-		$atts = shortcode_atts( [
-			'view' => 'bar',
-			'calendar' => '',
-			'placeholder' => __( 'Termine suchen...', 'churchtools-suite' ),
-			'class' => '',
-		], $atts, 'cts_search' );
-		
-		// Get events for search index
-		$events = self::get_events( $atts );
-		
-		return self::render_template( "search/{$atts['view']}", $events, $atts );
-	}
-	
-	/**
-	 * Widget Shortcode
-	 * 
-	 * Usage:
-	 * [cts_widget view="upcoming-events" limit="5"]
-	 * [cts_widget view="calendar-widget"]
-	 * 
-	 * @param array $atts Shortcode attributes
-	 * @return string HTML output
-	 */
-	public static function widget_shortcode( $atts ): string {
-		$atts = shortcode_atts( [
-			'view' => 'upcoming',
-			'calendar' => '',
-			'limit' => 5,
-			'class' => '',
-		], $atts, 'cts_widget' );
-		
-		$events = self::get_events( $atts );
-		
-		return self::render_template( "widget/{$atts['view']}", $events, $atts );
-	}
-	
-	/**
-	 * Legacy Events Shortcode
-	 * 
-	 * Backward compatibility for old plugin
-	 * Maps to [cts_list view="classic"]
-	 * 
-	 * @param array $atts Shortcode attributes
-	 * @return string HTML output
-	 */
-	public static function legacy_events_shortcode( $atts ): string {
-		$atts = shortcode_atts( [
-			'calendar' => '',
-			'limit' => 20,
-			'from' => '',
-			'to' => '',
-		], $atts, 'cts_events' );
-		
-		// Map to list view
-		$atts['view'] = 'classic';
-		
-		return self::list_shortcode( $atts );
+		return self::render_template( $template_path, $events, $atts );
 	}
 	
 	/**
@@ -723,11 +546,11 @@ class ChurchTools_Suite_Shortcodes {
 		}
 		
 		// Test 4: Check template path
-		$template_path = CHURCHTOOLS_SUITE_PATH . 'templates/list/classic.php';
+		$template_path = CHURCHTOOLS_SUITE_PATH . 'templates/views/event-list/classic.php';
 		if ( file_exists( $template_path ) ) {
-			$output .= '<p>✅ Template exists: templates/list/classic.php</p>';
+			$output .= '<p>✅ Template exists: templates/views/event-list/classic.php</p>';
 		} else {
-			$output .= '<p>❌ Template missing: templates/list/classic.php</p>';
+			$output .= '<p>❌ Template missing: templates/views/event-list/classic.php</p>';
 		}
 		
 		$output .= '</div>';
@@ -752,6 +575,7 @@ class ChurchTools_Suite_Shortcodes {
 			'limit' => absint( $atts['limit'] ?? 20 ),
 			'from' => $atts['from'] ?? '',
 			'to' => $atts['to'] ?? '',
+			'show_past_events' => $atts['show_past_events'] ?? false,
 		];
 		
 		// Sprint 4: Add date filters
@@ -830,15 +654,20 @@ class ChurchTools_Suite_Shortcodes {
 	 * @return array Array of calendar IDs
 	 */
 	private static function parse_calendar_ids( string $calendar_ids ): array {
-		if ( empty( $calendar_ids ) ) {
-			return [];
+		// If calendar_ids parameter is explicitly provided
+		if ( ! empty( $calendar_ids ) ) {
+			$ids = explode( ',', $calendar_ids );
+			$ids = array_map( 'trim', $ids );
+			$ids = array_filter( $ids );
+			return $ids;
 		}
 		
-		$ids = explode( ',', $calendar_ids );
-		$ids = array_map( 'trim', $ids );
-		$ids = array_filter( $ids );
+		// If no parameter provided, use selected calendars from admin settings
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-calendars-repository.php';
+		$calendars_repo = new ChurchTools_Suite_Calendars_Repository();
+		$selected_ids = $calendars_repo->get_selected_calendar_ids();
 		
-		return $ids;
+		return ! empty( $selected_ids ) ? $selected_ids : [];
 	}
 	
 	/**
@@ -936,9 +765,19 @@ class ChurchTools_Suite_Shortcodes {
 			return;
 		}
 		
-		// Check if any CTS shortcodes exist on page
+		// v0.9.6.18: Always load modal (needed for Gutenberg blocks)
+		// Old condition was too restrictive - Gutenberg blocks don't use shortcodes
+		// Check if any CTS content exists (shortcodes OR blocks)
 		global $post;
-		if ( ! $post || ! has_shortcode( $post->post_content, 'cts_' ) ) {
+		if ( ! $post ) {
+			return;
+		}
+		
+		// Check for shortcodes OR Gutenberg blocks
+		$has_cts_content = has_shortcode( $post->post_content, 'cts_' ) || 
+		                   has_block( 'churchtools-suite/events-block', $post );
+		
+		if ( ! $has_cts_content ) {
 			return;
 		}
 		

@@ -60,6 +60,8 @@ class ChurchTools_Suite_Events_Repository extends ChurchTools_Suite_Repository_B
             'address_longitude' => null, // v0.9.2.0: GPS longitude
             'tags' => null, // v0.9.2.0: JSON array of tags
             'status' => null,
+            'image_attachment_id' => null, // v0.10.5.0: WordPress attachment ID
+            'image_url' => null, // v0.10.5.0: Fallback image URL
             'raw_payload' => null,
             'last_modified' => null, // v0.7.1.0: For incremental sync
             'appointment_modified' => null, // v0.8.1.0: For appointment-level changes
@@ -93,6 +95,8 @@ class ChurchTools_Suite_Events_Repository extends ChurchTools_Suite_Repository_B
                 'address_latitude',
                 'address_longitude',
                 'tags',
+                'image_attachment_id', // v0.10.5.0: WordPress attachment ID
+                'image_url', // v0.10.5.0: Fallback image URL
                 'appointment_modified',
                 'raw_payload',
                 'status',
@@ -127,19 +131,25 @@ class ChurchTools_Suite_Events_Repository extends ChurchTools_Suite_Repository_B
             $result = $this->db->update(
                 $this->table_name,
                 $update_data,
-                ['id' => $existing_id]
+                ['id' => $existing_id],
+                null, // v0.9.0.1: Auto-detect format for data fields
+                ['%d'] // WHERE id format
             );
 
-            // Fehler-Logging
-            if ($result === false && class_exists('ChurchTools_Suite_Logger') && !empty($this->db->last_error)) {
-                ChurchTools_Suite_Logger::error(
-                    'repository',
-                    sprintf('SELECTIVE UPDATE failed for event ID %d', $existing_id),
-                    [
-                        'wpdb_error' => $this->db->last_error,
-                        'last_query' => $this->db->last_query,
-                    ]
-                );
+            // Fehler-Logging (v0.9.0.1: Fixed false positives when no changes made)
+            // $result kann sein: int (rows affected), false (error), oder 0 (no changes)
+            if ($result === false) {
+                if (class_exists('ChurchTools_Suite_Logger') && !empty($this->db->last_error)) {
+                    ChurchTools_Suite_Logger::error(
+                        'repository',
+                        sprintf('SELECTIVE UPDATE failed for event ID %d', $existing_id),
+                        [
+                            'wpdb_error' => $this->db->last_error,
+                            'last_query' => $this->db->last_query,
+                        ]
+                    );
+                }
+                return false; // v0.9.0.1: Return false on actual error
             }
 
             return (int) $existing_id;

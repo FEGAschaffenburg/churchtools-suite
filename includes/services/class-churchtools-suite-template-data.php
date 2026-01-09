@@ -35,6 +35,13 @@ class ChurchTools_Suite_Template_Data {
 	 * @var ChurchTools_Suite_Event_Services_Repository
 	 */
 	private $event_services_repo;
+
+	/**
+	 * Calendar fallback images (calendar_id => attachment ID)
+	 *
+	 * @var array
+	 */
+	private $calendar_images;
 	
 	/**
 	 * Constructor
@@ -43,6 +50,29 @@ class ChurchTools_Suite_Template_Data {
 		$this->events_repo = new ChurchTools_Suite_Events_Repository();
 		$this->calendars_repo = new ChurchTools_Suite_Calendars_Repository();
 		$this->event_services_repo = new ChurchTools_Suite_Event_Services_Repository();
+		
+		// v0.9.9.58: Load calendar images from table (with fallback to option for backward compatibility)
+		$this->load_calendar_images();
+	}
+	
+	/**
+	 * Load calendar images from table (v0.9.9.58)
+	 * Falls back to option if table field is empty
+	 */
+	private function load_calendar_images(): void {
+		$calendars = $this->calendars_repo->get_all();
+		$this->calendar_images = [];
+		
+		foreach ( $calendars as $calendar ) {
+			if ( ! empty( $calendar->calendar_image_id ) ) {
+				$this->calendar_images[ $calendar->calendar_id ] = absint( $calendar->calendar_image_id );
+			}
+		}
+		
+		// Fallback to option for backward compatibility
+		if ( empty( $this->calendar_images ) ) {
+			$this->calendar_images = get_option( 'churchtools_suite_calendar_images', [] );
+		}
 	}
 	
 	/**
@@ -63,11 +93,12 @@ class ChurchTools_Suite_Template_Data {
 	public function get_events( array $filters = [] ): array {
 		$defaults = [
 			'calendar_ids' => [],
-			'limit' => 20,
+			'limit' => 5,
 			'from' => '',
 			'to' => '',
 			'order' => 'ASC',
 			'filter_tags' => [], // v0.10.4.11: Tag filter
+			'show_past_events' => false, // v0.9.2.0: Show past events toggle
 		];
 		
 		$filters = wp_parse_args( $filters, $defaults );
@@ -85,14 +116,15 @@ class ChurchTools_Suite_Template_Data {
 			$where[] = $wpdb->prepare( "calendar_id IN ($calendar_placeholders)", $filters['calendar_ids'] );
 		}
 		
-		// Date range filter
+		// Date range filter (v0.9.2.0: show_past_events support)
 		if ( ! empty( $filters['from'] ) ) {
 			// User has explicitly set a start date - respect it (can be past!)
 			$where[] = $wpdb->prepare( 'start_datetime >= %s', $filters['from'] );
-		} else {
+		} elseif ( ! $filters['show_past_events'] ) {
 			// Default: show events from today onwards (no past events)
 			$where[] = $wpdb->prepare( 'start_datetime >= %s', current_time( 'mysql' ) );
 		}
+		// If show_past_events=true and no explicit from date, show ALL events (no date filter)
 		
 		if ( ! empty( $filters['to'] ) ) {
 			$where[] = $wpdb->prepare( 'start_datetime <= %s', $filters['to'] );
@@ -253,11 +285,17 @@ class ChurchTools_Suite_Template_Data {
 			'event_id' => $event['event_id'] ?? '',
 			'appointment_id' => $event['appointment_id'] ?? '',
 			'calendar_id' => $event['calendar_id'] ?? '',
-			
+
+			// Bildfelder explizit übernehmen
+			'image_attachment_id' => $event['image_attachment_id'] ?? '',
+			'image_url' => $event['image_url'] ?? '',
+
 			// Calendar info
 			'calendar_name' => $calendar ? $calendar->name : '',
 			'calendar_name_translated' => $calendar ? $calendar->name_translated : '',
 			'calendar_color' => $calendar ? $calendar->color : '#3498db',
+			'calendar_image_id' => $this->get_calendar_image_id( $event['calendar_id'] ?? '' ),
+			'calendar_image_url' => $this->get_calendar_image_url( $event['calendar_id'] ?? '' ),
 			
 			// Basic data
 			'title' => $event['title'] ?? __( 'Unbenannt', 'churchtools-suite' ),
@@ -293,6 +331,8 @@ class ChurchTools_Suite_Template_Data {
 			
 			// Date components
 		'start_day' => date_i18n( 'j', $start_timestamp ), // Tag ohne führende Null
+		'start_weekday' => date_i18n( 'D', $start_timestamp ), // Kurzer Wochentag lokalisiert (z.B. "Mo", "Mon")
+		'start_weekday_full' => date_i18n( 'l', $start_timestamp ), // Voller Wochentag lokalisiert (z.B. "Montag", "Monday")
 		'start_month' => strtoupper( date_i18n( 'M', $start_timestamp ) ), // Kurzer Monat UPPERCASE (z.B. "DEZ")
 		'start_month_short' => date_i18n( 'M', $start_timestamp ), // Kurzer Monat (z.B. "Dez")
 		'start_month_full' => date_i18n( 'F', $start_timestamp ), // Voller Monat (z.B. "Dezember")
@@ -315,6 +355,36 @@ class ChurchTools_Suite_Template_Data {
 		];
 	}
 	
+	/**
+	 * Get fallback image attachment ID for a calendar
+	 *
+	 * @param string $calendar_id Calendar domain identifier
+	 * @return int Attachment ID or 0
+	 */
+	private function get_calendar_image_id( string $calendar_id ): int {
+		if ( empty( $calendar_id ) || empty( $this->calendar_images ) ) {
+			return 0;
+		}
+
+		return isset( $this->calendar_images[ $calendar_id ] ) ? absint( $this->calendar_images[ $calendar_id ] ) : 0;
+	}
+
+	/**
+	 * Get fallback image URL for a calendar
+	 *
+	 * @param string $calendar_id Calendar domain identifier
+	 * @return string|null Image URL or null when none set
+	 */
+	private function get_calendar_image_url( string $calendar_id ): ?string {
+		$attachment_id = $this->get_calendar_image_id( $calendar_id );
+		if ( ! $attachment_id ) {
+			return null;
+		}
+
+		$image_url = wp_get_attachment_image_url( $attachment_id, 'large' );
+		return $image_url ?: null;
+	}
+
 	/**
 	 * Check if event is all-day
 	 * 

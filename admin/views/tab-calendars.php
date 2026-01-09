@@ -19,6 +19,8 @@ $calendars_repo = new ChurchTools_Suite_Calendars_Repository();
 $calendars = $calendars_repo->get_all();
 $selected_count = $calendars_repo->count_selected();
 $last_sync = get_option('churchtools_suite_calendars_last_sync', null);
+// v0.9.9.58: Read calendar_image_id from table, fallback to option for backward compatibility
+$calendar_images_option = get_option('churchtools_suite_calendar_images', []);
 ?>
 
 <div class="cts-tab-content-inner">
@@ -119,10 +121,16 @@ $last_sync = get_option('churchtools_suite_calendars_last_sync', null);
 								<th><?php esc_html_e('ChurchTools-ID', 'churchtools-suite'); ?></th>
 								<th><?php esc_html_e('Sichtbarkeit', 'churchtools-suite'); ?></th>
 								<th><?php esc_html_e('Farbe', 'churchtools-suite'); ?></th>
+								<th><?php esc_html_e('Fallback-Bild', 'churchtools-suite'); ?></th>
 							</tr>
 						</thead>
 						<tbody>
 							<?php foreach ($calendars as $calendar): ?>
+								<?php
+									// v0.9.9.58: Prefer calendar_image_id from table, fallback to option
+									$image_id = !empty($calendar->calendar_image_id) ? absint($calendar->calendar_image_id) : (isset($calendar_images_option[$calendar->calendar_id]) ? absint($calendar_images_option[$calendar->calendar_id]) : 0);
+									$image_url = $image_id ? wp_get_attachment_image_url($image_id, 'thumbnail') : '';
+								?>
 								<tr>
 									<td>
 										<input 
@@ -159,6 +167,22 @@ $last_sync = get_option('churchtools_suite_calendars_last_sync', null);
 										<?php else: ?>
 											—
 										<?php endif; ?>
+									</td>
+									<td>
+										<div class="cts-calendar-image-wrapper">
+											<div class="cts-calendar-image-preview" data-calendar-id="<?php echo esc_attr($calendar->calendar_id); ?>">
+												<?php if ($image_url): ?>
+													<img src="<?php echo esc_url($image_url); ?>" alt="" />
+												<?php else: ?>
+													<span class="description"><?php esc_html_e('Kein Bild', 'churchtools-suite'); ?></span>
+												<?php endif; ?>
+											</div>
+											<input type="hidden" class="cts-calendar-image-input" data-calendar-id="<?php echo esc_attr($calendar->calendar_id); ?>" name="calendar_images[<?php echo esc_attr($calendar->calendar_id); ?>]" value="<?php echo esc_attr($image_id); ?>">
+											<div class="cts-calendar-image-actions">
+												<button type="button" class="button button-secondary cts-select-calendar-image" data-calendar-id="<?php echo esc_attr($calendar->calendar_id); ?>"><?php esc_html_e('Bild wählen', 'churchtools-suite'); ?></button>
+												<button type="button" class="button-link-delete cts-remove-calendar-image" data-calendar-id="<?php echo esc_attr($calendar->calendar_id); ?>"><?php esc_html_e('Entfernen', 'churchtools-suite'); ?></button>
+											</div>
+										</div>
 									</td>
 								</tr>
 							<?php endforeach; ?>
@@ -203,5 +227,21 @@ $last_sync = get_option('churchtools_suite_calendars_last_sync', null);
 	padding: 10px;
 	border-left: 4px solid #72aee6;
 	margin-bottom: 15px;
+}
+.cts-calendar-image-wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+.cts-calendar-image-preview img {
+	max-width: 96px;
+	height: auto;
+	border: 1px solid #e5e7eb;
+	border-radius: 4px;
+}
+.cts-calendar-image-actions {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
 }
 </style>

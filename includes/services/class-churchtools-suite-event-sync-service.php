@@ -83,7 +83,7 @@ class ChurchTools_Suite_Event_Sync_Service {
      *     @type string $to           End date (Y-m-d, default: +90 days)
      *     @type bool   $force_full   Force full sync instead of incremental (default: false)
      * }
-     * @return array|WP_Error Statistics array or WP_Error on failure
+     * @return array Statistics array (may contain 'success' => false on error)
      */
     public function sync_events(array $args = []): array {
 		// Get sync range from settings
@@ -125,7 +125,11 @@ class ChurchTools_Suite_Event_Sync_Service {
                 'Event Sync aborted: No calendars selected',
                 ChurchTools_Suite_Logger::WARNING
             );
-            return new WP_Error('no_calendars_selected', __('Keine Kalender ausgewählt.', 'churchtools-suite'));
+            return [
+                'success' => false,
+                'error' => __('Keine Kalender ausgewählt.', 'churchtools-suite'),
+                'error_code' => 'no_calendars_selected',
+            ];
         }
         
         $stats = [
@@ -806,13 +810,62 @@ class ChurchTools_Suite_Event_Sync_Service {
             $address_street = $address['street'] ?? null;
             $address_zip = $address['zip'] ?? $address['postalcode'] ?? null;
             $address_city = $address['city'] ?? null;
-            $address_latitude = isset($address['latitude']) ? (float) $address['latitude'] : null;
-            $address_longitude = isset($address['longitude']) ? (float) $address['longitude'] : null;
+            $address_latitude = isset($address['latitude']) ? (float) $address['latitude'] : (isset($address['geoLat']) ? (float) $address['geoLat'] : null);
+            $address_longitude = isset($address['longitude']) ? (float) $address['longitude'] : (isset($address['geoLng']) ? (float) $address['geoLng'] : null);
         }
         
         // v0.10.4.0: Tags gibt es NUR bei Appointments, nicht bei Events!
         // Tags werden in Phase 2 (Appointments API) importiert
         $tags = null;
+        
+        // v0.10.5.0: Import image from ChurchTools (Update: prüfe, ob Bild noch aktuell ist)
+        $image_attachment_id = null;
+        $image_url = null;
+        $external_image_url = $event['appointment']['base']['image']['imageUrl'] ?? $event['appointment']['image']['imageUrl'] ?? $event['image']['imageUrl'] ?? null;
+        $external_image_name = $event['appointment']['base']['image']['name'] ?? $event['appointment']['image']['name'] ?? $event['image']['name'] ?? null;
+
+        // Prüfe, ob das Bild neu importiert werden muss (URL oder Name geändert)
+        $import_new_image = false;
+        $existing_event = null;
+        if (!empty($event['id'])) {
+            $existing_event = $this->events_repo->get_by_event_id($event['id']);
+        }
+        if (!empty($external_image_url) && filter_var($external_image_url, FILTER_VALIDATE_URL)) {
+            $last_image_url = $existing_event->image_url ?? null;
+            $last_image_name = $existing_event->raw_payload ? (json_decode($existing_event->raw_payload, true)['image']['name'] ?? null) : null;
+            if ($last_image_url !== $external_image_url || $last_image_name !== $external_image_name) {
+                $import_new_image = true;
+            }
+        }
+
+        if (!empty($external_image_url) && filter_var($external_image_url, FILTER_VALIDATE_URL)) {
+            require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-image-importer.php';
+            if ($import_new_image) {
+                $import_result = ChurchTools_Suite_Image_Importer::import_image(
+                    $external_image_url,
+                    $external_image_name ?? $event['name'] ?? $event['designation'] ?? 'Event Image',
+                    (string) $event['id']
+                );
+                if (!is_wp_error($import_result)) {
+                    $image_attachment_id = $import_result;
+                    $image_url = ChurchTools_Suite_Image_Importer::get_image_url($import_result);
+                    ChurchTools_Suite_Logger::debug(
+                        'event_sync',
+                        sprintf('Image imported/updated for event %s: attachment_id=%d', $event['id'], $import_result),
+                        ['external_url' => $external_image_url]
+                    );
+                } else {
+                    ChurchTools_Suite_Logger::warning(
+                        'event_sync',
+                        sprintf('Failed to import image for event %s: %s', $event['id'], $import_result->get_error_message()),
+                        ['external_url' => $external_image_url, 'error_code' => $import_result->get_error_code()]
+                    );
+                }
+            } elseif ($existing_event && !empty($existing_event->image_attachment_id)) {
+                $image_attachment_id = $existing_event->image_attachment_id;
+                $image_url = $existing_event->image_url;
+            }
+        }
         
         return [
             'event_id' => (string) $event['id'],
@@ -833,6 +886,8 @@ class ChurchTools_Suite_Event_Sync_Service {
             'address_longitude' => $address_longitude, // v0.9.2.0
             'tags' => $tags, // v0.9.2.0
             'status' => 'active',
+            'image_attachment_id' => $image_attachment_id, // v0.10.5.0
+            'image_url' => $image_url, // v0.10.5.0 - Fallback URL
             'raw_payload' => wp_json_encode($event),
             'last_modified' => $last_modified, // v0.7.1.0
             'appointment_modified' => $appointment_modified, // v0.8.1.0
@@ -923,14 +978,36 @@ class ChurchTools_Suite_Event_Sync_Service {
             $address_street = $address['street'] ?? null;
             $address_zip = $address['zip'] ?? $address['postalcode'] ?? null;
             $address_city = $address['city'] ?? null;
-            $address_latitude = isset($address['latitude']) ? (float) $address['latitude'] : null;
-            $address_longitude = isset($address['longitude']) ? (float) $address['longitude'] : null;
+            $address_latitude = isset($address['latitude']) ? (float) $address['latitude'] : (isset($address['geoLat']) ? (float) $address['geoLat'] : null);
+            $address_longitude = isset($address['longitude']) ? (float) $address['longitude'] : (isset($address['geoLng']) ? (float) $address['geoLng'] : null);
             
             // Fallback location_name from address
             $location = $address_name ?? '';
         } else {
             // Fallback to base address string
             $location = $base['address'] ?? '';
+        }
+
+        // v0.9.9.x: Enrich missing address/geo from bookings (resource address)
+        if (empty($address_name) || empty($address_latitude) || empty($address_longitude)) {
+            if (!empty($appointment_data['bookings']) && is_array($appointment_data['bookings'])) {
+                $first_booking = $appointment_data['bookings'][0]['base'] ?? $appointment_data['bookings'][0] ?? [];
+                $resource = $first_booking['resource'] ?? [];
+                $resource_address = $resource['address'] ?? [];
+                if (empty($address_name) && !empty($resource['name'])) {
+                    $address_name = $resource['name'];
+                    if (empty($location)) {
+                        $location = $resource['name'];
+                    }
+                }
+                if (is_array($resource_address)) {
+                    $address_street = $address_street ?: ($resource_address['street'] ?? null);
+                    $address_zip = $address_zip ?: ($resource_address['zip'] ?? $resource_address['postalcode'] ?? null);
+                    $address_city = $address_city ?: ($resource_address['city'] ?? null);
+                    $address_latitude = $address_latitude ?: (isset($resource_address['latitude']) ? (float) $resource_address['latitude'] : (isset($resource_address['geoLat']) ? (float) $resource_address['geoLat'] : null));
+                    $address_longitude = $address_longitude ?: (isset($resource_address['longitude']) ? (float) $resource_address['longitude'] : (isset($resource_address['geoLng']) ? (float) $resource_address['geoLng'] : null));
+                }
+            }
         }
         
         // v0.10.4.9: Extract tags from appointment_data (tags are on OUTER level, not in appointment.base!)
@@ -983,6 +1060,49 @@ class ChurchTools_Suite_Event_Sync_Service {
         $start_date = $calc['startDate'] ?? $base['startDate'] ?? '';
         $end_date = $calc['endDate'] ?? $base['endDate'] ?? '';
         
+        // v0.10.5.0: Import image from ChurchTools (also for appointments!)
+        $image_attachment_id = null;
+        $image_url = null;
+        // FIX: Image object has imageUrl field inside it!
+        $external_image_url = $appointment['base']['image']['imageUrl'] ?? $appointment['image']['imageUrl'] ?? $appointment_data['image']['imageUrl'] ?? null;
+        
+        if (!empty($external_image_url) && filter_var($external_image_url, FILTER_VALIDATE_URL)) {
+            // Lade Image Importer
+            require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-image-importer.php';
+            
+            // Prüfe ob bereits importiert
+            $existing_id = ChurchTools_Suite_Image_Importer::find_existing_image($external_image_url);
+            
+            if ($existing_id) {
+                $image_attachment_id = $existing_id;
+                $image_url = ChurchTools_Suite_Image_Importer::get_image_url($existing_id);
+            } else {
+                // Importiere neues Bild
+                $import_result = ChurchTools_Suite_Image_Importer::import_image(
+                    $external_image_url,
+                    $title,
+                    (string) $appointment_id
+                );
+                
+                if (!is_wp_error($import_result)) {
+                    $image_attachment_id = $import_result;
+                    $image_url = ChurchTools_Suite_Image_Importer::get_image_url($import_result);
+                    
+                    ChurchTools_Suite_Logger::debug(
+                        'event_sync',
+                        sprintf('Image imported for appointment %s: attachment_id=%d', $appointment_id, $import_result),
+                        ['external_url' => $external_image_url]
+                    );
+                } else {
+                    ChurchTools_Suite_Logger::warning(
+                        'event_sync',
+                        sprintf('Failed to import image for appointment %s: %s', $appointment_id, $import_result->get_error_message()),
+                        ['external_url' => $external_image_url]
+                    );
+                }
+            }
+        }
+        
         return [
             'event_id' => null, // v0.9.0.0: NULL for standalone appointments
             'calendar_id' => $calendar_id,
@@ -1002,6 +1122,8 @@ class ChurchTools_Suite_Event_Sync_Service {
             'address_longitude' => $address_longitude, // v0.9.2.0
             'tags' => $tags, // v0.9.2.0
             'status' => 'active',
+            'image_attachment_id' => $image_attachment_id, // v0.10.5.0
+            'image_url' => $image_url, // v0.10.5.0 - Fallback URL
             'raw_payload' => wp_json_encode($appointment),
         ];
     }

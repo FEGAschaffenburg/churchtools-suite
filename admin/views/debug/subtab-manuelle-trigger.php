@@ -25,7 +25,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div id="cts-manual-trigger-result" style="margin-top: 16px;"></div>
 	</div>
 	<div class="cts-card" style="margin-top:24px;">
-		<h3>🛠️ Update & Log</h3>
+
+		<h3>�🛠️ Update & Log</h3>
 		<div style="display: flex; gap: 12px; flex-wrap: wrap;">
 			<button type="button" id="cts-manual-update" class="cts-button">
 				<span>🔄</span> Manuelles Update prüfen

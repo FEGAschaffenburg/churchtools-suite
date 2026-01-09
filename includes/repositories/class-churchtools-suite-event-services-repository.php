@@ -114,6 +114,16 @@ class ChurchTools_Suite_Event_Services_Repository extends ChurchTools_Suite_Repo
 	}
 	
 	/**
+	 * Alias for get_for_event() - for consistency with other repositories
+	 *
+	 * @param int $event_id Local event ID
+	 * @return array Array of service objects
+	 */
+	public function get_by_event_id( int $event_id ): array {
+		return $this->get_for_event( $event_id );
+	}
+	
+	/**
 	 * Delete all services for an event
 	 *
 	 * Used when an event is deleted to clean up orphaned services.

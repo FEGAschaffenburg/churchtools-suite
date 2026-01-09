@@ -31,4 +31,54 @@
   padding: 24px 24px 12px 24px;
 }
 
+/* Toggle Switch Styles (v0.9.6.2) */
+.cts-toggle {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.cts-toggle input[type="checkbox"] {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.cts-toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #cbd5e1;
+  transition: 0.3s;
+  border-radius: 24px;
+}
+
+.cts-toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+.cts-toggle input:checked + .cts-toggle-slider {
+  background-color: #2563eb;
+}
+
+.cts-toggle input:checked + .cts-toggle-slider:before {
+  transform: translateX(20px);
+}
+
+.cts-toggle input:focus + .cts-toggle-slider {
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
 

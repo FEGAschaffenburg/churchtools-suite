@@ -81,6 +81,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</button>
 		</div>
 
+		<!-- Rebuild Database Tables (v0.9.0.1) -->
+		<div style="padding: 15px; background: #e7f3ff; border: 2px solid #0073aa; border-radius: 5px;">
+			<h4 style="margin: 0 0 10px 0;">🔨 <?php esc_html_e( 'Datenbank neu aufbauen', 'churchtools-suite' ); ?></h4>
+			<p style="font-size: 13px; color: #004a6f; margin-bottom: 10px;">
+				<?php esc_html_e( 'Löscht ALLE Tabellen und erstellt sie neu. Alle Daten gehen verloren, aber DB-Strukturprobleme werden behoben.', 'churchtools-suite' ); ?>
+			</p>
+			<button type="button" class="button" id="cts-rebuild-database" style="width: 100%; background: #0073aa; border-color: #0073aa; color: white;">
+				<?php esc_html_e( 'Tabellen neu erstellen', 'churchtools-suite' ); ?>
+			</button>
+		</div>
+
 	</div>
 
 	<script>
@@ -163,6 +174,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 				'cts_complete_reset',
 				'<?php esc_html_e('🚨 KRITISCHE WARNUNG 🚨\n\nWirklich ALLES KOMPLETT LÖSCHEN?\n\n- Alle Daten (Events, Kalender, Services, etc.)\n- Alle Einstellungen (ChurchTools URL, Login, Cookies)\n- Kompletter Plugin-Reset\n\nSie müssen danach alles neu konfigurieren!\n\nDiese Aktion kann NICHT rückgängig gemacht werden!', 'churchtools-suite'); ?>',
 				'<?php esc_html_e('Plugin komplett zurückgesetzt! Bitte neu konfigurieren.', 'churchtools-suite'); ?>'
+			);
+		});
+		
+		$('#cts-rebuild-database').on('click', function() {
+			performReset(
+				'cts_rebuild_database',
+				'<?php esc_html_e('⚠️ DATENBANK NEU AUFBAUEN ⚠️\n\nAlle Tabellen werden gelöscht und neu erstellt!\n\n- Alle Events gelöscht\n- Alle Kalender gelöscht\n- Alle Services gelöscht\n- Alle Sync-Historie gelöscht\n\nEinstellungen bleiben erhalten.\n\nNützlich bei DB-Strukturproblemen nach Updates.\n\nFortfahren?', 'churchtools-suite'); ?>',
+				'<?php esc_html_e('Datenbank erfolgreich neu aufgebaut! Bitte Daten neu synchronisieren.', 'churchtools-suite'); ?>'
 			);
 		});
 	});

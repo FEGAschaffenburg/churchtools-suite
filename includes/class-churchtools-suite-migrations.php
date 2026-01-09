@@ -23,7 +23,7 @@ class ChurchTools_Suite_Migrations {
 	 * Increment this when adding new migrations.
 	 * Format: Major.Minor (e.g., 1.0, 1.1, 1.2)
 	 */
-	const DB_VERSION = '1.0';
+	const DB_VERSION = '1.2';
 	
 	/**
 	 * Option key for storing DB version
@@ -56,6 +56,14 @@ class ChurchTools_Suite_Migrations {
 		if ( version_compare( $current_version, '1.0', '<' ) ) {
 			self::migrate_to_1_0();
 		}
+
+		if ( version_compare( $current_version, '1.1', '<' ) ) {
+			self::migrate_to_1_1();
+		}
+
+		if ( version_compare( $current_version, '1.2', '<' ) ) {
+			self::migrate_to_1_2();
+		}
 		
 		// Update DB version
 		update_option( self::DB_VERSION_KEY, self::DB_VERSION );
@@ -82,23 +90,24 @@ class ChurchTools_Suite_Migrations {
 		
 		$sql = [];
 		
-		// Calendars table
-		$sql[] = "CREATE TABLE IF NOT EXISTS {$prefix}calendars (
-			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-			calendar_id varchar(100) NOT NULL,
-			name varchar(255) NOT NULL,
-			name_translated varchar(255) DEFAULT NULL,
-			color varchar(20) DEFAULT NULL,
-			is_selected tinyint(1) DEFAULT 0,
-			is_public tinyint(1) DEFAULT 0,
-			sort_order int(11) DEFAULT 0,
-			raw_payload longtext DEFAULT NULL,
-			created_at datetime DEFAULT CURRENT_TIMESTAMP,
-			updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-			PRIMARY KEY (id),
-			UNIQUE KEY calendar_id (calendar_id),
-			KEY is_selected (is_selected)
-		) $charset_collate;";
+		   // Calendars table
+		   $sql[] = "CREATE TABLE IF NOT EXISTS {$prefix}calendars (
+			   id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			   calendar_id varchar(100) NOT NULL,
+			   name varchar(255) NOT NULL,
+			   name_translated varchar(255) DEFAULT NULL,
+			   color varchar(20) DEFAULT NULL,
+			   calendar_image_id bigint(20) unsigned DEFAULT NULL,
+			   is_selected tinyint(1) DEFAULT 0,
+			   is_public tinyint(1) DEFAULT 0,
+			   sort_order int(11) DEFAULT 0,
+			   raw_payload longtext DEFAULT NULL,
+			   created_at datetime DEFAULT CURRENT_TIMESTAMP,
+			   updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			   PRIMARY KEY (id),
+			   UNIQUE KEY calendar_id (calendar_id),
+			   KEY is_selected (is_selected)
+		   ) $charset_collate;";
 		
 		// Events table (v0.9.0: COMPOSITE UNIQUE KEY for appointment + datetime)
 		$sql[] = "CREATE TABLE IF NOT EXISTS {$prefix}events (
@@ -122,6 +131,8 @@ class ChurchTools_Suite_Migrations {
 			address_longitude decimal(11,8) DEFAULT NULL,
 			tags longtext DEFAULT NULL,
 			status varchar(50) DEFAULT NULL,
+			image_attachment_id bigint(20) unsigned DEFAULT NULL,
+			image_url varchar(500) DEFAULT NULL,
 			raw_payload longtext DEFAULT NULL,
 			last_modified datetime DEFAULT NULL,
 			appointment_modified datetime DEFAULT NULL,
@@ -251,6 +262,60 @@ class ChurchTools_Suite_Migrations {
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-shortcode-presets-repository.php';
 		$presets_repo = new ChurchTools_Suite_Shortcode_Presets_Repository();
 		$presets_repo->create_system_presets();
+	}
+	
+	/**
+	 * Migration 1.1: Add image support to events table
+	 * 
+	 * Adds image_attachment_id and image_url columns for local image storage
+	 * 
+	 * @since 0.10.5.0
+	 */
+	private static function migrate_to_1_1(): void {
+		global $wpdb;
+		
+		$charset_collate = $wpdb->get_charset_collate();
+		$prefix = $wpdb->prefix . CHURCHTOOLS_SUITE_DB_PREFIX;
+		$events_table = $prefix . 'events';
+		
+		// Check if columns already exist
+		$wpdb->suppress_errors();
+		$columns = $wpdb->get_results( "SHOW COLUMNS FROM {$events_table} LIKE 'image_attachment_id'" );
+		$wpdb->show_errors();
+		
+		if ( empty( $columns ) ) {
+			// Add image columns after status
+			$wpdb->query( "ALTER TABLE {$events_table} 
+				ADD COLUMN image_attachment_id bigint(20) unsigned DEFAULT NULL AFTER status,
+				ADD COLUMN image_url varchar(500) DEFAULT NULL AFTER image_attachment_id
+			" );
+			
+			if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+				ChurchTools_Suite_Logger::log( 'migrations', 'Added image columns to events table', [
+					'table' => $events_table,
+				] );
+			}
+		}
+	}
+	
+	/**
+	 * Migration 1.2: Add calendar_image_id to calendars table
+	 *
+	 * @since 0.9.9.58
+	 */
+	private static function migrate_to_1_2(): void {
+		global $wpdb;
+		$prefix = $wpdb->prefix . CHURCHTOOLS_SUITE_DB_PREFIX;
+		$table = $prefix . 'calendars';
+		$wpdb->suppress_errors();
+		$columns = $wpdb->get_results( "SHOW COLUMNS FROM {$table} LIKE 'calendar_image_id'" );
+		$wpdb->show_errors();
+		if ( empty( $columns ) ) {
+			$wpdb->query( "ALTER TABLE {$table} ADD COLUMN calendar_image_id bigint(20) unsigned DEFAULT NULL AFTER color" );
+			if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+				ChurchTools_Suite_Logger::log( 'migrations', 'Added calendar_image_id to calendars table', [ 'table' => $table ] );
+			}
+		}
 	}
 	
 	/**

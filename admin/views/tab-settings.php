@@ -21,6 +21,9 @@ $active_subtab = isset( $_GET['subtab'] ) ? sanitize_key( $_GET['subtab'] ) : 'a
 		<a href="?page=churchtools-suite&tab=settings&subtab=api" class="cts-sub-tab <?php echo $active_subtab === 'api' ? 'active' : ''; ?>">
 			<?php esc_html_e( 'API & Verbindung', 'churchtools-suite' ); ?>
 		</a>
+		<a href="?page=churchtools-suite&tab=settings&subtab=allgemeines" class="cts-sub-tab <?php echo $active_subtab === 'allgemeines' ? 'active' : ''; ?>">
+			<?php esc_html_e( 'Allgemeines', 'churchtools-suite' ); ?>
+		</a>
 		<a href="?page=churchtools-suite&tab=settings&subtab=sync" class="cts-sub-tab <?php echo $active_subtab === 'sync' ? 'active' : ''; ?>">
 			<?php esc_html_e( 'Synchronisation', 'churchtools-suite' ); ?>
 		</a>
@@ -30,6 +33,9 @@ $active_subtab = isset( $_GET['subtab'] ) ? sanitize_key( $_GET['subtab'] ) : 'a
 		<a href="?page=churchtools-suite&tab=settings&subtab=services" class="cts-sub-tab <?php echo $active_subtab === 'services' ? 'active' : ''; ?>">
 			<?php esc_html_e( 'Services', 'churchtools-suite' ); ?>
 		</a>
+		<a href="?page=churchtools-suite&tab=settings&subtab=templates" class="cts-sub-tab <?php echo $active_subtab === 'templates' ? 'active' : ''; ?>">
+			<?php esc_html_e( 'Templates', 'churchtools-suite' ); ?>
+		</a>
 		<a href="?page=churchtools-suite&tab=settings&subtab=advanced" class="cts-sub-tab <?php echo $active_subtab === 'advanced' ? 'active' : ''; ?>">
 			<?php esc_html_e( 'Erweitert', 'churchtools-suite' ); ?>
 		</a>
@@ -37,6 +43,10 @@ $active_subtab = isset( $_GET['subtab'] ) ? sanitize_key( $_GET['subtab'] ) : 'a
 	
 	<?php
 	switch ( $active_subtab ) {
+		case 'allgemeines':
+			// Fallback to API for now
+			include __DIR__ . '/settings/subtab-api.php';
+			break;
 		case 'sync':
 			include __DIR__ . '/settings/subtab-sync.php';
 			break;
@@ -45,6 +55,9 @@ $active_subtab = isset( $_GET['subtab'] ) ? sanitize_key( $_GET['subtab'] ) : 'a
 			break;
 		case 'services':
 			include __DIR__ . '/tab-services.php';
+			break;
+		case 'templates':
+			include __DIR__ . '/settings/subtab-templates.php';
 			break;
 		case 'advanced':
 			include __DIR__ . '/settings/subtab-advanced.php';

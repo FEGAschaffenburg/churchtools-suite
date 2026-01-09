@@ -347,6 +347,73 @@
 		const form = document.getElementById('cts-calendar-selection-form');
 		if (!form) return;
 
+		const mediaFrames = {};
+
+		function updateCalendarImage(calendarId, attachmentId, url) {
+			const input = form.querySelector('.cts-calendar-image-input[data-calendar-id="' + calendarId + '"]');
+			const preview = form.querySelector('.cts-calendar-image-preview[data-calendar-id="' + calendarId + '"]');
+			const removeBtn = form.querySelector('.cts-remove-calendar-image[data-calendar-id="' + calendarId + '"]');
+
+			if (input) {
+				input.value = attachmentId || '';
+			}
+
+			if (preview) {
+				if (attachmentId && url) {
+					preview.innerHTML = '<img src="' + url + '" alt="" />';
+				} else {
+					preview.innerHTML = '<span class="description">Kein Bild</span>';
+				}
+			}
+
+			if (removeBtn) {
+				removeBtn.style.display = attachmentId ? 'inline-block' : 'none';
+			}
+		}
+
+		function bindCalendarImageButtons() {
+			const selectButtons = form.querySelectorAll('.cts-select-calendar-image');
+			const removeButtons = form.querySelectorAll('.cts-remove-calendar-image');
+
+			selectButtons.forEach(button => {
+				button.addEventListener('click', function() {
+					const calendarId = this.getAttribute('data-calendar-id');
+					if (!calendarId) return;
+
+					if (!window.wp || !wp.media) {
+						alert('Medienbibliothek nicht geladen. Bitte Seite neu laden.');
+						return;
+					}
+
+					if (!mediaFrames[calendarId]) {
+						mediaFrames[calendarId] = wp.media({
+							title: 'Kalenderbild wählen',
+							button: { text: 'Verwenden' },
+							multiple: false
+						});
+
+						mediaFrames[calendarId].on('select', function() {
+							const attachment = mediaFrames[calendarId].state().get('selection').first().toJSON();
+							const url = (attachment.sizes && (attachment.sizes.thumbnail || attachment.sizes.medium)) ? (attachment.sizes.thumbnail?.url || attachment.sizes.medium?.url) : attachment.url;
+							updateCalendarImage(calendarId, attachment.id, url);
+						});
+					}
+
+					mediaFrames[calendarId].open();
+				});
+			});
+
+			removeButtons.forEach(button => {
+				const hasImage = button.closest('td') && button.closest('td').querySelector('img');
+				button.style.display = hasImage ? 'inline-block' : 'none';
+				button.addEventListener('click', function() {
+					const calendarId = this.getAttribute('data-calendar-id');
+					if (!calendarId) return;
+					updateCalendarImage(calendarId, '', '');
+				});
+			});
+		}
+
 		// Select all checkbox
 		const selectAllCheckbox = document.getElementById('cts-select-all-calendars');
 		const calendarCheckboxes = document.querySelectorAll('.cts-calendar-checkbox');
@@ -366,6 +433,8 @@
 				});
 			});
 		}
+
+		bindCalendarImageButtons();
 
 		// Form submission
 		form.addEventListener('submit', function(e) {
@@ -399,6 +468,14 @@
 			formData.append('nonce', churchtoolsSuite.nonce);
 			selectedIds.forEach(id => {
 				formData.append('selected_ids[]', id);
+			});
+
+			// Append calendar fallback images
+			const imageInputs = form.querySelectorAll('.cts-calendar-image-input');
+			imageInputs.forEach(input => {
+				const calId = input.getAttribute('data-calendar-id');
+				if (!calId) return;
+				formData.append('calendar_images[' + calId + ']', input.value || '');
 			});
 
 			fetch(churchtoolsSuite.ajaxUrl, {

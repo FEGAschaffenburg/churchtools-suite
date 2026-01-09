@@ -199,4 +199,22 @@ class ChurchTools_Suite_Calendars_Repository extends ChurchTools_Suite_Repositor
         );
         return (int) $count > 0;
     }
+    
+    /**
+     * Update calendar_image_id by calendar_id (v0.9.9.58)
+     *
+     * @param string $calendar_id ChurchTools calendar ID
+     * @param int $attachment_id WordPress attachment ID
+     * @return bool Success
+     */
+    public function update_calendar_image_by_calendar_id(string $calendar_id, int $attachment_id): bool {
+        $result = $this->db->update(
+            $this->table_name,
+            ['calendar_image_id' => $attachment_id, 'updated_at' => $this->now()],
+            ['calendar_id' => $calendar_id],
+            ['%d', '%s'],
+            ['%s']
+        );
+        return $result !== false;
+    }
 }

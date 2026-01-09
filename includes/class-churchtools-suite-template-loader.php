@@ -25,12 +25,15 @@ class ChurchTools_Suite_Template_Loader {
 	 * 
 	 * Checks in this order:
 	 * 1. Theme: {theme}/churchtools-suite/{template}.php
-	 * 2. Plugin: {plugin}/templates/{template}.php
+	 * 2. Plugin: {plugin}/templates/{template}.php (with migration support)
 	 *
 	 * @param string $template_name Template name (e.g., 'calendar/monthly.php')
 	 * @return string|false Full path to template file or false
 	 */
 	public static function locate_template( string $template_name ) {
+		// v0.9.9.44: Template-Pfad-Migration (Kompatibilitäts-Layer)
+		$template_name = self::migrate_template_path( $template_name );
+		
 		// Check in theme first
 		$theme_template = get_stylesheet_directory() . '/' . self::THEME_TEMPLATE_DIR . '/' . $template_name;
 		
@@ -55,6 +58,35 @@ class ChurchTools_Suite_Template_Loader {
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * Migrate old template paths to new structure (v0.9.9.44)
+	 * 
+	 * Alte Struktur: list/modern.php, grid/simple.php, single/modern.php
+	 * Neue Struktur: views/event-list/modern.php, views/event-grid/simple.php
+	 * 
+	 * @param string $template_name Template path
+	 * @return string Migrated template path
+	 * @since 0.9.9.44
+	 */
+	private static function migrate_template_path( string $template_name ): string {
+		// Migration-Map: alt → neu
+		$migrations = [
+			'list/'     => 'views/event-list/',
+			'grid/'     => 'views/event-grid/',
+			'single/'   => 'views/event-single/',
+			'modal/'    => 'views/event-modal/',
+			'calendar/' => 'views/event-calendar/',
+		];
+		
+		foreach ( $migrations as $old => $new ) {
+			if ( strpos( $template_name, $old ) === 0 ) {
+				return str_replace( $old, $new, $template_name );
+			}
+		}
+		
+		return $template_name;
 	}
 	
 	/**

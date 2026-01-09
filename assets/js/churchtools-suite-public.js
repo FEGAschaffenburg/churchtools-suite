@@ -12,6 +12,8 @@
 	// DOM Ready
 	$(function() {
 		console.log('[ChurchTools Suite] Public JS loaded');
+		console.log('[ChurchTools Suite] jQuery version:', $.fn.jquery);
+		console.log('[ChurchTools Suite] Body classes:', $('body').attr('class'));
 		
 		// Check if we're in editor mode (Gutenberg or Elementor)
 		const isEditor = $('body').hasClass('block-editor-page') || 
@@ -20,13 +22,23 @@
 		                 $('body').hasClass('wp-admin') ||
 		                 window.location.href.indexOf('/wp-admin/') !== -1;
 		
+		console.log('[ChurchTools Suite] Editor mode check:', {
+			'block-editor-page': $('body').hasClass('block-editor-page'),
+			'elementor': typeof elementor !== 'undefined',
+			'elementor-editor-active': $('body').hasClass('elementor-editor-active'),
+			'wp-admin': $('body').hasClass('wp-admin'),
+			'url-check': window.location.href.indexOf('/wp-admin/') !== -1,
+			'isEditor': isEditor
+		});
+		
 		if (isEditor) {
 			console.log('[ChurchTools Suite] Editor mode detected - skipping ALL click handlers');
 			// Only initialize modal close handlers (for cleanup)
 			initModalCloseHandlers();
 		} else {
 			console.log('[ChurchTools Suite] Frontend mode - initializing ALL handlers');
-			initClickableEvents(); // v0.10.3.0: Click-to-details
+			initClickableEvents(); // v0.10.3.0: Click-to-details (Modal)
+			initPageLinkEvents(); // v0.9.6.16: Click-to-page navigation
 			initGridButtons(); // Grid/List detail buttons
 			initModalViews(); // Modal open/close
 		}
@@ -330,20 +342,41 @@
 	 * Macht alle Events mit .cts-event-clickable klickbar
 	 */
 	function initClickableEvents() {
+		const $clickableEvents = $('.cts-event-clickable');
 		console.log('[ChurchTools Suite] initClickableEvents() called');
-		console.log('[ChurchTools Suite] Found clickable events:', $('.cts-event-clickable').length);
+		console.log('[ChurchTools Suite] Found clickable events:', $clickableEvents.length);
+		console.log('[ChurchTools Suite] Sample element:', $clickableEvents.first().length > 0 ? $clickableEvents.first()[0] : 'NONE');
 		
 		// Event-Delegation für dynamisch geladene Events
 		$(document).on('click', '.cts-event-clickable', function(e) {
-			e.preventDefault();
+		// WICHTIG: Nur verarbeiten wenn NICHT auch page-link (verhindert Konflikt)
+		if ($(this).hasClass('cts-event-page-link')) {
+			console.log('[ChurchTools Suite] Skipping - has page-link class');
+			return; // Lass den page-link handler übernehmen
+		}
+		
 			const eventId = $(this).data('event-id');
-			console.log('[ChurchTools Suite] Event clicked, ID:', eventId);
+			console.log('[ChurchTools Suite] Event clicked, ID:', eventId, 'Element:', this);
 			if (eventId) {
-				// Find parent container with settings
+				// Find parent container with settings (v0.9.9.66: Detect current view type)
 				const $container = $(this).closest('[data-show-description]');
-				showEventModal(eventId, $container);
+				
+				// v0.9.9.66: Detect current view type from container classes
+				let currentView = null;
+				if ($container.length > 0) {
+					// Check for view-specific class patterns
+					const classes = $container.attr('class') || '';
+					if (classes.includes('cts-grid-')) currentView = 'grid';
+					else if (classes.includes('cts-list')) currentView = 'list';
+					else if (classes.includes('cts-calendar')) currentView = 'calendar';
+					else if (classes.includes('cts-single')) currentView = 'single';
+					
+					console.log('[ChurchTools Suite] Detected view type:', currentView, 'from classes:', classes);
+				}
+				
+				showEventModal(eventId, $container, currentView);
 			} else {
-				console.error('[ChurchTools Suite] No event-id attribute found!');
+				console.error('[ChurchTools Suite] No event-id attribute found!', 'Element:', this, 'Attributes:', this.attributes);
 			}
 		});
 		
@@ -356,19 +389,42 @@
 				if (eventId) {
 					// Find parent container with settings
 					const $container = $(this).closest('[data-show-description]');
-					showEventModal(eventId, $container);
+					
+					// v0.9.9.66: Detect current view type from container classes (keyboard access)
+					let currentView = null;
+					if ($container.length > 0) {
+						const classes = $container.attr('class') || '';
+						if (classes.includes('cts-grid-')) currentView = 'grid';
+						else if (classes.includes('cts-list')) currentView = 'list';
+						else if (classes.includes('cts-calendar')) currentView = 'calendar';
+						else if (classes.includes('cts-single')) currentView = 'single';
+					}
+					
+					showEventModal(eventId, $container, currentView);
 				}
 			}
 		});
 	}
 
 	/**
+	 * Initialize page link events (v0.9.9.3)
+	 * DEPRECATED: Handler wurde nach unten verschoben (Zeile 746)
+	 * Diese Funktion ist nur noch ein Platzhalter für Kompatibilität
+	 */
+	function initPageLinkEvents() {
+		console.log('[ChurchTools Suite] initPageLinkEvents() called (deprecated - handler registered globally)');
+		// Event-Handler wurde nach unten verschoben zu den anderen globalen Handlern (Zeile 746)
+		// Dort wird er zusammen mit .cts-event-clickable registriert
+	}
+
+	/**
 	 * Show event detail modal
 	 * @param {string} eventId - Event ID to display
 	 * @param {jQuery} $container - Optional container element with display settings (e.g., calendar)
+	 * @param {string} currentView - Current view type ('list', 'grid', 'calendar', 'single') - v0.9.9.66
 	 */
-	function showEventModal(eventId, $container) {
-		console.log('[ChurchTools Suite] showEventModal() called with ID:', eventId);
+	function showEventModal(eventId, $container, currentView) {
+		console.log('[ChurchTools Suite] showEventModal() called with ID:', eventId, 'view:', currentView);
 		
 		// Show modal overlay
 		let $overlay = $('#cts-modal-overlay');
@@ -379,13 +435,14 @@
 			console.log('[ChurchTools Suite] Loading modal template via AJAX...');
 			console.log('[ChurchTools Suite] AJAX URL:', churchtoolsSuitePublic.ajaxUrl);
 			
-			// Load modal template via AJAX
+			// Load modal template via AJAX (v0.9.9.66: Pass current view)
 			$.ajax({
 				url: churchtoolsSuitePublic.ajaxUrl,
 				type: 'POST',
 				data: {
 					action: 'cts_get_modal_template',
-					nonce: churchtoolsSuitePublic.nonce
+					nonce: churchtoolsSuitePublic.nonce,
+					current_view: currentView // v0.9.9.66: Pass current view
 				},
 				success: function(response) {
 					console.log('[ChurchTools Suite] Modal template response:', response);
@@ -428,7 +485,7 @@
 		
 		// Show loading
 		$('#cts-modal-loading').show();
-		$('#cts-modal-details').hide();
+		$('#cts-modal-content').hide();
 		$('#cts-modal-error').hide();
 		
 		// Load event data
@@ -470,22 +527,42 @@
 		
 		console.log('[Modal] Display options:', {showDescription, showLocation, showServices, showCalendarName});
 		
-		// Title
-		$('#cts-modal-title').text(event.title);
+		// Event Title (new: in main area)
+		$('#cts-modal-event-title').text(event.title);
 		
-		// Calendar Badge (nur wenn enabled)
+		// Event Image (new: hero image in main area) - v0.9.9.69
+		if (event.image_url) {
+			$('#cts-modal-image-img').attr('src', event.image_url);
+			$('#cts-modal-image').show();
+		} else {
+			$('#cts-modal-image').hide();
+		}
+		
+		// Calendar Badge (new: in main area)
 		if (showCalendarName && event.calendar_name) {
 			$('#cts-modal-calendar').text(event.calendar_name)
-				.css('background', event.calendar_color || '#3498db').show();
+				.css('background-color', event.calendar_color || '#3498db').show();
 		} else {
 			$('#cts-modal-calendar').hide();
 		}
 		
-		// Date & Time (use pre-formatted time_display from backend)
-		$('#cts-modal-date').text(event.start_date);
-		$('#cts-modal-time').text(event.time_display || event.start_time);
+		// Date (new: in sidebar) - v0.9.9.69
+		if (event.start_date) {
+			$('#cts-modal-date-value').text(event.start_date);
+			$('#cts-modal-date').show();
+		} else {
+			$('#cts-modal-date').hide();
+		}
 		
-		// Location (prefer structured address fields)
+		// Time (new: in sidebar) - v0.9.9.69
+		if (event.time_display || event.start_time) {
+			$('#cts-modal-time-value').text(event.time_display || event.start_time);
+			$('#cts-modal-time').show();
+		} else {
+			$('#cts-modal-time').hide();
+		}
+		
+		// Location (new: in sidebar with address details) - v0.9.9.69
 		var loc = event.address_name || event.location_name || '';
 		if (!loc && event.address_street) {
 			loc = event.address_street;
@@ -494,61 +571,83 @@
 			loc = event.address;
 		}
 
-		// Build fallback info string
-		var infoParts = [];
-		if (event.address_street) infoParts.push(event.address_street);
-		if (event.address_zip) infoParts.push(event.address_zip);
-		if (event.address_city) infoParts.push(event.address_city);
-		var infoStr = infoParts.join(', ');
-
-		// Location (nur wenn enabled UND vorhanden)
 		if (showLocation && loc) {
-			$('#cts-modal-location').text(loc);
-			$('#cts-modal-location-wrapper').show();
-			if (infoStr) {
-				$('#cts-modal-location').find('.cts-info-popup').remove();
-				$('#cts-modal-location').append(' <span class="cts-info-popup" title="'+infoStr+'"> ⓘ</span>');
+			var locationHtml = loc;
+			if (event.address_street) locationHtml += '<br>' + event.address_street;
+			if (event.address_zip || event.address_city) {
+				locationHtml += '<br>' + [event.address_zip, event.address_city].filter(Boolean).join(' ');
 			}
+			$('#cts-modal-location-value').html(locationHtml);
+			$('#cts-modal-location').show();
 		} else {
-			$('#cts-modal-location-wrapper').hide();
+			$('#cts-modal-location').hide();
 		}
 		
-		// Description (nur wenn enabled UND vorhanden)
-		if (showDescription && event.description) {
-			$('#cts-modal-description').html(event.description);
-			$('#cts-modal-description-wrapper').show();
+		// Debug: Log event data
+		console.log('[Modal] Event data received:', event);
+		console.log('[Modal] event_description:', event.event_description);
+		console.log('[Modal] appointment_description:', event.appointment_description);
+		
+		// Event Description (in main area)
+		if (event.event_description && event.event_description.trim() !== '') {
+			console.log('[Modal] Showing event description');
+			$('#cts-modal-event-description-content').html(event.event_description);
+			$('#cts-modal-event-description').show();
 		} else {
-			$('#cts-modal-description-wrapper').hide();
+			console.log('[Modal] Hiding event description (empty)');
+			$('#cts-modal-event-description').hide();
 		}
 		
-		// Services (nur wenn enabled UND vorhanden)
+		// Appointment Description (in main area)
+		if (event.appointment_description && event.appointment_description.trim() !== '') {
+			console.log('[Modal] Showing appointment description');
+			$('#cts-modal-appointment-description-content').html(event.appointment_description);
+			$('#cts-modal-appointment-description').show();
+		} else {
+			console.log('[Modal] Hiding appointment description (empty)');
+			$('#cts-modal-appointment-description').hide();
+		}
+		
+		// Tags (new: in sidebar) - v0.9.9.69
+		if (event.tags && event.tags.length > 0) {
+			const $tagsList = $('#cts-modal-tags-content');
+			$tagsList.empty();
+			event.tags.forEach(function(tag) {
+				const $tag = $('<span>').addClass('cts-tag')
+					.text(tag.name)
+					.css('background-color', tag.color || '#6b7280');
+				$tagsList.append($tag);
+			});
+			$('#cts-modal-tags').show();
+		} else {
+			$('#cts-modal-tags').hide();
+		}
+		
+		// Services (in main area)
 		if (showServices && event.services && event.services.length > 0) {
-			const $servicesList = $('#cts-modal-services');
+			const $servicesList = $('#cts-modal-services-list');
 			$servicesList.empty();
 			
 			event.services.forEach(function(service) {
-				const $item = $('<div>').addClass('cts-modal-service-item');
+				const $item = $('<li>').addClass('cts-service-item');
 				
-				const $name = $('<span>').addClass('cts-modal-service-name')
-					.text(service.service_name);
-				$item.append($name);
+				const $name = $('<strong>').addClass('cts-service-name')
+					.text(service.service_name + ':');
 				
-				if (service.person_name) {
-					const $person = $('<span>').addClass('cts-modal-service-person')
-						.text('- ' + service.person_name);
-					$item.append($person);
-				}
+				const $person = $('<span>').addClass('cts-service-person')
+					.text(' ' + (service.person_name || 'Nicht zugewiesen'));
 				
+				$item.append($name).append($person);
 				$servicesList.append($item);
 			});
 			
-			$('#cts-modal-services-wrapper').show();
+			$('#cts-modal-services').show();
 		} else {
-			$('#cts-modal-services-wrapper').hide();
+			$('#cts-modal-services').hide();
 		}
 		
-		// Show details
-		$('#cts-modal-details').show();
+		// Show content (hide loading)
+		$('#cts-modal-content').show();
 	}
 
 	/**
@@ -644,18 +743,55 @@
 
 	/**
 	 * Event click handler (in list/grid views)
+	 * v0.9.3.1: Support for event_action modes (modal/page/none)
 	 */
-	$(document).on('click', '[data-event-id]', function(e) {
-		// Only handle if not a button/link
-		if ($(e.target).is('a, button')) {
-			return;
-		}
+	$(document).on('click', '.cts-event-clickable', function(e) {
+		// Modal action - open modal
+		e.preventDefault();
 		
 		const eventId = $(this).data('event-id');
 		if (eventId) {
-			// Find parent container with settings
 			const $container = $(this).closest('[data-show-description]');
 			showEventModal(eventId, $container);
+		}
+	});
+	
+	/**
+	 * Page link click handler
+	 * v0.9.9.3: Navigate to single event page with URL params + Display settings
+	 */
+	$(document).on('click', '.cts-event-page-link', function(e) {
+		e.preventDefault();
+		
+		const eventId = $(this).data('event-id');
+		if (!eventId) return;
+		
+		// Build URL with display settings from parent container
+		const $container = $(this).closest('[data-show-description]');
+		const params = {
+			event_id: eventId,
+			show_event_description: $container.data('show-description') ? '1' : '0',
+			show_appointment_description: $container.data('show-appointment-description') ? '1' : '0',
+			show_location: $container.data('show-location') ? '1' : '0',
+			show_services: $container.data('show-services') ? '1' : '0',
+			show_time: $container.data('show-time') ? '1' : '0',
+			show_tags: $container.data('show-tags') ? '1' : '0',
+			show_calendar_name: $container.data('show-calendar-name') ? '1' : '0'
+		};
+		
+		// Navigate to current page with event_id parameter
+		const url = new URL(window.location.href);
+		Object.keys(params).forEach(key => url.searchParams.set(key, params[key]));
+		window.location.href = url.toString();
+	});
+	
+	/**
+	 * Keyboard accessibility for page links (Enter/Space)
+	 */
+	$(document).on('keydown', '.cts-event-page-link', function(e) {
+		if (e.keyCode === 13 || e.keyCode === 32) { // Enter or Space
+			e.preventDefault();
+			$(this).click();
 		}
 	});
 

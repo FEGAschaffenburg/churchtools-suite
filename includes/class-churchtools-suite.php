@@ -66,17 +66,11 @@ class ChurchTools_Suite {
 		// Single Event Shortcode (v0.7.1.0)
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/shortcodes/class-churchtools-suite-single-event-shortcode.php';
 		
+		// Single Event Handler (v0.9.3.1)
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-single-event-handler.php';
+		
 		// Gutenberg Blocks (v0.5.8.0+)
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-blocks.php';
-		
-		// Elementor Integration (v0.5.9.38+)
-		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-elementor.php';
-		
-		// Debug helper (v0.5.8.2+)
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			require_once CHURCHTOOLS_SUITE_PATH . 'includes/debug-blocks-shortcode.php';
-			require_once CHURCHTOOLS_SUITE_PATH . 'debug-css-enqueue.php'; // v0.10.4.34
-		}
 
 		// Auto updater (checks GitHub releases and installs ZIP)
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-auto-updater.php';
@@ -164,9 +158,9 @@ class ChurchTools_Suite {
 		
 		// Register Gutenberg blocks (v0.5.8.0)
 		add_action( 'init', [ 'ChurchTools_Suite_Blocks', 'register' ] );
-		
-		// Register Elementor widgets (v0.5.9.38)
-		add_action( 'plugins_loaded', [ 'ChurchTools_Suite_Elementor', 'init' ] );
+
+		// Register single event handler (v0.9.3.1)
+		add_action( 'init', [ 'ChurchTools_Suite_Single_Event_Handler', 'init' ] );
 		
 		// Enqueue frontend assets (also loaded in admin via admin_enqueue_scripts)
 		$this->loader->add_action( 'wp_enqueue_scripts', $this, 'enqueue_public_assets' );

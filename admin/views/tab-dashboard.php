@@ -12,21 +12,50 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Status prüfen
 $ct_url = get_option( 'churchtools_suite_ct_url', '' );
+$ct_auth_method = get_option( 'churchtools_suite_ct_auth_method', 'password' );
 $ct_username = get_option( 'churchtools_suite_ct_username', '' );
 $ct_password = get_option( 'churchtools_suite_ct_password', '' );
+$ct_token = get_option( 'churchtools_suite_ct_token', '' );
 $ct_cookies = get_option( 'churchtools_suite_ct_cookies', [] );
 $ct_last_login = get_option( 'churchtools_suite_ct_last_login', '' );
-$is_configured = ! empty( $ct_url ) && ! empty( $ct_username ) && ! empty( $ct_password );
-$is_connected = ! empty( $ct_cookies );
+$is_configured = ! empty( $ct_url ) && (
+	( $ct_auth_method === 'token' && ! empty( $ct_token ) ) ||
+	( $ct_auth_method !== 'token' && ! empty( $ct_username ) && ! empty( $ct_password ) )
+);
+$is_connected = ( $ct_auth_method === 'token' ) ? ! empty( $ct_token ) : ! empty( $ct_cookies );
 
 // Statistiken
 global $wpdb;
 $prefix = $wpdb->prefix . CHURCHTOOLS_SUITE_DB_PREFIX;
+
+// v0.9.0.3: Suppress DB errors if tables don't exist yet (first activation)
+$wpdb->suppress_errors();
 $events_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}events" );
 $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendars WHERE is_selected = 1" );
+$wpdb->show_errors();
+
+// Check if tables exist (if queries returned NULL, tables might not exist)
+$tables_missing = ( $wpdb->last_error !== '' );
 ?>
 
 <div class="cts-dashboard">
+	
+	<?php if ( $tables_missing ) : ?>
+		<div class="notice notice-warning" style="padding: 15px; margin-bottom: 20px;">
+			<h3 style="margin-top: 0;">⚠️ <?php esc_html_e( 'Datenbank-Tabellen fehlen', 'churchtools-suite' ); ?></h3>
+			<p><?php esc_html_e( 'Die Plugin-Tabellen existieren noch nicht. Bitte laden Sie die Seite neu, damit die Datenbank korrekt initialisiert wird.', 'churchtools-suite' ); ?></p>
+			<p>
+				<button type="button" class="button button-primary" onclick="location.reload();">
+					<?php esc_html_e( 'Seite neu laden', 'churchtools-suite' ); ?>
+				</button>
+				<?php if ( current_user_can( 'manage_options' ) ) : ?>
+				<a href="?page=churchtools-suite&tab=debug&subtab=reset-cleanup" class="button button-secondary">
+					<?php esc_html_e( 'Datenbank neu aufbauen (Debug)', 'churchtools-suite' ); ?>
+				</a>
+				<?php endif; ?>
+			</p>
+		</div>
+	<?php endif; ?>
 	
 	<!-- Dashboard Header mit One-Click-Actions -->
 	<div class="cts-section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
@@ -411,7 +440,7 @@ $calendars_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}calendar
 	<div class="cts-card cts-quick-start">
 		<h3><?php esc_html_e( 'Quick Start', 'churchtools-suite' ); ?></h3>
 		<ol>
-			<li><?php printf( esc_html__( 'ChurchTools-URL und API-Token in den %sEinstellungen%s hinterlegen', 'churchtools-suite' ), '<a href="?page=churchtools-suite&tab=settings">', '</a>' ); ?></li>
+			<li><?php printf( esc_html__( 'ChurchTools-URL und Zugangsdaten (API-Token oder Benutzername/Passwort) in den %sEinstellungen%s hinterlegen', 'churchtools-suite' ), '<a href="?page=churchtools-suite&tab=settings">', '</a>' ); ?></li>
 			<li><?php esc_html_e( 'Kalender auswählen und synchronisieren', 'churchtools-suite' ); ?></li>
 			<li><?php esc_html_e( 'Events per Shortcode im Frontend anzeigen', 'churchtools-suite' ); ?></li>
 		</ol>

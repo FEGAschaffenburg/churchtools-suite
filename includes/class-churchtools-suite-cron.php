@@ -203,10 +203,15 @@ class ChurchTools_Suite_Cron {
 	public static function session_keepalive() {
         // Nur ausführen wenn konfiguriert
         $ct_url = get_option('churchtools_suite_ct_url', '');
+        $auth_method = get_option('churchtools_suite_ct_auth_method', 'password');
         $ct_username = get_option('churchtools_suite_ct_username', '');
         $ct_password = get_option('churchtools_suite_ct_password', '');
+        $ct_token = get_option('churchtools_suite_ct_token', '');
         
-        if (empty($ct_url) || empty($ct_username) || empty($ct_password)) {
+        $has_password_creds = !empty($ct_url) && !empty($ct_username) && !empty($ct_password);
+        $has_token_creds = !empty($ct_url) && !empty($ct_token);
+
+        if (($auth_method === 'password' && !$has_password_creds) || ($auth_method === 'token' && !$has_token_creds)) {
             return;
         }
         
@@ -215,18 +220,16 @@ class ChurchTools_Suite_Cron {
 
         $client = new ChurchTools_Suite_CT_Client();
 
-        // Wenn nicht authentifiziert, versuche Login
         if (!$client->is_authenticated()) {
             $login_result = $client->login();
             if (!$login_result['success']) {
                 error_log('ChurchTools Suite: Session Keep-Alive Login fehlgeschlagen - ' . $login_result['message']);
-                // Still attempt to reschedule a keepalive in short time
                 self::reschedule_keepalive_after_attempt($client);
                 return;
             }
         }
 
-        // Ping API mit whoami
+        // Ping API mit whoami (bei Token auch Validierung)
         $result = $client->api_request('whoami', 'GET');
 
         if (is_wp_error($result)) {

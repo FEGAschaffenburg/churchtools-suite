@@ -39,8 +39,10 @@ $active_subtab = isset( $_GET['subtab'] ) ? sanitize_key( $_GET['subtab'] ) : 'e
 
 	<?php
 	// Data page header with quick actions (similar to Dashboard)
+	$ct_auth_method = get_option( 'churchtools_suite_ct_auth_method', 'password' );
+	$ct_token = get_option( 'churchtools_suite_ct_token', '' );
 	$ct_cookies = get_option( 'churchtools_suite_ct_cookies', [] );
-	$is_connected = ! empty( $ct_cookies );
+	$is_connected = ( $ct_auth_method === 'token' ) ? ! empty( $ct_token ) : ! empty( $ct_cookies );
 	?>
 	<div class="cts-section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
 		<div>

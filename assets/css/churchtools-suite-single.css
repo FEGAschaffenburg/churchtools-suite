@@ -24,6 +24,18 @@
 	border-bottom: 2px solid #e5e7eb;
 }
 
+.cts-single-classic .cts-single-calendar {
+	display: inline-block;
+	padding: 6px 14px;
+	font-size: 12px;
+	font-weight: 600;
+	border-radius: 20px;
+	margin-bottom: 16px;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	background: rgba(37, 99, 235, 0.1);
+}
+
 .cts-single-classic .cts-single-calendar-badge {
 	display: inline-block;
 	padding: 6px 14px;
@@ -47,8 +59,39 @@
 .cts-single-classic .cts-single-meta {
 	display: flex;
 	flex-direction: column;
-	gap: 20px;
+	gap: 16px;
 	margin-bottom: 32px;
+}
+
+.cts-single-classic .cts-meta-row {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	padding: 14px;
+	background: #f9fafb;
+	border-radius: 8px;
+	border: 1px solid #e5e7eb;
+}
+
+.cts-single-classic .cts-meta-icon {
+	flex-shrink: 0;
+	font-size: 20px;
+}
+
+.cts-single-classic .cts-meta-label {
+	min-width: 80px;
+	font-size: 13px;
+	color: #6b7280;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.3px;
+}
+
+.cts-single-classic .cts-meta-value {
+	flex: 1;
+	font-size: 15px;
+	color: #1a202c;
+	line-height: 1.5;
 }
 
 .cts-single-classic .cts-single-meta-item {
@@ -99,6 +142,45 @@
 	margin-bottom: 32px;
 }
 
+.cts-single-classic .cts-single-section {
+	margin-bottom: 32px;
+	padding: 24px;
+	background: #ffffff;
+	border: 1px solid #e5e7eb;
+	border-radius: 8px;
+}
+
+.cts-single-classic .cts-single-section h2 {
+	font-size: 22px;
+	font-weight: 600;
+	color: #1a202c;
+	margin: 0 0 16px 0;
+}
+
+.cts-single-classic .cts-single-description {
+	font-size: 16px;
+	line-height: 1.7;
+	color: #4b5563;
+}
+
+.cts-single-classic .cts-single-tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 24px;
+}
+
+.cts-single-classic .cts-tag {
+	display: inline-block;
+	padding: 6px 12px;
+	color: white;
+	font-size: 12px;
+	font-weight: 600;
+	border-radius: 16px;
+	text-transform: uppercase;
+	letter-spacing: 0.3px;
+}
+
 .cts-single-classic .cts-single-description h2 {
 	font-size: 24px;
 	font-weight: 600;
@@ -114,6 +196,33 @@
 
 .cts-single-classic .cts-single-services {
 	margin-bottom: 32px;
+}
+
+.cts-single-classic .cts-single-services {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.cts-single-classic .cts-service-item {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 12px;
+	background: #f9fafb;
+	border: 1px solid #e5e7eb;
+	border-radius: 6px;
+}
+
+.cts-single-classic .cts-service-name {
+	font-weight: 600;
+	color: #1a202c;
+	min-width: 120px;
+}
+
+.cts-single-classic .cts-service-person {
+	color: #6b7280;
+	font-weight: normal;
 }
 
 .cts-single-classic .cts-single-services h2 {
