@@ -1576,11 +1576,10 @@ class ChurchTools_Suite_Admin {
 		
 		// v0.9.9.84: If click action is "page", return page URL instead of modal HTML
 		if ( $click_action === 'page' ) {
+			// v0.9.9.85: Always use Dashboard setting (no Block override)
 			$single_template = get_option( 'churchtools_suite_single_template', 'professional' );
 			
-			// Build event page URL
-			// Alternative: Use a dedicated page slug
-			// Adjust 'events' to your actual page slug
+			// Build event page URL - clean (only event_id + template)
 			$event_page_url = home_url( '/events/?event_id=' . urlencode( $event_id ) . '&template=' . urlencode( $single_template ) );
 			
 			ChurchTools_Suite_Logger::debug( 'ajax_modal', 'Returning page redirect', [
@@ -1629,32 +1628,12 @@ class ChurchTools_Suite_Admin {
 		}
 		
 		// v0.9.9.83: UNIFIED - Same template for ALL views (list, grid, calendar, single)
-		// Optional: Block can override with template_override parameter
+		// v0.9.9.85: Always use Dashboard setting (no Block override needed)
 		$modal_template = $global_modal_setting;
-		
-		// Check for template override from Block (v0.9.9.83: NEW)
-		if ( isset( $_POST['template_override'] ) && ! empty( $_POST['template_override'] ) ) {
-			$override_template = sanitize_text_field( wp_unslash( $_POST['template_override'] ) );
-			
-			// Validate override template exists
-			if ( in_array( $override_template, $valid_modal_templates, true ) ) {
-				$modal_template = $override_template;
-				ChurchTools_Suite_Logger::debug( 'ajax_modal', 'Using block override template', [
-					'block_override' => $override_template,
-					'default_global_template' => $global_modal_setting,
-				] );
-			} else {
-				ChurchTools_Suite_Logger::warning( 'ajax_modal', 'Block override template does not exist', [
-					'requested_override' => $override_template,
-					'valid_templates' => $valid_modal_templates,
-					'using_default' => $global_modal_setting,
-				] );
-			}
-		}
 		
 		ChurchTools_Suite_Logger::debug( 'ajax_modal', 'Template selected', [
 			'selected_template' => $modal_template,
-			'source' => isset( $_POST['template_override'] ) ? 'block_override' : 'dashboard_global',
+			'source' => 'dashboard_global',
 			'current_view' => $current_view,
 		] );
 		

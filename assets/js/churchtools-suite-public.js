@@ -451,8 +451,7 @@
 				nonce: churchtoolsSuitePublic.nonce,
 				event_id: eventId,
 				current_view: currentView,
-				click_action: clickAction,
-				template_override: options.template
+				click_action: clickAction
 			},
 			success: function(response) {
 				console.log('[ChurchTools Suite] Click action response:', response);
@@ -806,17 +805,10 @@
 		const eventId = $(this).data('event-id');
 		if (!eventId) return;
 		
-		// Build URL with display settings from parent container
-		const $container = $(this).closest('[data-show-description]');
+		// v0.9.9.85: Clean URL - only event_id (template from Settings)
+		// Display options controlled by /events/ page, not URL params
 		const params = {
-			event_id: eventId,
-			show_event_description: $container.data('show-description') ? '1' : '0',
-			show_appointment_description: $container.data('show-appointment-description') ? '1' : '0',
-			show_location: $container.data('show-location') ? '1' : '0',
-			show_services: $container.data('show-services') ? '1' : '0',
-			show_time: $container.data('show-time') ? '1' : '0',
-			show_tags: $container.data('show-tags') ? '1' : '0',
-			show_calendar_name: $container.data('show-calendar-name') ? '1' : '0'
+			event_id: eventId
 		};
 		
 		// Navigate to current page with event_id parameter
