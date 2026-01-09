@@ -1578,6 +1578,29 @@ class ChurchTools_Suite_Admin {
 			'current_view' => $current_view,
 		] );
 		
+		// v0.9.9.80: CRITICAL FIX - Validate template names exist (Fallback for old/non-existent templates)
+		$valid_modal_templates = [ 'professional' ];
+		$valid_single_templates = [ 'professional' ];
+		
+		// Check if dashboard settings reference non-existent templates
+		if ( ! in_array( $global_modal_setting, $valid_modal_templates, true ) ) {
+			ChurchTools_Suite_Logger::warning( 'ajax_modal', 'Dashboard modal template does not exist - using fallback', [
+				'requested_template' => $global_modal_setting,
+				'fallback_template' => 'professional',
+				'valid_templates' => $valid_modal_templates,
+			] );
+			$global_modal_setting = 'professional'; // Fallback
+		}
+		
+		if ( ! in_array( $global_single_setting, $valid_single_templates, true ) ) {
+			ChurchTools_Suite_Logger::warning( 'ajax_modal', 'Dashboard single template does not exist - using fallback', [
+				'requested_template' => $global_single_setting,
+				'fallback_template' => 'professional',
+				'valid_templates' => $valid_single_templates,
+			] );
+			$global_single_setting = 'professional'; // Fallback
+		}
+		
 		// Map view type to modal template (v0.9.9.66, v0.9.9.69: updated to professional)
 		$view_to_modal_map = [
 			'list' => $global_modal_setting,
