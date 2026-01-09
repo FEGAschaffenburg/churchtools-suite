@@ -1587,10 +1587,9 @@ class ChurchTools_Suite_Admin {
 		// v1.4.0: Neue Template-Struktur (views/event-modal/)
 		$template_path = 'views/event-modal/' . sanitize_file_name( $modal_template ) . '.php';
 		
-		// Render modal template (echo=true, da wir mit ob_start() den Output fangen)
-		ob_start();
-		ChurchTools_Suite_Template_Loader::render_template( $template_path, [], true );
-		$html = ob_get_clean();
+		// v0.9.9.74: FIX - render_template with $echo=false to capture output
+		// (using ob_start() with $echo=true doesn't work because output is sent directly)
+		$html = ChurchTools_Suite_Template_Loader::render_template( $template_path, [], false );
 		
 		// v0.10.3.6: Debug - Prüfe ob HTML vorhanden ist
 		if ( empty( $html ) || strpos( $html, '<!--' ) === 0 ) {
@@ -1599,8 +1598,8 @@ class ChurchTools_Suite_Admin {
 				'message' => 'Modal-Template konnte nicht geladen werden',
 				'html' => $html, // Sende trotzdem für Debugging
 				'debug' => [
-					'template_path' => CHURCHTOOLS_SUITE_PATH . 'templates/views/event-modal/event-detail.php',
-					'exists' => file_exists( CHURCHTOOLS_SUITE_PATH . 'templates/views/event-modal/event-detail.php' ),
+					'template_path' => CHURCHTOOLS_SUITE_PATH . 'templates/views/event-modal/' . $modal_template . '.php',
+					'exists' => file_exists( CHURCHTOOLS_SUITE_PATH . 'templates/views/event-modal/' . $modal_template . '.php' ),
 					'current_view' => $current_view, // v0.9.9.66: Log received view
 					'selected_modal' => $modal_template, // v0.9.9.66: Log selected template
 				],
