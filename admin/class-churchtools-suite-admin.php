@@ -1565,10 +1565,42 @@ class ChurchTools_Suite_Admin {
 		// Load template loader
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-template-loader.php';
 		
+		// v0.9.9.84: Click action from Block, not Dashboard setting
+		$click_action = isset( $_POST['click_action'] ) ? sanitize_text_field( $_POST['click_action'] ) : 'modal';
+		$event_id = isset( $_POST['event_id'] ) ? sanitize_text_field( $_POST['event_id'] ) : null;
+		
+		ChurchTools_Suite_Logger::debug( 'ajax_modal', 'Modal request received', [
+			'click_action' => $click_action,
+			'event_id' => $event_id,
+		] );
+		
+		// v0.9.9.84: If click action is "page", return page URL instead of modal HTML
+		if ( $click_action === 'page' ) {
+			$single_template = get_option( 'churchtools_suite_single_template', 'professional' );
+			
+			// Build event page URL
+			// Alternative: Use a dedicated page slug
+			// Adjust 'events' to your actual page slug
+			$event_page_url = home_url( '/events/?event_id=' . urlencode( $event_id ) . '&template=' . urlencode( $single_template ) );
+			
+			ChurchTools_Suite_Logger::debug( 'ajax_modal', 'Returning page redirect', [
+				'action' => 'page',
+				'template' => $single_template,
+				'url' => $event_page_url,
+			] );
+			
+			wp_send_json_success( [
+				'action' => 'page',
+				'url' => $event_page_url,
+			] );
+			return;
+		}
+		
+		// v0.9.9.84: Click action is "modal" - continue with modal loading
 		// v0.9.9.66: Get current view from client (if available)
 		$current_view = isset( $_POST['current_view'] ) ? sanitize_text_field( $_POST['current_view'] ) : null;
 		
-		// v0.9.9.83: SIMPLIFIED - Only load modal template (no separate single template)
+		// Load modal template settings
 		$global_modal_setting = get_option( 'churchtools_suite_modal_template', 'professional' );
 		
 		ChurchTools_Suite_Logger::debug( 'ajax_modal', 'Dashboard settings loaded', [
@@ -1652,7 +1684,6 @@ class ChurchTools_Suite_Admin {
 				'churchtools_suite_path' => CHURCHTOOLS_SUITE_PATH,
 				'error_message' => substr( $html, 4, 300 ), // Remove <!-- and get message
 				'dashboard_modal_setting' => $global_modal_setting,
-				'dashboard_single_setting' => $global_single_setting,
 				'current_view' => $current_view,
 			] );
 		}
@@ -1670,7 +1701,6 @@ class ChurchTools_Suite_Admin {
 					'selected_modal' => $modal_template,
 					'churchtools_suite_path' => CHURCHTOOLS_SUITE_PATH,
 					'dashboard_modal_setting' => $global_modal_setting,
-					'dashboard_single_setting' => $global_single_setting,
 				],
 			] );
 			return;
@@ -1681,10 +1711,11 @@ class ChurchTools_Suite_Admin {
 			'template_path' => $template_path,
 			'selected_template' => $modal_template,
 			'html_length' => strlen( $html ),
-			'dashboard_setting_used' => $current_view === 'single' ? 'churchtools_suite_single_template' : 'churchtools_suite_modal_template',
+			'action' => 'modal',
 		] );
 		
 		wp_send_json_success( [
+			'action' => 'modal',
 			'html' => $html
 		] );
 	}

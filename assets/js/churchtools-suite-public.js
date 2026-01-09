@@ -429,58 +429,75 @@
 	}
 
 	/**
-	 * Show event detail modal
+	 * Show event detail modal or navigate to page
 	 * @param {string} eventId - Event ID to display
 	 * @param {jQuery} $container - Optional container element with display settings (e.g., calendar)
 	 * @param {string} currentView - Current view type ('list', 'grid', 'calendar', 'single') - v0.9.9.66
+	 * @param {Object} options - Optional settings: { click_action: 'modal'|'page', template: 'name' } - v0.9.9.84
 	 */
-	function showEventModal(eventId, $container, currentView) {
-		console.log('[ChurchTools Suite] showEventModal() called with ID:', eventId, 'view:', currentView);
+	function showEventModal(eventId, $container, currentView, options) {
+		options = options || {};
+		console.log('[ChurchTools Suite] showEventModal() called with ID:', eventId, 'view:', currentView, 'options:', options);
 		
-		// Show modal overlay
-		let $overlay = $('#cts-modal-overlay');
-		console.log('[ChurchTools Suite] Modal overlay found:', $overlay.length > 0);
+		// v0.9.9.84: Get click_action from options (passed from Block)
+		var clickAction = options.click_action || 'modal';
 		
-		// Create modal if not exists
-		if ($overlay.length === 0) {
-			console.log('[ChurchTools Suite] Loading modal template via AJAX...');
-			console.log('[ChurchTools Suite] AJAX URL:', churchtoolsSuitePublic.ajaxUrl);
-			
-			// Load modal template via AJAX (v0.9.9.66: Pass current view)
-			$.ajax({
-				url: churchtoolsSuitePublic.ajaxUrl,
-				type: 'POST',
-				data: {
-					action: 'cts_get_modal_template',
-					nonce: churchtoolsSuitePublic.nonce,
-					current_view: currentView // v0.9.9.66: Pass current view
-				},
-				success: function(response) {
-					console.log('[ChurchTools Suite] Modal template response:', response);
-					console.log('[ChurchTools Suite] response.success:', response.success);
-					console.log('[ChurchTools Suite] response.data:', response.data);
-					console.log('[ChurchTools Suite] response.data.html exists:', !!response.data?.html);
-					console.log('[ChurchTools Suite] response.data.html length:', response.data?.html?.length);
-					
-					if (response.success && response.data && response.data.html) {
-						console.log('[ChurchTools Suite] Appending modal HTML to body...');
-						$('body').append(response.data.html);
-						$overlay = $('#cts-modal-overlay');
-						console.log('[ChurchTools Suite] Modal template appended to body');
-					loadEventData(eventId, $overlay, $container);
-					} else {
-						console.error('[ChurchTools Suite] Invalid modal template response');
-						console.error('[ChurchTools Suite] Missing html in response.data!');
-					}
-				},
-				error: function(xhr, status, error) {
-					console.error('[ChurchTools Suite] AJAX error loading modal template:', error);
-					alert('Modal konnte nicht geladen werden.');
+		// v0.9.9.84: AJAX request with click_action and template
+		$.ajax({
+			url: churchtoolsSuitePublic.ajaxUrl,
+			type: 'POST',
+			data: {
+				action: 'cts_get_modal_template',
+				nonce: churchtoolsSuitePublic.nonce,
+				event_id: eventId,
+				current_view: currentView,
+				click_action: clickAction,
+				template_override: options.template
+			},
+			success: function(response) {
+				console.log('[ChurchTools Suite] Click action response:', response);
+				
+				if (!response.success || !response.data) {
+					console.error('[ChurchTools Suite] Invalid response');
+					alert('Fehler beim Laden des Events.');
+					return;
 				}
-			});
-		} else {
-			loadEventData(eventId, $overlay, $container);
-		}
+				
+				// v0.9.9.84: NEW - Check if action is 'page' or 'modal'
+				if (response.data.action === 'page') {
+					// Navigate to event page
+					console.log('[ChurchTools Suite] Navigating to event page:', response.data.url);
+					window.location.href = response.data.url;
+					return;
+				}
+				
+				// v0.9.9.84: action === 'modal' - show modal
+				if (response.data.action !== 'modal' || !response.data.html) {
+					console.error('[ChurchTools Suite] Invalid modal action or missing html');
+					alert('Modal konnte nicht geladen werden.');
+					return;
+				}
+				
+				// Load modal overlay
+				let $overlay = $('#cts-modal-overlay');
+				console.log('[ChurchTools Suite] Modal overlay found:', $overlay.length > 0);
+				
+				// Create modal if not exists
+				if ($overlay.length === 0) {
+					console.log('[ChurchTools Suite] Appending modal HTML to body...');
+					$('body').append(response.data.html);
+					$overlay = $('#cts-modal-overlay');
+					console.log('[ChurchTools Suite] Modal template appended to body');
+				}
+				
+				// Load event data into modal
+				loadEventData(eventId, $overlay, $container);
+			},
+			error: function(xhr, status, error) {
+				console.error('[ChurchTools Suite] AJAX error:', error);
+				alert('Event konnte nicht geladen werden.');
+			}
+		});
 	}
 	
 	/**
