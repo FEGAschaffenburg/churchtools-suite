@@ -1591,8 +1591,19 @@ class ChurchTools_Suite_Admin {
 		// (using ob_start() with $echo=true doesn't work because output is sent directly)
 		$html = ChurchTools_Suite_Template_Loader::render_template( $template_path, [], false );
 		
+		// v0.9.9.75: Enhanced error debugging
+		$is_error_comment = strpos( $html, '<!--' ) === 0;
+		error_log( '[AJAX Modal] Template: ' . $template_path . ' | HTML Length: ' . strlen( $html ) . ' | Is Error: ' . ( $is_error_comment ? 'YES' : 'NO' ) );
+		
+		if ( $is_error_comment ) {
+			error_log( '[AJAX Modal] Error Comment: ' . substr( $html, 0, 200 ) );
+			// Also log full path check
+			$full_path = CHURCHTOOLS_SUITE_PATH . 'templates/' . $template_path;
+			error_log( '[AJAX Modal] Full Path: ' . $full_path . ' | Exists: ' . ( file_exists( $full_path ) ? 'YES' : 'NO' ) );
+		}
+		
 		// v0.10.3.6: Debug - Prüfe ob HTML vorhanden ist
-		if ( empty( $html ) || strpos( $html, '<!--' ) === 0 ) {
+		if ( empty( $html ) || $is_error_comment ) {
 			// Fehler beim Laden des Templates
 			wp_send_json_error( [
 				'message' => 'Modal-Template konnte nicht geladen werden',
@@ -1602,6 +1613,7 @@ class ChurchTools_Suite_Admin {
 					'exists' => file_exists( CHURCHTOOLS_SUITE_PATH . 'templates/views/event-modal/' . $modal_template . '.php' ),
 					'current_view' => $current_view, // v0.9.9.66: Log received view
 					'selected_modal' => $modal_template, // v0.9.9.66: Log selected template
+					'churchtools_suite_path' => CHURCHTOOLS_SUITE_PATH,
 				],
 			] );
 			return;
