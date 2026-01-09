@@ -787,10 +787,32 @@ class ChurchTools_Suite_Shortcodes {
 			self::$template_loader = new ChurchTools_Suite_Template_Loader();
 		}
 		
-		// Render modal template
-		self::$template_loader::render_template( 'views/event-modal/professional.php', [], true );
+		// v0.9.9.73: Enhanced logging
+		$debug = defined( 'WP_DEBUG' ) && WP_DEBUG;
+		if ( $debug ) {
+			error_log( '[ChurchTools Suite] add_modal_template() called. has_content: ' . ( $has_cts_content ? 'YES' : 'NO' ) );
+		}
 		
-		self::$modal_loaded = true;
+		// Render modal template - WICHTIG: $echo=true means output is directly sent to browser
+		$modal_html = self::$template_loader::render_template( 'views/event-modal/professional.php', [], false );
+		
+		if ( $debug ) {
+			error_log( '[ChurchTools Suite] Modal template rendered. Length: ' . strlen( $modal_html ) . ' chars. First 100: ' . substr( $modal_html, 0, 100 ) );
+		}
+		
+		// Output the modal HTML directly
+		if ( ! empty( $modal_html ) && strpos( $modal_html, '<!--' ) !== 0 ) {
+			echo $modal_html;
+			self::$modal_loaded = true;
+			
+			if ( $debug ) {
+				error_log( '[ChurchTools Suite] Modal template output successfully' );
+			}
+		} else {
+			if ( $debug ) {
+				error_log( '[ChurchTools Suite] Modal template load FAILED or returned error comment: ' . ( $modal_html ? substr( $modal_html, 0, 150 ) : 'EMPTY' ) );
+			}
+		}
 	}
 	
 	/**
