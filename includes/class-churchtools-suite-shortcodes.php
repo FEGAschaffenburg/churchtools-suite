@@ -254,6 +254,8 @@ class ChurchTools_Suite_Shortcodes {
 			'view' => 'classic',
 			'limit' => 5,
 			'calendar' => '',
+			'calendars' => '',
+			'tags' => '',
 			'show_event_description' => true,
 			'show_appointment_description' => true,
 			'show_location' => true,
@@ -298,6 +300,8 @@ class ChurchTools_Suite_Shortcodes {
 		$atts = shortcode_atts( [
 			'view' => 'classic',
 			'calendar' => '',
+			'calendars' => '',
+			'tags' => '',
 			'limit' => 5,
 			'from' => '',
 			'to' => '',
@@ -386,6 +390,8 @@ class ChurchTools_Suite_Shortcodes {
 			'columns' => 3,
 			'limit' => 9,
 			'calendar' => '',
+			'calendars' => '',
+			'tags' => '',
 			'from' => '',
 			'to' => '',
 			'class' => '',
@@ -454,6 +460,8 @@ class ChurchTools_Suite_Shortcodes {
 		$atts = shortcode_atts( [
 			'view' => 'monthly-simple',
 			'calendar' => '',
+			'calendars' => '',
+			'tags' => '',
 			'limit' => 100, // Higher limit for calendar views
 			'from' => '',
 			'to' => '',
@@ -569,9 +577,10 @@ class ChurchTools_Suite_Shortcodes {
 			self::$data_provider = new ChurchTools_Suite_Template_Data();
 		}
 		
-		// Parse filters
+		// Parse filters - support both 'calendar' (old) and 'calendars' (new)
+		$calendar_param = ! empty( $atts['calendars'] ) ? $atts['calendars'] : ( $atts['calendar'] ?? '' );
 		$filters = [
-			'calendar_ids' => self::parse_calendar_ids( $atts['calendar'] ?? '' ),
+			'calendar_ids' => self::parse_calendar_ids( $calendar_param ),
 			'limit' => absint( $atts['limit'] ?? 20 ),
 			'from' => $atts['from'] ?? '',
 			'to' => $atts['to'] ?? '',
@@ -586,9 +595,10 @@ class ChurchTools_Suite_Shortcodes {
 			$filters['to'] = $atts['date_to'];
 		}
 		
-		// v0.10.4.11: Add tag filter
-		if ( ! empty( $atts['filter_tags'] ) ) {
-			$filters['filter_tags'] = self::parse_tag_filter( $atts['filter_tags'] );
+		// v0.10.4.11: Add tag filter (support both 'filter_tags' and 'tags')
+		$tags_param = ! empty( $atts['tags'] ) ? $atts['tags'] : ( $atts['filter_tags'] ?? '' );
+		if ( ! empty( $tags_param ) ) {
+			$filters['filter_tags'] = self::parse_tag_filter( $tags_param );
 		}
 		
 		// Debug output (only when WP_DEBUG is enabled)
@@ -867,10 +877,10 @@ class ChurchTools_Suite_Shortcodes {
 			] );
 		}
 		
-		// Group events by date
+		// Group events by date (use WordPress timezone)
 		$events_by_date = [];
 		foreach ( $events as $event ) {
-			$date = date( 'Y-m-d', strtotime( $event['start_datetime'] ) );
+			$date = get_date_from_gmt( $event['start_datetime'], 'Y-m-d' );
 			if ( ! isset( $events_by_date[ $date ] ) ) {
 				$events_by_date[ $date ] = [];
 			}

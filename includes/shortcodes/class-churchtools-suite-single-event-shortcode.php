@@ -70,12 +70,14 @@ class ChurchTools_Suite_Single_Event_Shortcode {
 		// Load services
 		$services = $event_services_repo->get_by_event_id( $event_id );
 		
-		// Enqueue styles
-		self::enqueue_styles();
+		// Enqueue styles (skip for professional template - uses inline CSS)
+		$template_name = self::validate_template( $atts['template'] );
+		if ( $template_name !== 'professional' ) {
+			self::enqueue_styles();
+		}
 		
 		// Load template
-		$template = self::validate_template( $atts['template'] );
-		return self::load_template( $template, [
+		return self::load_template( $template_name, [
 			'event'    => $event,
 			'calendar' => $calendar,
 			'services' => $services,
@@ -89,16 +91,31 @@ class ChurchTools_Suite_Single_Event_Shortcode {
 	 * @return string Valid template name
 	 */
 	private static function validate_template( string $template ): string {
-		// Nur "professional" ist aktiv; frühere Namen werden kompatibel gemappt
+		// Verfügbare Templates
+		$available_templates = [
+			'professional',
+			'minimal',
+		];
+
+		// Wenn Template existiert → verwenden
+		if ( in_array( $template, $available_templates, true ) ) {
+			return $template;
+		}
+
+		// Backwards compatibility: alte Namen mappen auf "professional"
 		$alias_map = [
-			'professional' => 'professional',
 			'modern' => 'professional',
 			'classic' => 'professional',
-			'minimal' => 'professional',
 			'card' => 'professional',
 		];
 
-		return $alias_map[ $template ] ?? 'professional';
+		if ( isset( $alias_map[ $template ] ) ) {
+			return $alias_map[ $template ];
+		}
+
+		// Fallback: Dashboard-Einstellung verwenden
+		$default = get_option( 'churchtools_suite_single_template', 'professional' );
+		return in_array( $default, $available_templates, true ) ? $default : 'professional';
 	}
 	
 	/**

@@ -39,6 +39,9 @@ class ChurchTools_Suite_Blocks {
 		// Add translations
 		wp_set_script_translations( 'churchtools-suite-blocks', 'churchtools-suite' );
 		
+		// v0.9.9.94: Load calendars and tags for filter dropdowns
+		self::localize_block_data();
+		
 		// Register ChurchTools Events Block
 		register_block_type( 'churchtools-suite/events', [
 			'api_version' => 2,
@@ -53,7 +56,8 @@ class ChurchTools_Suite_Blocks {
 				'view' => [ 'type' => 'string', 'default' => 'classic' ],
 				'limit' => [ 'type' => 'number', 'default' => 5 ],
 				'columns' => [ 'type' => 'number', 'default' => 3 ],
-				'calendar' => [ 'type' => 'string', 'default' => '' ],
+			'calendars' => [ 'type' => 'string', 'default' => '' ],
+			'tags' => [ 'type' => 'string', 'default' => '' ],
 				'show_event_description' => [ 'type' => 'boolean', 'default' => true ],
 				'show_appointment_description' => [ 'type' => 'boolean', 'default' => true ],
 				'show_location' => [ 'type' => 'boolean', 'default' => true ],
@@ -61,6 +65,7 @@ class ChurchTools_Suite_Blocks {
 				'show_time' => [ 'type' => 'boolean', 'default' => true ],
 				'show_tags' => [ 'type' => 'boolean', 'default' => true ],
 				'show_calendar_name' => [ 'type' => 'boolean', 'default' => true ],
+				'show_images' => [ 'type' => 'boolean', 'default' => true ],
 				'show_month_separator' => [ 'type' => 'boolean', 'default' => true ],
 				'show_past_events' => [ 'type' => 'boolean', 'default' => false ],
 				'event_action' => [ 'type' => 'string', 'default' => 'modal' ],
@@ -122,5 +127,74 @@ class ChurchTools_Suite_Blocks {
 		}
 		
 		return '<p>' . __( 'Dieser Ansichtstyp ist derzeit deaktiviert.', 'churchtools-suite' ) . '</p>';
+	}
+	
+	/**
+	 * Localize block data - pass calendars and tags to editor
+	 * 
+	 * @since 0.9.9.94
+	 */
+	private static function localize_block_data(): void {
+		// Load repositories
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-repository-base.php';
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-calendars-repository.php';
+		
+		$calendars_repo = new ChurchTools_Suite_Calendars_Repository();
+		$all_calendars = $calendars_repo->get_all();
+		
+		// Format calendars for dropdown
+		$calendar_options = [];
+		if ( ! empty( $all_calendars ) ) {
+			foreach ( $all_calendars as $calendar ) {
+				$calendar_options[] = [
+					'label' => $calendar->name,
+					'value' => $calendar->calendar_id,
+				];
+			}
+		}
+		
+		// Get unique tags from events
+		global $wpdb;
+		$table = $wpdb->prefix . CHURCHTOOLS_SUITE_DB_PREFIX . 'events';
+		
+		$results = $wpdb->get_results(
+			"SELECT DISTINCT tags FROM {$table} WHERE tags IS NOT NULL AND tags != ''",
+			ARRAY_A
+		);
+		
+		// Extract and merge all tags
+		$all_tags = [];
+		if ( ! empty( $results ) ) {
+			foreach ( $results as $row ) {
+				$tags = json_decode( $row['tags'], true );
+				if ( is_array( $tags ) ) {
+					foreach ( $tags as $tag ) {
+						if ( isset( $tag['id'] ) && isset( $tag['name'] ) ) {
+							$all_tags[ $tag['id'] ] = $tag['name'];
+						}
+					}
+				}
+			}
+		}
+		
+		// Format tags for dropdown
+		$tag_options = [];
+		foreach ( $all_tags as $id => $name ) {
+			$tag_options[] = [
+				'label' => $name,
+				'value' => (string) $id,
+			];
+		}
+		
+		// Sort by name
+		usort( $tag_options, function( $a, $b ) {
+			return strcmp( $a['label'], $b['label'] );
+		} );
+		
+		// Pass to editor
+		wp_localize_script( 'churchtools-suite-blocks', 'churchtoolsSuiteBlocks', [
+			'calendars' => $calendar_options,
+			'tags' => $tag_options,
+		] );
 	}
 }

@@ -397,9 +397,9 @@ class ChurchTools_Suite_Template_Data {
 			return (bool) $event['is_all_day'];
 		}
 		
-		// Fallback: Check if time is 00:00:00
+		// Fallback: Check if time is 00:00:00 (use WordPress timezone)
 		if ( ! empty( $event['start_datetime'] ) ) {
-			$time = date( 'H:i:s', strtotime( $event['start_datetime'] ) );
+			$time = get_date_from_gmt( $event['start_datetime'], 'H:i:s' );
 			return $time === '00:00:00';
 		}
 		
@@ -417,8 +417,9 @@ class ChurchTools_Suite_Template_Data {
 			return false;
 		}
 		
-		$start_date = date( 'Y-m-d', strtotime( $event['start_datetime'] ) );
-		$end_date = date( 'Y-m-d', strtotime( $event['end_datetime'] ) );
+		// Use WordPress timezone for date comparison
+		$start_date = get_date_from_gmt( $event['start_datetime'], 'Y-m-d' );
+		$end_date = get_date_from_gmt( $event['end_datetime'], 'Y-m-d' );
 		
 		return $start_date !== $end_date;
 	}
@@ -599,12 +600,13 @@ class ChurchTools_Suite_Template_Data {
 	}
 	
 	/**
-	 * Filter events by tags (v0.10.4.12)
+	 * Filter events by tags (v0.9.9.94 - ID + Name support)
 	 * 
+	 * Supports both tag IDs (from Gutenberg block) and tag names (from legacy shortcodes).
 	 * OR logic: Event must have AT LEAST ONE of the specified tags to pass filter.
 	 * 
 	 * @param array $events Formatted events array
-	 * @param array $filter_tags Tag names to filter by
+	 * @param array $filter_tags Tag IDs or names to filter by
 	 * @return array Filtered events
 	 */
 	private function filter_events_by_tags( array $events, array $filter_tags ): array {
@@ -612,7 +614,15 @@ class ChurchTools_Suite_Template_Data {
 			return $events;
 		}
 		
-		return array_filter( $events, function( $event ) use ( $filter_tags ) {
+		// Detect if filter uses IDs (numeric) or names (string)
+		$first_filter = reset( $filter_tags );
+		$is_id_filter = is_numeric( $first_filter );
+		
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			error_log( 'ChurchTools Suite Tag Filter: ' . ( $is_id_filter ? 'ID mode' : 'Name mode' ) . ' - Filter values: ' . print_r( $filter_tags, true ) );
+		}
+		
+		return array_filter( $events, function( $event ) use ( $filter_tags, $is_id_filter ) {
 			// No tags field or empty tags
 			if ( empty( $event['tags'] ) ) {
 				return false;
@@ -624,16 +634,28 @@ class ChurchTools_Suite_Template_Data {
 				return false;
 			}
 			
-			// Extract tag names from event
-			$event_tag_names = array_map( function( $tag ) {
-				return strtolower( trim( $tag['name'] ?? '' ) );
-			}, $event_tags );
-			
-			// Check if event has AT LEAST ONE required tag (OR logic)
-			foreach ( $filter_tags as $required_tag ) {
-				$required_tag_lower = strtolower( trim( $required_tag ) );
-				if ( in_array( $required_tag_lower, $event_tag_names, true ) ) {
-					return true; // Found matching tag
+			if ( $is_id_filter ) {
+				// v0.9.9.94: Filter by ID (from Gutenberg block)
+				$event_tag_ids = array_map( function( $tag ) {
+					return (string) ( $tag['id'] ?? '' );
+				}, $event_tags );
+				
+				foreach ( $filter_tags as $required_tag_id ) {
+					if ( in_array( (string) $required_tag_id, $event_tag_ids, true ) ) {
+						return true;
+					}
+				}
+			} else {
+				// Legacy: Filter by name
+				$event_tag_names = array_map( function( $tag ) {
+					return strtolower( trim( $tag['name'] ?? '' ) );
+				}, $event_tags );
+				
+				foreach ( $filter_tags as $required_tag ) {
+					$required_tag_lower = strtolower( trim( $required_tag ) );
+					if ( in_array( $required_tag_lower, $event_tag_names, true ) ) {
+						return true;
+					}
 				}
 			}
 			

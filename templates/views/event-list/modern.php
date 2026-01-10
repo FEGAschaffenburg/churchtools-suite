@@ -98,18 +98,16 @@ if ( ! function_exists( 'truncate_description' ) ) {
 			<?php 
 			$current_month = '';
 			foreach ( $events as $event ) : 
-				$event_month = date( 'Y-m', strtotime( $event['start_datetime'] ) );
-				$show_separator = $show_month_separator && $event_month !== $current_month;
-				$current_month = $event_month;
-				
-				// Kalenderfarbe holen
-				$calendar_color = $event['calendar_color'] ?? '#2563eb';
-				
-				// Datum-Parts
-				$day = date_i18n( 'd', strtotime( $event['start_datetime'] ) );
-				$month_short = date_i18n( 'M', strtotime( $event['start_datetime'] ) );
-				
-				// Event-Action Logic
+			$event_month = get_date_from_gmt( $event['start_datetime'], 'Y-m' );
+			$show_separator = $show_month_separator && $event_month !== $current_month;
+			$current_month = $event_month;
+			
+			// Kalenderfarbe holen
+			$calendar_color = $event['calendar_color'] ?? '#2563eb';
+			
+			// Datum-Parts
+			$day = get_date_from_gmt( $event['start_datetime'], 'd' );
+			$month_short = get_date_from_gmt( $event['start_datetime'], 'M' );
 				$event_action = $args['event_action'] ?? 'modal';
 				$event_class = 'cts-event-modern';
 				$event_attrs = '';
@@ -131,7 +129,7 @@ if ( ! function_exists( 'truncate_description' ) ) {
 				
 				<?php if ( $show_separator ) : ?>
 					<div class="cts-month-separator">
-						<span><?php echo esc_html( date_i18n( 'F Y', strtotime( $event['start_datetime'] ) ) ); ?></span>
+					<span><?php echo esc_html( get_date_from_gmt( $event['start_datetime'], 'F Y' ) ); ?></span>
 					</div>
 				<?php endif; ?>
 				

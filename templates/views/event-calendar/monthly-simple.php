@@ -50,7 +50,8 @@ $grid_start = date( 'Y-m-d', strtotime( $first_day . ' -' . ( $first_weekday - 1
 $events_by_day = [];
 if ( ! empty( $events ) ) {
 	foreach ( $events as $event ) {
-		$day = date( 'Y-m-d', strtotime( $event['start_datetime'] ) );
+		// Convert UTC to WordPress timezone
+		$day = get_date_from_gmt( $event['start_datetime'], 'Y-m-d' );
 		
 		// Only include events in displayed month (allow some overlap for grid)
 		$event_month = date( 'n', strtotime( $day ) );
@@ -179,9 +180,7 @@ $weekdays = [
 						
 						foreach ( $day_events as $event ) :
 							$calendar_color = $event['calendar_color'] ?? '#2563eb';
-							$event_time = date_i18n( get_option( 'time_format' ), strtotime( $event['start_datetime'] ) );
-							
-							// v0.9.8.9: Event-Action support
+				$event_time = get_date_from_gmt( $event['start_datetime'], get_option( 'time_format' ) );
 							$event_attrs = '';
 							$event_classes = 'cts-event-marker';
 							

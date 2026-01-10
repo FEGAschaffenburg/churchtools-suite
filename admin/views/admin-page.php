@@ -35,8 +35,8 @@ $advanced_mode = get_option( 'churchtools_suite_advanced_mode', 0 );
 		</a>
 		<!-- Daten tab removed from main navigation; moved to separate submenu -->
 		<a href="?page=churchtools-suite&tab=sync" class="cts-tab <?php echo $active_tab === 'sync' ? 'active' : ''; ?>">
-			<span>🔄</span>
-			<?php esc_html_e( 'Synchronisation', 'churchtools-suite' ); ?>
+			<span>�</span>
+			<?php esc_html_e( 'Events', 'churchtools-suite' ); ?>
 		</a>
 		   <!-- Dokumentation Tab entfernt -->
 		<?php if ( $advanced_mode ) : ?>

@@ -2030,9 +2030,15 @@ class ChurchTools_Suite_Admin {
 		
 		// Delete event services first (foreign key)
 		$services_deleted = $wpdb->query( "DELETE FROM {$event_services_table}" );
+		if ( $services_deleted === false ) {
+			wp_send_json_error( [ 'message' => __( 'Fehler beim Löschen der Event-Services', 'churchtools-suite' ) ] );
+		}
 		
 		// Delete events
 		$events_deleted = $wpdb->query( "DELETE FROM {$events_table}" );
+		if ( $events_deleted === false ) {
+			wp_send_json_error( [ 'message' => __( 'Fehler beim Löschen der Events', 'churchtools-suite' ) ] );
+		}
 		
 		wp_send_json_success( [
 			'message' => sprintf(
@@ -2058,6 +2064,9 @@ class ChurchTools_Suite_Admin {
 		$calendars_table = $wpdb->prefix . 'cts_calendars';
 		
 		$deleted = $wpdb->query( "DELETE FROM {$calendars_table}" );
+		if ( $deleted === false ) {
+			wp_send_json_error( [ 'message' => __( 'Fehler beim Löschen der Kalender', 'churchtools-suite' ) ] );
+		}
 		
 		wp_send_json_success( [
 			'message' => sprintf(
@@ -2085,12 +2094,21 @@ class ChurchTools_Suite_Admin {
 		
 		// Delete event services first (foreign key)
 		$event_services_deleted = $wpdb->query( "DELETE FROM {$event_services_table}" );
+		if ( $event_services_deleted === false ) {
+			wp_send_json_error( [ 'message' => __( 'Fehler beim Löschen der Event-Service-Zuordnungen', 'churchtools-suite' ) ] );
+		}
 		
 		// Delete services
 		$services_deleted = $wpdb->query( "DELETE FROM {$services_table}" );
+		if ( $services_deleted === false ) {
+			wp_send_json_error( [ 'message' => __( 'Fehler beim Löschen der Services', 'churchtools-suite' ) ] );
+		}
 		
 		// Delete service groups
 		$groups_deleted = $wpdb->query( "DELETE FROM {$service_groups_table}" );
+		if ( $groups_deleted === false ) {
+			wp_send_json_error( [ 'message' => __( 'Fehler beim Löschen der Service-Gruppen', 'churchtools-suite' ) ] );
+		}
 		
 		wp_send_json_success( [
 			'message' => sprintf(
@@ -2117,6 +2135,9 @@ class ChurchTools_Suite_Admin {
 		$sync_history_table = $wpdb->prefix . 'cts_sync_history';
 		
 		$deleted = $wpdb->query( "DELETE FROM {$sync_history_table}" );
+		if ( $deleted === false ) {
+			wp_send_json_error( [ 'message' => __( 'Fehler beim Löschen der Sync-Historie', 'churchtools-suite' ) ] );
+		}
 		
 		wp_send_json_success( [
 			'message' => sprintf(
@@ -2152,6 +2173,9 @@ class ChurchTools_Suite_Admin {
 		$total_deleted = 0;
 		foreach ( $tables as $table ) {
 			$deleted = $wpdb->query( "DELETE FROM {$table}" );
+			if ( $deleted === false ) {
+				wp_send_json_error( [ 'message' => sprintf( __( 'Fehler beim Löschen der Tabelle %s', 'churchtools-suite' ), esc_html( $table ) ) ] );
+			}
 			$total_deleted += $deleted;
 		}
 		
@@ -2190,6 +2214,9 @@ class ChurchTools_Suite_Admin {
 		$total_deleted = 0;
 		foreach ( $tables as $table ) {
 			$deleted = $wpdb->query( "DELETE FROM {$table}" );
+			if ( $deleted === false ) {
+				wp_send_json_error( [ 'message' => sprintf( __( 'Fehler beim Löschen der Tabelle %s', 'churchtools-suite' ), esc_html( $table ) ) ] );
+			}
 			$total_deleted += $deleted;
 		}
 		
@@ -2327,9 +2354,31 @@ class ChurchTools_Suite_Admin {
 			}
 			
 			// Shortcode-Attribute aus Request
-			$calendar_ids = isset( $_POST['calendar_ids'] ) ? sanitize_text_field( $_POST['calendar_ids'] ) : '';
+			$calendar_ids_raw = isset( $_POST['calendar_ids'] ) ? sanitize_text_field( $_POST['calendar_ids'] ) : '';
 			$limit = isset( $_POST['limit'] ) ? absint( $_POST['limit'] ) : 100;
+			// Clamp Limit auf sinnvolle Grenzen (1..500)
+			if ( $limit < 1 || $limit > 500 ) {
+				ChurchTools_Suite_Logger::debug( 'ajax_calendar', 'Limit clamped', [ 'original' => $limit ] );
+				$limit = max( 1, min( 500, $limit ) );
+			}
 			$enable_modal = isset( $_POST['enable_modal'] ) ? filter_var( $_POST['enable_modal'], FILTER_VALIDATE_BOOLEAN ) : true;
+
+			// Validierung calendar_ids: max. 20 IDs, nur A-Z, a-z, 0-9, _ und - (max. 100 Zeichen)
+			$calendar_ids_list = [];
+			if ( ! empty( $calendar_ids_raw ) ) {
+				$parts = array_slice( array_map( 'trim', explode( ',', $calendar_ids_raw ) ), 0, 20 );
+				foreach ( $parts as $p ) {
+					if ( $p === '' ) { continue; }
+					if ( preg_match( '/^[A-Za-z0-9_-]{1,100}$/', $p ) ) {
+						$calendar_ids_list[] = $p;
+					}
+				}
+				if ( empty( $calendar_ids_list ) ) {
+					ChurchTools_Suite_Logger::warning( 'ajax_calendar', 'All provided calendar_ids invalid', [ 'raw' => $calendar_ids_raw ] );
+					wp_send_json_error( [ 'message' => __( 'Ungültige Kalender-IDs', 'churchtools-suite' ) ] );
+					return;
+				}
+			}
 			
 			// Anzeige-Optionen (für Tooltip-Infos)
 			$show_time = isset( $_POST['show_time'] ) ? filter_var( $_POST['show_time'], FILTER_VALIDATE_BOOLEAN ) : true;
@@ -2365,8 +2414,8 @@ class ChurchTools_Suite_Admin {
 				'show_calendar_name' => $show_calendar_name,
 			];
 			
-			if ( ! empty( $calendar_ids ) ) {
-				$atts['calendar'] = $calendar_ids;
+			if ( ! empty( $calendar_ids_list ) ) {
+				$atts['calendar'] = implode( ',', $calendar_ids_list );
 			}
 			
 			// Lade Template Loader
@@ -2387,7 +2436,7 @@ class ChurchTools_Suite_Admin {
 			$raw_events = $events_repo->get_events_in_range(
 				$from_date . ' 00:00:00',
 				$to_date . ' 23:59:59',
-				! empty( $calendar_ids ) ? explode( ',', $calendar_ids ) : [],
+				! empty( $calendar_ids_list ) ? $calendar_ids_list : [],
 				$limit
 			);
 			

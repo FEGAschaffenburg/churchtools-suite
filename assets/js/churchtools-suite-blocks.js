@@ -12,7 +12,7 @@
 	
 	const { registerBlockType } = wp.blocks;
 	const { InspectorControls, useBlockProps } = wp.blockEditor || wp.editor;
-	const { PanelBody, SelectControl, RangeControl, ToggleControl } = wp.components;
+	const { PanelBody, SelectControl, RangeControl, ToggleControl, CheckboxControl } = wp.components;
 	const { __ } = wp.i18n;
 	const { createElement: el } = wp.element;
 	const ServerSideRender = wp.serverSideRender || wp.components.ServerSideRender;
@@ -65,6 +65,8 @@
 			// Event Settings
 		limit: { type: 'number', default: 5 },
 			columns: { type: 'number', default: 3 },
+			calendars: { type: 'string', default: '' },
+			tags: { type: 'string', default: '' },
 			show_event_description: { type: 'boolean', default: true },
 			show_appointment_description: { type: 'boolean', default: true },
 			show_location: { type: 'boolean', default: true },
@@ -72,6 +74,7 @@
 			show_time: { type: 'boolean', default: true },
 			show_tags: { type: 'boolean', default: true },
 			show_calendar_name: { type: 'boolean', default: true },
+			show_images: { type: 'boolean', default: true },
 			show_month_separator: { type: 'boolean', default: true },
 			show_past_events: { type: 'boolean', default: false },
 			
@@ -96,6 +99,14 @@
 			
 			// Get available views for current viewType
 			const availableViews = views[attributes.viewType] || [];
+
+			// View helpers
+			const isListWithImages = attributes.viewType === 'list' && (attributes.view === 'classic-with-images' || attributes.view === 'modern');
+
+			// Minimal-View soll standardmäßig keinen Kalendernamen anzeigen
+			if (attributes.view === 'minimal' && attributes.show_calendar_name) {
+				setAttributes({ show_calendar_name: false });
+			}
 			
 			// v0.9.6.25: Disable click events in editor
 			const editorStyles = {
@@ -231,8 +242,8 @@
 								]
 							),
 					
-			// Display Options (v0.9.7.3: Show for classic and modern views, v0.9.9.0: + grid simple, v0.9.9.66: + grid modern)
-			(attributes.view === 'classic' || attributes.view === 'modern' || (attributes.viewType === 'grid' && (attributes.view === 'simple' || attributes.view === 'modern'))) ? el(
+						// Display Options (v0.9.7.3: Show for classic and modern views, v0.9.9.0: + grid simple, v0.9.9.66: + grid modern, v0.9.9.96: + classic-with-images)
+						(attributes.view === 'classic' || attributes.view === 'classic-with-images' || attributes.view === 'modern' || (attributes.viewType === 'grid' && (attributes.view === 'simple' || attributes.view === 'modern'))) ? el(
 				PanelBody,
 				{
 					title: __('Anzeige-Optionen', 'churchtools-suite'),
@@ -290,6 +301,86 @@
 									})
 								]
 							) : null, // Close conditional Display Options panel
+							
+// Filter Panel (v0.9.9.94: Multi-Select mit Klarnamen)
+						el(
+							PanelBody,
+							{
+								title: __('Filter', 'churchtools-suite'),
+								initialOpen: false
+							},
+							[
+								// Helper functions for checkbox state
+								function() {
+									const calendarsArray = attributes.calendars ? attributes.calendars.split(',').filter(Boolean) : [];
+									const tagsArray = attributes.tags ? attributes.tags.split(',').filter(Boolean) : [];
+									
+									const availableCalendars = window.churchtoolsSuiteBlocks?.calendars || [];
+									const availableTags = window.churchtoolsSuiteBlocks?.tags || [];
+									
+									const calendarCheckboxes = availableCalendars.length > 0 ? [
+										el('h4', { style: { margin: '0 0 8px 0', fontSize: '12px', fontWeight: '600' } }, 
+											__('Kalender', 'churchtools-suite')
+										),
+										el('p', { style: { fontSize: '11px', color: '#666', marginBottom: '8px' } }, 
+											__('Wählen Sie einen oder mehrere Kalender aus', 'churchtools-suite')
+										),
+										...availableCalendars.map(function(cal) {
+											return el(CheckboxControl, {
+												label: cal.label,
+												checked: calendarsArray.includes(cal.value),
+												onChange: function(checked) {
+													let newCalendars = [...calendarsArray];
+													if (checked) {
+														if (!newCalendars.includes(cal.value)) {
+															newCalendars.push(cal.value);
+														}
+													} else {
+														newCalendars = newCalendars.filter(id => id !== cal.value);
+													}
+													setAttributes({ calendars: newCalendars.join(',') });
+												}
+											});
+										})
+									] : [
+										el('p', { style: { fontSize: '12px', color: '#999', fontStyle: 'italic' } }, 
+											__('Keine Kalender verfügbar. Bitte synchronisieren Sie zuerst Kalender.', 'churchtools-suite')
+										)
+									];
+									
+									const tagCheckboxes = availableTags.length > 0 ? [
+										el('h4', { style: { margin: '16px 0 8px 0', fontSize: '12px', fontWeight: '600' } }, 
+											__('Tags', 'churchtools-suite')
+										),
+										el('p', { style: { fontSize: '11px', color: '#666', marginBottom: '8px' } }, 
+											__('Events müssen ALLE ausgewählten Tags haben (UND-Verknüpfung)', 'churchtools-suite')
+										),
+										...availableTags.map(function(tag) {
+											return el(CheckboxControl, {
+												label: tag.label,
+												checked: tagsArray.includes(tag.value),
+												onChange: function(checked) {
+													let newTags = [...tagsArray];
+													if (checked) {
+														if (!newTags.includes(tag.value)) {
+															newTags.push(tag.value);
+														}
+													} else {
+														newTags = newTags.filter(id => id !== tag.value);
+													}
+													setAttributes({ tags: newTags.join(',') });
+												}
+											});
+										})
+									] : [];
+									
+									return el('div', {}, [
+										...calendarCheckboxes,
+										...tagCheckboxes
+									]);
+								}()
+								]
+							),
 							
 							// Farbschema
 							el(

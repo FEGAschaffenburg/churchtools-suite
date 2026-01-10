@@ -87,12 +87,12 @@ $current_month = null;
 		<?php foreach ( $events as $event ) : ?>
 			<?php 
 			// Month separator logic
-			$event_month = date( 'Y-m', strtotime( $event['start_datetime'] ) );
+		$event_month = get_date_from_gmt( $event['start_datetime'], 'Y-m' );
 			if ( $show_month_separator && ( $current_month === null || $current_month !== $event_month ) ) : 
 				$current_month = $event_month;
 			?>
 				<div class="cts-month-separator">
-					<span class="cts-month-name"><?php echo esc_html( date_i18n( 'F Y', strtotime( $event['start_datetime'] ) ) ); ?></span>
+				<span class="cts-month-name"><?php echo esc_html( get_date_from_gmt( $event['start_datetime'], 'F Y' ) ); ?></span>
 				</div>
 			<?php endif; ?>
 			<?php 

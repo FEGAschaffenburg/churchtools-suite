@@ -79,7 +79,7 @@ class ChurchTools_Suite_Logger {
     }
     
     /**
-     * Write log entry (Enhanced v0.7.0.3, Fixed v0.7.2.6)
+     * Write log entry (Enhanced v0.7.0.3, Fixed v0.7.2.6, Production v1.0.0)
      *
      * @param string $message Log message (can include [context] prefix)
      * @param string $level Log level (debug, info, warning, error, critical)
@@ -90,6 +90,14 @@ class ChurchTools_Suite_Logger {
             if (!self::$log_file) {
                 self::init();
             }
+			
+			// Production filter: Skip debug/info unless WP_DEBUG or Advanced Mode (v1.0.0)
+			if (in_array($level, [self::LEVEL_DEBUG, self::LEVEL_INFO], true)) {
+				$advanced_mode = get_option('churchtools_suite_advanced_mode', 0);
+				if (!WP_DEBUG && !$advanced_mode) {
+					return; // Skip low-level logs in production
+				}
+			}
 			
 			// Extract context from message if present: "[context] message" format (v0.7.2.6)
 			$context = 'general';

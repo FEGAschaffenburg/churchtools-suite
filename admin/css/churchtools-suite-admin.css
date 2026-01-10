@@ -81,4 +81,7 @@
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
+/* Hide WordPress admin footer on plugin pages (Danke/Version) */
+#wpfooter { display: none !important; }
+
 
