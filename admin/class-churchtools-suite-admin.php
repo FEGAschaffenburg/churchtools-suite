@@ -1713,7 +1713,7 @@ class ChurchTools_Suite_Admin {
 	}
 	
 	/**
-	 * AJAX Handler: Get Event Details (v1.0.3.1: Added Demo Mode Support)
+	 * AJAX Handler: Get Event Details
 	 */
 	public function ajax_get_event_details() {
 		// Check nonce
@@ -1742,35 +1742,7 @@ class ChurchTools_Suite_Admin {
 		// Get event
 		$event = $events_repo->get_by_id( $event_id );
 		
-		// v1.0.3.1: If event not found in DB, try Demo Mode
-		if ( ! $event && defined( 'CTS_DEMO_MODE' ) && CTS_DEMO_MODE ) {
-			require_once CHURCHTOOLS_SUITE_PATH . 'includes/services/class-churchtools-suite-demo-data-provider.php';
-			
-			$demo_provider = new ChurchTools_Suite_Demo_Data_Provider();
-			$demo_events = $demo_provider->get_events( [
-				'limit' => 100,
-				'from' => date( 'Y-m-d', strtotime( '-30 days' ) ),
-				'to' => date( 'Y-m-d', strtotime( '+120 days' ) ),
-			] );
-			
-			// Find matching demo event by ID
-			$found_demo_event = null;
-			foreach ( $demo_events as $demo_event ) {
-				if ( (int) $demo_event['id'] === $event_id ) {
-					$found_demo_event = $demo_event;
-					break;
-				}
-			}
-			
-			if ( ! $found_demo_event ) {
-				wp_send_json_error( [
-					'message' => __( 'Event nicht gefunden.', 'churchtools-suite' )
-				] );
-			}
-			
-			// Format demo event for response (Demo events are already formatted)
-			$event = (object) $found_demo_event;
-		} elseif ( ! $event ) {
+		if ( ! $event ) {
 			wp_send_json_error( [
 				'message' => __( 'Event nicht gefunden.', 'churchtools-suite' )
 			] );
@@ -1782,11 +1754,8 @@ class ChurchTools_Suite_Admin {
 			$calendar = $calendars_repo->get_by_calendar_id( $event->calendar_id );
 		}
 		
-		// Get services (skip for demo events)
-		$services = [];
-		if ( ! ( isset( $found_demo_event ) ) ) {
-			$services = $services_repo->get_for_event( $event_id );
-		}
+		// Get services
+		$services = $services_repo->get_for_event( $event_id );
 		
 		// Format dates with WordPress timezone
 		$date_format = get_option( 'date_format', 'd.m.Y' );
@@ -1796,9 +1765,9 @@ class ChurchTools_Suite_Admin {
 		$is_24h = ( strpos( $time_format, 'a' ) === false && strpos( $time_format, 'A' ) === false );
 		$time_suffix = $is_24h ? ' Uhr' : '';
 		
-		// Convert to WordPress timezone (v1.0.3.1: Handle both DB objects and Demo event arrays)
-		$start_datetime = is_object( $event ) ? $event->start_datetime : $event['start_datetime'];
-		$end_datetime = is_object( $event ) ? $event->end_datetime : $event['end_datetime'];
+		// Convert to WordPress timezone
+		$start_datetime = $event->start_datetime;
+		$end_datetime = $event->end_datetime;
 		
 		$start_timestamp = strtotime( get_date_from_gmt( $start_datetime ) );
 		$end_timestamp = $end_datetime ? strtotime( get_date_from_gmt( $end_datetime ) ) : null;
@@ -1817,17 +1786,17 @@ class ChurchTools_Suite_Admin {
 			$time_display .= ' - ' . $end_time_formatted;
 		}
 		
-		// Extract common fields (handle both DB objects and demo arrays)
-		$event_id_val = is_object( $event ) ? $event->id : $event['id'];
-		$title = is_object( $event ) ? $event->title : $event['title'];
-		$event_desc = is_object( $event ) ? $event->event_description : $event['event_description'];
-		$apt_desc = is_object( $event ) ? $event->appointment_description : $event['appointment_description'];
-		$location_name = is_object( $event ) ? $event->location_name : $event['location_name'];
-		$address_name = is_object( $event ) ? $event->address_name : $event['address_name'];
-		$address_street = is_object( $event ) ? $event->address_street : $event['address_street'];
-		$address_zip = is_object( $event ) ? $event->address_zip : $event['address_zip'];
-		$address_city = is_object( $event ) ? $event->address_city : $event['address_city'];
-		$tags_json = is_object( $event ) ? $event->tags : $event['tags'];
+		// Extract common fields
+		$event_id_val = $event->id;
+		$title = $event->title;
+		$event_desc = $event->event_description;
+		$apt_desc = $event->appointment_description;
+		$location_name = $event->location_name;
+		$address_name = $event->address_name;
+		$address_street = $event->address_street;
+		$address_zip = $event->address_zip;
+		$address_city = $event->address_city;
+		$tags_json = $event->tags;
 		
 		// Build response
 		$response = [
@@ -1850,7 +1819,7 @@ class ChurchTools_Suite_Admin {
 			'services' => []
 		];
 		
-		// Parse tags (v1.0.3.1: Handle both DB objects and Demo event arrays)
+		// Parse tags
 		if ( ! empty( $tags_json ) ) {
 			$tags_data = is_string( $tags_json ) ? json_decode( $tags_json, true ) : $tags_json;
 			if ( is_array( $tags_data ) ) {

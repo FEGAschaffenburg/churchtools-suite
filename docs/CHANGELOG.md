@@ -1,5 +1,14 @@
 # ChurchTools Suite - Changelog
 
+## v1.0.3.2 - Demo-Mode Cleanup (12. Januar 2026)
+
+### 🔧 Änderungen
+- Entfernt verbleibende CTS_DEMO_MODE- und Demo-Handling-Pfade im Hauptplugin (AJAX Event Details, Dashboard, API-Settings, Template Data)
+- Demo-Events werden ausschließlich über das separate Demo-Plugin bereitgestellt (Persistenz in DB), kein Fallback im Hauptplugin
+- README aktualisiert (Demo-Modus-Konstante entfernt)
+
+---
+
 ## v1.0.3.1 - Modal Event Loading Bugfix (12. Januar 2026)
 
 ### 🐛 Bugfixes

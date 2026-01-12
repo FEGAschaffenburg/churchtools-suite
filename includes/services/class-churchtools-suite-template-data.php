@@ -130,59 +130,12 @@ class ChurchTools_Suite_Template_Data {
 			$where[] = $wpdb->prepare( 'start_datetime <= %s', $filters['to'] );
 		}
 		
-		// Status filter
-		$where[] = "status = 'active'";
-		
-		$where_clause = ! empty( $where ) ? 'WHERE ' . implode( ' AND ', $where ) : '';
-		$order = strtoupper( $filters['order'] ) === 'DESC' ? 'DESC' : 'ASC';
-		$limit = absint( $filters['limit'] );
-		
-		$sql = "SELECT * FROM {$table} 
-				{$where_clause}
-				ORDER BY start_datetime {$order} 
-				LIMIT {$limit}";
-		
-		// Debug output
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			error_log( 'ChurchTools Suite Template Data: SQL Query: ' . $sql );
-			error_log( 'ChurchTools Suite Template Data: Filters: ' . print_r( $filters, true ) );
-		}
-		
-		$results = $wpdb->get_results( $sql, ARRAY_A );
-		
-		// Debug output
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			error_log( 'ChurchTools Suite Template Data: Found ' . ( $results ? count( $results ) : 0 ) . ' events' );
-			if ( $wpdb->last_error ) {
-				error_log( 'ChurchTools Suite Template Data: SQL Error: ' . $wpdb->last_error );
-			}
-		}
-		
-		// Format events (empty array if no results)
-		$events = [];
-		if ( $results ) {
-			foreach ( $results as $row ) {
-				$events[] = $this->format_event( $row );
-			}
-		}
-		
-		// v0.10.4.11: Apply tag filter (post-processing after formatting)
-		if ( ! empty( $filters['filter_tags'] ) && is_array( $filters['filter_tags'] ) ) {
-			$events = $this->filter_events_by_tags( $events, $filters['filter_tags'] );
-		}
-		
-		// Debug logging before filter
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			error_log( 'ChurchTools Suite Template Data: BEFORE apply_filters - ' . count( $events ) . ' events' );
-		}
 		
 		/**
 		 * Filter events before returning to templates (v0.10.0.0)
-		 * 
-		 * Allows external plugins (like churchtools-suite-demo) to override events.
-		 * This filter is ALWAYS called, even if database is empty, to allow
-		 * demo plugins to inject events.
-		 * 
+		 *
+		 * Allows external plugins to override or enrich events.
+		 *
 		 * @param array $events  Formatted events array (may be empty)
 		 * @param array $filters Original query filters
 		 * @return array Modified events array
@@ -529,74 +482,6 @@ class ChurchTools_Suite_Template_Data {
 		}
 
 		return $stats;
-	}
-	
-	/**
-	 * Check if demo mode is enabled (v0.9.3.0)
-	 * 
-	 * Demo mode only active wenn CTS_DEMO_MODE constant in wp-config.php gesetzt ist.
-	 * Ermöglicht Demo-Seite ohne ChurchTools API Zugriff.
-	 * 
-	 * @return bool True wenn Demo-Modus aktiv
-	 */
-	private function is_demo_mode(): bool {
-		return defined( 'CTS_DEMO_MODE' ) && CTS_DEMO_MODE === true;
-	}
-	
-	/**
-	 * Get demo events (v0.9.3.0)
-	 * 
-	 * Nutzt Demo Data Provider wenn Demo-Modus aktiv ist.
-	 * Gibt realistische fake Events für nächste 90 Tage zurück.
-	 * 
-	 * @param array $filters Query filters (same as get_events)
-	 * @return array Formatted events data
-	 */
-	private function get_demo_events( array $filters = [] ): array {
-		// Load Demo Data Provider
-		require_once CHURCHTOOLS_SUITE_PATH . 'includes/services/class-churchtools-suite-demo-data-provider.php';
-		
-		$demo_provider = new ChurchTools_Suite_Demo_Data_Provider();
-		
-		// Convert filters to demo provider format
-		$demo_args = [
-			'from' => ! empty( $filters['from'] ) ? $filters['from'] : date( 'Y-m-d H:i:s' ),
-			'to' => ! empty( $filters['to'] ) ? $filters['to'] : date( 'Y-m-d H:i:s', strtotime( '+90 days' ) ),
-			'limit' => ! empty( $filters['limit'] ) ? absint( $filters['limit'] ) : 20,
-			'calendar_ids' => ! empty( $filters['calendar_ids'] ) ? $filters['calendar_ids'] : [],
-		];
-		
-		// Debug logging
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && class_exists( 'ChurchTools_Suite_Logger' ) ) {
-			ChurchTools_Suite_Logger::debug( 'demo_mode', 'Getting demo events', [
-				'demo_args' => $demo_args,
-			] );
-		}
-		
-		// Get demo events (raw data from provider)
-		$demo_events = $demo_provider->get_events( $demo_args );
-		
-		// Debug result
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG && class_exists( 'ChurchTools_Suite_Logger' ) ) {
-			ChurchTools_Suite_Logger::debug( 'demo_mode', 'Demo events loaded', [
-				'count' => count( $demo_events ),
-				'first_event_title' => ! empty( $demo_events[0]['title'] ) ? $demo_events[0]['title'] : 'N/A',
-			] );
-		}
-		
-		// WICHTIG: Demo-Events müssen durch format_event() laufen!
-		// Sie benötigen start_day, start_month, start_year, start_time etc.
-		$formatted_events = [];
-		foreach ( $demo_events as $event ) {
-			$formatted_events[] = $this->format_event( $event );
-		}
-		
-		// Apply order sorting
-		if ( ! empty( $filters['order'] ) && strtoupper( $filters['order'] ) === 'DESC' ) {
-			$formatted_events = array_reverse( $formatted_events );
-		}
-		
-		return $formatted_events;
 	}
 	
 	/**
