@@ -1,5 +1,37 @@
 # ChurchTools Suite - Changelog
 
+## v1.0.3.6 - Modal Event Loading Bugfix (12. Januar 2026)
+
+### 🐛 Bugfixes
+- ✅ **Modal Event Loading** - Demo Events zeigen nun korrekt Inhalte im Modal
+  - AJAX-Handler `cts_get_event_details` unterstützt jetzt Demo-Events
+  - Event-Modal wird auch bei Demo-Daten korrekt angezeigt
+  - Fehler "Error Loading Event" bei Demo-Events behoben
+
+### 🔧 Technical
+- Enhanced `ajax_get_event_details()` in `class-churchtools-suite-admin.php`:
+  - Fallback zu Demo Data Provider wenn Event nicht in DB gefunden
+  - Unterstützt beide DB Objects und Demo-Event Arrays
+  - Timezone-aware Datumformatierung für Demo-Events (keine GMT-Konvertierung für Demo-Events)
+  - Sichere Feldextraktion mit `isset()` für optionale Properties
+  - Image-Felder in AJAX Response hinzugefügt (`image_attachment_id`, `image_url`)
+
+---
+
+## v1.0.3.5 - Translation Notice Suppression (12. Januar 2026)
+
+### 🔧 Änderungen
+- JIT Translation Notice Suppression für WordPress 6.7 (identisch mit Demo-Plugin v1.0.5.15)
+
+---
+
+## v1.0.3.4 - Translation Notice Suppression (12. Januar 2026)
+
+### 🔧 Änderungen
+- JIT Translation Notice Suppression für WordPress 6.7 (identisch mit Demo-Plugin v1.0.5.15)
+
+---
+
 ## v1.0.3.3 - Critical Hotfix (12. Januar 2026)
 
 ### 🐛 Bugfix
@@ -17,19 +49,9 @@
 
 ---
 
-## v1.0.3.1 - Modal Event Loading Bugfix (12. Januar 2026)
+## v1.0.3.1 - DEPRECATED - Modal Bugfix nicht vollständig (12. Januar 2026)
 
-### 🐛 Bugfixes
-- ✅ **Modal Event Loading** - Demo Events zeigen nun korrekt Inhalte im Modal
-  - AJAX-Handler `cts_get_event_details` unterstützt jetzt Demo-Events
-  - Event-Modal wird auch bei Demo-Daten korrekt angezeigt
-  - Fehler "Error Loading Event" bei Demo-Events behoben
-
-### 🔧 Technical
-- Enhanced `ajax_get_event_details()` in `class-churchtools-suite-admin.php`
-  - Fallback zu Demo Data Provider wenn Event nicht in DB gefunden
-  - Unterstützt beide DB Objects und Demo-Event Arrays
-  - Timezone-aware Datumformatierung für Demo-Events
+**HINWEIS:** Diese Version hatte den Modal-Fix im CHANGELOG beschrieben, aber nicht implementiert. Siehe v1.0.3.6 für die tatsächliche Implementierung.
 
 ---
 

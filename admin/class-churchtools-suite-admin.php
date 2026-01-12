@@ -1714,6 +1714,8 @@ class ChurchTools_Suite_Admin {
 	
 	/**
 	 * AJAX Handler: Get Event Details
+	 * 
+	 * v1.0.3.1: Supports demo events via fallback to Demo Data Provider
 	 */
 	public function ajax_get_event_details() {
 		// Check nonce
@@ -1739,8 +1741,40 @@ class ChurchTools_Suite_Admin {
 		$calendars_repo = new ChurchTools_Suite_Calendars_Repository( $wpdb );
 		$services_repo = new ChurchTools_Suite_Event_Services_Repository( $wpdb );
 		
-		// Get event
+		// Get event from database
 		$event = $events_repo->get_by_id( $event_id );
+		
+		// v1.0.3.1: Fallback to Demo Data Provider if event not found (demo events)
+		$is_demo_event = false;
+		if ( ! $event ) {
+			// Check if demo plugin is active
+			if ( defined( 'CHURCHTOOLS_SUITE_DEMO_VERSION' ) ) {
+				// Try to load event from Demo Data Provider
+				$demo_provider_path = WP_PLUGIN_DIR . '/churchtools-suite-demo/includes/services/class-demo-data-provider.php';
+				if ( file_exists( $demo_provider_path ) ) {
+					require_once $demo_provider_path;
+					if ( class_exists( 'ChurchTools_Suite_Demo_Data_Provider' ) ) {
+						// Get all demo events (inefficient but works for demo purposes)
+						$demo_provider = new ChurchTools_Suite_Demo_Data_Provider();
+						$demo_events = $demo_provider->get_events( [
+							'from' => date( 'Y-m-d', strtotime( '-30 days' ) ),
+							'to' => date( 'Y-m-d', strtotime( '+180 days' ) ),
+							'limit' => 1000,
+						] );
+						
+						// Find event by DB ID
+						foreach ( $demo_events as $demo_event ) {
+							if ( isset( $demo_event['id'] ) && (int) $demo_event['id'] === $event_id ) {
+								// Convert array to object for consistent handling
+								$event = (object) $demo_event;
+								$is_demo_event = true;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
 		
 		if ( ! $event ) {
 			wp_send_json_error( [
@@ -1769,8 +1803,16 @@ class ChurchTools_Suite_Admin {
 		$start_datetime = $event->start_datetime;
 		$end_datetime = $event->end_datetime;
 		
-		$start_timestamp = strtotime( get_date_from_gmt( $start_datetime ) );
-		$end_timestamp = $end_datetime ? strtotime( get_date_from_gmt( $end_datetime ) ) : null;
+		// v1.0.3.1: Handle timezone conversion differently for demo events
+		if ( $is_demo_event ) {
+			// Demo events are already in local timezone
+			$start_timestamp = strtotime( $start_datetime );
+			$end_timestamp = $end_datetime ? strtotime( $end_datetime ) : null;
+		} else {
+			// Real events from ChurchTools are in GMT
+			$start_timestamp = strtotime( get_date_from_gmt( $start_datetime ) );
+			$end_timestamp = $end_datetime ? strtotime( get_date_from_gmt( $end_datetime ) ) : null;
+		}
 		
 		// Format times with suffix
 		$start_time_formatted = date_i18n( $time_format, $start_timestamp ) . $time_suffix;
@@ -1786,17 +1828,19 @@ class ChurchTools_Suite_Admin {
 			$time_display .= ' - ' . $end_time_formatted;
 		}
 		
-		// Extract common fields
+		// Extract common fields (v1.0.3.1: Use isset() for optional fields)
 		$event_id_val = $event->id;
 		$title = $event->title;
-		$event_desc = $event->event_description;
-		$apt_desc = $event->appointment_description;
-		$location_name = $event->location_name;
-		$address_name = $event->address_name;
-		$address_street = $event->address_street;
-		$address_zip = $event->address_zip;
-		$address_city = $event->address_city;
-		$tags_json = $event->tags;
+		$event_desc = isset( $event->event_description ) ? $event->event_description : null;
+		$apt_desc = isset( $event->appointment_description ) ? $event->appointment_description : null;
+		$location_name = isset( $event->location_name ) ? $event->location_name : '';
+		$address_name = isset( $event->address_name ) ? $event->address_name : '';
+		$address_street = isset( $event->address_street ) ? $event->address_street : '';
+		$address_zip = isset( $event->address_zip ) ? $event->address_zip : '';
+		$address_city = isset( $event->address_city ) ? $event->address_city : '';
+		$tags_json = isset( $event->tags ) ? $event->tags : null;
+		$image_attachment_id = isset( $event->image_attachment_id ) ? $event->image_attachment_id : null;
+		$image_url = isset( $event->image_url ) ? $event->image_url : null;
 		
 		// Build response
 		$response = [
@@ -1815,6 +1859,8 @@ class ChurchTools_Suite_Admin {
 			'address_city' => $address_city,
 			'calendar_name' => $calendar ? $calendar->name : '',
 			'calendar_color' => $calendar ? $calendar->color : '#3498db',
+			'image_attachment_id' => $image_attachment_id,
+			'image_url' => $image_url,
 			'tags' => [],
 			'services' => []
 		];
