@@ -36,8 +36,8 @@ class ChurchTools_Suite_Admin {
 		// Check nonce
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
 
-		// Permission
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// v1.0.2.0: Permission updated to manage_churchtools_suite
+		if ( ! current_user_can( 'manage_churchtools_suite' ) ) {
 			wp_send_json_error( [ 'message' => __( 'Keine Berechtigung.', 'churchtools-suite' ) ] );
 			return;
 		}
@@ -80,8 +80,8 @@ class ChurchTools_Suite_Admin {
 		// Check nonce
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
 
-		// Permission
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Permission: manage_churchtools_suite (General Admin)
+		if ( ! current_user_can( 'manage_churchtools_suite' ) ) {
 			wp_send_json_error( [ 'message' => __( 'Keine Berechtigung.', 'churchtools-suite' ) ] );
 			return;
 		}
@@ -205,10 +205,12 @@ class ChurchTools_Suite_Admin {
 	 * Add plugin admin menu
 	 */
 	public function add_plugin_admin_menu() {
+		// v1.0.2.0: Use custom capability instead of manage_options
+		// This allows ChurchTools Managers to access the plugin without full WordPress admin access
 		add_menu_page(
 			__( 'ChurchTools Suite', 'churchtools-suite' ),
 			__( 'ChurchTools', 'churchtools-suite' ),
-			'manage_options',
+			'manage_churchtools_suite', // New: Custom capability (vs manage_options)
 			'churchtools-suite',
 			[ $this, 'display_admin_page' ],
 			'dashicons-calendar-alt',
@@ -221,7 +223,7 @@ class ChurchTools_Suite_Admin {
 			'churchtools-suite',
 			__( 'Shortcode Manager', 'churchtools-suite' ),
 			__( '⚡ Shortcode Manager', 'churchtools-suite' ),
-			'manage_options',
+			'manage_churchtools_suite',
 			'churchtools-suite-shortcodes',
 			[ $this, 'display_shortcode_manager' ]
 		);
@@ -234,7 +236,7 @@ class ChurchTools_Suite_Admin {
 			'churchtools-suite',
 			__( 'Daten', 'churchtools-suite' ),
 			__( '📋 Daten', 'churchtools-suite' ),
-			'manage_options',
+			'manage_churchtools_suite',
 			'churchtools-suite-data',
 			[ $this, 'display_data_page' ]
 		);
@@ -332,6 +334,12 @@ class ChurchTools_Suite_Admin {
 	public function ajax_test_connection() {
 		// Check nonce
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
+		
+		// Permission: configure_churchtools_suite (Settings)
+		if ( ! current_user_can( 'configure_churchtools_suite' ) ) {
+			wp_send_json_error( [ 'message' => __( 'Keine Berechtigung.', 'churchtools-suite' ) ] );
+			return;
+		}
 	}
 
 	/**
@@ -345,14 +353,15 @@ class ChurchTools_Suite_Admin {
 			wp_send_json_error( [ 'message' => 'Invalid nonce' ] );
 			return;
 		}
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Permission: configure_churchtools_suite (Settings)
+		if ( ! current_user_can( 'configure_churchtools_suite' ) ) {
 			wp_send_json_error( [ 'message' => 'No permission' ] );
 			return;
 		}
 		wp_send_json_success( [ 'message' => 'pong' ] );
 		
 		// Check permissions
-		if ( ! current_user_can( 'manage_options' ) ) {
+		if ( ! current_user_can( 'configure_churchtools_suite' ) ) {
 			wp_send_json_error( [
 				'message' => 'Keine Berechtigung.'
 			] );
@@ -395,8 +404,8 @@ class ChurchTools_Suite_Admin {
 		// Check nonce
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
 		
-		// Check permissions
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Check permissions: manage_churchtools_calendars (Calendars)
+		if ( ! current_user_can( 'manage_churchtools_calendars' ) ) {
 			wp_send_json_error( [
 				'message' => __( 'Keine Berechtigung.', 'churchtools-suite' )
 			] );
@@ -459,8 +468,8 @@ class ChurchTools_Suite_Admin {
 		// Check nonce
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
 		
-		// Check permissions
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Check permissions: manage_churchtools_calendars (Calendars)
+		if ( ! current_user_can( 'manage_churchtools_calendars' ) ) {
 			wp_send_json_error( [
 				'message' => __( 'Keine Berechtigung.', 'churchtools-suite' )
 			] );
@@ -531,8 +540,8 @@ class ChurchTools_Suite_Admin {
 		// Check nonce
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
 		
-		// Check permissions
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Check permissions: manage_churchtools_services (Services)
+		if ( ! current_user_can( 'manage_churchtools_services' ) ) {
 			wp_send_json_error( [
 				'message' => __( 'Keine Berechtigung.', 'churchtools-suite' )
 			] );
@@ -597,8 +606,8 @@ class ChurchTools_Suite_Admin {
 		// Check nonce
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
 		
-		// Check permissions
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Check permissions: manage_churchtools_services (Services)
+		if ( ! current_user_can( 'manage_churchtools_services' ) ) {
 			wp_send_json_error( [
 				'message' => __( 'Keine Berechtigung.', 'churchtools-suite' )
 			] );
@@ -643,8 +652,8 @@ class ChurchTools_Suite_Admin {
 		// Check nonce
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
 		
-		// Check permissions
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Check permissions: manage_churchtools_services (Services)
+		if ( ! current_user_can( 'manage_churchtools_services' ) ) {
 			wp_send_json_error( [
 				'message' => __( 'Keine Berechtigung.', 'churchtools-suite' )
 			] );
@@ -700,8 +709,8 @@ class ChurchTools_Suite_Admin {
 		// Check nonce
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
 		
-		// Check permissions
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Check permissions: manage_churchtools_services (Services)
+		if ( ! current_user_can( 'manage_churchtools_services' ) ) {
 			wp_send_json_error( [
 				'message' => __( 'Keine Berechtigung.', 'churchtools-suite' )
 			] );
@@ -795,8 +804,8 @@ class ChurchTools_Suite_Admin {
 		// Check nonce
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
 		
-		// Check permissions
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Check permissions: sync_churchtools_events (Event Sync)
+		if ( ! current_user_can( 'sync_churchtools_events' ) ) {
 			wp_send_json_error( [
 				'message' => __( 'Keine Berechtigung.', 'churchtools-suite' )
 			] );
@@ -896,7 +905,8 @@ class ChurchTools_Suite_Admin {
 	public function ajax_fetch_events_list() {
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
 
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Permission: manage_churchtools_suite (General Admin)
+		if ( ! current_user_can( 'manage_churchtools_suite' ) ) {
 			wp_send_json_error( [ 'message' => __( 'Keine Berechtigung.', 'churchtools-suite' ) ] );
 			return;
 		}
@@ -1075,7 +1085,8 @@ class ChurchTools_Suite_Admin {
 	public function ajax_fetch_imported_services_list() {
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
 
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Permission: manage_churchtools_suite (General Admin)
+		if ( ! current_user_can( 'manage_churchtools_suite' ) ) {
 			wp_send_json_error( [ 'message' => __( 'Keine Berechtigung.', 'churchtools-suite' ) ] );
 			return;
 		}
@@ -1157,7 +1168,8 @@ class ChurchTools_Suite_Admin {
 		
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
 		
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Permission: sync_churchtools_events (Event Sync)
+		if ( ! current_user_can( 'sync_churchtools_events' ) ) {
 			wp_send_json_error( [
 				'message' => __( 'Keine Berechtigung.', 'churchtools-suite' )
 			] );
@@ -1376,7 +1388,8 @@ class ChurchTools_Suite_Admin {
 			return;
 		}
 		
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Permission: configure_churchtools_suite (Settings)
+		if ( ! current_user_can( 'configure_churchtools_suite' ) ) {
 			wp_send_json_error( [
 				'message' => __( 'Keine Berechtigung.', 'churchtools-suite' )
 			] );
@@ -1448,8 +1461,8 @@ class ChurchTools_Suite_Admin {
 		// Check nonce
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
 		
-		// Check permissions
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Check permissions: view_churchtools_debug (Debug/Logs)
+		if ( ! current_user_can( 'view_churchtools_debug' ) ) {
 			wp_send_json_error( [
 				'message' => __( 'Keine Berechtigung.', 'churchtools-suite' )
 			] );
@@ -1495,8 +1508,8 @@ class ChurchTools_Suite_Admin {
 		// Check nonce
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
 		
-		// Check permissions
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Check permissions: view_churchtools_debug (Debug/Logs)
+		if ( ! current_user_can( 'view_churchtools_debug' ) ) {
 			wp_send_json_error( [
 				'message' => __( 'Keine Berechtigung.', 'churchtools-suite' )
 			] );
@@ -1528,8 +1541,8 @@ class ChurchTools_Suite_Admin {
 		// Check nonce
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
 		
-		// Check permissions
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Check permissions: view_churchtools_debug (Debug/Logs)
+		if ( ! current_user_can( 'view_churchtools_debug' ) ) {
 			wp_send_json_error( [
 				'message' => __( 'Keine Berechtigung.', 'churchtools-suite' )
 			] );
@@ -1818,7 +1831,8 @@ class ChurchTools_Suite_Admin {
 	public function ajax_save_preset() {
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
 		
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Permission: manage_churchtools_suite (General Admin)
+		if ( ! current_user_can( 'manage_churchtools_suite' ) ) {
 			wp_send_json_error( [ 'message' => __( 'Keine Berechtigung', 'churchtools-suite' ) ] );
 		}
 		
@@ -1878,7 +1892,8 @@ class ChurchTools_Suite_Admin {
 	public function ajax_update_preset() {
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
 		
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Permission: manage_churchtools_suite (General Admin)
+		if ( ! current_user_can( 'manage_churchtools_suite' ) ) {
 			wp_send_json_error( [ 'message' => __( 'Keine Berechtigung', 'churchtools-suite' ) ] );
 		}
 		
@@ -1942,7 +1957,8 @@ class ChurchTools_Suite_Admin {
 	public function ajax_delete_preset() {
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
 		
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Permission: manage_churchtools_suite (General Admin)
+		if ( ! current_user_can( 'manage_churchtools_suite' ) ) {
 			wp_send_json_error( [ 'message' => __( 'Keine Berechtigung', 'churchtools-suite' ) ] );
 		}
 		
@@ -1978,8 +1994,8 @@ class ChurchTools_Suite_Admin {
 		// Check nonce
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
 		
-		// Check permissions
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Check permissions: manage_churchtools_calendars (Calendars)
+		if ( ! current_user_can( 'manage_churchtools_calendars' ) ) {
 			wp_send_json_error( [ 'message' => __( 'Keine Berechtigung', 'churchtools-suite' ) ] );
 		}
 		
@@ -2020,7 +2036,8 @@ class ChurchTools_Suite_Admin {
 	public function ajax_clear_events() {
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
 		
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Permission: sync_churchtools_events (Event Sync)
+		if ( ! current_user_can( 'sync_churchtools_events' ) ) {
 			wp_send_json_error( [ 'message' => __( 'Keine Berechtigung', 'churchtools-suite' ) ] );
 		}
 		
@@ -2056,7 +2073,8 @@ class ChurchTools_Suite_Admin {
 	public function ajax_clear_calendars() {
 		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
 		
-		if ( ! current_user_can( 'manage_options' ) ) {
+		// Permission: manage_churchtools_calendars (Calendars)
+		if ( ! current_user_can( 'manage_churchtools_calendars' ) ) {
 			wp_send_json_error( [ 'message' => __( 'Keine Berechtigung', 'churchtools-suite' ) ] );
 		}
 		

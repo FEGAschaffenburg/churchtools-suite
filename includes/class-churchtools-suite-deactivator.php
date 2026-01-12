@@ -22,5 +22,8 @@ class ChurchTools_Suite_Deactivator {
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-cron.php';
 		ChurchTools_Suite_Cron::clear_jobs();
 		flush_rewrite_rules();
+		
+		// Note: Roles are NOT removed on deactivation (to preserve user permissions)
+		// They are only removed on uninstall via uninstall.php
 	}
 }

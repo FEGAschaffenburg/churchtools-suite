@@ -1,5 +1,39 @@
 # ChurchTools Suite - Changelog
 
+## v1.0.2.0 - Roles & Capabilities System (12. Januar 2026)
+
+### Features
+- ✅ **Option B: Granular Permissions** - WordPress-native Rollen & Capabilities
+  - Neue Custom-Rolle: `cts_manager` für dedizierte Plugin-Manager
+  - 6 granulare Capabilities:
+    - `manage_churchtools_suite` - Allgemeiner Admin-Zugang
+    - `configure_churchtools_suite` - Settings & Verbindung konfigurieren
+    - `sync_churchtools_events` - Events synchronisieren & triggern
+    - `manage_churchtools_calendars` - Kalender verwalten & selektieren
+    - `manage_churchtools_services` - Services verwalten & selektieren
+    - `view_churchtools_debug` - Debug & Logs ansehen
+  - Automische Rolle-Registrierung bei Plugin-Aktivierung
+  - Alle 23+ AJAX-Handler aktualisiert auf granulare Permissions
+  - Menu-Items verwenden neue Capabilities statt `manage_options`
+
+### Improvements
+- 🔧 **Permission Check Standardisierung** - Alle AJAX-Handler konsistent
+- 📚 **Dokumentation** - Vollständiges `ROLES-AND-CAPABILITIES.md` Guide
+- 🚀 **Deployment** - Migration Scripts für Bash & PowerShell
+
+### Breaking Changes
+- ⚠️ Plugin-Menu-Zugang benötigt jetzt `manage_churchtools_suite` statt `manage_options`
+- Bestehende Admin-User bekommen Role `cts_manager` automatisch bei Update
+
+### Files
+- `includes/class-churchtools-suite-roles.php` (neu)
+- `admin/class-churchtools-suite-admin.php` (23+ Permission Checks)
+- `includes/class-churchtools-suite-activator.php` (Role-Registration)
+- `docs/ROLES-AND-CAPABILITIES.md` (neu)
+- `scripts/migrate-roles.sh`, `migrate-roles.ps1` (neu)
+
+---
+
 ## v0.5.1.0 - Frontend CSS/JS (12. Dezember 2025)
 
 ### Features

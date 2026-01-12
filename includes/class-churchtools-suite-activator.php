@@ -23,6 +23,10 @@ class ChurchTools_Suite_Activator {
 	 * Note: Database tables are created via migration system (class-churchtools-suite-migrations.php)
 	 */
 	public static function activate(): void {
+		// Load and register roles/capabilities (v1.0.2.0)
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-roles.php';
+		ChurchTools_Suite_Roles::register_role();
+		
 		// Load migrations system
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-migrations.php';
 		
