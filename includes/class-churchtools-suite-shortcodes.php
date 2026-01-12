@@ -233,13 +233,15 @@ class ChurchTools_Suite_Shortcodes {
 	
 	/**
 	 * Generic Events Shortcode (v0.9.4.11)
+	/**
+	 * Main Shortcode Handler (v1.0.1: Unified view names)
 	 * 
-	 * Main shortcode that routes to appropriate view handler based on viewType parameter.
-	 * Compatible with Gutenberg block attributes.
+	 * Routes to appropriate handler based on view name prefix: list-, grid-, calendar-
 	 * 
-	 * Usage:
-	 * [churchtools_events limit="5"]
-	 * [churchtools_events viewType="list" view="classic" limit="10"]
+	 * Usage (v1.0.1+):
+	 * [churchtools_events view="list-classic"]
+	 * [churchtools_events view="grid-simple" columns="3"]
+	 * [churchtools_events view="calendar-monthly-simple"]
 	 * 
 	 * @param array $atts Shortcode attributes
 	 * @return string HTML output
@@ -250,9 +252,9 @@ class ChurchTools_Suite_Shortcodes {
 		$default_show_month_sep = get_option( 'churchtools_suite_show_month_separator', 1 );
 		
 		$atts = shortcode_atts( [
-			'viewType' => 'list',  // Matches Gutenberg block attribute
-			'view' => 'classic',
+			'view' => 'list-classic',  // v1.0.1: Unified view names with prefix
 			'limit' => 5,
+			'columns' => 3,  // for grid views
 			'calendar' => '',
 			'calendars' => '',
 			'tags' => '',
@@ -269,20 +271,31 @@ class ChurchTools_Suite_Shortcodes {
 			'event_action' => 'modal',
 		], $atts, 'churchtools_events' );
 		
-		// Route to appropriate view handler
-		$view_type = strtolower( $atts['viewType'] );
+		// Route to appropriate view handler based on view name prefix
+		$view = strtolower( $atts['view'] );
 		
-		if ( $view_type === 'list' ) {
+		// v1.0.1: Auto-extract view prefix and convert to old format for backward compatibility
+		if ( strpos( $view, 'list-' ) === 0 ) {
+			// list-classic → classic
+			$atts['view'] = substr( $view, 5 );
 			return self::list_shortcode( $atts );
 		}
 		
-		// v0.9.8.0: Calendar view activated
-		if ( $view_type === 'calendar' ) {
+		if ( strpos( $view, 'grid-' ) === 0 ) {
+			// grid-simple → simple
+			$atts['view'] = substr( $view, 5 );
+			return self::grid_shortcode( $atts );
+		}
+		
+		if ( strpos( $view, 'calendar-' ) === 0 ) {
+			// calendar-monthly-simple → monthly-simple
+			$atts['view'] = substr( $view, 9 );
 			return self::calendar_shortcode( $atts );
 		}
 		
-		// Other view types deactivated in v1.0.0
-		return '<p style="padding: 12px; background: #fef3c7; border-radius: 4px;">⚠️ <strong>View Type nicht verfügbar:</strong> Nur "list" und "calendar" sind aktiv.</p>';
+		// Fallback: unknown view prefix
+		$valid_views = 'list-classic, list-minimal, list-modern, list-classic-with-images, grid-simple, grid-modern, calendar-monthly-simple';
+		return '<p style="padding: 12px; background: #fef3c7; border-radius: 4px;">⚠️ <strong>View nicht verfügbar:</strong> "' . esc_html( $view ) . '" ist keine gültige View. Verfügbar: ' . esc_html( $valid_views ) . '</p>';
 	}
 	
 	/**
