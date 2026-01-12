@@ -1,5 +1,21 @@
 # ChurchTools Suite - Changelog
 
+## v1.0.3.1 - Modal Event Loading Bugfix (12. Januar 2026)
+
+### 🐛 Bugfixes
+- ✅ **Modal Event Loading** - Demo Events zeigen nun korrekt Inhalte im Modal
+  - AJAX-Handler `cts_get_event_details` unterstützt jetzt Demo-Events
+  - Event-Modal wird auch bei Demo-Daten korrekt angezeigt
+  - Fehler "Error Loading Event" bei Demo-Events behoben
+
+### 🔧 Technical
+- Enhanced `ajax_get_event_details()` in `class-churchtools-suite-admin.php`
+  - Fallback zu Demo Data Provider wenn Event nicht in DB gefunden
+  - Unterstützt beide DB Objects und Demo-Event Arrays
+  - Timezone-aware Datumformatierung für Demo-Events
+
+---
+
 ## v1.0.3.0 - User Management & Demo Registration (12. Januar 2026)
 
 ### ✨ Features
