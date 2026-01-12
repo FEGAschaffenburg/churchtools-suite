@@ -136,6 +136,9 @@ class ChurchTools_Suite {
 	private function define_admin_hooks(): void {
 		$admin = new ChurchTools_Suite_Admin( $this->version );
 		
+		// v1.0.3.1: Ensure capabilities exist (fallback in case activation hook didn't fire)
+		$this->ensure_capabilities_exist();
+		
 		$this->loader->add_action( 'admin_enqueue_scripts', $admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'admin_menu', $admin, 'add_plugin_admin_menu' );
@@ -147,6 +150,24 @@ class ChurchTools_Suite {
 		
 		// Register AJAX handlers immediately
 		$admin->register_ajax_handlers();
+	}
+	
+	/**
+	 * Ensure capabilities exist (fallback if activation hook didn't fire)
+	 * 
+	 * Called during admin_menu to ensure ChurchTools roles/capabilities exist.
+	 * This is a safety measure in case the activation hook was skipped during updates.
+	 * 
+	 * @since 1.0.3.1
+	 */
+	private function ensure_capabilities_exist(): void {
+		// Check if admin role has the capability
+		$admin_role = get_role( 'administrator' );
+		if ( ! $admin_role || ! $admin_role->has_cap( 'manage_churchtools_suite' ) ) {
+			// Capabilities don't exist yet, so initialize them
+			require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-roles.php';
+			ChurchTools_Suite_Roles::create_or_update_roles();
+		}
 	}
 	
 	/**
