@@ -130,6 +130,26 @@ class ChurchTools_Suite_Template_Data {
 			$where[] = $wpdb->prepare( 'start_datetime <= %s', $filters['to'] );
 		}
 		
+		// Execute query
+		$where_clause = ! empty( $where ) ? 'WHERE ' . implode( ' AND ', $where ) : '';
+		$order_clause = 'ORDER BY start_datetime ' . $filters['order'];
+		$limit_clause = $filters['limit'] > 0 ? 'LIMIT ' . absint( $filters['limit'] ) : '';
+		
+		$query = "SELECT * FROM {$table} {$where_clause} {$order_clause} {$limit_clause}";
+		$results = $wpdb->get_results( $query );
+		
+		// Format events
+		$events = [];
+		if ( $results ) {
+			foreach ( $results as $event ) {
+				$events[] = $this->format_event( (array) $event );
+			}
+		}
+		
+		// Apply tag filter (v0.10.4.11)
+		if ( ! empty( $filters['filter_tags'] ) ) {
+			$events = $this->filter_events_by_tags( $events, $filters['filter_tags'] );
+		}
 		
 		/**
 		 * Filter events before returning to templates (v0.10.0.0)

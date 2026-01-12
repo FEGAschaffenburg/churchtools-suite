@@ -1,5 +1,13 @@
 # ChurchTools Suite - Changelog
 
+## v1.0.3.3 - Critical Hotfix (12. Januar 2026)
+
+### 🐛 Bugfix
+- **CRITICAL:** Fixed undefined $events variable causing fatal error in template data service
+- Restored missing DB query and event formatting logic accidentally removed in v1.0.3.2
+
+---
+
 ## v1.0.3.2 - Demo-Mode Cleanup (12. Januar 2026)
 
 ### 🔧 Änderungen
