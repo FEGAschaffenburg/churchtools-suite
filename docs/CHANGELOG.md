@@ -1,6 +1,78 @@
 # ChurchTools Suite - Changelog
 
+## v1.0.3.0 - User Management & Demo Registration (12. Januar 2026)
+
+### ✨ Features
+- ✅ **CTS Managers Dashboard** - Read-only Liste aller Plugin-Manager unter Settings
+  - Manager-Übersicht mit Email, letzter Anmeldung
+  - Quick-Link zu User-Editor
+  - Anleitung zum Hinzufügen neuer Manager
+
+- ✅ **Demo User Auto-Create** - Automatische Erstellung beim Demo-Plugin Activation
+  - `demo-manager` User wird erstellt (falls nicht vorhanden)
+  - Bekommt `cts_manager` Rolle automatisch
+  - Admin sieht Credentials für 24h in Admin-Notiz
+  - Strong Password wird generiert
+
+- ✅ **Post-Registration Credentials** - Zugangsdaten nach erfolgreicher Registrierung
+  - Email & Passwort werden angezeigt
+  - Copy-Buttons für einfache Verwendung
+  - Toggle für Passwort-Sichtbarkeit
+  - Schritt-für-Schritt Anleitung
+  - Direct Link zur Demo
+
+### 📚 Documentation
+- 🆕 [USER-MANAGEMENT-GUIDE.md](../docs/USER-MANAGEMENT-GUIDE.md) - Vollständiger Guide für neue Features
+- Updated [ROLES-AND-CAPABILITIES.md](../docs/ROLES-AND-CAPABILITIES.md)
+
+### 🎯 Improvements
+- Benutzerfreundlichere Verwaltung von Plugin-Zugriffen
+- Demo-Erlebnis deutlich verbessert
+- Besserer Onboarding-Flow für neue Benutzer
+
+### Files
+- `admin/views/settings/subtab-benutzer.php` (neu)
+- `includes/class-demo-registration-response.php` (neu)
+- `admin/class-demo-admin.php` (erweitert: Admin-Notiz)
+- `churchtools-suite-demo/churchtools-suite-demo.php` (erweitert: Auto-Create)
+- `admin/views/tab-settings.php` (erweitert: Benutzer-Subtab)
+- `includes/class-demo-shortcodes.php` (erweitert: Success-Shortcode)
+
+---
+
 ## v1.0.2.0 - Roles & Capabilities System (12. Januar 2026)
+
+### Features
+- ✅ **Option B: Granular Permissions** - WordPress-native Rollen & Capabilities
+  - Neue Custom-Rolle: `cts_manager` für dedizierte Plugin-Manager
+  - 6 granulare Capabilities:
+    - `manage_churchtools_suite` - Allgemeiner Admin-Zugang
+    - `configure_churchtools_suite` - Settings & Verbindung konfigurieren
+    - `sync_churchtools_events` - Events synchronisieren & triggern
+    - `manage_churchtools_calendars` - Kalender verwalten & selektieren
+    - `manage_churchtools_services` - Services verwalten & selektieren
+    - `view_churchtools_debug` - Debug & Logs ansehen
+  - Automische Rolle-Registrierung bei Plugin-Aktivierung
+  - Alle 23+ AJAX-Handler aktualisiert auf granulare Permissions
+  - Menu-Items verwenden neue Capabilities statt `manage_options`
+
+### Improvements
+- 🔧 **Permission Check Standardisierung** - Alle AJAX-Handler konsistent
+- 📚 **Dokumentation** - Vollständiges `ROLES-AND-CAPABILITIES.md` Guide
+- 🚀 **Deployment** - Migration Scripts für Bash & PowerShell
+
+### Breaking Changes
+- ⚠️ Plugin-Menu-Zugang benötigt jetzt `manage_churchtools_suite` statt `manage_options`
+- Bestehende Admin-User bekommen Role `cts_manager` automatisch bei Update
+
+### Files
+- `includes/class-churchtools-suite-roles.php` (neu)
+- `admin/class-churchtools-suite-admin.php` (23+ Permission Checks)
+- `includes/class-churchtools-suite-activator.php` (Role-Registration)
+- `docs/ROLES-AND-CAPABILITIES.md` (neu)
+- `scripts/migrate-roles.sh`, `migrate-roles.ps1` (neu)
+
+---
 
 ### Features
 - ✅ **Option B: Granular Permissions** - WordPress-native Rollen & Capabilities
