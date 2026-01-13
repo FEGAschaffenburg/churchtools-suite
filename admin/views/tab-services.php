@@ -184,12 +184,22 @@ $last_services_sync = get_option('churchtools_suite_services_last_sync', null);
 </div>
 
 <div id="cts-sync-services-result" class="cts-mt-15" style="display: none;"></div>
-				<div class="notice notice-info inline">
-					<p>
-						<?php esc_html_e('Keine Services vorhanden. Bitte synchronisieren Sie zuerst die Services.', 'churchtools-suite'); ?>
-					</p>
-				</div>
-			<?php else: ?>
+
+<!-- SCHRITT 4: Services auswählen -->
+<div class="cts-card cts-mt-20">
+	<div class="cts-card-header">
+		<span class="cts-card-icon">✅</span>
+		<h3><?php esc_html_e('Schritt 4: Services auswählen', 'churchtools-suite'); ?></h3>
+	</div>
+	<div class="cts-card-body">
+		
+		<?php if (empty($services)): ?>
+			<div class="notice notice-info inline">
+				<p>
+					<?php esc_html_e('Keine Services vorhanden. Bitte synchronisieren Sie zuerst die Services.', 'churchtools-suite'); ?>
+				</p>
+			</div>
+		<?php else: ?>
 				
 				<p class="description">
 					<?php

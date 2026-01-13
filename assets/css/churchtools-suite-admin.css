@@ -307,6 +307,7 @@
 	display: flex;
 	align-items: center;
 	gap: 10px;
+	background: transparent;
 }
 
 .cts-card-header .cts-card-icon {
