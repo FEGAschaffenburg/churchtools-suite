@@ -24,7 +24,7 @@ $calendar_images_option = get_option('churchtools_suite_calendar_images', []);
 ?>
 
    <!-- Kalender Sync Button -->
-   <div class="cts-card" style="margin-top: 20px; margin-bottom: 0; background: #f8f9fa; border: 1px solid #e0e0e0;">
+   <div class="cts-card cts-mt-20 cts-mb-0" style="background: #f8f9fa; border: 1px solid #e0e0e0;">
 	   <div class="cts-card-header">
 		   <h2>🗓️ <?php esc_html_e('Kalender synchronisieren', 'churchtools-suite'); ?></h2>
 	   </div>
@@ -47,12 +47,12 @@ $calendar_images_option = get_option('churchtools_suite_calendar_images', []);
 			   </button>
 		   </div>
 		   
-		   <div id="cts-sync-calendars-result" style="margin-top: 15px;"></div>
+		   <div id="cts-sync-calendars-result" class="cts-mt-15"></div>
 	   </div>
    </div>
 
    <!-- Calendar Selection Card -->
-   <div class="cts-card" style="margin-top: 20px;">
+   <div class="cts-card cts-mt-20">
 	   <div class="cts-card-header">
 		   <h2>✅ <?php esc_html_e('Kalenderauswahl', 'churchtools-suite'); ?></h2>
 	   </div>
@@ -218,22 +218,4 @@ $calendar_images_option = get_option('churchtools_suite_calendar_images', []);
 			
 		</div>
 	</div>
-	
-<style>
-.cts-calendar-image-wrapper {
-	display: flex;
-	flex-direction: column;
-	gap: 6px;
-}
-.cts-calendar-image-preview img {
-	max-width: 96px;
-	height: auto;
-	border: 1px solid #e5e7eb;
-	border-radius: 4px;
-}
-.cts-calendar-image-actions {
-	display: flex;
-	gap: 8px;
-	flex-wrap: wrap;
-}
-</style>
+

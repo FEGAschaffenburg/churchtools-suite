@@ -166,11 +166,6 @@ $auto_update_level = get_option( 'churchtools_suite_auto_update_level', 'none' )
 	</div>
 </div>
 
-<style>
-.cts-modal-overlay{position:fixed;left:0;top:0;right:0;bottom:0;background:rgba(0,0,0,0.5);}
-.cts-modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;padding:20px;border-radius:6px;max-width:640px;width:90%;box-shadow:0 8px 24px rgba(0,0,0,0.2);}
-</style>
-
 <script type="text/javascript">
 /* <![CDATA[ */
 (function($){

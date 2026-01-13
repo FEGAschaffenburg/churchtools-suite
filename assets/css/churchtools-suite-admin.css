@@ -1604,3 +1604,125 @@
 		padding: 2px 6px;
 	}
 }
+/* === SubTab Specific Styles === */
+
+/* Calendar Image Management (tab-calendars.php) */
+.cts-calendar-image-wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.cts-calendar-image-preview img {
+	max-width: 96px;
+	height: auto;
+	border: 1px solid #e5e7eb;
+	border-radius: 4px;
+}
+
+.cts-calendar-image-actions {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+/* Template Description (subtab-templates.php) */
+.cts-card-description {
+	color: #64748b;
+	margin: 12px 0 20px 0;
+	line-height: 1.6;
+}
+
+/* Modal (subtab-advanced.php) */
+.cts-modal-overlay {
+	position: fixed;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.5);
+	z-index: 9999;
+}
+
+.cts-modal {
+	position: fixed;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	background: #fff;
+	padding: 20px;
+	border-radius: 6px;
+	max-width: 640px;
+	width: 90%;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+	z-index: 10000;
+}
+
+/* Utility Classes for Common Inline Styles */
+.cts-mt-20 {
+	margin-top: 20px;
+}
+
+.cts-mt-24 {
+	margin-top: 24px;
+}
+
+.cts-mt-15 {
+	margin-top: 15px;
+}
+
+.cts-mb-0 {
+	margin-bottom: 0;
+}
+
+.cts-info-box {
+	margin-top: 15px;
+	padding: 12px;
+	background: #f0f6fc;
+	border-left: 4px solid #0073aa;
+	border-radius: 4px;
+}
+
+.cts-info-box p {
+	margin: 0 0 8px 0;
+}
+
+.cts-info-box p:last-child {
+	margin-bottom: 0;
+}
+
+.cts-warning-box {
+	margin-top: 20px;
+	padding: 16px;
+	background: #fff3cd;
+	border-left: 4px solid #ffc107;
+	border-radius: 4px;
+}
+
+.cts-warning-box h4 {
+	margin: 0 0 10px;
+	color: #856404;
+	font-size: 14px;
+}
+
+.cts-warning-box p {
+	margin: 0;
+	color: #856404;
+	font-size: 13px;
+	line-height: 1.6;
+}
+
+.cts-card-info-bg {
+	background: #f0f9ff;
+	border-left: 4px solid #0284c7;
+}
+
+.cts-code-block {
+	display: block;
+	background: #f5f5f5;
+	padding: 12px;
+	border-radius: 4px;
+	margin: 8px 0;
+	font-family: 'Courier New', monospace;
+	font-size: 13px;
+}

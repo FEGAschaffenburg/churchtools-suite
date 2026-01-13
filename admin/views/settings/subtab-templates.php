@@ -114,7 +114,7 @@ if ( empty( $available_modal_templates ) ) {
 	</div>
 	
 	<!-- v0.9.9.84: Click Action Info -->
-	<div class="cts-card" style="margin-top: 24px; background: #f0f9ff; border-left: 4px solid #0284c7;">
+	<div class="cts-card cts-mt-24 cts-card-info-bg">
 		<h3><?php esc_html_e( '💡 Event-Klick Verhalten', 'churchtools-suite' ); ?></h3>
 		<p class="cts-card-description">
 			<?php esc_html_e( 'Das Verhalten beim Event-Klick wird jetzt im Block konfiguriert, nicht hier!', 'churchtools-suite' ); ?>
@@ -122,8 +122,8 @@ if ( empty( $available_modal_templates ) ) {
 		
 		<div style="margin-top: 12px;">
 			<p><strong><?php esc_html_e( 'Block-Parameter:', 'churchtools-suite' ); ?></strong></p>
-			<code style="display: block; background: #f5f5f5; padding: 12px; border-radius: 4px; margin: 8px 0;">[cts_event_list click_action="modal" template="professional"]</code>
-			<code style="display: block; background: #f5f5f5; padding: 12px; border-radius: 4px; margin: 8px 0;">[cts_event_list click_action="page"]</code>
+			<code class="cts-code-block">[cts_event_list click_action="modal" template="professional"]</code>
+			<code class="cts-code-block">[cts_event_list click_action="page"]</code>
 			
 			<p style="margin-top: 12px;">
 				<strong><?php esc_html_e( 'Optionen:', 'churchtools-suite' ); ?></strong>
@@ -142,10 +142,3 @@ if ( empty( $available_modal_templates ) ) {
 	</div>
 </form>
 
-<style>
-.cts-card-description {
-	color: #64748b;
-	margin: 12px 0 20px 0;
-	line-height: 1.6;
-}
-</style>

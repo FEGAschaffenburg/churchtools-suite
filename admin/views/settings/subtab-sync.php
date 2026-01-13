@@ -78,8 +78,8 @@ $last_auto_sync = get_option( 'churchtools_suite_last_auto_sync', '' );
 		$to_date = date_i18n( get_option( 'date_format' ), current_time( 'timestamp' ) + absint( $sync_days_future ) * DAY_IN_SECONDS );
 		?>
 		
-		<div class="cts-info" style="margin-top: 15px; padding: 12px; background: #f0f6fc; border-left: 4px solid #0073aa;">
-			<p style="margin: 0 0 8px 0;">
+		<div class="cts-info-box">
+			<p>
 				<strong>📅 Berechneter Zeitraum:</strong>
 			</p>
 			<p style="margin: 0; font-family: monospace; font-size: 14px;">
@@ -93,7 +93,7 @@ $last_auto_sync = get_option( 'churchtools_suite_last_auto_sync', '' );
 		</div>
 	</div>
 	
-	<div class="cts-card" style="margin-top: 20px;">
+	<div class="cts-card cts-mt-20">
 		<h3><?php esc_html_e( 'Automatische Synchronisation', 'churchtools-suite' ); ?></h3>
 		
 		<table class="cts-form-table">
