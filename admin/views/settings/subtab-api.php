@@ -45,7 +45,11 @@ $ct_token = get_option( 'churchtools_suite_ct_token', '' );
 	<?php wp_nonce_field( 'cts_settings' ); ?>
 	
 	<div class="cts-card">
-		<h3><?php esc_html_e( 'ChurchTools API-Verbindung', 'churchtools-suite' ); ?></h3>
+		<div class="cts-card-header">
+			<span class="cts-card-icon">🔌</span>
+			<h3><?php esc_html_e( 'ChurchTools API-Verbindung', 'churchtools-suite' ); ?></h3>
+		</div>
+		<div class="cts-card-body">
 		
 		<table class="cts-form-table">
 			<tr>
@@ -136,9 +140,10 @@ $ct_token = get_option( 'churchtools_suite_ct_token', '' );
 				</td>
 			</tr>
 		</table>
+	
 	</div>
-
-	<div class="cts-submit">
+	
+	<div class="cts-card-footer">
 		<button type="submit" name="cts_save_api" class="cts-button cts-button-primary">
 			<span>💾</span>
 			<?php esc_html_e( 'Speichern', 'churchtools-suite' ); ?>
@@ -148,8 +153,6 @@ $ct_token = get_option( 'churchtools_suite_ct_token', '' );
 			<?php esc_html_e( 'Verbindung testen', 'churchtools-suite' ); ?>
 		</button>
 	</div>
-</form>
-
 <div id="cts-connection-result" style="display: none; margin-top: 20px;"></div>
 
 <script>

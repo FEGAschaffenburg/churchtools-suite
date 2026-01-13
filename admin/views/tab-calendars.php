@@ -24,24 +24,25 @@ $calendar_images_option = get_option('churchtools_suite_calendar_images', []);
 ?>
 
    <!-- Kalender Sync Button -->
-   <div class="cts-card cts-mt-20 cts-mb-0" style="background: #f8f9fa; border: 1px solid #e0e0e0;">
+   <div class="cts-card">
 	   <div class="cts-card-header">
-		   <h2>🗓️ <?php esc_html_e('Kalender synchronisieren', 'churchtools-suite'); ?></h2>
+		   <span class="cts-card-icon">🗓️</span>
+		   <h3><?php esc_html_e('Kalender synchronisieren', 'churchtools-suite'); ?></h3>
 	   </div>
 	   <div class="cts-card-body">
 		   <p class="description">
 			   <?php esc_html_e('Lädt die Kalenderliste aus ChurchTools und aktualisiert die verfügbaren Kalender in der Datenbank.', 'churchtools-suite'); ?>
 		   </p>
 		   
-		   <?php if ($calendars_last_sync): ?>
+		   <?php if ($last_sync): ?>
 		   <p class="cts-info">
 			   <strong><?php esc_html_e('Letzte Synchronisation:', 'churchtools-suite'); ?></strong>
-			   <?php echo esc_html(get_date_from_gmt($calendars_last_sync, get_option('date_format') . ' ' . get_option('time_format'))); ?>
+			   <?php echo esc_html(get_date_from_gmt($last_sync, get_option('date_format') . ' ' . get_option('time_format'))); ?>
 		   </p>
 		   <?php endif; ?>
 		   
 		   <div class="cts-button-group">
-			   <button type="button" id="cts-sync-calendars-btn" class="button button-primary">
+			   <button type="button" id="cts-sync-calendars-btn" class="cts-button cts-button-primary">
 				   <span class="dashicons dashicons-update"></span>
 				   <?php esc_html_e('Kalender jetzt synchronisieren', 'churchtools-suite'); ?>
 			   </button>
@@ -54,7 +55,8 @@ $calendar_images_option = get_option('churchtools_suite_calendar_images', []);
    <!-- Calendar Selection Card -->
    <div class="cts-card cts-mt-20">
 	   <div class="cts-card-header">
-		   <h2>✅ <?php esc_html_e('Kalenderauswahl', 'churchtools-suite'); ?></h2>
+		   <span class="cts-card-icon">✅</span>
+		   <h3><?php esc_html_e('Kalenderauswahl', 'churchtools-suite'); ?></h3>
 	   </div>
 		</div>
 

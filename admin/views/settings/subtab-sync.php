@@ -36,7 +36,11 @@ $last_auto_sync = get_option( 'churchtools_suite_last_auto_sync', '' );
 	<?php wp_nonce_field( 'cts_settings' ); ?>
 	
 	<div class="cts-card">
-		<h3><?php esc_html_e( 'Zeitraum', 'churchtools-suite' ); ?></h3>
+		<div class="cts-card-header">
+			<span class="cts-card-icon">⏱️</span>
+			<h3><?php esc_html_e( 'Zeitraum', 'churchtools-suite' ); ?></h3>
+		</div>
+		<div class="cts-card-body">
 		
 		<table class="cts-form-table">
 			<tr>
