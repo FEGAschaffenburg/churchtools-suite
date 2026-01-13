@@ -23,8 +23,6 @@ $last_sync = get_option('churchtools_suite_calendars_last_sync', null);
 $calendar_images_option = get_option('churchtools_suite_calendar_images', []);
 ?>
 
-<div class="cts-tab-content-inner">
-
    <!-- Kalender Sync Button -->
    <div class="cts-card" style="margin-top: 20px; margin-bottom: 0; background: #f8f9fa; border: 1px solid #e0e0e0;">
 	   <div class="cts-card-header">
@@ -221,8 +219,6 @@ $calendar_images_option = get_option('churchtools_suite_calendar_images', []);
 		</div>
 	</div>
 	
-</div>
-
 <style>
 .cts-calendar-image-wrapper {
 	display: flex;

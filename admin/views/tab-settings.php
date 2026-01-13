@@ -21,9 +21,6 @@ $active_subtab = isset( $_GET['subtab'] ) ? sanitize_key( $_GET['subtab'] ) : 'a
 		<a href="?page=churchtools-suite&tab=settings&subtab=api" class="cts-sub-tab <?php echo $active_subtab === 'api' ? 'active' : ''; ?>">
 			<?php esc_html_e( 'API & Verbindung', 'churchtools-suite' ); ?>
 		</a>
-		<a href="?page=churchtools-suite&tab=settings&subtab=allgemeines" class="cts-sub-tab <?php echo $active_subtab === 'allgemeines' ? 'active' : ''; ?>">
-			<?php esc_html_e( 'Allgemeines', 'churchtools-suite' ); ?>
-		</a>
 		<a href="?page=churchtools-suite&tab=settings&subtab=sync" class="cts-sub-tab <?php echo $active_subtab === 'sync' ? 'active' : ''; ?>">
 			<?php esc_html_e( 'Synchronisation', 'churchtools-suite' ); ?>
 		</a>
@@ -44,35 +41,34 @@ $active_subtab = isset( $_GET['subtab'] ) ? sanitize_key( $_GET['subtab'] ) : 'a
 		</a>
 	</div>
 	
-	<?php
-	switch ( $active_subtab ) {
-		case 'allgemeines':
-			// Fallback to API for now
-			include __DIR__ . '/settings/subtab-api.php';
-			break;
-		case 'sync':
-			include __DIR__ . '/settings/subtab-sync.php';
-			break;
-		case 'calendars':
-			include __DIR__ . '/tab-calendars.php';
-			break;
-		case 'services':
-			include __DIR__ . '/tab-services.php';
-			break;
-		case 'templates':
-			include __DIR__ . '/settings/subtab-templates.php';
-			break;
-		case 'advanced':
-			include __DIR__ . '/settings/subtab-advanced.php';
-			break;
-		case 'benutzer':
-			include __DIR__ . '/settings/subtab-benutzer.php';
-			break;
-		case 'api':
-		default:
-			include __DIR__ . '/settings/subtab-api.php';
-			break;
-	}
-	?>
+	<!-- SubTab Content Wrapper -->
+	<div class="cts-subtab-content">
+		<?php
+		switch ( $active_subtab ) {
+			case 'sync':
+				include __DIR__ . '/settings/subtab-sync.php';
+				break;
+			case 'calendars':
+				include __DIR__ . '/tab-calendars.php';
+				break;
+			case 'services':
+				include __DIR__ . '/tab-services.php';
+				break;
+			case 'templates':
+				include __DIR__ . '/settings/subtab-templates.php';
+				break;
+			case 'advanced':
+				include __DIR__ . '/settings/subtab-advanced.php';
+				break;
+			case 'benutzer':
+				include __DIR__ . '/settings/subtab-benutzer.php';
+				break;
+			case 'api':
+			default:
+				include __DIR__ . '/settings/subtab-api.php';
+				break;
+		}
+		?>
+	</div>
 	
 </div>

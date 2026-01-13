@@ -16,8 +16,6 @@ require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-roles.ph
 
 $cts_managers = ChurchTools_Suite_Roles::get_cts_managers();
 ?>
-
-<div class="cts-settings-content">
 	<h3><?php esc_html_e( 'ChurchTools Suite Manager', 'churchtools-suite' ); ?></h3>
 	<p class="description">
 		<?php esc_html_e( 'Benutzer mit Zugriff auf die ChurchTools Suite Plugin-Verwaltung.', 'churchtools-suite' ); ?>
@@ -88,4 +86,3 @@ $cts_managers = ChurchTools_Suite_Roles::get_cts_managers();
 		</ol>
 	</div>
 
-</div>

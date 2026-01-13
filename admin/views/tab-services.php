@@ -27,8 +27,6 @@ $services = $services_repo->get_all();
 $selected_services_count = $services_repo->get_selected_count();
 $last_services_sync = get_option('churchtools_suite_services_last_sync', null);
 ?>
-
-<div class="cts-tab-content cts-services">
 	
 	<div class="cts-section-header">
 		<h2><?php esc_html_e('Services', 'churchtools-suite'); ?></h2>
@@ -291,5 +289,3 @@ $last_services_sync = get_option('churchtools_suite_services_last_sync', null);
 	</div>
 	
 	<div id="cts-service-selection-result" style="margin-top: 15px; display: none;"></div>
-	
-</div>

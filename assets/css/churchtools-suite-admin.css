@@ -164,12 +164,23 @@
 
 /* Sub-Tab Content Container */
 .cts-sub-tabs + .cts-settings,
-.cts-sub-tabs + .cts-debug-subtab-content {
+.cts-sub-tabs + .cts-debug-subtab-content,
+.cts-sub-tabs + .cts-subtab-content {
 	background: #fff;
 	border: 1px solid #ddd;
 	border-top: none;
 	border-radius: 0 6px 6px 6px;
 	padding: 20px;
+}
+
+/* Unified SubTab Content Styling */
+.cts-subtab-content {
+	background: #fff;
+	border: 1px solid #ddd;
+	border-top: none;
+	border-radius: 0 6px 6px 6px;
+	padding: 20px;
+	margin-bottom: 20px;
 }
 
 /* === Headings & Text === */
