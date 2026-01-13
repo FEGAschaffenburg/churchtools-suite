@@ -1,87 +1,14 @@
-/* Settings & Debug Subtab-Navigation (v0.10.1.6 - vereinheitlicht) */
-.cts-sub-tabs {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-.cts-sub-tab {
-  display: inline-block;
-  padding: 8px 18px;
-  background: #f6f8fa;
-  border-radius: 4px 4px 0 0;
-  color: #1e293b;
-  text-decoration: none;
-  font-weight: 500;
-  border: 1px solid #e5e7eb;
-  border-bottom: none;
-  transition: background 0.15s, color 0.15s;
-}
-.cts-sub-tab.active, .cts-sub-tab:hover {
-  background: #fff;
-  color: #2563eb;
-  border-bottom: 2px solid #2563eb;
-  font-weight: 600;
-}
+/**
+ * DEPRECATED: Admin CSS - Verwende assets/css/churchtools-suite-admin.css
+ * Diese Datei ist deprecated und wird nicht mehr verwendet.
+ * Alle Styles wurden in assets/css/churchtools-suite-admin.css konsolidiert.
+ * 
+ * @deprecated v1.0.3.8
+ * @see assets/css/churchtools-suite-admin.css
+ */
 
-/* Debug Subtab Content Container */
-.cts-debug-subtab-content {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 0 0 6px 6px;
-  padding: 24px 24px 12px 24px;
-}
+/* WARNUNG: Diese Datei sollte NICHT editiert werden! */
+/* Bearbeite stattdessen: assets/css/churchtools-suite-admin.css */
 
-/* Toggle Switch Styles (v0.9.6.2) */
-.cts-toggle {
-  position: relative;
-  display: inline-block;
-  width: 44px;
-  height: 24px;
-}
-
-.cts-toggle input[type="checkbox"] {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.cts-toggle-slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #cbd5e1;
-  transition: 0.3s;
-  border-radius: 24px;
-}
-
-.cts-toggle-slider:before {
-  position: absolute;
-  content: "";
-  height: 18px;
-  width: 18px;
-  left: 3px;
-  bottom: 3px;
-  background-color: white;
-  transition: 0.3s;
-  border-radius: 50%;
-}
-
-.cts-toggle input:checked + .cts-toggle-slider {
-  background-color: #2563eb;
-}
-
-.cts-toggle input:checked + .cts-toggle-slider:before {
-  transform: translateX(20px);
-}
-
-.cts-toggle input:focus + .cts-toggle-slider {
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-/* Hide WordPress admin footer on plugin pages (Danke/Version) */
-#wpfooter { display: none !important; }
 
 

@@ -63,8 +63,8 @@ $current_month = null;
 		
 		<div class="cts-list-empty">
 			<span class="cts-empty-icon">📅</span>
-			<h3><?php esc_html_e( 'Keine Termine gefunden', 'churchtools-suite' ); ?></h3>
-			<p><?php esc_html_e( 'Es gibt aktuell keine Termine in diesem Zeitraum.', 'churchtools-suite' ); ?></p>
+			<h3>Keine Termine gefunden</h3>
+			<p>Es gibt aktuell keine Termine in diesem Zeitraum.</p>
 		</div>
 		
 	<?php else : ?>

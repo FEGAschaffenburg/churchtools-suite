@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $event_id = isset( $_GET['event_id'] ) ? intval( $_GET['event_id'] ) : 0;
 
 if ( ! $event_id ) {
-	echo '<p>' . esc_html__( 'Event nicht gefunden.', 'churchtools-suite' ) . '</p>';
+	echo '<p>Event nicht gefunden.</p>';
 	return;
 }
 
@@ -31,7 +31,7 @@ $calendars_repo = new ChurchTools_Suite_Calendars_Repository();
 $event = $events_repo->get_by_id( $event_id );
 
 if ( ! $event ) {
-	echo '<p>' . esc_html__( 'Event nicht gefunden.', 'churchtools-suite' ) . '</p>';
+	echo '<p>Event nicht gefunden.</p>';
 	return;
 }
 
@@ -71,7 +71,7 @@ $full_description = wpautop( wp_kses_post( $full_description ) );
 	
 	<!-- Back Link -->
 	<div class="cts-back">
-		<a href="javascript:history.back()">← <?php esc_html_e( 'Zurück', 'churchtools-suite' ); ?></a>
+		<a href="javascript:history.back()">← Zurück</a>
 	</div>
 	
 	<!-- Calendar Badge -->

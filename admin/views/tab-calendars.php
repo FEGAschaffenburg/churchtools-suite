@@ -27,13 +27,30 @@ $calendar_images_option = get_option('churchtools_suite_calendar_images', []);
 
    <!-- Kalender Sync Button -->
    <div class="cts-card" style="margin-top: 20px; margin-bottom: 0; background: #f8f9fa; border: 1px solid #e0e0e0;">
-	   <div class="cts-card-header" style="display: flex; align-items: center; justify-content: space-between;">
-		   <h2 style="margin:0;">📅 <?php esc_html_e('Kalender', 'churchtools-suite'); ?></h2>
-		   <button id="cts-sync-calendars-btn" class="button button-secondary" style="font-size:15px; padding:8px 18px;">
-			   <span class="dashicons dashicons-update"></span> <?php esc_html_e('Kalender synchronisieren', 'churchtools-suite'); ?>
-		   </button>
+	   <div class="cts-card-header">
+		   <h2>🗓️ <?php esc_html_e('Kalender synchronisieren', 'churchtools-suite'); ?></h2>
 	   </div>
-	   <div id="cts-sync-calendars-result" style="margin-top:8px; font-size:13px; color:#2271b1;"></div>
+	   <div class="cts-card-body">
+		   <p class="description">
+			   <?php esc_html_e('Lädt die Kalenderliste aus ChurchTools und aktualisiert die verfügbaren Kalender in der Datenbank.', 'churchtools-suite'); ?>
+		   </p>
+		   
+		   <?php if ($calendars_last_sync): ?>
+		   <p class="cts-info">
+			   <strong><?php esc_html_e('Letzte Synchronisation:', 'churchtools-suite'); ?></strong>
+			   <?php echo esc_html(get_date_from_gmt($calendars_last_sync, get_option('date_format') . ' ' . get_option('time_format'))); ?>
+		   </p>
+		   <?php endif; ?>
+		   
+		   <div class="cts-button-group">
+			   <button type="button" id="cts-sync-calendars-btn" class="button button-primary">
+				   <span class="dashicons dashicons-update"></span>
+				   <?php esc_html_e('Kalender jetzt synchronisieren', 'churchtools-suite'); ?>
+			   </button>
+		   </div>
+		   
+		   <div id="cts-sync-calendars-result" style="margin-top: 15px;"></div>
+	   </div>
    </div>
 
    <!-- Calendar Selection Card -->
@@ -207,27 +224,6 @@ $calendar_images_option = get_option('churchtools_suite_calendar_images', []);
 </div>
 
 <style>
-.cts-badge {
-	display: inline-block;
-	padding: 3px 8px;
-	font-size: 12px;
-	font-weight: 600;
-	border-radius: 3px;
-}
-.cts-badge-success {
-	background: #d4edda;
-	color: #155724;
-}
-.cts-badge-secondary {
-	background: #e2e3e5;
-	color: #383d41;
-}
-.cts-info {
-	background: #f0f0f1;
-	padding: 10px;
-	border-left: 4px solid #72aee6;
-	margin-bottom: 15px;
-}
 .cts-calendar-image-wrapper {
 	display: flex;
 	flex-direction: column;

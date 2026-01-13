@@ -16,6 +16,10 @@
 	background: transparent;
 	margin: 0;
 	padding: 0;
+	/* Emoji Rendering Fix */
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 /* === Header === */
@@ -76,11 +80,16 @@
 	text-decoration: none;
 	cursor: pointer;
 	transition: all 0.15s ease;
+	/* Emoji rendering fix */
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
 }
 
 .cts-tab span {
 	font-size: 16px;
 	line-height: 1;
+	display: inline-flex;
+	align-items: center;
 }
 
 .cts-tab.active {
@@ -114,37 +123,106 @@
 /* === Sub-Tabs === */
 .cts-sub-tabs {
 	display: flex;
-	gap: 4px;
-	padding: 0 0 10px 0;
-	border-bottom: 1px solid #ddd;
+	gap: 8px;
+	padding: 0 0 0 0;
 	margin-bottom: 20px;
+	/* Emoji rendering fix */
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
 }
 
 .cts-sub-tab {
 	display: inline-flex;
 	align-items: center;
+	justify-content: center;
 	gap: 6px;
-	padding: 8px 12px;
-	font-size: 12px;
-	font-weight: 400;
-	border: none;
-	border-bottom: 2px solid transparent;
-	background: transparent;
+	padding: 10px 16px;
+	font-size: 13px;
+	font-weight: 500;
+	border: 1px solid #ddd;
+	border-radius: 4px 4px 0 0;
+	background: #f6f7f7;
 	color: #646970;
 	text-decoration: none;
 	cursor: pointer;
-	transition: all 0.15s ease;
+	transition: all 0.2s ease;
+	border-bottom: 2px solid transparent;
+}
+
+.cts-sub-tab:hover {
+	background: #f0f1f2;
+	color: #1d2327;
 }
 
 .cts-sub-tab.active {
-	border-bottom-color: #2271b1;
+	background: #fff;
+	border-color: #ddd;
+	border-bottom: 2px solid #2271b1;
 	color: #1d2327;
 	font-weight: 600;
 }
 
-.cts-sub-tab:hover:not(.active) {
+/* Sub-Tab Content Container */
+.cts-sub-tabs + .cts-settings,
+.cts-sub-tabs + .cts-debug-subtab-content {
+	background: #fff;
+	border: 1px solid #ddd;
+	border-top: none;
+	border-radius: 0 6px 6px 6px;
+	padding: 20px;
+}
+
+/* === Headings & Text === */
+.cts-settings h1,
+.cts-settings h2,
+.cts-settings h3,
+.cts-settings h4 {
 	color: #1d2327;
-	background: rgba(0,0,0,0.03);
+	font-weight: 600;
+	margin: 12px 0 8px;
+	line-height: 1.4;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.cts-settings h2 {
+	font-size: 18px;
+	margin: 0 0 12px;
+}
+
+.cts-settings h3 {
+	font-size: 15px;
+	margin: 16px 0 10px;
+}
+
+.cts-settings h4 {
+	font-size: 13px;
+	margin: 12px 0 6px;
+}
+
+.cts-settings p,
+.cts-settings .description {
+	color: #646970;
+	font-size: 13px;
+	line-height: 1.6;
+	margin: 0 0 12px;
+}
+
+.cts-settings strong {
+	font-weight: 600;
+	color: #1d2327;
+}
+
+/* Icon standardization for emoji */
+.cts-settings h2::before,
+.cts-settings h3::before,
+.cts-card-header::before {
+	font-size: 1.2em;
+	line-height: 1;
+	text-rendering: optimizeLegibility;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 /* === Content Area === */
@@ -245,6 +323,47 @@
 	border-top: 1px solid #dcdcde;
 	display: flex;
 	justify-content: flex-start;
+}
+
+/* === Info Box === */
+.cts-info {
+	background: #f0f0f1;
+	padding: 12px;
+	border-left: 4px solid #72aee6;
+	margin: 12px 0 15px;
+	border-radius: 2px;
+}
+
+.cts-info p {
+	margin: 0;
+	color: #646970;
+	font-size: 13px;
+	line-height: 1.5;
+}
+
+.cts-info strong {
+	color: #1d2327;
+	font-weight: 600;
+}
+
+/* === Badges === */
+.cts-badge {
+	display: inline-block;
+	padding: 4px 10px;
+	font-size: 12px;
+	font-weight: 600;
+	border-radius: 3px;
+	line-height: 1.4;
+}
+
+.cts-badge-success {
+	background: #d4edda;
+	color: #155724;
+}
+
+.cts-badge-secondary {
+	background: #e2e3e5;
+	color: #383d41;
 }
 
 /* === Status Indicator === */

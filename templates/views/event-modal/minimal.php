@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="cts-modal-content">
 			
 			<!-- Close Button -->
-			<button class="cts-modal-close" id="cts-modal-close" aria-label="<?php esc_attr_e( 'Modal schließen', 'churchtools-suite' ); ?>">
+			<button class="cts-modal-close" id="cts-modal-close" aria-label="Modal schließen">
 				<span aria-hidden="true">×</span>
 			</button>
 			
@@ -36,7 +36,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			
 			<!-- Location -->
 			<div id="cts-modal-location" class="cts-modal-location" style="display: none;">
-				<strong>📍 <?php esc_html_e( 'Ort:', 'churchtools-suite' ); ?></strong>
+				<strong>📍 Ort:</strong>
 				<div id="cts-modal-location-value"></div>
 			</div>
 			

@@ -26,34 +26,6 @@ $auto_sync_enabled = get_option('churchtools_suite_auto_sync_enabled', 0);
 
 <div class="cts-tab-content-inner">
 	
-	<!-- Sync Calendars Card -->
-	<div class="cts-card">
-		<div class="cts-card-header">
-			<h2>🗓️ <?php esc_html_e('Kalender synchronisieren', 'churchtools-suite'); ?></h2>
-		</div>
-		<div class="cts-card-body">
-			<p class="description">
-				<?php esc_html_e('Lädt die Kalenderliste aus ChurchTools und aktualisiert die verfügbaren Kalender in der Datenbank.', 'churchtools-suite'); ?>
-			</p>
-			
-			<?php if ($calendars_last_sync): ?>
-			<p class="cts-info">
-				<strong><?php esc_html_e('Letzte Synchronisation:', 'churchtools-suite'); ?></strong>
-				<?php echo esc_html(get_date_from_gmt($calendars_last_sync, get_option('date_format') . ' ' . get_option('time_format'))); ?>
-			</p>
-			<?php endif; ?>
-			
-			<div class="cts-button-group">
-				<button type="button" id="cts-sync-calendars-btn" class="button button-primary">
-					<span class="dashicons dashicons-update"></span>
-					<?php esc_html_e('Kalender jetzt synchronisieren', 'churchtools-suite'); ?>
-				</button>
-			</div>
-			
-			<div id="cts-sync-calendars-result" style="margin-top: 15px;"></div>
-		</div>
-	</div>
-	
 	<!-- Sync Events Card -->
 	<div class="cts-card" style="margin-top: 20px;">
 		<div class="cts-card-header">
