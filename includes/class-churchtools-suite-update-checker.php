@@ -23,6 +23,19 @@ class ChurchTools_Suite_Update_Checker {
         
         // Hook for after update completion
         add_action( 'upgrader_process_complete', [ __CLASS__, 'after_update' ], 10, 2 );
+        
+        // Force cache refresh on plugins page (v1.0.3.14)
+        add_action( 'load-plugins.php', [ __CLASS__, 'force_cache_refresh' ] );
+    }
+    
+    /**
+     * Force cache refresh when viewing plugins page
+     * Ensures latest version is always shown (v1.0.3.14)
+     */
+    public static function force_cache_refresh(): void {
+        delete_transient( self::TRANSIENT_KEY );
+        delete_site_transient( 'update_plugins' );
+        wp_clean_plugins_cache();
     }
 
     /**
