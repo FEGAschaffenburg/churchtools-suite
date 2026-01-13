@@ -1,8 +1,25 @@
 # ChurchTools Suite
 
-**Aktuelle Version:** 1.0.3.2
+**Aktuelle Version:** 1.0.3.14
 
 Professionelle WordPress-Integration für ChurchTools.
+
+## 🔍 Backend-Demo
+
+**Teste das Plugin, bevor du es installierst!**
+
+Fordere einen kostenlosen Backend-Zugang an und probiere alle Funktionen aus:
+- ✅ ChurchTools-API-Verbindung testen
+- ✅ Kalender synchronisieren & auswählen
+- ✅ Services & Service-Gruppen verwalten
+- ✅ Template-System erkunden
+- ✅ Alle Admin-Einstellungen ausprobieren
+
+👉 **[Jetzt Backend-Demo anfordern](https://plugin.feg-aschaffenburg.de/backend-demo/)**
+
+📧 Du erhältst sofort Zugangsdaten per E-Mail • 🔒 Keine Kreditkarte erforderlich • ⏱️ Demo-Zugang 7 Tage gültig
+
+---
 
 ## Features
 

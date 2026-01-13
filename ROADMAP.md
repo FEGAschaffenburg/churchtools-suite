@@ -1,6 +1,6 @@
 # ChurchTools Suite - Roadmap
 
-> **Aktueller Stand:** v1.0.0.0 (12. Januar 2026) - 🎉 Production Ready  
+> **Aktueller Stand:** v1.0.3.14 (13. Januar 2026) - 🎉 Production Ready  
 > **Nächstes Milestone:** v1.1.0 - Performance & Batch Processing
 
 ---
@@ -11,7 +11,18 @@ ChurchTools Suite ist eine umfassende WordPress-Integration für ChurchTools, di
 
 ---
 
- 
+## 🔍 Backend-Demo
+
+**Neu:** Teste das Plugin, bevor du es installierst!
+
+👉 **[Backend-Demo anfordern](https://plugin.feg-aschaffenburg.de/backend-demo/)**
+
+- ✅ Self-Service Registrierung mit E-Mail-Verifizierung
+- ✅ Automatische WordPress-User-Erstellung mit `cts_manager` Rolle
+- ✅ 7-Tage-Zugang zu allen Backend-Funktionen
+- ✅ Vollständige Dokumentation in `docs/USER-MANAGEMENT-GUIDE.md`
+
+---
 
 ## 🚀 In Arbeit
 
