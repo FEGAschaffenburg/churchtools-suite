@@ -1,5 +1,41 @@
 # ChurchTools Suite - Changelog
 
+## v1.0.3.18 - Elementor Events Widget (14. Januar 2026)
+
+### ✨ Neue Features
+- **Elementor Page Builder Integration** 🎉
+  - Neuer "ChurchTools Events" Widget für Elementor
+  - Pragmatische Shortcode-Wrapper-Architektur (Reuse existing functionality)
+  - 28+ Kontrollparameter mit vollständiger UI
+  - Volle Unterstützung aller bestehenden Shortcode-Features
+
+### 🎨 Widget-Funktionen
+**Content Section:**
+- Ansicht: Liste oder Raster
+- Template: 13 vordefinierte Designs
+- Anzahl Events: 1-100
+- Spalten (Raster): 1-6
+
+**Filter Section:**
+- Kalender-Filter (Multi-Select)
+- Tags-Filter (Multi-Select)
+- Vergangene Events anzeigen
+
+**Display Section:**
+- 8 Toggle-Optionen für verschiedene Event-Informationen
+
+**Style Section:**
+- Theme Standard oder Benutzerdefiniert
+- Custom Colors, Spacing, Border Radius
+
+### 🔧 Technische Details
+- Location: `includes/elementor/class-churchtools-suite-elementor-events-widget.php`
+- Registration: `elementor/widgets/register` Hook
+- Architecture: Shortcode-Wrapper (pragmatisch, wartbar)
+- Vollständig auf Deutsch
+
+---
+
 ## v1.0.3.6 - Modal Event Loading Bugfix (12. Januar 2026)
 
 ### 🐛 Bugfixes
