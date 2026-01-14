@@ -241,6 +241,26 @@ class ChurchTools_Suite_Admin {
 			[ $this, 'display_data_page' ]
 		);
 
+		// Add Disclaimer subpage (separate admin page for legal information)
+		add_submenu_page(
+			'churchtools-suite',
+			__( 'Haftungsausschluss', 'churchtools-suite' ),
+			__( '⚠️ Haftungsausschluss', 'churchtools-suite' ),
+			'manage_churchtools_suite',
+			'churchtools-suite-disclaimer',
+			[ $this, 'display_disclaimer_page' ]
+		);
+
+		// Add Documentation link
+		add_submenu_page(
+			'churchtools-suite',
+			__( 'Dokumentation', 'churchtools-suite' ),
+			__( '📖 Dokumentation', 'churchtools-suite' ),
+			'manage_churchtools_suite',
+			'churchtools-suite-docs',
+			[ $this, 'redirect_to_documentation' ]
+		);
+
 		// Note: Settings, Sync and Debug are handled as tabs in the main admin page
 		// (admin/views/admin-page.php) — no separate submenu entries are added here.
 	}
@@ -283,10 +303,7 @@ class ChurchTools_Suite_Admin {
 	 * Register AJAX handlers
 	 */
 	public function register_ajax_handlers() {
-		// Admin notices
-		add_action( 'admin_notices', [ $this, 'show_disclaimer_notice' ] );
-		add_action( 'wp_ajax_cts_dismiss_disclaimer', [ $this, 'ajax_dismiss_disclaimer' ] );
-		
+		// Main AJAX handlers for Settings, Calendars, Events, Services
 		add_action( 'wp_ajax_cts_test_connection', [ $this, 'ajax_test_connection' ] );
 		add_action( 'wp_ajax_cts_sync_calendars', [ $this, 'ajax_sync_calendars' ] );
 		add_action( 'wp_ajax_cts_save_calendar_selection', [ $this, 'ajax_save_calendar_selection' ] );
@@ -2714,58 +2731,98 @@ class ChurchTools_Suite_Admin {
 	 * 
 	 * @since 1.0.4.0
 	 */
-	public function show_disclaimer_notice() {
-		// Only on ChurchTools Suite admin pages
-		$screen = get_current_screen();
-		if ( ! $screen || strpos( $screen->id, 'churchtools-suite' ) === false ) {
-			return;
-		}
-		
-		// Check if user dismissed notice
-		$user_id = get_current_user_id();
-		if ( get_user_meta( $user_id, 'cts_disclaimer_dismissed', true ) ) {
-			return;
+	/**
+	 * Redirect to documentation
+	 * 
+	 * @since 1.0.3.16
+	 */
+	public function redirect_to_documentation() {
+		wp_redirect( 'https://plugin.feg-aschaffenburg.de/' );
+		exit;
+	}
+
+	/**
+	 * Display Disclaimer admin page
+	 * 
+	 * @since 1.0.3.16
+	 */
+	public function display_disclaimer_page() {
+		if ( ! current_user_can( 'manage_churchtools_suite' ) ) {
+			wp_die( esc_html__( 'Sie haben keine Berechtigung, auf diese Seite zuzugreifen.', 'churchtools-suite' ) );
 		}
 		
 		?>
-		<div class="notice notice-warning is-dismissible cts-disclaimer-notice" data-notice="disclaimer">
-			<h3 style="margin-top: 0.5em;">⚠️ Haftungsausschluss</h3>
-			<p><strong>Wichtig:</strong> Dieses Plugin wird ohne Gewährleistung bereitgestellt ("as is"). Die Nutzung erfolgt auf eigenes Risiko.</p>
-			<p>
-				<strong>Keine Haftung für:</strong> Datenverlust, Systemausfälle, fehlerhafte Darstellung, Sicherheitsprobleme oder Inkompatibilitäten.<br>
-				<strong>Unabhängiges Projekt:</strong> Keine offizielle Verbindung zur ChurchTools GmbH. ChurchTools übernimmt keine Verantwortung.<br>
-				<strong>Eigenverantwortung:</strong> Regelmäßige Backups, Updates testen, Kompatibilität prüfen.
-			</p>
-			<p>
-				<a href="https://plugin.feg-aschaffenburg.de/haftungsausschluss/" target="_blank" style="font-weight: 600;">→ Vollständiger Haftungsausschluss</a> · 
-				<a href="https://github.com/FEGAschaffenburg/churchtools-suite" target="_blank">GitHub (GPL-2.0)</a>
-			</p>
+		<div class="wrap cts-wrap">
+			<div class="cts-header">
+				<h1>⚠️ <?php esc_html_e( 'Haftungsausschluss', 'churchtools-suite' ); ?></h1>
+				<p class="cts-subtitle"><?php esc_html_e( 'Rechtliche Informationen und Disclaimers', 'churchtools-suite' ); ?></p>
+			</div>
+
+			<div style="max-width: 900px; margin-top: 2rem;">
+				<div style="background: #fff; padding: 2rem; border-radius: 4px; border-left: 4px solid #ff6b6b;">
+					<h2><?php esc_html_e( 'Nutzung ohne Gewährleistung', 'churchtools-suite' ); ?></h2>
+					<p><?php esc_html_e( 'Dieses Plugin (ChurchTools Suite) wird ohne jegliche Gewährleistung bereitgestellt ("as is"). Die Nutzung erfolgt auf eigenes Risiko.', 'churchtools-suite' ); ?></p>
+				</div>
+
+				<div style="background: #fff; padding: 2rem; border-radius: 4px; margin-top: 2rem; border-left: 4px solid #ff6b6b;">
+					<h2><?php esc_html_e( 'Keine Haftung für:', 'churchtools-suite' ); ?></h2>
+					<ul style="list-style-type: disc; margin-left: 2rem; line-height: 1.8;">
+						<li><?php esc_html_e( 'Datenverlust oder Datenschäden', 'churchtools-suite' ); ?></li>
+						<li><?php esc_html_e( 'Systemausfälle oder Fehlfunktionen', 'churchtools-suite' ); ?></li>
+						<li><?php esc_html_e( 'Fehlerhafte oder unvollständige Darstellung von Inhalten', 'churchtools-suite' ); ?></li>
+						<li><?php esc_html_e( 'Sicherheitsprobleme oder unbefugter Zugriff', 'churchtools-suite' ); ?></li>
+						<li><?php esc_html_e( 'Inkompatibilität mit anderen Plugins oder Themes', 'churchtools-suite' ); ?></li>
+						<li><?php esc_html_e( 'Unterbrechung oder Verzögerung des Service', 'churchtools-suite' ); ?></li>
+					</ul>
+				</div>
+
+				<div style="background: #fff; padding: 2rem; border-radius: 4px; margin-top: 2rem; border-left: 4px solid #ffa500;">
+					<h2><?php esc_html_e( 'Unabhängiges Projekt', 'churchtools-suite' ); ?></h2>
+					<p>
+						<strong><?php esc_html_e( 'ChurchTools ist eine registrierte Marke der ChurchTools GmbH.', 'churchtools-suite' ); ?></strong><br>
+						<?php esc_html_e( 'Dieses Projekt steht in keiner Verbindung zu oder Unterstützung durch die ChurchTools GmbH. Die ChurchTools GmbH übernimmt keine Verantwortung für dieses Projekt oder dessen Verwendung.', 'churchtools-suite' ); ?>
+					</p>
+				</div>
+
+				<div style="background: #fff; padding: 2rem; border-radius: 4px; margin-top: 2rem; border-left: 4px solid #4CAF50;">
+					<h2><?php esc_html_e( 'Ihre Verantwortung', 'churchtools-suite' ); ?></h2>
+					<ul style="list-style-type: disc; margin-left: 2rem; line-height: 1.8;">
+						<li><?php esc_html_e( 'Führen Sie regelmäßig Backups Ihrer WordPress-Installation durch', 'churchtools-suite' ); ?></li>
+						<li><?php esc_html_e( 'Testen Sie Updates in einer Test-Umgebung, bevor Sie diese auf der Live-Site einspielen', 'churchtools-suite' ); ?></li>
+						<li><?php esc_html_e( 'Überprüfen Sie die Kompatibilität mit anderen aktiven Plugins', 'churchtools-suite' ); ?></li>
+						<li><?php esc_html_e( 'Halten Sie WordPress, PHP und alle Plugins aktuell', 'churchtools-suite' ); ?></li>
+						<li><?php esc_html_e( 'Lesen Sie die Dokumentation und Anleitung gründlich', 'churchtools-suite' ); ?></li>
+						<li><?php esc_html_e( 'Melden Sie Bugs und Probleme auf GitHub, um zur Verbesserung beizutragen', 'churchtools-suite' ); ?></li>
+					</ul>
+				</div>
+
+				<div style="background: #f0f0f0; padding: 2rem; border-radius: 4px; margin-top: 2rem;">
+					<h3><?php esc_html_e( 'Weitere Informationen', 'churchtools-suite' ); ?></h3>
+					<p>
+						<strong><?php esc_html_e( 'Lizenz:', 'churchtools-suite' ); ?></strong> 
+						<a href="https://www.gnu.org/licenses/gpl-2.0.html" target="_blank">GPL v2 or later</a>
+					</p>
+					<p>
+						<strong><?php esc_html_e( 'GitHub Repository:', 'churchtools-suite' ); ?></strong> 
+						<a href="https://github.com/FEGAschaffenburg/churchtools-suite" target="_blank">FEGAschaffenburg/churchtools-suite</a>
+					</p>
+					<p>
+						<strong><?php esc_html_e( 'Dokumentation:', 'churchtools-suite' ); ?></strong> 
+						<a href="https://github.com/FEGAschaffenburg/churchtools-suite/blob/main/README.md" target="_blank">README.md auf GitHub</a>
+					</p>
+					<p>
+						<strong><?php esc_html_e( 'Feedback & Bug-Reports:', 'churchtools-suite' ); ?></strong> 
+						<a href="https://github.com/FEGAschaffenburg/churchtools-suite/issues" target="_blank">GitHub Issues</a>
+					</p>
+				</div>
+
+				<div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #ddd; color: #666; font-size: 0.9em;">
+					<p><?php esc_html_e( 'Stand:', 'churchtools-suite' ); ?> <?php echo esc_html( date( 'd. F Y', strtotime( '2026-01-14' ) ) ); ?> | 
+						<?php esc_html_e( 'Version:', 'churchtools-suite' ); ?> <?php echo esc_html( CHURCHTOOLS_SUITE_VERSION ); ?></p>
+				</div>
+			</div>
 		</div>
-		<script>
-		jQuery(document).ready(function($) {
-			$('.cts-disclaimer-notice').on('click', '.notice-dismiss', function() {
-				$.post(ajaxurl, {
-					action: 'cts_dismiss_disclaimer',
-					nonce: '<?php echo wp_create_nonce( 'cts_dismiss_disclaimer' ); ?>'
-				});
-			});
-		});
-		</script>
 		<?php
-	}
-	
-	/**
-	 * AJAX handler to dismiss disclaimer notice
-	 * 
-	 * @since 1.0.4.0
-	 */
-	public function ajax_dismiss_disclaimer() {
-		check_ajax_referer( 'cts_dismiss_disclaimer', 'nonce' );
-		
-		$user_id = get_current_user_id();
-		update_user_meta( $user_id, 'cts_disclaimer_dismissed', true );
-		
-		wp_send_json_success();
 	}
 	
 }
