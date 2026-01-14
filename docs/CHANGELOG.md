@@ -1,5 +1,22 @@
 # ChurchTools Suite - Changelog
 
+## v1.0.3.19 - Elementor Widget Hotfix (14. Januar 2026)
+
+### 🔧 Bugfixes
+- ✅ **Class Definition Wrapper** - Elementor Widget-Klasse in `if ( ! class_exists() )` umschlossen
+  - Verhindert Fatal Error bei doppelter Klassendefinition
+  - Standard WordPress Plugin-Pattern
+
+- ✅ **Registration Guard** - Widget-Registrierung überprüft `did_action( 'elementor/loaded' )`
+  - Widget wird nur registriert wenn Elementor aktiv ist
+  - Fehlerprävention für inaktive Elementor Installationen
+
+### ✅ Qualitätssicherung
+- PHP Syntax Validation bestanden
+- Alle Dateien geprüft (churchtools-suite.php, classes, widget)
+
+---
+
 ## v1.0.3.18 - Elementor Events Widget (14. Januar 2026)
 
 ### ✨ Neue Features
