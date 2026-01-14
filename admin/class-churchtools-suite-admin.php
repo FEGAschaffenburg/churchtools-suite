@@ -283,6 +283,10 @@ class ChurchTools_Suite_Admin {
 	 * Register AJAX handlers
 	 */
 	public function register_ajax_handlers() {
+		// Admin notices
+		add_action( 'admin_notices', [ $this, 'show_disclaimer_notice' ] );
+		add_action( 'wp_ajax_cts_dismiss_disclaimer', [ $this, 'ajax_dismiss_disclaimer' ] );
+		
 		add_action( 'wp_ajax_cts_test_connection', [ $this, 'ajax_test_connection' ] );
 		add_action( 'wp_ajax_cts_sync_calendars', [ $this, 'ajax_sync_calendars' ] );
 		add_action( 'wp_ajax_cts_save_calendar_selection', [ $this, 'ajax_save_calendar_selection' ] );
@@ -2699,6 +2703,69 @@ class ChurchTools_Suite_Admin {
 		
 		sort( $templates ); // Alphabetical order
 		return $templates;
+	}
+	
+	/**
+	 * Show disclaimer notice in admin dashboard
+	 * 
+	 * Displays an informational notice about software liability and usage terms
+	 * Only shown on ChurchTools Suite admin pages
+	 * Can be dismissed by user
+	 * 
+	 * @since 1.0.4.0
+	 */
+	public function show_disclaimer_notice() {
+		// Only on ChurchTools Suite admin pages
+		$screen = get_current_screen();
+		if ( ! $screen || strpos( $screen->id, 'churchtools-suite' ) === false ) {
+			return;
+		}
+		
+		// Check if user dismissed notice
+		$user_id = get_current_user_id();
+		if ( get_user_meta( $user_id, 'cts_disclaimer_dismissed', true ) ) {
+			return;
+		}
+		
+		?>
+		<div class="notice notice-warning is-dismissible cts-disclaimer-notice" data-notice="disclaimer">
+			<h3 style="margin-top: 0.5em;">⚠️ Haftungsausschluss</h3>
+			<p><strong>Wichtig:</strong> Dieses Plugin wird ohne Gewährleistung bereitgestellt ("as is"). Die Nutzung erfolgt auf eigenes Risiko.</p>
+			<p>
+				<strong>Keine Haftung für:</strong> Datenverlust, Systemausfälle, fehlerhafte Darstellung, Sicherheitsprobleme oder Inkompatibilitäten.<br>
+				<strong>Unabhängiges Projekt:</strong> Keine offizielle Verbindung zur ChurchTools GmbH. ChurchTools übernimmt keine Verantwortung.<br>
+				<strong>Eigenverantwortung:</strong> Regelmäßige Backups, Updates testen, Kompatibilität prüfen.
+			</p>
+			<p>
+				<a href="https://plugin.feg-aschaffenburg.de/haftungsausschluss/" target="_blank" style="font-weight: 600;">→ Vollständiger Haftungsausschluss</a> · 
+				<a href="https://github.com/FEGAschaffenburg/churchtools-suite" target="_blank">GitHub (GPL-2.0)</a>
+			</p>
+		</div>
+		<script>
+		jQuery(document).ready(function($) {
+			$('.cts-disclaimer-notice').on('click', '.notice-dismiss', function() {
+				$.post(ajaxurl, {
+					action: 'cts_dismiss_disclaimer',
+					nonce: '<?php echo wp_create_nonce( 'cts_dismiss_disclaimer' ); ?>'
+				});
+			});
+		});
+		</script>
+		<?php
+	}
+	
+	/**
+	 * AJAX handler to dismiss disclaimer notice
+	 * 
+	 * @since 1.0.4.0
+	 */
+	public function ajax_dismiss_disclaimer() {
+		check_ajax_referer( 'cts_dismiss_disclaimer', 'nonce' );
+		
+		$user_id = get_current_user_id();
+		update_user_meta( $user_id, 'cts_disclaimer_dismissed', true );
+		
+		wp_send_json_success();
 	}
 	
 }

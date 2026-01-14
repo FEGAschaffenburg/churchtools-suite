@@ -4,6 +4,9 @@
 
 Professionelle WordPress-Integration für ChurchTools.
 
+> **⚠️ UNABHÄNGIGES PROJEKT**  
+> ChurchTools ist eine registrierte Marke der **ChurchTools GmbH**. Dieses Projekt steht in keiner Verbindung zu oder Unterstützung durch die ChurchTools GmbH. Weitere Informationen siehe [Haftungsausschluss](https://plugin.feg-aschaffenburg.de/haftungsausschluss/).
+
 ## 🔍 Backend-Demo
 
 **Teste das Plugin, bevor du es installierst!**

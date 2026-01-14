@@ -36,27 +36,15 @@ class ChurchTools_Suite_Roles {
 	/**
 	 * Register custom role and capabilities
 	 * Called on plugin activation
+	 * 
+	 * NOTE: cts_manager role is DEPRECATED as of v1.0.3.15
+	 * Use cts_demo_user from Demo Plugin instead
 	 */
 	public static function register_role(): void {
-		// Add custom role with basic WordPress capabilities
-		add_role(
-			self::ROLE_CTS_MANAGER,
-			__( 'ChurchTools Manager', 'churchtools-suite' ),
-			[
-				'read'              => true,      // Can read/view
-				'manage_options'    => false,     // NOT full WordPress admin
-			]
-		);
+		// DO NOT create cts_manager role anymore
+		// Demo users should use cts_demo_user role from demo-plugin
 		
-		// Add custom capabilities to the role
-		$role = get_role( self::ROLE_CTS_MANAGER );
-		if ( $role ) {
-			foreach ( self::CAPABILITIES as $cap ) {
-				$role->add_cap( $cap );
-			}
-		}
-		
-		// Also add capabilities to Administrator role (for backwards compatibility)
+		// Only add capabilities to Administrator role (for backwards compatibility)
 		$admin_role = get_role( 'administrator' );
 		if ( $admin_role ) {
 			foreach ( self::CAPABILITIES as $cap ) {
@@ -69,7 +57,7 @@ class ChurchTools_Suite_Roles {
 	 * Remove custom role and capabilities on deactivation
 	 */
 	public static function remove_role(): void {
-		// Remove role
+		// Remove deprecated cts_manager role if it exists
 		remove_role( self::ROLE_CTS_MANAGER );
 		
 		// Remove capabilities from Administrator
