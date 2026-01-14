@@ -34,3 +34,7 @@ debug.log
 # Plugin-specific
 scripts/*.zip
 *.php.broken
+
+# SSH Keys & sensitive info (local only)
+SSH-KEYS.md
+.ssh/
