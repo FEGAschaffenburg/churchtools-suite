@@ -71,6 +71,9 @@ class ChurchTools_Suite {
 		
 		// Gutenberg Blocks (v0.5.8.0+)
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-blocks.php';
+		
+		// Elementor Widget (v1.0.3.18+)
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/elementor/class-churchtools-suite-elementor-events-widget.php';
 
 		// Auto updater (checks GitHub releases and installs ZIP)
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-auto-updater.php';
@@ -179,12 +182,29 @@ class ChurchTools_Suite {
 		
 		// Register Gutenberg blocks (v0.5.8.0)
 		add_action( 'init', [ 'ChurchTools_Suite_Blocks', 'register' ] );
+		
+		// Register Elementor widget (v1.0.3.18+)
+		add_action( 'elementor/widgets/register', [ $this, 'register_elementor_widget' ] );
 
 		// Register single event handler (v0.9.3.1)
 		add_action( 'init', [ 'ChurchTools_Suite_Single_Event_Handler', 'init' ] );
 		
 		// Enqueue frontend assets (also loaded in admin via admin_enqueue_scripts)
 		$this->loader->add_action( 'wp_enqueue_scripts', $this, 'enqueue_public_assets' );
+	}
+	
+	/**
+	 * Register Elementor widget
+	 * 
+	 * Called via elementor/widgets/register hook when Elementor is loaded.
+	 * 
+	 * @param \Elementor\Widgets_Manager $widgets_manager Elementor widgets manager
+	 * @since 1.0.3.18
+	 */
+	public function register_elementor_widget( $widgets_manager ) {
+		if ( class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
+			$widgets_manager->register( new ChurchTools_Suite_Elementor_Events_Widget() );
+		}
 	}
 	
 	/**
