@@ -13,7 +13,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class ChurchTools_Suite_Elementor_Events_Widget extends \Elementor\Widget_Base {
+if ( ! class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
+
+	class ChurchTools_Suite_Elementor_Events_Widget extends \Elementor\Widget_Base {
 
 	/**
 	 * Get widget name
@@ -536,4 +538,5 @@ class ChurchTools_Suite_Elementor_Events_Widget extends \Elementor\Widget_Base {
 
 		return $tags_set;
 	}
+}
 }

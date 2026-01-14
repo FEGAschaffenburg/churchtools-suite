@@ -197,12 +197,14 @@ class ChurchTools_Suite {
 	 * Register Elementor widget
 	 * 
 	 * Called via elementor/widgets/register hook when Elementor is loaded.
+	 * Only processes if Elementor is available.
 	 * 
 	 * @param \Elementor\Widgets_Manager $widgets_manager Elementor widgets manager
 	 * @since 1.0.3.18
 	 */
 	public function register_elementor_widget( $widgets_manager ) {
-		if ( class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
+		// Only register if Elementor is active and widget class exists
+		if ( did_action( 'elementor/loaded' ) && class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
 			$widgets_manager->register( new ChurchTools_Suite_Elementor_Events_Widget() );
 		}
 	}
