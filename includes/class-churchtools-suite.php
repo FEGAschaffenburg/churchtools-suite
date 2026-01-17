@@ -297,7 +297,64 @@ class ChurchTools_Suite {
 		add_action( 'churchtools_suite_session_keepalive', [ 'ChurchTools_Suite_Cron', 'session_keepalive' ] );
 		add_action( 'churchtools_suite_auto_sync', [ 'ChurchTools_Suite_Cron', 'auto_sync' ] );
 	}
+
+	/**
+	 * Fallback method to register Elementor widget
+	 * 
+	 * Used when the primary elementor/widgets/register hook doesn't fire.
+	 * Tries to access the Elementor Widgets Manager directly.
+	 * 
+	 * @since 1.0.4.0
+	 */
+	public function register_elementor_widget_fallback() {
+		error_log( '[ChurchTools Suite] Fallback: Versuche direkte Widget-Registrierung' );
+		
+		// Check if Elementor is fully loaded
+		if ( ! did_action( 'elementor/loaded' ) ) {
+			error_log( '[ChurchTools Suite] Fallback: Elementor noch nicht geladen' );
+			return;
+		}
+		
+		// Get the widgets manager
+		try {
+			if ( ! class_exists( '\Elementor\Plugin' ) ) {
+				error_log( '[ChurchTools Suite] Fallback: Elementor\Plugin nicht gefunden' );
+				return;
+			}
+			
+			$elementor = \Elementor\Plugin::instance();
+			if ( ! $elementor || ! isset( $elementor->widgets_manager ) ) {
+				error_log( '[ChurchTools Suite] Fallback: Widgets Manager nicht gefunden' );
+				return;
+			}
+			
+			error_log( '[ChurchTools Suite] Fallback: Widgets Manager gefunden, registriere Widget...' );
+			
+			// Register category first
+			if ( method_exists( $elementor->widgets_manager, 'get_categories' ) ) {
+				error_log( '[ChurchTools Suite] Fallback: Registriere Kategorie...' );
+				if ( ! isset( $elementor->widgets_manager->get_categories()['churchtools-suite'] ) ) {
+					$elementor->widgets_manager->add_category( 'churchtools-suite', [
+						'title' => __( 'ChurchTools Suite', 'churchtools-suite' ),
+						'icon' => 'fa fa-calendar-alt',
+					] );
+					error_log( '[ChurchTools Suite] Fallback: Kategorie registriert' );
+				}
+			}
+			
+			// Register widget
+			if ( class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
+				$elementor->widgets_manager->register( new ChurchTools_Suite_Elementor_Events_Widget() );
+				error_log( '[ChurchTools Suite] Fallback: Widget erfolgreich registriert' );
+			} else {
+				error_log( '[ChurchTools Suite] Fallback: Widget-Klasse nicht gefunden' );
+			}
+		} catch ( \Exception $e ) {
+			error_log( '[ChurchTools Suite] Fallback Fehler: ' . $e->getMessage() );
+		}
+	}
 	
+
 	/**
 	 * Run the loader
 	 */
