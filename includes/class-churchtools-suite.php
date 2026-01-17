@@ -72,10 +72,8 @@ class ChurchTools_Suite {
 		// Gutenberg Blocks (v0.5.8.0+)
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-blocks.php';
 		
-		// Elementor Widget (v1.0.3.18+) - Load early, registration happens via hook
-		if ( function_exists( 'elementor_load_plugin_textdomain' ) || did_action( 'elementor/loaded' ) ) {
-			require_once CHURCHTOOLS_SUITE_PATH . 'includes/elementor/class-churchtools-suite-elementor-events-widget.php';
-		}
+		// Elementor Widget (v1.0.4.0+) - Always load, Elementor handles registration
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/elementor/class-churchtools-suite-elementor-events-widget.php';
 
 		// Auto updater (checks GitHub releases and installs ZIP)
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-auto-updater.php';
@@ -219,14 +217,13 @@ class ChurchTools_Suite {
 	 * Register Elementor widget
 	 * 
 	 * Called via elementor/widgets/register hook when Elementor is loaded.
-	 * Only processes if Elementor is available.
 	 * 
 	 * @param \Elementor\Widgets_Manager $widgets_manager Elementor widgets manager
 	 * @since 1.0.3.18
 	 */
 	public function register_elementor_widget( $widgets_manager ) {
-		// Only register if Elementor is active and widget class exists
-		if ( did_action( 'elementor/loaded' ) && class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
+		// Register if widget class exists (should always exist if Elementor is active)
+		if ( class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
 			$widgets_manager->register( new ChurchTools_Suite_Elementor_Events_Widget() );
 		}
 	}
