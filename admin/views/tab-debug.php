@@ -17,6 +17,7 @@ $subtabs = [
     'uebersicht' => 'Übersicht',
     'manuelle-trigger' => 'Manuelle Trigger',
     'logs' => 'Logs',
+    'reset-cleanup' => 'Reset & Cleanup',
 ];
 ?>
 <div class="cts-debug">
@@ -35,6 +36,9 @@ $subtabs = [
           break;
         case 'logs':
           include __DIR__ . '/debug/subtab-logs.php';
+          break;
+        case 'reset-cleanup':
+          include __DIR__ . '/debug/subtab-reset-cleanup.php';
           break;
         case 'uebersicht':
         default:
