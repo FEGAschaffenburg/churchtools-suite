@@ -266,4 +266,4 @@ class ChurchTools_Suite {
 		return $this->version;
 	}
 }
-}
+
