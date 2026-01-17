@@ -482,6 +482,10 @@ if ( ! class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
 		protected function render() {
 		$settings = $this->get_settings_for_display();
 
+		// Determine selected view based on type
+		$view_type = $settings['view_type'] ?? 'list';
+		$selected_view = null;
+
 			if ( $view_type === 'list' && ! empty( $settings['view_list'] ) ) {
 				$selected_view = $settings['view_list'];
 			} elseif ( $view_type === 'grid' && ! empty( $settings['view_grid'] ) ) {
