@@ -207,7 +207,9 @@ class ChurchTools_Suite {
 	 * @since 1.0.4.0
 	 */
 	public function register_elementor_category( $elements_manager ) {
+		error_log( '[ChurchTools Suite] *** CATEGORY HOOK WURDE AUFGERUFEN ***' );
 		error_log( '[ChurchTools Suite] Registriere Elementor Kategorie...' );
+		error_log( '[ChurchTools Suite] elements_manager Typ: ' . gettype( $elements_manager ) );
 		try {
 			$elements_manager->add_category(
 				'churchtools-suite',
@@ -219,6 +221,7 @@ class ChurchTools_Suite {
 			error_log( '[ChurchTools Suite] Elementor Kategorie erfolgreich registriert' );
 		} catch ( \Exception $e ) {
 			error_log( '[ChurchTools Suite] Fehler bei Kategorie-Registrierung: ' . $e->getMessage() );
+			error_log( '[ChurchTools Suite] Stack Trace: ' . $e->getTraceAsString() );
 		}
 	}
 
@@ -231,16 +234,21 @@ class ChurchTools_Suite {
 	 * @since 1.0.3.18
 	 */
 	public function register_elementor_widget( $widgets_manager ) {
+		error_log( '[ChurchTools Suite] *** WIDGET HOOK WURDE AUFGERUFEN ***' );
 		error_log( '[ChurchTools Suite] Versuche Elementor Widget zu registrieren...' );
 		error_log( '[ChurchTools Suite] Widget-Klasse existiert: ' . ( class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ? 'ja' : 'nein' ) );
+		error_log( '[ChurchTools Suite] widgets_manager Typ: ' . gettype( $widgets_manager ) );
 		
 		// Register if widget class exists (should always exist if Elementor is active)
 		if ( class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
 			try {
-				$widgets_manager->register( new ChurchTools_Suite_Elementor_Events_Widget() );
+				$widget_instance = new ChurchTools_Suite_Elementor_Events_Widget();
+				error_log( '[ChurchTools Suite] Widget-Instance erstellt: ' . get_class( $widget_instance ) );
+				$widgets_manager->register( $widget_instance );
 				error_log( '[ChurchTools Suite] Elementor Widget erfolgreich registriert' );
 			} catch ( \Exception $e ) {
 				error_log( '[ChurchTools Suite] Fehler bei Widget-Registrierung: ' . $e->getMessage() );
+				error_log( '[ChurchTools Suite] Stack Trace: ' . $e->getTraceAsString() );
 			}
 		} else {
 			error_log( '[ChurchTools Suite] FEHLER: Widget-Klasse existiert nicht!' );
