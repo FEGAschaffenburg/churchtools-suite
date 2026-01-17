@@ -1,5 +1,51 @@
 # ChurchTools Suite - Changelog
 
+## v1.0.5.0 - Elementor Integration Fix & System Info (17. Januar 2026)
+
+### 🔧 Bugfixes
+- ✅ **Elementor Integration Load Timing** - Integration wird jetzt über `plugins_loaded` Hook geladen
+  - Fix: `is_plugin_active()` Funktion war im Constructor noch nicht verfügbar
+  - Priority 20 stellt sicher dass Elementor vor unserer Integration lädt
+  - Automatisches Laden von `wp-admin/includes/plugin.php` wenn benötigt
+
+- ✅ **Elementor Widget Registration** - Verbesserte Hook-Registrierung
+  - Kategorie "ChurchTools Suite" wird korrekt registriert
+  - Widget wird über `elementor/widgets/register` Hook registriert
+  - Umfangreiches Debug-Logging für Troubleshooting
+
+### ✨ Neue Features
+- **System Info Dashboard** - Elementor-Status wird im Admin-Dashboard angezeigt
+  - Zeigt ob Elementor aktiv ist (✓ Aktiv / ✗ Inaktiv)
+  - Zeigt installierte Elementor-Version wenn aktiv
+  - Integration im System-Bereich neben WordPress/PHP-Version
+
+### 🏗️ Architektur
+- **Saubere Integration-Klasse** - Neue `ChurchTools_Suite_Elementor_Integration` Klasse
+  - Zentrale Verwaltung aller Elementor-Funktionen
+  - Klare Trennung von Plugin-Core und Elementor-Code
+  - Conditional Loading: Nur laden wenn Elementor aktiv ist
+
+### 📝 Code Quality
+- Umfangreiches Error-Logging für Debugging
+- Try-Catch Blöcke für Widget-Registrierung
+- Klare Fehlerbehandlung bei fehlenden Dependencies
+
+---
+
+## v1.0.4.0 - Calendar Image Picker & API Error Handling (17. Januar 2026)
+
+### 🔧 Bugfixes
+- ✅ **Calendar Image Picker JavaScript Fix** - Try-Catch Block verhindert Fehler
+  - Robuste Fehlerbehandlung wenn Mediathek nicht geladen ist
+  - Console-Logging für besseres Debugging
+
+- ✅ **API Error Messages** - Strukturierte Fehlerausgabe mit Debug-Hints
+  - Zeigt HTTP-Statuscode und Error-Message
+  - Gibt hilfreiche Debugging-Hinweise (z.B. CT-API-Token prüfen)
+  - Verbesserte User Experience bei API-Problemen
+
+---
+
 ## v1.0.3.19 - Elementor Widget Hotfix (14. Januar 2026)
 
 ### 🔧 Bugfixes
