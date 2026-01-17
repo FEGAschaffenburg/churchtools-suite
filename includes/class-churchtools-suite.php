@@ -74,13 +74,17 @@ class ChurchTools_Suite {
 		
 		// Elementor Integration (v1.0.4.0+) - Load on plugins_loaded hook after plugin.php is available
 		add_action( 'plugins_loaded', function() {
+			error_log( '[ChurchTools Suite] plugins_loaded fired - checking Elementor' );
 			if ( ! function_exists( 'is_plugin_active' ) ) {
 				require_once ABSPATH . 'wp-admin/includes/plugin.php';
+				error_log( '[ChurchTools Suite] plugin.php loaded for is_plugin_active()' );
 			}
 			
 			if ( is_plugin_active( 'elementor/elementor.php' ) || did_action( 'elementor/loaded' ) ) {
 				error_log( '[ChurchTools Suite] Loading Elementor Integration' );
-				require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-elementor-integration.php';
+				$error_log_path = CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-elementor-integration.php';
+				error_log( '[ChurchTools Suite] Integration path: ' . $error_log_path . ' exists: ' . ( file_exists( $error_log_path ) ? 'YES' : 'NO' ) );
+				require_once $error_log_path;
 			} else {
 				error_log( '[ChurchTools Suite] Elementor NOT active - skipping integration' );
 			}

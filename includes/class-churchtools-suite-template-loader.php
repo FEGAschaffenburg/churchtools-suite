@@ -21,6 +21,88 @@ class ChurchTools_Suite_Template_Loader {
 	const THEME_TEMPLATE_DIR = 'churchtools-suite';
 	
 	/**
+	 * Prüft, ob ein Template für einen View-Typ existiert
+	 *
+	 * @param string $view_type list|grid|calendar
+	 * @param string $view      Template-Name
+	 * @return bool
+	 */
+	public static function template_exists( string $view_type, string $view ): bool {
+		$base = [
+			'list' => 'views/event-list/',
+			'grid' => 'views/event-grid/',
+			'calendar' => 'views/event-calendar/',
+		];
+
+		if ( ! isset( $base[ $view_type ] ) ) {
+			return false;
+		}
+
+		$tpl = $base[ $view_type ] . $view . '.php';
+		return (bool) self::locate_template( $tpl );
+	}
+
+	/**
+	 * Liefert die verfügbaren View-Typen (mit Labels) basierend auf Templates
+	 *
+	 * @return array[] Array von Options-Objekten: [ [label => '...', value => '...'], ... ]
+	 */
+	public static function get_view_types_options(): array {
+		$types = [
+			[ 'label' => __( 'Liste', 'churchtools-suite' ), 'value' => 'list' ],
+			[ 'label' => __( 'Grid', 'churchtools-suite' ), 'value' => 'grid' ],
+			[ 'label' => __( 'Kalender', 'churchtools-suite' ), 'value' => 'calendar' ],
+		];
+
+		$filtered = [];
+		foreach ( $types as $opt ) {
+			$views = self::get_view_options( $opt['value'] );
+			if ( ! empty( $views ) ) {
+				$filtered[] = $opt;
+			}
+		}
+
+		return $filtered;
+	}
+
+	/**
+	 * Liefert die verfügbaren Views (Templates) für einen Typ als Options-Liste
+	 *
+	 * @param string $view_type list|grid|calendar
+	 * @return array[] Array von Options-Objekten: [ [label => '...', value => '...'], ... ]
+	 */
+	public static function get_view_options( string $view_type ): array {
+		$labels = [
+			'list' => [
+				'classic' => __( 'Klassisch', 'churchtools-suite' ),
+				'classic-with-images' => __( 'Klassisch mit Bildern', 'churchtools-suite' ),
+				'minimal' => __( 'Minimal', 'churchtools-suite' ),
+				'modern' => __( 'Modern', 'churchtools-suite' ),
+			],
+			'grid' => [
+				'simple' => __( 'Einfach', 'churchtools-suite' ),
+				'modern' => __( 'Modern', 'churchtools-suite' ),
+			],
+			'calendar' => [
+				'monthly-simple' => __( 'Monat (Simple)', 'churchtools-suite' ),
+			],
+		];
+
+		if ( ! isset( $labels[ $view_type ] ) ) {
+			return [];
+		}
+
+		$options = [];
+		foreach ( $labels[ $view_type ] as $view => $label ) {
+			if ( self::template_exists( $view_type, $view ) ) {
+				$options[] = [ 'label' => $label, 'value' => $view ];
+			}
+		}
+
+		return $options;
+	}
+
+	/**
 	 * Locate a template file
 	 * 
 	 * Checks in this order:
@@ -255,37 +337,8 @@ class ChurchTools_Suite_Template_Loader {
 	 * @return array Available views
 	 */
 	public static function get_available_views( string $view_type ): array {
-		$views = [];
-		
-		// Scan plugin templates directory
-		$plugin_dir = CHURCHTOOLS_SUITE_PATH . 'templates/' . $view_type;
-		
-		if ( is_dir( $plugin_dir ) ) {
-			$files = scandir( $plugin_dir );
-			
-			foreach ( $files as $file ) {
-				if ( preg_match( '/^(.+)\.php$/', $file, $matches ) ) {
-					$views[] = $matches[1];
-				}
-			}
-		}
-		
-		// Scan theme templates directory
-		$theme_dir = get_stylesheet_directory() . '/' . self::THEME_TEMPLATE_DIR . '/' . $view_type;
-		
-		if ( is_dir( $theme_dir ) ) {
-			$files = scandir( $theme_dir );
-			
-			foreach ( $files as $file ) {
-				if ( preg_match( '/^(.+)\.php$/', $file, $matches ) ) {
-					if ( ! in_array( $matches[1], $views ) ) {
-						$views[] = $matches[1];
-					}
-				}
-			}
-		}
-		
-		return $views;
+		$opts = self::get_view_options( $view_type );
+		return array_map( function( $o ) { return $o['value']; }, $opts );
 	}
 	
 	/**

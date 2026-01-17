@@ -138,6 +138,7 @@ class ChurchTools_Suite_Blocks {
 		// Load repositories
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-repository-base.php';
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-calendars-repository.php';
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-template-loader.php';
 		
 		$calendars_repo = new ChurchTools_Suite_Calendars_Repository();
 		$all_calendars = $calendars_repo->get_all();
@@ -191,10 +192,20 @@ class ChurchTools_Suite_Blocks {
 			return strcmp( $a['label'], $b['label'] );
 		} );
 		
+		// View registry (Single Source of Truth)
+		$view_types = ChurchTools_Suite_Template_Loader::get_view_types_options();
+		$views_map = [
+			'list' => ChurchTools_Suite_Template_Loader::get_view_options( 'list' ),
+			'grid' => ChurchTools_Suite_Template_Loader::get_view_options( 'grid' ),
+			'calendar' => ChurchTools_Suite_Template_Loader::get_view_options( 'calendar' ),
+		];
+
 		// Pass to editor
 		wp_localize_script( 'churchtools-suite-blocks', 'churchtoolsSuiteBlocks', [
 			'calendars' => $calendar_options,
 			'tags' => $tag_options,
+			'viewTypes' => $view_types,
+			'views' => $views_map,
 		] );
 	}
 }

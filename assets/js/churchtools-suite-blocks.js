@@ -18,10 +18,9 @@
 	const ServerSideRender = wp.serverSideRender || wp.components.ServerSideRender;
 	
 	/**
-	 * Available View Types
-	 * Start minimal - activate more views as needed
+	 * Available View Types (from PHP, with fallback)
 	 */
-	const viewTypes = [
+	const viewTypes = (window.churchtoolsSuiteBlocks && churchtoolsSuiteBlocks.viewTypes) || [
 		{ label: __('Liste', 'churchtools-suite'), value: 'list' },
 		{ label: __('Grid', 'churchtools-suite'), value: 'grid' },
 		{ label: __('Kalender', 'churchtools-suite'), value: 'calendar' }
@@ -30,16 +29,16 @@
 	/**
 	 * Available Views per Type
 	 */
-	const views = {
+	const views = (window.churchtoolsSuiteBlocks && churchtoolsSuiteBlocks.views) || {
 		list: [
 			{ label: __('Classic', 'churchtools-suite'), value: 'classic' },
-			{ label: __('Classic mit Bildern', 'churchtools-suite'), value: 'classic-with-images' }, // v0.9.9.35
+			{ label: __('Classic mit Bildern', 'churchtools-suite'), value: 'classic-with-images' },
 			{ label: __('Minimal', 'churchtools-suite'), value: 'minimal' },
 			{ label: __('Modern', 'churchtools-suite'), value: 'modern' }
 		],
 		grid: [
 			{ label: __('Simple', 'churchtools-suite'), value: 'simple' },
-			{ label: __('Modern', 'churchtools-suite'), value: 'modern' } // v0.9.9.66: Modern view mit Background-Images
+			{ label: __('Modern', 'churchtools-suite'), value: 'modern' }
 		],
 		calendar: [
 			{ label: __('Monat (Simple)', 'churchtools-suite'), value: 'monthly-simple' }

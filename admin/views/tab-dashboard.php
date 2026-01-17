@@ -75,6 +75,7 @@ $tables_missing = ( $wpdb->last_error !== '' );
 		</div>
 		<?php endif; ?>
 	</div>
+
 	</div>
 
 	<?php
