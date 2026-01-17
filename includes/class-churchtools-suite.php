@@ -330,10 +330,19 @@ class ChurchTools_Suite {
 			
 			error_log( '[ChurchTools Suite] Fallback: Widgets Manager gefunden, registriere Widget...' );
 			
+			// Ensure our widget class exists - it might not be loaded yet
+			if ( ! class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
+				error_log( '[ChurchTools Suite] Fallback: Widget-Klasse existiert nicht, lade manuell...' );
+				// Manually load the widget class file
+				require_once CHURCHTOOLS_SUITE_PATH . 'includes/elementor/class-churchtools-suite-elementor-events-widget.php';
+				error_log( '[ChurchTools Suite] Fallback: Widget-Klasse manuell geladen' );
+			}
+			
 			// Register category first
 			if ( method_exists( $elementor->widgets_manager, 'get_categories' ) ) {
 				error_log( '[ChurchTools Suite] Fallback: Registriere Kategorie...' );
-				if ( ! isset( $elementor->widgets_manager->get_categories()['churchtools-suite'] ) ) {
+				$categories = $elementor->widgets_manager->get_categories();
+				if ( ! isset( $categories['churchtools-suite'] ) ) {
 					$elementor->widgets_manager->add_category( 'churchtools-suite', [
 						'title' => __( 'ChurchTools Suite', 'churchtools-suite' ),
 						'icon' => 'fa fa-calendar-alt',
@@ -347,10 +356,11 @@ class ChurchTools_Suite {
 				$elementor->widgets_manager->register( new ChurchTools_Suite_Elementor_Events_Widget() );
 				error_log( '[ChurchTools Suite] Fallback: Widget erfolgreich registriert' );
 			} else {
-				error_log( '[ChurchTools Suite] Fallback: Widget-Klasse nicht gefunden' );
+				error_log( '[ChurchTools Suite] Fallback: Widget-Klasse IMMER NOCH nicht gefunden' );
 			}
 		} catch ( \Exception $e ) {
 			error_log( '[ChurchTools Suite] Fallback Fehler: ' . $e->getMessage() );
+			error_log( '[ChurchTools Suite] Stack: ' . $e->getTraceAsString() );
 		}
 	}
 	
