@@ -61,18 +61,6 @@ function run_churchtools_suite() {
 	require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite.php';
 	$plugin = new ChurchTools_Suite();
 	$plugin->run();
-	
-	// Register Elementor hooks with MULTIPLE fallbacks to ensure widget registration
-	error_log( '[ChurchTools Suite] Registriere Elementor-Hooks mit mehreren Fallbacks' );
-	
-	// Primary hooks - try these first
-	add_action( 'elementor/elements/categories_registered', [ $plugin, 'register_elementor_category' ], 5, 1 );
-	add_action( 'elementor/widgets/register', [ $plugin, 'register_elementor_widget' ], 5, 1 );
-	
-	// Fallback hooks - in case the above don't fire
-	add_action( 'elementor_pro/init', [ $plugin, 'register_elementor_widget_fallback' ], 1 );
-	add_action( 'elementor/init', [ $plugin, 'register_elementor_widget_fallback' ], 1 );
-	add_action( 'plugins_loaded', [ $plugin, 'register_elementor_widget_fallback' ], 999 );
 }
 run_churchtools_suite();
 

@@ -15,12 +15,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Only define class if not already defined
 if ( ! class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
-	
-	// Check if Elementor Widget_Base exists, only define our class if it does
-	if ( ! class_exists( '\Elementor\Widget_Base' ) ) {
-		// Elementor not properly loaded, exit gracefully
-		return;
-	}
 
 	class ChurchTools_Suite_Elementor_Events_Widget extends \Elementor\Widget_Base {
 
