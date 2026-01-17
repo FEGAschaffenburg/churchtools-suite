@@ -361,6 +361,51 @@ class ChurchTools_Suite_Admin {
 			wp_send_json_error( [ 'message' => __( 'Keine Berechtigung.', 'churchtools-suite' ) ] );
 			return;
 		}
+		
+		try {
+			// Load CT Client
+			require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-ct-client.php';
+			require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-logger.php';
+			
+			ChurchTools_Suite_Logger::info( 'test_connection', 'Verbindungstest gestartet' );
+			
+			$client = new ChurchTools_Suite_CT_Client();
+			$result = $client->test_connection();
+			
+			if ( $result['success'] ) {
+				ChurchTools_Suite_Logger::info( 'test_connection', 'Verbindungstest erfolgreich', [
+					'user' => $result['user_info'] ?? 'unknown'
+				] );
+				
+				wp_send_json_success( [
+					'message' => $result['message'],
+					'user_info' => $result['user_info'] ?? null
+				] );
+			} else {
+				$error_msg = $result['message'] ?? 'Unbekannter Fehler';
+				ChurchTools_Suite_Logger::error( 'test_connection', 'Verbindungstest fehlgeschlagen', [
+					'message' => $error_msg,
+					'error_code' => $result['error_code'] ?? null,
+					'error_details' => $result['error_details'] ?? null
+				] );
+				
+				wp_send_json_error( [
+					'message' => $error_msg,
+					'error_code' => $result['error_code'] ?? null,
+					'error_details' => $result['error_details'] ?? null
+				] );
+			}
+		} catch ( Exception $e ) {
+			ChurchTools_Suite_Logger::error( 'test_connection', 'Exception beim Verbindungstest', [
+				'exception' => $e->getMessage(),
+				'trace' => $e->getTraceAsString()
+			] );
+			
+			wp_send_json_error( [
+				'message' => __( 'Fehler beim Testen der Verbindung.', 'churchtools-suite' ),
+				'error_details' => $e->getMessage()
+			] );
+		}
 	}
 
 	/**

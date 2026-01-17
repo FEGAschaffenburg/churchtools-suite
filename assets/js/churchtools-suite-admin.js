@@ -229,16 +229,26 @@
 					nonce: churchtoolsSuite.nonce
 				})
 			})
-			.then(response => response.json())
+			.then(response => {
+				// Log HTTP-Status
+				console.log('CT Connection Test HTTP Response:', response.status, response.statusText);
+				if (!response.ok) {
+					throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+				}
+				return response.json();
+			})
 			.then(data => {
+				// Log API-Response
+				console.log('CT Connection Test API Response:', data);
+				
 				if (resultDiv) {
 					resultDiv.style.display = 'block';
 					
 					if (data.success) {
 						let message = data.data?.message || 'Verbindung erfolgreich!';
 						
-						// User-Info anzeigen wenn verf�gbar
-						if (data.data.user_info) {
+						// User-Info anzeigen wenn verfügbar
+						if (data.data?.user_info) {
 							const user = data.data.user_info;
 							message += '<br><br><strong>Eingeloggt als:</strong><br>';
 							if (user.firstName && user.lastName) {
@@ -253,18 +263,32 @@
 							message + 
 							'</p></div>';
 					} else {
+						// Bessere Fehlermeldung mit technischen Details
+						let errorMsg = data.data?.message || 'Verbindung fehlgeschlagen!';
+						let details = '';
+						
+						if (data.data?.error_code) {
+							details += '<br><small style="color: #999;">Fehlercode: ' + data.data.error_code + '</small>';
+						}
+						if (data.data?.error_details) {
+							details += '<br><small style="color: #999;">Details: ' + data.data.error_details + '</small>';
+						}
+						
 						resultDiv.innerHTML = '<div class="cts-notice cts-notice-error"><p>' + 
-							(data.data?.message || 'Verbindung fehlgeschlagen!') + 
+							errorMsg + details + 
 							'</p></div>';
 					}
 				}
 			})
 			.catch(error => {
+				// Log Fetch-Error
+				console.error('CT Connection Test Fetch Error:', error);
 				const errorMsg = error?.message || 'Unbekannter Fehler';
 				if (resultDiv) {
 					resultDiv.style.display = 'block';
-					resultDiv.innerHTML = '<div class="cts-notice cts-notice-error"><p>Fehler: ' + 
-						errorMsg + 
+					resultDiv.innerHTML = '<div class="cts-notice cts-notice-error"><p>' + 
+						'Fehler: ' + errorMsg + 
+						'<br><small style="color: #999;">Siehe Browser-Konsole für Details (F12)</small>' +
 						'</p></div>';
 				}
 			})

@@ -210,23 +210,47 @@ class ChurchTools_Suite_CT_Client {
         $response = wp_remote_get($whoami_url, $args);
         
         if (is_wp_error($response)) {
+            $error_msg = $response->get_error_message();
             return [
                 'success' => false,
-                'message' => 'API-Test fehlgeschlagen: ' . $response->get_error_message()
+                'message' => 'Verbindung zum Server fehlgeschlagen.',
+                'error_code' => 'connection_error',
+                'error_details' => $error_msg
             ];
         }
         
         $status_code = wp_remote_retrieve_response_code($response);
         
-        if ($status_code !== 200) {
+        if ($status_code === 401 || $status_code === 403) {
             return [
                 'success' => false,
-                'message' => 'API-Zugriff fehlgeschlagen (HTTP ' . $status_code . ')'
+                'message' => 'Authentifizierung fehlgeschlagen. Überprüfen Sie API-Key/Passwort.',
+                'error_code' => 'auth_failed',
+                'error_details' => "HTTP $status_code - Ungültige Anmeldedaten"
+            ];
+        }
+        
+        if ($status_code !== 200) {
+            $body = wp_remote_retrieve_body($response);
+            return [
+                'success' => false,
+                'message' => 'ChurchTools API antwortet nicht korrekt.',
+                'error_code' => "http_$status_code",
+                'error_details' => "HTTP $status_code - $body"
             ];
         }
         
         $body = wp_remote_retrieve_body($response);
         $data = json_decode($body, true);
+        
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return [
+                'success' => false,
+                'message' => 'API-Antwort ist kein gültiges JSON.',
+                'error_code' => 'json_error',
+                'error_details' => json_last_error_msg()
+            ];
+        }
         
         // Save user info
         if (!empty($data['data'])) {
@@ -235,7 +259,7 @@ class ChurchTools_Suite_CT_Client {
         
         return [
             'success' => true,
-            'message' => 'Verbindung erfolgreich. API-Zugriff funktioniert.',
+            'message' => 'Verbindung erfolgreich! API-Zugriff funktioniert.',
             'user_info' => $data['data'] ?? []
         ];
     }
