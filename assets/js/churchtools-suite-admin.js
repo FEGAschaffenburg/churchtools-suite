@@ -399,40 +399,70 @@
 			const selectButtons = form.querySelectorAll('.cts-select-calendar-image');
 			const removeButtons = form.querySelectorAll('.cts-remove-calendar-image');
 
-			selectButtons.forEach(button => {
-				button.addEventListener('click', function() {
-					const calendarId = this.getAttribute('data-calendar-id');
-					if (!calendarId) return;
+			if (selectButtons.length === 0 && removeButtons.length === 0) {
+				console.log('Keine Kalender-Bild-Buttons gefunden');
+				return;
+			}
 
-					if (!window.wp || !wp.media) {
+			selectButtons.forEach(button => {
+				button.addEventListener('click', function(e) {
+					e.preventDefault();
+					const calendarId = this.getAttribute('data-calendar-id');
+					console.log('Bild-Picker für Kalender clicked:', calendarId);
+					
+					if (!calendarId) {
+						console.error('Keine Calendar ID auf Button');
+						return;
+					}
+
+					// Prüfe ob wp.media vorhanden ist
+					if (typeof window.wp === 'undefined' || typeof window.wp.media === 'undefined') {
+						console.error('WordPress Media Library nicht verfügbar');
 						alert('Medienbibliothek nicht geladen. Bitte Seite neu laden.');
 						return;
 					}
 
 					if (!mediaFrames[calendarId]) {
-						mediaFrames[calendarId] = wp.media({
-							title: 'Kalenderbild wählen',
-							button: { text: 'Verwenden' },
-							multiple: false
-						});
+						try {
+							mediaFrames[calendarId] = wp.media({
+								title: 'Kalenderbild wählen',
+								button: { text: 'Verwenden' },
+								multiple: false
+							});
 
-						mediaFrames[calendarId].on('select', function() {
-							const attachment = mediaFrames[calendarId].state().get('selection').first().toJSON();
-							const url = (attachment.sizes && (attachment.sizes.thumbnail || attachment.sizes.medium)) ? (attachment.sizes.thumbnail?.url || attachment.sizes.medium?.url) : attachment.url;
-							updateCalendarImage(calendarId, attachment.id, url);
-						});
+							mediaFrames[calendarId].on('select', function() {
+								try {
+									const attachment = mediaFrames[calendarId].state().get('selection').first().toJSON();
+									const url = (attachment.sizes && (attachment.sizes.thumbnail || attachment.sizes.medium)) 
+										? (attachment.sizes.thumbnail?.url || attachment.sizes.medium?.url) 
+										: attachment.url;
+									console.log('Bild ausgewählt:', attachment.id, url);
+									updateCalendarImage(calendarId, attachment.id, url);
+								} catch (err) {
+									console.error('Fehler beim Verarbeiten des ausgewählten Bildes:', err);
+								}
+							});
+						} catch (err) {
+							console.error('Fehler beim Erstellen des Media Frame:', err);
+							alert('Fehler beim Öffnen der Medienbibliothek: ' + err.message);
+							return;
+						}
 					}
 
-					mediaFrames[calendarId].open();
+					try {
+						mediaFrames[calendarId].open();
+					} catch (err) {
+						console.error('Fehler beim Öffnen des Media Frames:', err);
+					}
 				});
 			});
 
 			removeButtons.forEach(button => {
-				const hasImage = button.closest('td') && button.closest('td').querySelector('img');
-				button.style.display = hasImage ? 'inline-block' : 'none';
-				button.addEventListener('click', function() {
+				button.addEventListener('click', function(e) {
+					e.preventDefault();
 					const calendarId = this.getAttribute('data-calendar-id');
 					if (!calendarId) return;
+					console.log('Bild entfernt für Kalender:', calendarId);
 					updateCalendarImage(calendarId, '', '');
 				});
 			});
