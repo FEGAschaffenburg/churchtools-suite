@@ -72,10 +72,19 @@ class ChurchTools_Suite {
 		// Gutenberg Blocks (v0.5.8.0+)
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-blocks.php';
 		
-		// Elementor Integration (v1.0.4.0+) - Only load if Elementor is active
-		if ( is_plugin_active( 'elementor/elementor.php' ) || ( function_exists( 'did_action' ) && did_action( 'elementor/loaded' ) ) ) {
-			require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-elementor-integration.php';
-		}
+		// Elementor Integration (v1.0.4.0+) - Load on plugins_loaded hook after plugin.php is available
+		add_action( 'plugins_loaded', function() {
+			if ( ! function_exists( 'is_plugin_active' ) ) {
+				require_once ABSPATH . 'wp-admin/includes/plugin.php';
+			}
+			
+			if ( is_plugin_active( 'elementor/elementor.php' ) || did_action( 'elementor/loaded' ) ) {
+				error_log( '[ChurchTools Suite] Loading Elementor Integration' );
+				require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-elementor-integration.php';
+			} else {
+				error_log( '[ChurchTools Suite] Elementor NOT active - skipping integration' );
+			}
+		}, 20 ); // Priority 20 to ensure Elementor is loaded first
 
 		// Auto updater (checks GitHub releases and installs ZIP)
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-auto-updater.php';
