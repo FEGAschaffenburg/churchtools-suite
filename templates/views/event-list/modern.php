@@ -38,7 +38,27 @@ $use_calendar_colors = isset( $args['use_calendar_colors'] ) ?
 // Style-Mode unterstützen
 $style_mode = $args['style_mode'] ?? 'theme';
 $custom_styles = '';
-if ( $style_mode === 'custom' ) {
+
+if ( $style_mode === 'plugin' ) {
+	$primary = '#2563eb';
+	$text = '#1e293b';
+	$bg = '#ffffff';
+	$border_radius = 12;
+	$font_size = 15;
+	$padding = 20;
+	$spacing = 20;
+	
+	$custom_styles = sprintf(
+		'--cts-primary-color: %s; --cts-text-color: %s; --cts-bg-color: %s; --cts-border-radius: %dpx; --cts-font-size: %dpx; --cts-padding: %dpx; --cts-spacing: %dpx;',
+		esc_attr( $primary ),
+		esc_attr( $text ),
+		esc_attr( $bg ),
+		absint( $border_radius ),
+		absint( $font_size ),
+		absint( $padding ),
+		absint( $spacing )
+	);
+} elseif ( $style_mode === 'custom' ) {
 	$primary = $args['custom_primary_color'] ?? '#2563eb';
 	$text = $args['custom_text_color'] ?? '#1e293b';
 	$bg = $args['custom_background_color'] ?? '#ffffff';
