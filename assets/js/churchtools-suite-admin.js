@@ -84,13 +84,13 @@
 				if (data.success) {
 					if (result) {
 						result.innerHTML = '<div class="cts-notice cts-notice-success"><p>' + 
-							(data.data.message || 'Synchronisation erfolgreich!') + 
+							(data.data?.message || 'Synchronisation erfolgreich!') + 
 							'</p></div>';
 					}
 				} else {
 					if (result) {
 						result.innerHTML = '<div class="cts-notice cts-notice-error"><p>' + 
-							(data.data.message || 'Synchronisation fehlgeschlagen!') + 
+							(data.data?.message || 'Synchronisation fehlgeschlagen!') + 
 							'</p></div>';
 					}
 				}
@@ -138,7 +138,7 @@
 				if (result) result.style.display = 'block';
 				if (data.success) {
 					if (result) {
-						result.innerHTML = '<div class="cts-notice cts-notice-success" role="status" aria-live="polite"><p>' + (data.data.message || 'Manueller Sync erfolgreich') + '</p></div>';
+						result.innerHTML = '<div class="cts-notice cts-notice-success" role="status" aria-live="polite"><p>' + (data.data?.message || 'Manueller Sync erfolgreich') + '</p></div>';
 					}
 					// If events filter form exists, submit it to refresh the list
 					const eventsForm = document.querySelector('.cts-events form.cts-filter-section');
@@ -235,7 +235,7 @@
 					resultDiv.style.display = 'block';
 					
 					if (data.success) {
-						let message = data.data.message || 'Verbindung erfolgreich!';
+						let message = data.data?.message || 'Verbindung erfolgreich!';
 						
 						// User-Info anzeigen wenn verf�gbar
 						if (data.data.user_info) {
@@ -254,7 +254,7 @@
 							'</p></div>';
 					} else {
 						resultDiv.innerHTML = '<div class="cts-notice cts-notice-error"><p>' + 
-							(data.data.message || 'Verbindung fehlgeschlagen!') + 
+							(data.data?.message || 'Verbindung fehlgeschlagen!') + 
 							'</p></div>';
 					}
 				}
@@ -311,7 +311,7 @@
 					
 					if (data.success) {
 						resultDiv.innerHTML = '<div class="notice notice-success inline"><p>' + 
-							(data.data.message || 'Synchronisation erfolgreich!') + 
+							(data.data?.message || 'Synchronisation erfolgreich!') + 
 							'</p></div>';
 						
 						// Seite neu laden nach erfolgreicher Sync
@@ -320,7 +320,7 @@
 						}, 1500);
 					} else {
 						resultDiv.innerHTML = '<div class="notice notice-error inline"><p>' + 
-							(data.data.message || 'Synchronisation fehlgeschlagen!') + 
+							(data.data?.message || 'Synchronisation fehlgeschlagen!') + 
 							'</p></div>';
 					}
 				}
@@ -492,11 +492,11 @@
 					
 					if (data.success) {
 						resultDiv.innerHTML = '<div class="notice notice-success inline"><p>' + 
-							(data.data.message || 'Auswahl gespeichert!') + 
+							(data.data?.message || 'Auswahl gespeichert!') + 
 							'</p></div>';
 					} else {
 						resultDiv.innerHTML = '<div class="notice notice-error inline"><p>' + 
-							(data.data.message || 'Speichern fehlgeschlagen!') + 
+							(data.data?.message || 'Speichern fehlgeschlagen!') + 
 							'</p></div>';
 					}
 				}
@@ -554,7 +554,7 @@
 					
 					if (data.success) {
 						resultDiv.innerHTML = '<div class="notice notice-success inline"><p>' + 
-							(data.data.message || 'Synchronisation erfolgreich!') + 
+							(data.data?.message || 'Synchronisation erfolgreich!') + 
 							'</p></div>';
 						
 						// Seite neu laden nach erfolgreicher Sync
@@ -563,7 +563,7 @@
 						}, 1500);
 					} else {
 						resultDiv.innerHTML = '<div class="notice notice-error inline"><p>' + 
-							(data.data.message || 'Synchronisation fehlgeschlagen!') + 
+							(data.data?.message || 'Synchronisation fehlgeschlagen!') + 
 							'</p></div>';
 					}
 				}
@@ -687,11 +687,11 @@
 					
 					if (data.success) {
 						resultDiv.innerHTML = '<div class="notice notice-success inline"><p>' + 
-							(data.data.message || 'Auswahl gespeichert!') + 
+							(data.data?.message || 'Auswahl gespeichert!') + 
 							'</p></div>';
 					} else {
 						resultDiv.innerHTML = '<div class="notice notice-error inline"><p>' + 
-							(data.data.message || 'Speichern fehlgeschlagen!') + 
+							(data.data?.message || 'Speichern fehlgeschlagen!') + 
 							'</p></div>';
 					}
 				}
@@ -749,7 +749,7 @@
 					
 					if (data.success) {
 						resultDiv.innerHTML = '<div class="notice notice-success inline"><p>' + 
-							(data.data.message || 'Synchronisation erfolgreich!') + 
+							(data.data?.message || 'Synchronisation erfolgreich!') + 
 							'</p></div>';
 						
 						// Seite neu laden nach erfolgreicher Sync
@@ -758,7 +758,7 @@
 						}, 1500);
 					} else {
 						resultDiv.innerHTML = '<div class="notice notice-error inline"><p>' + 
-							(data.data.message || 'Synchronisation fehlgeschlagen!') + 
+							(data.data?.message || 'Synchronisation fehlgeschlagen!') + 
 							'</p></div>';
 					}
 				}
@@ -882,11 +882,11 @@
 					
 					if (data.success) {
 						resultDiv.innerHTML = '<div class="notice notice-success inline"><p>' + 
-							(data.data.message || 'Auswahl gespeichert!') + 
+							(data.data?.message || 'Auswahl gespeichert!') + 
 							'</p></div>';
 					} else {
 						resultDiv.innerHTML = '<div class="notice notice-error inline"><p>' + 
-							(data.data.message || 'Speichern fehlgeschlagen!') + 
+							(data.data?.message || 'Speichern fehlgeschlagen!') + 
 							'</p></div>';
 					}
 				}
@@ -985,7 +985,7 @@
 					resultDiv.style.display = 'block';
 					
 					if (data.success) {
-						let message = data.data.message || 'Synchronisation erfolgreich!';
+						let message = data.data?.message || 'Synchronisation erfolgreich!';
 						
 						// Show sync type badge (v0.7.1.0)
 						if (data.data.sync_type) {
@@ -1002,7 +1002,7 @@
 						}, 1500);
 					} else {
 						resultDiv.innerHTML = '<div class="notice notice-error inline"><p>' + 
-							(data.data.message || 'Synchronisation fehlgeschlagen!') + 
+							(data.data?.message || 'Synchronisation fehlgeschlagen!') + 
 							'</p></div>';
 					}
 				}
@@ -1058,7 +1058,7 @@
 						
 						if (data.success) {
 							resultDiv.innerHTML = '<div class="cts-notice cts-notice-success"><p>' + 
-								(data.data.message || 'Sync erfolgreich!') + 
+								(data.data?.message || 'Sync erfolgreich!') + 
 								'</p></div>';
 							
 							// Seite neu laden nach erfolgreicher Sync
@@ -1067,7 +1067,7 @@
 							}, 2000);
 						} else {
 							resultDiv.innerHTML = '<div class="cts-notice cts-notice-error"><p>' + 
-								(data.data.message || 'Sync fehlgeschlagen!') + 
+								(data.data?.message || 'Sync fehlgeschlagen!') + 
 								'</p></div>';
 						}
 					}
@@ -1115,11 +1115,11 @@
 						
 						if (data.success) {
 							resultDiv.innerHTML = '<div class="cts-notice cts-notice-success"><p>' + 
-								(data.data.message || 'Keepalive erfolgreich!') + 
+								(data.data?.message || 'Keepalive erfolgreich!') + 
 								'</p></div>';
 						} else {
 							resultDiv.innerHTML = '<div class="cts-notice cts-notice-error"><p>' + 
-								(data.data.message || 'Keepalive fehlgeschlagen!') + 
+								(data.data?.message || 'Keepalive fehlgeschlagen!') + 
 								'</p></div>';
 						}
 					}
@@ -1158,7 +1158,7 @@
 					.then(data => {
 						if (resultDiv) { resultDiv.style.display = 'block'; }
 						if (data.success) {
-							if (resultDiv) resultDiv.innerHTML = '<div class="cts-notice cts-notice-success"><p>' + (data.data.message || 'Update-Pr�fung abgeschlossen') + '</p></div>';
+							if (resultDiv) resultDiv.innerHTML = '<div class="cts-notice cts-notice-success"><p>' + (data.data?.message || 'Update-Pr�fung abgeschlossen') + '</p></div>';
 						} else {
 							if (resultDiv) resultDiv.innerHTML = '<div class="cts-notice cts-notice-error"><p>' + (data.data?.message || 'Update-Pr�fung fehlgeschlagen') + '</p></div>';
 						}
@@ -1508,4 +1508,5 @@
 	}
 
 })();
+
 
