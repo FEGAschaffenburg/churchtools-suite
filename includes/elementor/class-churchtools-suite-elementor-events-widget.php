@@ -60,7 +60,23 @@ if ( ! class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
 			]
 		);
 
-		// View Type (List/Grid)
+		// Event Action (Modal, Page, None)
+		$this->add_control(
+			'event_action',
+			[
+				'label' => __( 'Bei Event-Klick', 'churchtools-suite' ),
+				'type' => \Elementor\Controls_Manager::SELECT,
+				'options' => [
+					'modal' => __( 'Modal öffnen', 'churchtools-suite' ),
+					'page' => __( 'Event-Seite öffnen', 'churchtools-suite' ),
+					'none' => __( 'Nicht anklickbar', 'churchtools-suite' ),
+				],
+				'default' => 'modal',
+				'description' => __( 'Modal = Popup-Fenster, Event-Seite = Eigene Seite mit URL-Parameter', 'churchtools-suite' ),
+			]
+		);
+
+		// View Type (List/Grid/Calendar)
 		$this->add_control(
 			'view_type',
 			[
@@ -69,9 +85,10 @@ if ( ! class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
 				'options' => [
 					'list' => __( 'Liste', 'churchtools-suite' ),
 					'grid' => __( 'Gitter', 'churchtools-suite' ),
+					'calendar' => __( 'Kalender', 'churchtools-suite' ),
 				],
 				'default' => 'list',
-				'description' => __( 'Wähle zwischen Listenansicht und Gitteransicht', 'churchtools-suite' ),
+				'description' => __( 'Wähle zwischen Listenansicht, Gitteransicht und Kalender', 'churchtools-suite' ),
 			]
 		);
 
@@ -84,9 +101,10 @@ if ( ! class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
 				'options' => [
 					// List views
 					'classic' => __( 'Klassisch', 'churchtools-suite' ),
-					'standard' => __( 'Standard', 'churchtools-suite' ),
-					'modern' => __( 'Modern', 'churchtools-suite' ),
+					'classic-with-images' => __( 'Klassisch mit Bildern', 'churchtools-suite' ),
 					'minimal' => __( 'Minimal', 'churchtools-suite' ),
+					'modern' => __( 'Modern', 'churchtools-suite' ),
+					'standard' => __( 'Standard', 'churchtools-suite' ),
 					'toggle' => __( 'Toggle', 'churchtools-suite' ),
 					'with-map' => __( 'Mit Karte', 'churchtools-suite' ),
 					// Grid views
@@ -95,6 +113,8 @@ if ( ! class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
 					'colorful' => __( 'Farbig', 'churchtools-suite' ),
 					'novel' => __( 'Novel', 'churchtools-suite' ),
 					'tile' => __( 'Kachel', 'churchtools-suite' ),
+					// Calendar views
+					'monthly-simple' => __( 'Monat (Simple)', 'churchtools-suite' ),
 				],
 				'default' => 'classic',
 			]
@@ -109,6 +129,9 @@ if ( ! class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
 				'default' => 5,
 				'min' => 1,
 				'max' => 100,
+				'condition' => [
+					'view_type!' => 'calendar',
+				],
 			]
 		);
 
@@ -265,6 +288,20 @@ if ( ! class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
 				'label_on' => __( 'Ja', 'churchtools-suite' ),
 				'label_off' => __( 'Nein', 'churchtools-suite' ),
 				'default' => 'yes',
+			]
+		);
+
+		$this->add_control(
+			'show_month_separator',
+			[
+				'label' => __( 'Monatstrenner', 'churchtools-suite' ),
+				'type' => \Elementor\Controls_Manager::SWITCHER,
+				'label_on' => __( 'Ja', 'churchtools-suite' ),
+				'label_off' => __( 'Nein', 'churchtools-suite' ),
+				'default' => 'yes',
+				'condition' => [
+					'view_type' => 'list',
+				],
 			]
 		);
 
@@ -427,7 +464,6 @@ if ( ! class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
 		// Build shortcode attributes
 		$atts = [
 			'view' => $settings['view'],
-			'limit' => $settings['limit'],
 			'show_event_description' => $settings['show_event_description'] ? '1' : '0',
 			'show_appointment_description' => $settings['show_appointment_description'] ? '1' : '0',
 			'show_location' => $settings['show_location'] ? '1' : '0',
@@ -437,6 +473,8 @@ if ( ! class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
 			'show_calendar_name' => $settings['show_calendar_name'] ? '1' : '0',
 			'show_services' => $settings['show_services'] ? '1' : '0',
 			'show_past_events' => $settings['show_past_events'] ? '1' : '0',
+			'show_month_separator' => isset( $settings['show_month_separator'] ) ? ( $settings['show_month_separator'] ? '1' : '0' ) : '1',
+			'event_action' => isset( $settings['event_action'] ) ? $settings['event_action'] : 'modal',
 			'style_mode' => $settings['style_mode'],
 			'use_calendar_colors' => $settings['use_calendar_colors'] ? '1' : '0',
 			'custom_primary_color' => $settings['custom_primary_color'],
@@ -447,6 +485,11 @@ if ( ! class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
 			'custom_padding' => $settings['custom_padding'],
 			'custom_spacing' => $settings['custom_spacing'],
 		];
+
+		// Add limit for non-calendar views
+		if ( $settings['view_type'] !== 'calendar' ) {
+			$atts['limit'] = $settings['limit'];
+		}
 
 		// Add calendars filter if specified
 		if ( ! empty( $settings['calendars'] ) ) {
@@ -459,11 +502,13 @@ if ( ! class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
 		}
 
 		// Determine shortcode tag based on view type
-		$shortcode_tag = ( $settings['view_type'] === 'grid' ) ? 'cts_grid' : 'cts_list';
+		$shortcode_tag = 'cts_list'; // Default
 
-		// Add columns for grid
 		if ( $settings['view_type'] === 'grid' ) {
+			$shortcode_tag = 'cts_grid';
 			$atts['columns'] = $settings['columns'];
+		} elseif ( $settings['view_type'] === 'calendar' ) {
+			$shortcode_tag = 'cts_calendar';
 		}
 
 		// Execute shortcode
