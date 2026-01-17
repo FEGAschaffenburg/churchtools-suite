@@ -13,8 +13,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Only define class if Elementor is active and class not already defined
-if ( ! class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) && class_exists( '\Elementor\Widget_Base' ) ) {
+// Only define class if not already defined
+// Note: Elementor\Widget_Base check removed - let PHP handle the error if Elementor is not loaded
+if ( ! class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
 
 	class ChurchTools_Suite_Elementor_Events_Widget extends \Elementor\Widget_Base {
 
