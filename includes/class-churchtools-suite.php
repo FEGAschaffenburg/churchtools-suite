@@ -238,7 +238,6 @@ class ChurchTools_Suite {
 		add_action( 'churchtools_suite_session_keepalive', [ 'ChurchTools_Suite_Cron', 'session_keepalive' ] );
 		add_action( 'churchtools_suite_auto_sync', [ 'ChurchTools_Suite_Cron', 'auto_sync' ] );
 	}
-}
 
 	/**
 	 * Run the loader
@@ -266,4 +265,5 @@ class ChurchTools_Suite {
 	public function get_version(): string {
 		return $this->version;
 	}
+}
 }
