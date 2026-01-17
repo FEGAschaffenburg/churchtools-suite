@@ -61,6 +61,12 @@ function run_churchtools_suite() {
 	require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite.php';
 	$plugin = new ChurchTools_Suite();
 	$plugin->run();
+	
+	// Register Elementor hooks IMMEDIATELY after plugin is loaded
+	// This ensures we register before Elementor's own initialization happens
+	error_log( '[ChurchTools Suite] plugins_loaded: Registriere Elementor-Hooks in Main-Plugin-Datei' );
+	add_action( 'elementor/elements/categories_registered', [ $plugin, 'register_elementor_category' ], 10, 1 );
+	add_action( 'elementor/widgets/register', [ $plugin, 'register_elementor_widget' ], 10, 1 );
 }
 run_churchtools_suite();
 

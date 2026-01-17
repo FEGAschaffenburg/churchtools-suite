@@ -183,12 +183,8 @@ class ChurchTools_Suite {
 		// Register Gutenberg blocks (v0.5.8.0)
 		add_action( 'init', [ 'ChurchTools_Suite_Blocks', 'register' ] );
 		
-		// Register Elementor category and widget (v1.0.4.0+)
-		// Register directly on the hooks - this runs during plugin initialization
-		// The hooks will only fire if Elementor is active
-		error_log( '[ChurchTools Suite] Registriere Elementor-Hooks direkt in define_public_hooks' );
-		add_action( 'elementor/elements/categories_registered', [ $this, 'register_elementor_category' ], 10, 1 );
-		add_action( 'elementor/widgets/register', [ $this, 'register_elementor_widget' ], 10, 1 );
+		// NOTE: Elementor category and widget hooks are registered in main plugin file
+		// (churchtools-suite.php) right after plugin initialization to ensure early registration
 
 		// Register single event handler (v0.9.3.1)
 		add_action( 'init', [ 'ChurchTools_Suite_Single_Event_Handler', 'init' ] );
