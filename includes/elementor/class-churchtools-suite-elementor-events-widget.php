@@ -13,7 +13,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
+// Only define class if Elementor is active and class not already defined
+if ( ! class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) && class_exists( '\Elementor\Widget_Base' ) ) {
 
 	class ChurchTools_Suite_Elementor_Events_Widget extends \Elementor\Widget_Base {
 
