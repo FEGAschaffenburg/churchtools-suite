@@ -204,13 +204,19 @@ class ChurchTools_Suite {
 	 * @since 1.0.4.0
 	 */
 	public function register_elementor_category( $elements_manager ) {
-		$elements_manager->add_category(
-			'churchtools-suite',
-			[
-				'title' => __( 'ChurchTools Suite', 'churchtools-suite' ),
-				'icon' => 'fa fa-calendar-alt',
-			]
-		);
+		error_log( '[ChurchTools Suite] Registriere Elementor Kategorie...' );
+		try {
+			$elements_manager->add_category(
+				'churchtools-suite',
+				[
+					'title' => __( 'ChurchTools Suite', 'churchtools-suite' ),
+					'icon' => 'fa fa-calendar-alt',
+				]
+			);
+			error_log( '[ChurchTools Suite] Elementor Kategorie erfolgreich registriert' );
+		} catch ( \Exception $e ) {
+			error_log( '[ChurchTools Suite] Fehler bei Kategorie-Registrierung: ' . $e->getMessage() );
+		}
 	}
 
 	/**
@@ -222,9 +228,19 @@ class ChurchTools_Suite {
 	 * @since 1.0.3.18
 	 */
 	public function register_elementor_widget( $widgets_manager ) {
+		error_log( '[ChurchTools Suite] Versuche Elementor Widget zu registrieren...' );
+		error_log( '[ChurchTools Suite] Widget-Klasse existiert: ' . ( class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ? 'ja' : 'nein' ) );
+		
 		// Register if widget class exists (should always exist if Elementor is active)
 		if ( class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
-			$widgets_manager->register( new ChurchTools_Suite_Elementor_Events_Widget() );
+			try {
+				$widgets_manager->register( new ChurchTools_Suite_Elementor_Events_Widget() );
+				error_log( '[ChurchTools Suite] Elementor Widget erfolgreich registriert' );
+			} catch ( \Exception $e ) {
+				error_log( '[ChurchTools Suite] Fehler bei Widget-Registrierung: ' . $e->getMessage() );
+			}
+		} else {
+			error_log( '[ChurchTools Suite] FEHLER: Widget-Klasse existiert nicht!' );
 		}
 	}
 	
