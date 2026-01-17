@@ -72,8 +72,8 @@ class ChurchTools_Suite {
 		// Gutenberg Blocks (v0.5.8.0+)
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-blocks.php';
 		
-		// Elementor Widget (v1.0.3.18+) - Only load if Elementor is active
-		if ( did_action( 'elementor/loaded' ) || function_exists( 'elementor_load_plugin_textdomain' ) ) {
+		// Elementor Widget (v1.0.3.18+) - Load early, registration happens via hook
+		if ( function_exists( 'elementor_load_plugin_textdomain' ) || did_action( 'elementor/loaded' ) ) {
 			require_once CHURCHTOOLS_SUITE_PATH . 'includes/elementor/class-churchtools-suite-elementor-events-widget.php';
 		}
 
@@ -185,7 +185,8 @@ class ChurchTools_Suite {
 		// Register Gutenberg blocks (v0.5.8.0)
 		add_action( 'init', [ 'ChurchTools_Suite_Blocks', 'register' ] );
 		
-		// Register Elementor widget (v1.0.3.18+)
+		// Register Elementor category and widget (v1.0.3.18+)
+		add_action( 'elementor/elements/categories_registered', [ $this, 'register_elementor_category' ] );
 		add_action( 'elementor/widgets/register', [ $this, 'register_elementor_widget' ] );
 
 		// Register single event handler (v0.9.3.1)
@@ -195,6 +196,25 @@ class ChurchTools_Suite {
 		$this->loader->add_action( 'wp_enqueue_scripts', $this, 'enqueue_public_assets' );
 	}
 	
+	/**
+	 * Register Elementor widget category
+	 * 
+	 * Called via elementor/elements/categories_registered hook
+	 * Registers the ChurchTools Suite category for the widget
+	 * 
+	 * @param \Elementor\Elements_Manager $elements_manager Elementor elements manager
+	 * @since 1.0.4.0
+	 */
+	public function register_elementor_category( $elements_manager ) {
+		$elements_manager->add_category(
+			'churchtools-suite',
+			[
+				'title' => __( 'ChurchTools Suite', 'churchtools-suite' ),
+				'icon' => 'fa fa-calendar-alt',
+			]
+		);
+	}
+
 	/**
 	 * Register Elementor widget
 	 * 
