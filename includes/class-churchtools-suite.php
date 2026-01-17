@@ -72,9 +72,6 @@ class ChurchTools_Suite {
 		// Gutenberg Blocks (v0.5.8.0+)
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-blocks.php';
 		
-		// Admin Dashboard (v1.0.4.0+) - Show Elementor status
-		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-admin-dashboard.php';
-		
 		// Elementor Integration (v1.0.4.0+) - Only load if Elementor is active
 		if ( is_plugin_active( 'elementor/elementor.php' ) || ( function_exists( 'did_action' ) && did_action( 'elementor/loaded' ) ) ) {
 			require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-elementor-integration.php';

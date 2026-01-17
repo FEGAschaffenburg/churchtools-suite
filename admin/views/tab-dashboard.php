@@ -398,6 +398,23 @@ $tables_missing = ( $wpdb->last_error !== '' );
 					<td><?php esc_html_e( 'PHP-Version', 'churchtools-suite' ); ?></td>
 					<td><strong><?php echo esc_html( PHP_VERSION ); ?></strong></td>
 				</tr>
+				<tr>
+					<td><?php esc_html_e( 'Elementor', 'churchtools-suite' ); ?></td>
+					<td>
+						<strong>
+							<?php
+								if ( is_plugin_active( 'elementor/elementor.php' ) ) {
+									echo '<span style="color: green;">✓ Aktiv</span>';
+									if ( function_exists( 'elementor_get_version' ) ) {
+										echo ' (v' . esc_html( elementor_get_version() ) . ')';
+									}
+								} else {
+									echo '<span style="color: orange;">✗ Inaktiv</span>';
+								}
+							?>
+						</strong>
+					</td>
+				</tr>
 			</table>
 		</div>
 		<div class="cts-card-footer">
