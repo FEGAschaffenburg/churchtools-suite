@@ -183,34 +183,18 @@ class ChurchTools_Suite {
 		// Register Gutenberg blocks (v0.5.8.0)
 		add_action( 'init', [ 'ChurchTools_Suite_Blocks', 'register' ] );
 		
-		// Register Elementor category and widget (v1.0.3.18+)
-		// Use wp_loaded to ensure Elementor is fully initialized before hooking
-		add_action( 'wp_loaded', [ $this, 'register_elementor_hooks' ] );
+		// Register Elementor category and widget (v1.0.4.0+)
+		// Register directly on the hooks - this runs during plugin initialization
+		// The hooks will only fire if Elementor is active
+		error_log( '[ChurchTools Suite] Registriere Elementor-Hooks direkt in define_public_hooks' );
+		add_action( 'elementor/elements/categories_registered', [ $this, 'register_elementor_category' ], 10, 1 );
+		add_action( 'elementor/widgets/register', [ $this, 'register_elementor_widget' ], 10, 1 );
 
 		// Register single event handler (v0.9.3.1)
 		add_action( 'init', [ 'ChurchTools_Suite_Single_Event_Handler', 'init' ] );
 		
 		// Enqueue frontend assets (also loaded in admin via admin_enqueue_scripts)
 		$this->loader->add_action( 'wp_enqueue_scripts', $this, 'enqueue_public_assets' );
-	}
-
-	/**
-	 * Register Elementor hooks after wp_loaded
-	 * 
-	 * This ensures Elementor is fully initialized before we register our hooks.
-	 * Called on wp_loaded action, which fires after all plugins are loaded.
-	 * 
-	 * @since 1.0.4.0
-	 */
-	public function register_elementor_hooks(): void {
-		// Only register if Elementor is active
-		if ( did_action( 'elementor/loaded' ) ) {
-			error_log( '[ChurchTools Suite] Elementor geladen, registriere Hooks...' );
-			add_action( 'elementor/elements/categories_registered', [ $this, 'register_elementor_category' ] );
-			add_action( 'elementor/widgets/register', [ $this, 'register_elementor_widget' ] );
-		} else {
-			error_log( '[ChurchTools Suite] Elementor nicht geladen' );
-		}
 	}
 	
 	/**
