@@ -273,6 +273,12 @@ class ChurchTools_Suite_Shortcodes {
 			'show_past_events' => false,
 			'event_action' => 'modal',
 		], $atts, 'churchtools_events' );
+
+		// Single Event Routing: If URL contains event_id, render single view uniformly
+		$event_id = isset( $_GET['event_id'] ) ? absint( $_GET['event_id'] ) : 0;
+		if ( $event_id > 0 ) {
+			return do_shortcode( '[cts_event id="' . $event_id . '"]' );
+		}
 		
 		// Route to appropriate view handler based on view name prefix
 		$view = strtolower( $atts['view'] );
