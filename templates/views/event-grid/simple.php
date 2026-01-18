@@ -103,8 +103,16 @@ if ( ! empty( $args['class'] ) ) {
 		<p class="cts-no-events"><?php esc_html_e( 'Keine Events gefunden.', 'churchtools-suite' ); ?></p>
 	<?php else : ?>
 		
-		<div class="cts-grid-container" style="--grid-columns: <?php echo esc_attr( $columns ); ?>;">
-			<?php foreach ( $events as $event ) : 
+		<div class="cts-grid-rows">
+			<?php 
+			$events_count = is_array( $events ) ? count( $events ) : 0;
+			$columns_effective = max( 1, min( $columns, $events_count ) );
+			$chunks = array_chunk( $events, max( 1, $columns ) );
+			foreach ( $chunks as $chunk ) : 
+				$row_cols = min( $columns_effective, count( $chunk ) );
+			?>
+			<div class="cts-grid-row" style="--row-columns: <?php echo esc_attr( $row_cols ); ?>;">
+			<?php foreach ( $chunk as $event ) : 
 				// WP-timezone aware start timestamp
 				$start_ts = current_time( 'timestamp' );
 				if ( ! empty( $event['start_datetime'] ) ) {
@@ -266,6 +274,8 @@ if ( ! empty( $args['class'] ) ) {
 						</div>
 					<?php endif; ?>
 				</div>
+			<?php endforeach; ?>
+			</div>
 			<?php endforeach; ?>
 		</div>
 		

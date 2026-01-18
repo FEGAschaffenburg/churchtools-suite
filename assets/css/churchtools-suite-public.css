@@ -2373,6 +2373,19 @@
 	padding: 0;
 }
 
+/* Grid Rows (dynamic last row columns) */
+.cts-grid-rows {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+.cts-grid-row {
+	display: grid;
+	grid-template-columns: repeat(var(--row-columns, 3), 1fr);
+	gap: 24px;
+}
+
 /* Grid Card */
 .cts-grid-card {
 	background: var(--cts-bg-color, #ffffff);

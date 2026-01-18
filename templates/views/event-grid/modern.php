@@ -115,8 +115,17 @@ require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-image-he
 		<p class="cts-no-events"><?php esc_html_e( 'Keine Events gefunden.', 'churchtools-suite' ); ?></p>
 	<?php else : ?>
 		
-		<div class="cts-grid-container" style="--grid-columns: <?php echo esc_attr( $columns ); ?>;">
-			<?php foreach ( $events as $event ) : 
+		<div class="cts-grid-rows">
+			<?php 
+			$events_arr = is_array( $events ) ? $events : [];
+			$events_count = count( $events_arr );
+			$columns_effective = max( 1, min( $columns, $events_count ) );
+			$chunks = array_chunk( $events_arr, max( 1, $columns ) );
+			foreach ( $chunks as $chunk ) : 
+				$row_cols = min( $columns_effective, count( $chunk ) );
+			?>
+			<div class="cts-grid-row" style="--row-columns: <?php echo esc_attr( $row_cols ); ?>;">
+			<?php foreach ( $chunk as $event ) : 
 				// Defensive: Event kann Array oder Object sein
 				$event_arr = is_array( $event ) ? $event : (array) $event;
 				// WP-timezone aware start timestamp
@@ -318,6 +327,8 @@ require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-image-he
 						
 					</div>
 				</div>
+			<?php endforeach; ?>
+			</div>
 			<?php endforeach; ?>
 		</div>
 		
