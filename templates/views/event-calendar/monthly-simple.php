@@ -75,14 +75,17 @@ $use_calendar_colors = isset( $args['use_calendar_colors'] ) ?
 // Style-Mode unterstützen
 $style_mode = $args['style_mode'] ?? 'theme';
 $custom_styles = '';
-if ( $style_mode === 'custom' ) {
+if ( $style_mode === 'plugin' ) {
+	// Default plugin colors
+	$custom_styles = '--cts-primary-color: #2563eb; --cts-text-color: #1e293b; --cts-bg-color: #ffffff; --cts-border-radius: 6px; --cts-font-size: 14px; --cts-padding: 12px; --cts-spacing: 8px;';
+} elseif ( $style_mode === 'custom' ) {
 	$primary = $args['custom_primary_color'] ?? '#2563eb';
 	$text = $args['custom_text_color'] ?? '#1e293b';
 	$bg = $args['custom_background_color'] ?? '#ffffff';
 	$border_radius = $args['custom_border_radius'] ?? 6;
 	$font_size = $args['custom_font_size'] ?? 14;
-	$padding = $args['custom_padding'] ?? 8;
-	$spacing = $args['custom_spacing'] ?? 0;
+	$padding = $args['custom_padding'] ?? 12;
+	$spacing = $args['custom_spacing'] ?? 8;
 	
 	$custom_styles = sprintf(
 		'--cts-primary-color: %s; --cts-text-color: %s; --cts-bg-color: %s; --cts-border-radius: %dpx; --cts-font-size: %dpx; --cts-padding: %dpx; --cts-spacing: %dpx;',

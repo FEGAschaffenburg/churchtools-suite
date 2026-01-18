@@ -33,7 +33,9 @@ $columns = max( 1, min( 4, $columns ) ); // 1-4 columns
 // Style mode and custom colors
 $style_mode = $args['style_mode'] ?? 'theme';
 $custom_styles = '';
-if ( $style_mode === 'custom' ) {
+if ( $style_mode === 'plugin' ) {
+	$custom_styles = '--cts-primary-color: #2563eb;';
+} elseif ( $style_mode === 'custom' ) {
 	$primary = $args['custom_primary_color'] ?? '#2563eb';
 	$custom_styles = sprintf(
 		'--cts-primary-color: %s;',
