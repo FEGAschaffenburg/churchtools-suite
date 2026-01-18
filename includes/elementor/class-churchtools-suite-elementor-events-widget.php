@@ -486,88 +486,84 @@ if ( ! class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
 		$view_type = $settings['view_type'] ?? 'list';
 		$selected_view = null;
 
-			if ( $view_type === 'list' && ! empty( $settings['view_list'] ) ) {
-				$selected_view = $settings['view_list'];
-			} elseif ( $view_type === 'grid' && ! empty( $settings['view_grid'] ) ) {
-				$selected_view = $settings['view_grid'];
-			} elseif ( $view_type === 'calendar' && ! empty( $settings['view_calendar'] ) ) {
-				$selected_view = $settings['view_calendar'];
-			} else {
-				// Fallback für alte Widgets
-				$selected_view = $settings['view'] ?? 'classic';
-			}
-
-			// Build shortcode attributes
-			$atts = [
-				'view' => $selected_view,
-				'show_event_description' => ( isset($settings['show_event_description']) && $settings['show_event_description'] === 'yes' ) ? '1' : '0',
-				'show_appointment_description' => ( isset($settings['show_appointment_description']) && $settings['show_appointment_description'] === 'yes' ) ? '1' : '0',
-				'show_location' => ( isset($settings['show_location']) && $settings['show_location'] === 'yes' ) ? '1' : '0',
-				'show_time' => ( isset($settings['show_time']) && $settings['show_time'] === 'yes' ) ? '1' : '0',
-				'show_tags' => ( isset($settings['show_tags']) && $settings['show_tags'] === 'yes' ) ? '1' : '0',
-				'show_images' => ( isset($settings['show_images']) && $settings['show_images'] === 'yes' ) ? '1' : '0',
-				'show_calendar_name' => ( isset($settings['show_calendar_name']) && $settings['show_calendar_name'] === 'yes' ) ? '1' : '0',
-				'show_services' => ( isset($settings['show_services']) && $settings['show_services'] === 'yes' ) ? '1' : '0',
-				'show_past_events' => ( isset($settings['show_past_events']) && $settings['show_past_events'] === 'yes' ) ? '1' : '0',
-				'show_month_separator' => ( isset($settings['show_month_separator']) && $settings['show_month_separator'] === 'yes' ) ? '1' : '0',
-				'event_action' => isset( $settings['event_action'] ) ? $settings['event_action'] : 'modal',
-				'style_mode' => $settings['style_mode'] ?? 'theme',
-				'use_calendar_colors' => ( isset($settings['use_calendar_colors']) && $settings['use_calendar_colors'] === 'yes' ) ? '1' : '0',
-				'custom_primary_color' => $settings['custom_primary_color'] ?? '#2563eb',
-				'custom_text_color' => $settings['custom_text_color'] ?? '#1e293b',
-				'custom_background_color' => $settings['custom_background_color'] ?? '#ffffff',
-				'custom_border_radius' => $settings['custom_border_radius'] ?? 6,
-				'custom_font_size' => $settings['custom_font_size'] ?? 14,
-				'custom_padding' => $settings['custom_padding'] ?? 12,
-				'custom_spacing' => $settings['custom_spacing'] ?? 8,
-			];
-
-			// Add limit for non-calendar views
-			if ( $view_type !== 'calendar' ) {
-				$atts['limit'] = $settings['limit'] ?? 5;
-			}
-
-			// Add calendars filter if specified
-			if ( ! empty( $settings['calendars'] ) ) {
-				$atts['calendars'] = implode( ',', $settings['calendars'] );
-			}
-
-			// Add tags filter if specified
-			if ( ! empty( $settings['tags'] ) ) {
-				$atts['tags'] = implode( ',', $settings['tags'] );
-			}
-
-			// Determine shortcode tag based on view type
-			$shortcode_tag = 'cts_list'; // Default
-
-			if ( $view_type === 'grid' ) {
-				$shortcode_tag = 'cts_grid';
-				$atts['columns'] = $settings['columns'] ?? 3;
-			} elseif ( $view_type === 'calendar' ) {
-				$shortcode_tag = 'cts_calendar';
-			}
-
-			// Execute shortcode safely
-			try {
-				echo do_shortcode( '[' . $shortcode_tag . ' ' . $this->build_shortcode_atts( $atts ) . ']' );
-			} catch ( \Throwable $e ) {
-				echo '<div style="padding: 10px; background: #f5f5f5; border: 1px solid #ddd;">' . esc_html__( 'Render-Fehler: ', 'churchtools-suite' ) . esc_html( $e->getMessage() ) . '</div>';
-			}
+		if ( $view_type === 'list' && ! empty( $settings['view_list'] ) ) {
+			$selected_view = $settings['view_list'];
+		} elseif ( $view_type === 'grid' && ! empty( $settings['view_grid'] ) ) {
+			$selected_view = $settings['view_grid'];
+		} elseif ( $view_type === 'calendar' && ! empty( $settings['view_calendar'] ) ) {
+			$selected_view = $settings['view_calendar'];
+		} else {
+			// Fallback für alte Widgets
+			$selected_view = $settings['view'] ?? 'classic';
 		}
 
-		/**
-		 * Build shortcode attributes string
-		 *
-		 * @param array $atts Attributes array
-		 * @return string Attributes string
-		 */
-		private function build_shortcode_atts( $atts ) {
-			$output = '';
-			foreach ( $atts as $key => $value ) {
-				$output .= ' ' . $key . '="' . esc_attr( $value ) . '"';
-			}
-			return $output;
+		// Build shortcode attributes
+		$atts = [
+			'view' => $selected_view,
+			'show_event_description' => ( isset($settings['show_event_description']) && $settings['show_event_description'] === 'yes' ) ? '1' : '0',
+			'show_appointment_description' => ( isset($settings['show_appointment_description']) && $settings['show_appointment_description'] === 'yes' ) ? '1' : '0',
+			'show_location' => ( isset($settings['show_location']) && $settings['show_location'] === 'yes' ) ? '1' : '0',
+			'show_time' => ( isset($settings['show_time']) && $settings['show_time'] === 'yes' ) ? '1' : '0',
+			'show_tags' => ( isset($settings['show_tags']) && $settings['show_tags'] === 'yes' ) ? '1' : '0',
+			'show_images' => ( isset($settings['show_images']) && $settings['show_images'] === 'yes' ) ? '1' : '0',
+			'show_calendar_name' => ( isset($settings['show_calendar_name']) && $settings['show_calendar_name'] === 'yes' ) ? '1' : '0',
+			'show_services' => ( isset($settings['show_services']) && $settings['show_services'] === 'yes' ) ? '1' : '0',
+			'show_past_events' => ( isset($settings['show_past_events']) && $settings['show_past_events'] === 'yes' ) ? '1' : '0',
+			'show_month_separator' => ( isset($settings['show_month_separator']) && $settings['show_month_separator'] === 'yes' ) ? '1' : '0',
+			'event_action' => isset( $settings['event_action'] ) ? $settings['event_action'] : 'modal',
+			'style_mode' => $settings['style_mode'] ?? 'theme',
+			'use_calendar_colors' => ( isset($settings['use_calendar_colors']) && $settings['use_calendar_colors'] === 'yes' ) ? '1' : '0',
+			'custom_primary_color' => $settings['custom_primary_color'] ?? '#2563eb',
+			'custom_text_color' => $settings['custom_text_color'] ?? '#1e293b',
+			'custom_background_color' => $settings['custom_background_color'] ?? '#ffffff',
+			'custom_border_radius' => $settings['custom_border_radius'] ?? 6,
+			'custom_font_size' => $settings['custom_font_size'] ?? 14,
+			'custom_padding' => $settings['custom_padding'] ?? 12,
+			'custom_spacing' => $settings['custom_spacing'] ?? 8,
+		];
+
+		// Add limit for non-calendar views
+		if ( $view_type !== 'calendar' ) {
+			$atts['limit'] = $settings['limit'] ?? 5;
 		}
+
+		// Add calendars filter if specified
+		if ( ! empty( $settings['calendars'] ) ) {
+			$atts['calendars'] = implode( ',', $settings['calendars'] );
+		}
+
+		// Add tags filter if specified
+		if ( ! empty( $settings['tags'] ) ) {
+			$atts['tags'] = implode( ',', $settings['tags'] );
+		}
+
+		// Determine shortcode tag based on view type
+		$shortcode_tag = 'cts_list'; // Default
+
+		if ( $view_type === 'grid' ) {
+			$shortcode_tag = 'cts_grid';
+			$atts['columns'] = $settings['columns'] ?? 3;
+		} elseif ( $view_type === 'calendar' ) {
+			$shortcode_tag = 'cts_calendar';
+		}
+
+		// Execute shortcode
+		echo do_shortcode( '[' . $shortcode_tag . ' ' . $this->build_shortcode_atts( $atts ) . ']' );
+	}
+
+	/**
+	 * Build shortcode attributes string
+	 *
+	 * @param array $atts Attributes array
+	 * @return string Attributes string
+	 */
+	private function build_shortcode_atts( $atts ) {
+		$output = '';
+		foreach ( $atts as $key => $value ) {
+			$output .= ' ' . $key . '="' . esc_attr( $value ) . '"';
+		}
+		return $output;
+	}
 
 		/**
 		 * Get calendars options
