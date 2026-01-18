@@ -114,16 +114,7 @@ $current_month = null;
 			// v0.9.6.14: Event action logic (modal, page, none)
 			$event_action = isset( $args['event_action'] ) ? $args['event_action'] : 'modal';
 			
-			// DEBUG: Log event_action value
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				error_log( sprintf( '[ChurchTools Suite] Template event_action: %s (type: %s)', 
-					var_export( $event_action, true ), 
-					gettype( $event_action ) 
-				) );
-			}
-			
-			$click_class = '';
-			$click_attrs = '';
+
 		
 		if ( $event_action === 'modal' ) {
 			$click_class = 'cts-event-clickable';
@@ -141,7 +132,6 @@ $current_month = null;
 			);
 		}
 		?>
-<!-- DEBUG: event_action=<?php echo esc_attr( $event_action ); ?> click_class=<?php echo esc_attr( $click_class ); ?> -->
 <div class="cts-event-classic <?php echo esc_attr( $click_class ); ?>" <?php echo $click_attrs; ?><?php
 	// v0.9.9.2: Use calendar color if option enabled
 	if ( $use_calendar_colors && ! empty( $event['calendar_color'] ) ) {

@@ -138,8 +138,6 @@ $current_month = null;
 				);
 			}
 			?>
-
-<!-- DEBUG: event_action=<?php echo esc_attr( $event_action ); ?> click_class=<?php echo esc_attr( $click_class ); ?> -->
 <div class="cts-event-classic <?php echo esc_attr( $click_class ); ?>" <?php echo $click_attrs; ?><?php
 	if ( $use_calendar_colors && ! empty( $event['calendar_color'] ) ) {
 		echo ' style="--calendar-color: ' . esc_attr( $event['calendar_color'] ) . '; --cts-primary-color: ' . esc_attr( $event['calendar_color'] ) . ';"';
