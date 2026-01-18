@@ -482,6 +482,17 @@ if ( ! class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
 		protected function render() {
 		$settings = $this->get_settings_for_display();
 
+		// If a single event is requested via URL, render single view
+		$event_id = isset( $_GET['event_id'] ) ? absint( $_GET['event_id'] ) : 0;
+		if ( $event_id > 0 ) {
+			$event_action = isset( $settings['event_action'] ) ? $settings['event_action'] : 'modal';
+			// Only switch to page view when configured for page navigation
+			if ( $event_action === 'page' ) {
+				echo do_shortcode( '[cts_event id="' . $event_id . '"]' );
+				return;
+			}
+		}
+
 		// Determine selected view based on type
 		$view_type = $settings['view_type'] ?? 'list';
 		$selected_view = null;
