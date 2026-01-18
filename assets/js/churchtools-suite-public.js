@@ -801,9 +801,15 @@
 	 */
 	$(document).on('click', '.cts-event-page-link', function(e) {
 		e.preventDefault();
+		console.log('[ChurchTools Suite] .cts-event-page-link clicked');
 		
 		const eventId = $(this).data('event-id');
-		if (!eventId) return;
+		console.log('[ChurchTools Suite] Event ID:', eventId);
+		
+		if (!eventId) {
+			console.warn('[ChurchTools Suite] No event ID found on clicked element');
+			return;
+		}
 		
 		// v0.9.9.85: Clean URL - only event_id (template from Settings)
 		// Display options controlled by /events/ page, not URL params
@@ -814,6 +820,7 @@
 		// Navigate to current page with event_id parameter
 		const url = new URL(window.location.href);
 		Object.keys(params).forEach(key => url.searchParams.set(key, params[key]));
+		console.log('[ChurchTools Suite] Navigating to:', url.toString());
 		window.location.href = url.toString();
 	});
 	
@@ -825,6 +832,32 @@
 			e.preventDefault();
 			$(this).click();
 		}
+	});
+
+	/**
+	 * Elementor Frontend Support
+	 * Re-initialize handlers when Elementor widgets are loaded/refreshed
+	 */
+	$(window).on('elementor/frontend/init', function() {
+		console.log('[ChurchTools Suite] Elementor frontend initialized');
+		
+		elementorFrontend.hooks.addAction('frontend/element_ready/widget', function($scope) {
+			console.log('[ChurchTools Suite] Elementor widget ready, checking for CTS widgets');
+			
+			// Check if this is a ChurchTools Suite widget
+			if ($scope.find('.cts-events-container, .cts-calendar-monthly, .cts-event-grid, .cts-event-list').length > 0) {
+				console.log('[ChurchTools Suite] CTS widget detected, reinitializing handlers');
+				
+				// Re-initialize calendar views for this widget
+				$scope.find('.cts-calendar-monthly').each(function() {
+					const $calendar = $(this);
+					if (!$calendar.data('calendar-initialized')) {
+						$calendar.data('calendar-initialized', true);
+						setupCalendarNavigation($calendar);
+					}
+				});
+			}
+		});
 	});
 
 })(jQuery);
