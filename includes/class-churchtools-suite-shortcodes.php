@@ -55,6 +55,9 @@ class ChurchTools_Suite_Shortcodes {
 		
 		// Grid Views (v0.9.9.35: background-images added)
 		add_shortcode( 'cts_grid', [ __CLASS__, 'grid_shortcode' ] );
+		
+		// Calendar Views
+		add_shortcode( 'cts_calendar', [ __CLASS__, 'calendar_shortcode' ] );
 	}
 	
 	/**
