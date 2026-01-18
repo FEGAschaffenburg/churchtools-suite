@@ -549,7 +549,7 @@ if ( ! class_exists( 'ChurchTools_Suite_Elementor_Events_Widget' ) ) {
 
 			// Execute shortcode safely
 			try {
-				echo wp_kses_post( do_shortcode( '[' . $shortcode_tag . ' ' . $this->build_shortcode_atts( $atts ) . ']' ) );
+				echo do_shortcode( '[' . $shortcode_tag . ' ' . $this->build_shortcode_atts( $atts ) . ']' );
 			} catch ( \Throwable $e ) {
 				echo '<div style="padding: 10px; background: #f5f5f5; border: 1px solid #ddd;">' . esc_html__( 'Render-Fehler: ', 'churchtools-suite' ) . esc_html( $e->getMessage() ) . '</div>';
 			}
