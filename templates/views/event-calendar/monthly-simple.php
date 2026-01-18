@@ -67,6 +67,8 @@ if ( ! empty( $events ) ) {
 
 // Event-Action Parameter
 $event_action = $args['event_action'] ?? 'modal';
+$single_event_base = apply_filters( 'churchtools_suite_single_event_base_url', home_url( '/events/' ) );
+$single_event_template = get_option( 'churchtools_suite_single_template', 'professional' );
 
 // v0.9.9.2: Parse use_calendar_colors option
 $use_calendar_colors = isset( $args['use_calendar_colors'] ) ? 
@@ -208,7 +210,19 @@ $weekdays = [
 								);
 							} elseif ( $event_action === 'page' ) {
 								$event_classes .= ' cts-event-page-link';
-								$event_attrs = sprintf( 'data-event-id="%s"', esc_attr( $event['id'] ) );
+								$page_url = add_query_arg(
+									[
+										'event_id' => $event['id'],
+										'template' => $single_event_template,
+										'ctse_context' => 'elementor',
+									],
+									$single_event_base
+								);
+								$event_attrs = sprintf(
+									'data-event-id="%s" data-event-url="%s"',
+									esc_attr( $event['id'] ),
+									esc_url( $page_url )
+								);
 							}
 							// else: event_action === 'none' → no click functionality
 							

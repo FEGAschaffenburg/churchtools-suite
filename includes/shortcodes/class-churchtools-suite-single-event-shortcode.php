@@ -37,6 +37,11 @@ class ChurchTools_Suite_Single_Event_Shortcode {
 			'id'       => 0,
 			'template' => $default_template, // Use setting, fallback to validated template
 		], $atts, 'cts_event' );
+
+		// v1.0: Force Elementor widget page view to use plugin template, not theme overrides
+		if ( did_action( 'elementor/loaded' ) && isset( $_GET['ctse_context'] ) && $_GET['ctse_context'] === 'elementor' ) {
+			add_filter( 'churchtools_suite_allow_single_theme_override', '__return_false', 50 );
+		}
 		
 		// Validate event ID (fallback: read from URL ?event_id=)
 		$event_id = absint( $atts['id'] );
@@ -133,21 +138,20 @@ class ChurchTools_Suite_Single_Event_Shortcode {
 		extract( $data );
 		
 		// v0.9.9.44: Neue Template-Struktur (views/event-single/)
-		// Check for theme override (mit Kompatibilität für alte Pfade)
-		$theme_template = locate_template( "churchtools-suite/views/event-single/{$template}.php" );
-		
-		if ( ! $theme_template ) {
-			// Fallback: Alte Struktur im Theme
-			$theme_template = locate_template( "churchtools-suite/single/{$template}.php" );
+		// v1.0: Disable theme/Elementor overrides for single events (always use plugin template)
+		$allow_theme_override = apply_filters( 'churchtools_suite_allow_single_theme_override', false );
+		$theme_template = false;
+		if ( $allow_theme_override ) {
+			$theme_template = locate_template( "churchtools-suite/views/event-single/{$template}.php" );
+			if ( ! $theme_template ) {
+				$theme_template = locate_template( "churchtools-suite/single/{$template}.php" );
+			}
 		}
 		
 		if ( $theme_template ) {
 			$template_path = $theme_template;
 		} else {
-			// v0.9.9.44: Neue Struktur
 			$template_path = CHURCHTOOLS_SUITE_PATH . "templates/views/event-single/{$template}.php";
-			
-			// Fallback: Alte Struktur
 			if ( ! file_exists( $template_path ) ) {
 				$template_path = CHURCHTOOLS_SUITE_PATH . "templates/single/{$template}.php";
 			}

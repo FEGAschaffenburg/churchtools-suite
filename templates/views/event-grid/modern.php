@@ -43,6 +43,10 @@ $show_image = isset( $args['show_image'] ) ?
 
 $event_action = $args['event_action'] ?? 'modal';
 
+// Single event target for page clicks (Elementor included)
+$single_event_base = apply_filters( 'churchtools_suite_single_event_base_url', home_url( '/events/' ) );
+$single_event_template = get_option( 'churchtools_suite_single_template', 'professional' );
+
 // v0.9.9.2: Parse use_calendar_colors option
 $use_calendar_colors = isset( $args['use_calendar_colors'] ) ? 
 	ChurchTools_Suite_Shortcodes::parse_boolean( $args['use_calendar_colors'] ) : false;
@@ -154,7 +158,19 @@ require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-image-he
 						esc_attr( wp_trim_words( $event_arr['event_description'] ?? '', 50 ) )
 					);
 				} elseif ( $event_action === 'page' ) {
-					$event_attrs = sprintf( 'data-event-id="%s"', esc_attr( $event_arr['id'] ?? '' ) );
+					$page_url = add_query_arg(
+						[
+							'event_id' => $event_arr['id'] ?? '',
+							'template' => $single_event_template,
+							'ctse_context' => 'elementor',
+						],
+						$single_event_base
+					);
+					$event_attrs = sprintf(
+						'data-event-id="%s" data-event-url="%s"',
+						esc_attr( $event_arr['id'] ?? '' ),
+						esc_url( $page_url )
+					);
 				}
 				
 				// Tooltip mit wichtigsten Daten

@@ -35,6 +35,10 @@ $show_calendar_name = isset( $args['show_calendar_name'] ) ?
 $use_calendar_colors = isset( $args['use_calendar_colors'] ) ? 
 	ChurchTools_Suite_Shortcodes::parse_boolean( $args['use_calendar_colors'] ) : false;
 
+// Single event target (new page)
+$single_event_base = apply_filters( 'churchtools_suite_single_event_base_url', home_url( '/events/' ) );
+$single_event_template = get_option( 'churchtools_suite_single_template', 'professional' );
+
 // Style-Mode unterstützen
 $style_mode = $args['style_mode'] ?? 'theme';
 $custom_styles = '';
@@ -142,8 +146,18 @@ if ( ! function_exists( 'truncate_description' ) ) {
 					);
 				} elseif ( $event_action === 'page' ) {
 					$event_class .= ' cts-event-page-link';
-					$event_url = add_query_arg( 'event_id', $event['id'], get_permalink() );
-					$event_attrs = sprintf( 'data-event-url="%s"', esc_url( $event_url ) );
+					$event_url = add_query_arg(
+						[
+							'event_id' => $event['id'],
+							'template' => $single_event_template,
+						],
+						$single_event_base
+					);
+					$event_attrs = sprintf(
+						'data-event-id="%s" data-event-url="%s"',
+						esc_attr( $event['id'] ),
+						esc_url( $event_url )
+					);
 				}
 			?>
 				

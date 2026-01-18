@@ -804,6 +804,9 @@
 		console.log('[ChurchTools Suite] .cts-event-page-link clicked');
 		
 		const eventId = $(this).data('event-id');
+		const dataUrl = $(this).data('event-url');
+		const baseUrl = (window.churchtoolsSuitePublic && churchtoolsSuitePublic.singleEventBaseUrl) ? churchtoolsSuitePublic.singleEventBaseUrl : null;
+		const singleTemplate = (window.churchtoolsSuitePublic && churchtoolsSuitePublic.singleEventTemplate) ? churchtoolsSuitePublic.singleEventTemplate : null;
 		console.log('[ChurchTools Suite] Event ID:', eventId);
 		
 		if (!eventId) {
@@ -811,17 +814,28 @@
 			return;
 		}
 		
-		// v0.9.9.85: Clean URL - only event_id (template from Settings)
-		// Display options controlled by /events/ page, not URL params
-		const params = {
-			event_id: eventId
-		};
+		let targetUrl = null;
+		try {
+			if (dataUrl) {
+				targetUrl = new URL(dataUrl, window.location.origin);
+			} else if (baseUrl) {
+				targetUrl = new URL(baseUrl, window.location.origin);
+			}
+		} catch (err) {
+			console.warn('[ChurchTools Suite] Failed to build target URL, falling back to current page', err);
+		}
 		
-		// Navigate to current page with event_id parameter
-		const url = new URL(window.location.href);
-		Object.keys(params).forEach(key => url.searchParams.set(key, params[key]));
-		console.log('[ChurchTools Suite] Navigating to:', url.toString());
-		window.location.href = url.toString();
+		if (!targetUrl) {
+			targetUrl = new URL(window.location.href);
+		}
+		
+		targetUrl.searchParams.set('event_id', eventId);
+		if (singleTemplate) {
+			targetUrl.searchParams.set('template', singleTemplate);
+		}
+		
+		console.log('[ChurchTools Suite] Navigating to:', targetUrl.toString());
+		window.location.href = targetUrl.toString();
 	});
 	
 	/**

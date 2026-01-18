@@ -214,28 +214,44 @@ class ChurchTools_Suite {
 	public function enqueue_public_assets(): void {
 		// Always load assets - they're small and better UX than conditional loading issues
 		
-		// Enqueue CSS
+		// Enqueue CSS (cache-busted by filemtime when available)
+		$css_version = $this->version;
+		$css_path = CHURCHTOOLS_SUITE_PATH . 'assets/css/churchtools-suite-public.css';
+		if ( file_exists( $css_path ) ) {
+			$css_version = max( $css_version, filemtime( $css_path ) );
+		}
 		wp_enqueue_style(
 			'churchtools-suite-public',
 			CHURCHTOOLS_SUITE_URL . 'assets/css/churchtools-suite-public.css',
 			[],
-			$this->version,
+			$css_version,
 			'all'
 		);
 		
-		// Enqueue JS
+		// Enqueue JS (cache-busted by filemtime when available)
+		$js_version = $this->version;
+		$js_path = CHURCHTOOLS_SUITE_PATH . 'assets/js/churchtools-suite-public.js';
+		if ( file_exists( $js_path ) ) {
+			$js_version = max( $js_version, filemtime( $js_path ) );
+		}
 		wp_enqueue_script(
 			'churchtools-suite-public',
 			CHURCHTOOLS_SUITE_URL . 'assets/js/churchtools-suite-public.js',
 			[ 'jquery' ],
-			$this->version,
+			$js_version,
 			true
 		);
 		
 		// Localize script
+		$single_page_url = trim( (string) get_option( 'churchtools_suite_single_page_url', '' ) );
+		$single_event_base = $single_page_url ? $single_page_url : home_url( '/events/' );
+		$single_event_base = apply_filters( 'churchtools_suite_single_event_base_url', $single_event_base );
+		$single_event_template = get_option( 'churchtools_suite_single_template', 'professional' );
 		wp_localize_script( 'churchtools-suite-public', 'churchtoolsSuitePublic', [
 			'ajaxUrl' => admin_url( 'admin-ajax.php' ),
 			'nonce' => wp_create_nonce( 'churchtools_suite_public' ),
+			'singleEventBaseUrl' => $single_event_base,
+			'singleEventTemplate' => $single_event_template,
 		] );
 	}
 	

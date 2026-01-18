@@ -10,36 +10,42 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Helper function to get available templates
-function cts_get_available_templates( $type ) {
-	$template_dir = CHURCHTOOLS_SUITE_PATH . 'templates/views/' . $type . '/';
-	$templates = [];
-	
-	if ( is_dir( $template_dir ) ) {
-		$files = scandir( $template_dir );
-		if ( is_array( $files ) ) {
-			foreach ( $files as $file ) {
-				if ( substr( $file, -4 ) === '.php' && $file[0] !== '.' ) {
-					$templates[] = substr( $file, 0, -4 );
+// Helper function to get available templates (guarded to avoid redeclare conflicts)
+if ( ! function_exists( 'cts_get_available_templates' ) ) {
+	function cts_get_available_templates( $type ) {
+		$template_dir = CHURCHTOOLS_SUITE_PATH . 'templates/views/' . $type . '/';
+		$templates = [];
+        
+		if ( is_dir( $template_dir ) ) {
+			$files = scandir( $template_dir );
+			if ( is_array( $files ) ) {
+				foreach ( $files as $file ) {
+					if ( substr( $file, -4 ) === '.php' && $file[0] !== '.' ) {
+						$templates[] = substr( $file, 0, -4 );
+					}
 				}
 			}
+			sort( $templates );
 		}
-		sort( $templates );
+        
+		return $templates;
 	}
-	
-	return $templates;
 }
 
 // Form processing
 if ( isset( $_POST['cts_save_templates'] ) && check_admin_referer( 'cts_settings' ) ) {
 	update_option( 'churchtools_suite_single_template', sanitize_text_field( $_POST['single_template'] ?? 'professional' ) );
 	update_option( 'churchtools_suite_modal_template', sanitize_text_field( $_POST['modal_template'] ?? 'professional' ) );
-	
+
+	$single_page_url = isset( $_POST['single_page_url'] ) ? esc_url_raw( trim( $_POST['single_page_url'] ) ) : '';
+	update_option( 'churchtools_suite_single_page_url', $single_page_url );
+    
 	echo '<div class="cts-notice cts-notice-success"><p>' . esc_html__( 'Template-Einstellungen gespeichert.', 'churchtools-suite' ) . '</p></div>';
 }
 
 $single_template = get_option( 'churchtools_suite_single_template', 'professional' );
 $modal_template = get_option( 'churchtools_suite_modal_template', 'professional' );
+$single_page_url = get_option( 'churchtools_suite_single_page_url', '' );
 
 // Dynamically get available templates (v0.9.9.84)
 $available_single_templates = cts_get_available_templates( 'event-single' );
@@ -80,6 +86,27 @@ if ( empty( $available_modal_templates ) ) {
 					</select>
 					<div class="cts-form-description">
 						<?php printf( esc_html__( 'Verfügbare Templates: %s', 'churchtools-suite' ), esc_html( implode( ', ', $available_single_templates ) ) ); ?>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+
+	<!-- DEBUG: Single-Event URL Section v2 -->
+	<div class="cts-card" style="margin-top: 16px; background-color: #fff9e6; border-color: #f4d03f;">
+		<h3 style="color: #333;"><?php esc_html_e( '🔗 Single-Event Seite (URL)', 'churchtools-suite' ); ?></h3>
+		<p class="cts-card-description">
+			<?php esc_html_e( 'Pfad/URL der Seite, auf die Event-Links verweisen sollen (z.B. /events/). Leer lassen, um /events/ zu verwenden.', 'churchtools-suite' ); ?>
+		</p>
+		<table class="cts-form-table">
+			<tr>
+				<th scope="row">
+					<label for="single_page_url"><?php esc_html_e( 'Single-Event URL', 'churchtools-suite' ); ?></label>
+				</th>
+				<td>
+					<input type="url" id="single_page_url" name="single_page_url" class="cts-form-input" value="<?php echo esc_attr( $single_page_url ); ?>" placeholder="<?php echo esc_attr( home_url( '/events/' ) ); ?>" style="width: 100%; padding: 8px; border: 1px solid #ddd;" />
+					<div class="cts-form-description">
+						<?php esc_html_e( 'Beispiel: https://example.com/events/ oder https://example.com/meine-events/', 'churchtools-suite' ); ?>
 					</div>
 				</td>
 			</tr>

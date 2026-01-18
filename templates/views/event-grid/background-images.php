@@ -70,6 +70,10 @@ $use_calendar_colors = isset( $args['use_calendar_colors'] ) ? ChurchTools_Suite
 			<?php 
 			// Event action logic
 			$event_action = isset( $args['event_action'] ) ? $args['event_action'] : 'modal';
+
+			// Single event target for page clicks
+			$single_event_base = apply_filters( 'churchtools_suite_single_event_base_url', home_url( '/events/' ) );
+			$single_event_template = get_option( 'churchtools_suite_single_template', 'professional' );
 			
 			$click_class = '';
 			$click_attrs = '';
@@ -83,9 +87,18 @@ $use_calendar_colors = isset( $args['use_calendar_colors'] ) ? ChurchTools_Suite
 				);
 			} elseif ( $event_action === 'page' ) {
 				$click_class = 'cts-event-page-link';
+				$page_url = add_query_arg(
+					[
+						'event_id' => $event['id'],
+						'template' => $single_event_template,
+						'ctse_context' => 'elementor',
+					],
+					$single_event_base
+				);
 				$click_attrs = sprintf(
-					'data-event-id="%s" role="link" tabindex="0" aria-label="%s"',
+					'data-event-id="%s" data-event-url="%s" role="link" tabindex="0" aria-label="%s"',
 					esc_attr( $event['id'] ),
+					esc_url( $page_url ),
 					esc_attr( sprintf( __( 'Zu %s navigieren', 'churchtools-suite' ), $event['title'] ) )
 				);
 			}
