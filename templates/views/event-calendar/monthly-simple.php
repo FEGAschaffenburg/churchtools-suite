@@ -144,13 +144,20 @@ $weekdays = [
 		<?php endforeach; ?>
 	</div>
 	
-	<!-- Calendar Grid (42 cells: 6 weeks × 7 days) -->
+	<!-- Calendar Grid (dynamic weeks: 5–6 × 7 days) -->
 	<div class="cts-calendar-grid">
 		<?php
 		$current_date = $grid_start;
 		$today = date( 'Y-m-d' );
 		
-		for ( $i = 0; $i < 42; $i++ ) :
+		// Determine number of weeks to render for this month
+		$days_in_month = (int) date( 't', strtotime( $first_day ) );
+		$weeks = (int) ceil( ( $first_weekday - 1 + $days_in_month ) / 7 );
+		// Ensure a minimum of 5 weeks and a maximum of 6 weeks
+		$weeks = max( 5, min( 6, $weeks ) );
+		$total_cells = $weeks * 7;
+		
+		for ( $i = 0; $i < $total_cells; $i++ ) :
 			$day_number = date( 'j', strtotime( $current_date ) );
 			$is_current_month = date( 'n', strtotime( $current_date ) ) == $current_month;
 			$is_today = $current_date === $today;
