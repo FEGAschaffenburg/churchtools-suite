@@ -38,8 +38,11 @@ class ChurchTools_Suite_Single_Event_Shortcode {
 			'template' => $default_template, // Use setting, fallback to validated template
 		], $atts, 'cts_event' );
 		
-		// Validate event ID
+		// Validate event ID (fallback: read from URL ?event_id=)
 		$event_id = absint( $atts['id'] );
+		if ( ! $event_id && isset( $_GET['event_id'] ) ) {
+			$event_id = absint( $_GET['event_id'] );
+		}
 		if ( ! $event_id ) {
 			return '<div class="cts-error">' . __( 'Fehler: Keine Event-ID angegeben.', 'churchtools-suite' ) . '</div>';
 		}
