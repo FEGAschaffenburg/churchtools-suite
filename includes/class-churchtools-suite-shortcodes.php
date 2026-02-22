@@ -371,6 +371,8 @@ class ChurchTools_Suite_Shortcodes {
 		
 		// v0.9.7.0 - Erlaubte Views (deutsche IDs mit Präfix)
 		$allowed_views = [ 'list-klassisch', 'list-minimal', 'list-modern', 'list-klassisch-mit-bildern' ];
+		$allowed_views = apply_filters( 'churchtools_suite_list_allowed_views', $allowed_views );
+
 		if ( ! in_array( $atts['view'], $allowed_views, true ) ) {
 			return '<p style="padding: 12px; background: #fef3c7; border-radius: 4px;">⚠️ <strong>View nicht verfügbar:</strong> Erlaubte Ansichten: Klassisch, Minimal, Modern, Klassisch-mit-Bildern. View "' . esc_html( $atts['view'] ) . '" existiert nicht.</p>';
 		}
@@ -403,7 +405,7 @@ class ChurchTools_Suite_Shortcodes {
 		// Konvertiere standardisierte View-ID zu Template-Dateiname (list-klassisch → classic)
 		$template_filename = ChurchTools_Suite_Template_Loader::normalize_view_to_filename( $atts['view'] );
 		$template_path = 'views/event-list/' . $template_filename;
-		
+
 		return self::render_template( $template_path, $events, $atts );
 	}
 	
@@ -454,6 +456,8 @@ class ChurchTools_Suite_Shortcodes {
 		
 		// Erlaubte Views (deutsche IDs mit Präfix)
 		$allowed_views = [ 'grid-klassisch', 'grid-einfach', 'grid-minimal', 'grid-modern' ];
+		$allowed_views = apply_filters( 'churchtools_suite_grid_allowed_views', $allowed_views );
+		
 		if ( ! in_array( $atts['view'], $allowed_views, true ) ) {
 			return '<p style="padding: 12px; background: #fef3c7; border-radius: 4px;">⚠️ <strong>Grid View nicht verfügbar:</strong> Erlaubte Ansichten: Klassisch, Einfach, Minimal, Modern</p>';
 		}
@@ -525,6 +529,8 @@ class ChurchTools_Suite_Shortcodes {
 		
 		// v0.9.8.0: Only monthly-simple activated
 		$allowed_views = [ 'monthly-simple' ];
+		$allowed_views = apply_filters( 'churchtools_suite_calendar_allowed_views', $allowed_views );
+		
 		if ( ! in_array( $atts['view'], $allowed_views, true ) ) {
 			return '<p style="padding: 12px; background: #fef3c7; border-radius: 4px;">⚠️ <strong>Calendar View nicht verfügbar:</strong> Nur "monthly-simple" ist aktiv. (Erhalten: "' . esc_html( $atts['view'] ) . '")</p>';
 		}
@@ -596,6 +602,8 @@ class ChurchTools_Suite_Shortcodes {
 		
 		// Erlaubte Views (deutsche IDs mit Präfix)
 		$allowed_views = [ 'countdown-klassisch' ];
+		$allowed_views = apply_filters( 'churchtools_suite_countdown_allowed_views', $allowed_views );
+		
 		if ( ! in_array( $atts['view'], $allowed_views, true ) ) {
 			return '<p style="padding: 12px; background: #fef3c7; border-radius: 4px;">⚠️ <strong>Countdown View nicht verfügbar:</strong> Nur "countdown-klassisch" ist aktiv.</p>';
 		}
@@ -691,6 +699,8 @@ class ChurchTools_Suite_Shortcodes {
 		
 		// Erlaubte Views (deutsche IDs mit Präfix)
 		$allowed_views = [ 'carousel-klassisch' ];
+		$allowed_views = apply_filters( 'churchtools_suite_carousel_allowed_views', $allowed_views );
+		
 		if ( ! in_array( $atts['view'], $allowed_views, true ) ) {
 			return '<p style="padding: 12px; background: #fef3c7; border-radius: 4px;">⚠️ <strong>Carousel View nicht verfügbar:</strong> Nur "carousel-klassisch" ist aktiv.</p>';
 		}
@@ -932,7 +942,7 @@ class ChurchTools_Suite_Shortcodes {
 		if ( ! self::$template_loader ) {
 			self::$template_loader = new ChurchTools_Suite_Template_Loader();
 		}
-		
+
 		// Apply filters to events before rendering
 		$events = apply_filters( 'churchtools_suite_template_events', $events, $template_name, $args );
 		
@@ -941,7 +951,6 @@ class ChurchTools_Suite_Shortcodes {
 		if ( substr( $template_file, -4 ) !== '.php' ) {
 			$template_file .= '.php';
 		}
-		
 		$output = self::$template_loader->render_template( $template_file, [
 			'events' => $events,
 			'args' => $args,
