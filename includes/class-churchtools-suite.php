@@ -75,6 +75,9 @@ class ChurchTools_Suite {
 		// Gutenberg Blocks (v0.5.8.0+)
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-blocks.php';
 		
+		// Query variables
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-queryvars.php';
+		
 		// Elementor Integration (v1.0.9.0+) - Moved to separate plugin
 		// Notice is shown on the Addons page (admin/views/addons-page.php) only
 
@@ -188,6 +191,9 @@ class ChurchTools_Suite {
 
 		// Register single event handler (v0.9.3.1)
 		add_action( 'init', [ 'ChurchTools_Suite_Single_Event_Handler', 'init' ] );
+
+		// Register event search term
+		add_action( 'query_vars', [ 'ChurchTools_Suite_Queryvars', 'filter' ] );
 		
 		// Enqueue frontend assets (also loaded in admin via admin_enqueue_scripts)
 		$this->loader->add_action( 'wp_enqueue_scripts', $this, 'enqueue_public_assets' );

@@ -65,6 +65,9 @@ class ChurchTools_Suite_Shortcodes {
 		// Carousel Views (v1.1.3.0)
 		add_shortcode( 'cts_carousel', [ __CLASS__, 'carousel_shortcode' ] );
 		
+		// Carousel Views (v1.1.3.0)
+		add_shortcode( 'cts_event_search', [ __CLASS__, 'event_search_shortcode' ] );
+		
 	}
 	
 	/**
@@ -243,7 +246,7 @@ class ChurchTools_Suite_Shortcodes {
 	
 	/**
 	 * Generic Events Shortcode (v0.9.4.11)
-	/**
+	 * 
 	 * Main Shortcode Handler (v1.0.1: Unified view names)
 	 * 
 	 * Routes to appropriate handler based on view name prefix: list-, grid-, calendar-
@@ -314,6 +317,30 @@ class ChurchTools_Suite_Shortcodes {
 		return '<p style="padding: 12px; background: #fef3c7; border-radius: 4px;">⚠️ <strong>View nicht verfügbar:</strong> "' . esc_html( $view ) . '" ist keine gültige View. Verfügbar: ' . esc_html( $valid_views ) . '</p>';
 	}
 	
+	public static function event_search_shortcode($atts): string {
+		$atts = shortcode_atts( [
+			'view' => 'classic',
+			'custom_class' => '',
+		], $atts, 'cts_event_search' );
+
+		$search_term = ChurchTools_Suite_Queryvars::getEventSearchQuery();
+		$atts["search_term"] = $search_term;
+
+		// Backward-Compatibility: Normalisiere View-ID (alte Namen → neue deutsche IDs)
+		$atts['view'] = ChurchTools_Suite_Template_Loader::normalize_view_id( 'search', $atts['view'] );
+		
+		$allowed_views = [ 'search-classic' ];
+		$allowed_views = apply_filters( 'churchtools_suite_search_allowed_views', $allowed_views );
+		if ( ! in_array( $atts['view'], $allowed_views, true ) ) {
+			return '<p style="padding: 12px; background: #fef3c7; border-radius: 4px;">⚠️ <strong>View nicht verfügbar:</strong> Erlaubte Ansichten: Klassisch. View "' . esc_html( $atts['view'] ) . '" existiert nicht.</p>';
+		}
+
+		$template_filename = ChurchTools_Suite_Template_Loader::normalize_view_to_filename( $atts['view'] );
+		$template_path = 'views/event-search/' . $template_filename;
+
+		return self::render_template( $template_path, $events = [], $atts );
+	}
+
 	/**
 	 * List Shortcode
 	 * 
@@ -346,6 +373,7 @@ class ChurchTools_Suite_Shortcodes {
 			'show_calendar_name' => true,
 			'show_month_separator' => true,
 			'show_past_events' => false,
+
 			'event_action' => 'modal',
 			// v0.9.6.8: Style Management
 			'style_mode' => 'theme',
@@ -364,6 +392,9 @@ class ChurchTools_Suite_Shortcodes {
 			'date_from' => '',
 			'date_to' => '',
 			'filter_tags' => '',
+
+			// Use existing search value
+			'link_search' => true,
 		], $atts, 'cts_list' );
 		
 		// Backward-Compatibility: Normalisiere View-ID (alte Namen → neue deutsche IDs)
@@ -385,12 +416,17 @@ class ChurchTools_Suite_Shortcodes {
 		$atts['show_tags'] = self::parse_boolean( $atts['show_tags'] );
 		$atts['show_month_separator'] = self::parse_boolean( $atts['show_month_separator'] );
 		$atts['show_past_events'] = self::parse_boolean( $atts['show_past_events'] );
+		$atts['link_search'] = self::parse_boolean( $atts['link_search'] );
 		
 		// Legacy show_description fallback
 		if ( $atts['show_description'] !== null ) {
 			$show_desc = self::parse_boolean( $atts['show_description'] );
 			$atts['show_event_description'] = $show_desc;
 			$atts['show_appointment_description'] = $show_desc;
+		}
+
+		if($atts["link_search"] === true) {
+			$atts["search"] = ChurchTools_Suite_Queryvars::getEventSearchQuery();
 		}
 		
 		// Validate order
@@ -447,6 +483,9 @@ class ChurchTools_Suite_Shortcodes {
 			'custom_font_size' => 14,
 			'custom_padding' => 12,
 			'custom_spacing' => 16,
+
+			// Use existing search value
+			'link_search' => true,			
 		], $atts, 'cts_grid' );
 		
 		// Backward-Compatibility: Normalisiere View-ID (alte Namen → neue deutsche IDs)
@@ -472,7 +511,12 @@ class ChurchTools_Suite_Shortcodes {
 		$atts['show_time'] = self::parse_boolean( $atts['show_time'] );
 		$atts['show_tags'] = self::parse_boolean( $atts['show_tags'] );
 		$atts['show_calendar_name'] = self::parse_boolean( $atts['show_calendar_name'] );
+		$atts['link_search'] = self::parse_boolean( $atts['link_search'] );
 		
+		if($atts["link_search"] === true) {
+			$atts["search"] = ChurchTools_Suite_Queryvars::getEventSearchQuery();
+		}
+
 		// Get events
 		$events = self::get_events( $atts );
 		
@@ -515,6 +559,9 @@ class ChurchTools_Suite_Shortcodes {
 			'custom_font_size' => 14,
 			'custom_padding' => 8,
 			'custom_spacing' => 0,
+
+			// Use existing search value
+			'link_search' => true,			
 		], $atts, 'cts_calendar' );
 		
 		// v0.9.8.6: Debug - Check what view value we received
@@ -532,7 +579,12 @@ class ChurchTools_Suite_Shortcodes {
 		// Convert boolean values
 		$atts['show_past_events'] = self::parse_boolean( $atts['show_past_events'] );
 		$atts['use_calendar_colors'] = self::parse_boolean( $atts['use_calendar_colors'] );
+		$atts['link_search'] = self::parse_boolean( $atts['link_search'] );
 		
+		if($atts["link_search"] === true) {
+			$atts["search"] = ChurchTools_Suite_Queryvars::getEventSearchQuery();
+		}
+
 		// Get events
 		$events = self::get_events( $atts );
 		
@@ -684,6 +736,9 @@ class ChurchTools_Suite_Shortcodes {
 			'custom_font_size' => 14,
 			'custom_padding' => 16,
 			'custom_spacing' => 16,
+
+			// Use existing search value
+			'link_search' => true,			
 		], $atts, 'cts_carousel' );
 		
 		// Backward-Compatibility: Normalisiere View-ID
@@ -712,6 +767,11 @@ class ChurchTools_Suite_Shortcodes {
 		$atts['show_images'] = self::parse_boolean( $atts['show_images'] );
 		$atts['autoplay'] = self::parse_boolean( $atts['autoplay'] );
 		$atts['loop'] = self::parse_boolean( $atts['loop'] );
+		$atts['link_search'] = self::parse_boolean( $atts['link_search'] );
+		
+		if($atts["link_search"] === true) {
+			$atts["search"] = ChurchTools_Suite_Queryvars::getEventSearchQuery();
+		}
 		
 		// Get events
 		$events = self::get_events( $atts );
@@ -805,6 +865,7 @@ class ChurchTools_Suite_Shortcodes {
 			'from' => $atts['from'] ?? '',
 			'to' => $atts['to'] ?? '',
 			'show_past_events' => $atts['show_past_events'] ?? false,
+			'search' => $atts['search'] ?? '',
 		];
 		
 		// Sprint 4: Add date filters

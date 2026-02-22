@@ -97,6 +97,7 @@ class ChurchTools_Suite_Template_Data {
 			'limit' => 5,
 			'from' => '',
 			'to' => '',
+			'search' => '',
 			'order' => 'ASC',
 			'filter_tags' => [], // v0.10.4.11: Tag filter
 			'show_past_events' => false, // v0.9.2.0: Show past events toggle
@@ -127,6 +128,12 @@ class ChurchTools_Suite_Template_Data {
 		}
 		// If show_past_events=true and no explicit from date, show ALL events (no date filter)
 		
+		if ( ! empty( $filters['search'] ) ) {
+			$like = '%' . $wpdb->esc_like($filters['search']) . '%';
+
+			$where[] = $wpdb->prepare( '(title LIKE %s OR event_description LIKE %s OR appointment_description LIKE %s)', $like, $like, $like);
+		}
+
 		if ( ! empty( $filters['to'] ) ) {
 			$where[] = $wpdb->prepare( 'start_datetime <= %s', $filters['to'] );
 		}
@@ -137,6 +144,7 @@ class ChurchTools_Suite_Template_Data {
 		// No limit in SQL - will be applied after tag filtering
 		
 		$query = "SELECT * FROM {$table} {$where_clause} {$order_clause}";
+
 		$results = $wpdb->get_results( $query );
 		
 		// Format events

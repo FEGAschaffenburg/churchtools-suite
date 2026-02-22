@@ -6443,6 +6443,86 @@
 	border-radius: 5px;
 }
 
+/* event search */
+.cts-search-form {
+	max-width: 720px;
+	margin: 0 auto 1.5rem;
+}
+
+.cts-search-form__controls {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.6rem;
+	background: #ffffff;
+}
+
+
+input#cts-eventsearch-keyword {
+	flex: 1;
+	min-width: 0;
+	padding: 0.65rem 0.75rem;
+	font-size: 0.98rem;
+	line-height: 1.4;
+	color: #1f2937;
+
+	margin-bottom: 0;
+}
+
+.cts-eventsearch-input::placeholder {
+	color: #94a3b8;
+}
+
+.cts-eventsearch-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.4rem;
+	border: none;
+	border-radius: 10px;
+	padding: 0.65rem 1rem;
+	font-size: 0.9rem;
+	font-weight: 600;
+	line-height: 1;
+	color: #ffffff;
+	background: linear-gradient(135deg, #2563eb, #1d4ed8);
+	cursor: pointer;
+	white-space: nowrap;
+	transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.cts-eventsearch-button .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+.cts-eventsearch-button:hover {
+	filter: brightness(1.05);
+	transform: translateY(-1px);
+}
+
+.cts-eventsearch-button:active {
+	transform: translateY(0);
+}
+
+.cts-eventsearch-button:focus-visible {
+	outline: 2px solid #93c5fd;
+	outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+	.cts-search-form__controls {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.cts-eventsearch-button {
+		width: 100%;
+		padding: 0.75rem 1rem;
+	}
+}
+
 /* Responsive (wie Grid Classic) */
 @media (max-width: 1024px) {
 	.cts-carousel-slide {
@@ -6477,4 +6557,3 @@
 		font-size: 1.125rem;
 	}
 }
-

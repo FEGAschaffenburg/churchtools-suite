@@ -159,7 +159,7 @@ class ChurchTools_Suite_Template_Loader {
 		}
 		
 		// Backward-Compatibility: Ent ferne nur Präfix (grid- / list- / calendar- / countdown- / carousel-)
-		$view = preg_replace( '/^(grid|list|calendar|countdown|carousel)-/', '', $view );
+		$view = preg_replace( '/^(grid|list|calendar|countdown|carousel|search)-/', '', $view );
 		
 		return $view;
 	}
