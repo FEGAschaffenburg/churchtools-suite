@@ -1,0 +1,40 @@
+# WordPress
+wp-config.php
+wp-content/uploads/
+wp-content/cache/
+
+# Dependencies
+vendor/
+node_modules/
+
+# Build artifacts
+*.zip
+build/
+dist/
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+debug.log
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Plugin-specific
+scripts/*.zip
+*.php.broken
+
+# SSH Keys & sensitive info (local only)
+SSH-KEYS.md
+.ssh/

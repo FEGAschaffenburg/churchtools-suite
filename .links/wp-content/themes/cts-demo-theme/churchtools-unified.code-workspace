@@ -1,0 +1,64 @@
+{
+  "folders": [
+    {
+      "name": "Homepage Local: Main Plugin",
+      "path": "../../plugins/churchtools-suite"
+    },
+    {
+      "name": "Homepage Local: Demo Plugin",
+      "path": "../../plugins/churchtools-suite-demo"
+    },
+    {
+      "name": "Homepage Local: Elementor Addon",
+      "path": "../../plugins/churchtools-suite-elementor"
+    },
+    {
+      "name": "Homepage Local: Demo Theme",
+      "path": "."
+    },
+    {
+      "name": "Clone Local: Main Plugin",
+      "path": "../../../../feg-clone/wp-content/plugins/churchtools-suite"
+    },
+    {
+      "name": "Clone Local: Elementor Addon",
+      "path": "../../../../feg-clone/wp-content/plugins/churchtools-suite-elementor"
+    }
+  ],
+  "settings": {
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/vendor": true,
+      "**/.git": true,
+      "**/.svn": true,
+      "**/.hg": true,
+      "**/*.zip": true,
+      "**/*.log": true,
+      "**/*.bak": true,
+      "**/*.backup-*": true
+    },
+    "files.exclude": {
+      "**/.DS_Store": true,
+      "**/Thumbs.db": true
+    },
+    "files.watcherExclude": {
+      "**/.git/objects/**": true,
+      "**/.git/subtree-cache/**": true,
+      "**/node_modules/**": true,
+      "**/vendor/**": true
+    },
+    "php.suggest.basic": false,
+    "editor.formatOnSave": false,
+    "git.autoRepositoryDetection": true,
+    "git.openRepositoryInParentFolders": "always"
+  },
+  "extensions": {
+    "recommendations": [
+      "bmewburn.vscode-intelephense-client",
+      "xdebug.php-debug",
+      "github.vscode-pull-request-github",
+      "ms-vscode.powershell",
+      "ms-vscode-remote.remote-ssh"
+    ]
+  }
+}

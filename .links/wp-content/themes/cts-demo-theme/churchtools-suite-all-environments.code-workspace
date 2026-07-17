@@ -1,0 +1,72 @@
+{
+  "folders": [
+    {
+      "name": "Plugin-Homepage: ChurchTools Suite",
+      "path": "../../plugins/churchtools-suite"
+    },
+    {
+      "name": "Plugin-Homepage: ChurchTools Suite Demo",
+      "path": "../../plugins/churchtools-suite-demo"
+    },
+    {
+      "name": "Plugin-Homepage: Suite Addons (inkl. Elementor)",
+      "path": "../../plugins/churchtools-suite/addons"
+    },
+    {
+      "name": "Plugin-Homepage: CTS Demo Theme",
+      "path": "."
+    },
+    {
+      "name": "FEG Clone: ChurchTools Suite",
+      "path": "../../../../feg-clone/wp-content/plugins/churchtools-suite"
+    },
+    {
+      "name": "FEG Clone: Suite Addons (inkl. Elementor)",
+      "path": "../../../../feg-clone/wp-content/plugins/churchtools-suite/addons"
+    }
+  ],
+  "settings": {
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/vendor": true,
+      "**/.git": true,
+      "**/.svn": true,
+      "**/.hg": true,
+      "**/*.zip": true,
+      "**/*.log": true,
+      "**/*.bak": true,
+      "**/*.backup-*": true
+    },
+    "files.exclude": {
+      "**/.DS_Store": true,
+      "**/Thumbs.db": true
+    },
+    "files.watcherExclude": {
+      "**/.git/objects/**": true,
+      "**/.git/subtree-cache/**": true,
+      "**/node_modules/**": true,
+      "**/vendor/**": true
+    },
+    "php.suggest.basic": false,
+    "editor.formatOnSave": false,
+    "git.autoRepositoryDetection": true,
+    "git.openRepositoryInParentFolders": "always",
+    "github.copilot.enable": {
+      "*": true,
+      "plaintext": true,
+      "markdown": true,
+      "scminput": true
+    },
+    "github.copilot.chat.localeOverride": "de",
+    "githubPullRequests.defaultBaseBranch": "master"
+  },
+  "extensions": {
+    "recommendations": [
+      "bmewburn.vscode-intelephense-client",
+      "xdebug.php-debug",
+      "github.vscode-pull-request-github",
+      "ms-vscode.powershell",
+      "ms-vscode-remote.remote-ssh"
+    ]
+  }
+}

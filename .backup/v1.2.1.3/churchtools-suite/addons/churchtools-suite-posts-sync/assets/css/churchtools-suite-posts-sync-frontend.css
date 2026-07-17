@@ -1,0 +1,45 @@
+.cts-posts-sync-list {
+	display: grid;
+	gap: 16px;
+	margin: 12px 0;
+}
+
+.cts-posts-sync-item {
+	padding: 14px 16px;
+	border: 1px solid #dcdcde;
+	border-radius: 10px;
+	background: #fff;
+}
+
+.cts-posts-sync-title {
+	margin: 0 0 6px;
+	font-size: 1.12rem;
+	line-height: 1.35;
+}
+
+.cts-posts-sync-title a {
+	text-decoration: none;
+}
+
+.cts-posts-sync-title a:hover,
+.cts-posts-sync-title a:focus {
+	text-decoration: underline;
+}
+
+.cts-posts-sync-date {
+	margin: 0 0 8px;
+	font-size: 0.88rem;
+	color: #646970;
+}
+
+.cts-posts-sync-excerpt {
+	margin: 0;
+	line-height: 1.6;
+}
+
+.cts-posts-sync-list-empty {
+	padding: 12px 14px;
+	border-radius: 8px;
+	border: 1px dashed #c3c4c7;
+	color: #646970;
+}

@@ -1,0 +1,7 @@
+<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="256" cy="200" r="140" stroke="#0A4A73" stroke-width="20" fill="none" />
+  <rect x="246" y="80" width="20" height="240" fill="#0A4A73" />
+  <rect x="166" y="170" width="180" height="20" fill="#0A4A73" />
+  <text x="50%" y="420" font-family="Arial" font-size="40" fill="#0A4A73" text-anchor="middle">FeG Aschaffenburg</text>
+  <text x="50%" y="470" font-family="Arial" font-size="36" fill="#0A4A73" text-anchor="middle">ChurchTools Suite</text>
+</svg>

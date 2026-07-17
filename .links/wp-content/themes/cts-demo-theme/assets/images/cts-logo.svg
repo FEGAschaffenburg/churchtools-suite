@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-label="FeG Aschaffenburg ChurchTools Suite Logo">
+  <defs>
+    <style>
+      .cls-1 { fill: none; stroke: #1f4e79; stroke-width: 12; }
+      .cls-2 { fill: #1f4e79; }
+    </style>
+  </defs>
+  <circle class="cls-1" cx="128" cy="128" r="112" />
+  <rect class="cls-2" x="120" y="48" width="16" height="160" rx="4" />
+  <rect class="cls-2" x="64" y="120" width="128" height="16" rx="4" />
+</svg>

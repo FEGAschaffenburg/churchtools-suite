@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../plugins/churchtools-suite-demo"
+		}
+	],
+	"settings": {}
+}
