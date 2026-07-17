@@ -1,0 +1,33 @@
+<svg width="256" height="256" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- Gradient Background -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="icon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f0f4ff;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="256" height="256" rx="40" fill="url(#bg)"/>
+  
+  <!-- Demo Icon: Play Button + Cross -->
+  <g transform="translate(128, 110)">
+    <!-- Play Triangle -->
+    <path d="M -30,-35 L 40,0 L -30,35 Z" fill="url(#icon)" opacity="0.9"/>
+    
+    <!-- Small Cross in corner -->
+    <g transform="translate(45, -40) scale(0.5)">
+      <circle cx="0" cy="0" r="25" stroke="url(#icon)" stroke-width="8" fill="none" opacity="0.7"/>
+      <rect x="-3" y="-30" width="6" height="60" fill="url(#icon)" rx="3"/>
+      <rect x="-25" y="-3" width="50" height="6" fill="url(#icon)" rx="3"/>
+    </g>
+  </g>
+  
+  <!-- Bottom Label -->
+  <text x="128" y="200" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="white" text-anchor="middle" opacity="0.95">DEMO</text>
+  <text x="128" y="225" font-family="Arial, sans-serif" font-size="14" fill="white" text-anchor="middle" opacity="0.85">ChurchTools</text>
+</svg>

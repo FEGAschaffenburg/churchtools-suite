@@ -1,0 +1,20 @@
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Listen-Ansicht: Modern</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Diese Ansicht zeigt Events in einer modernen Listen-Darstellung mit klarem Design.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Verwendete Optionen:</h3>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list">
+<li><code>view="modern"</code></li>
+<li><code>limit="10"</code></li>
+</ul>
+<!-- /wp:list -->
+
+<!-- wp:churchtools-suite/events {"view":"modern","limit":10} /-->

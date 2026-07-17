@@ -1,0 +1,316 @@
+/**
+ * Demo Pages Frontend Styling
+ * 
+ * Styles für öffentliche Demo Pages auf der Website
+ * 
+ * @package ChurchTools_Suite_Demo
+ * @since   1.0.7.4
+ */
+
+/* ================================
+   Demo Page Container & Layout
+   ================================ */
+
+.cts-demo-page {
+	background: #fff;
+	padding: 2rem;
+	border-radius: 8px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.cts-demo-page .entry-header {
+	margin-bottom: 2rem;
+}
+
+.cts-demo-page .entry-title {
+	font-size: 2.5rem;
+	line-height: 1.2;
+	margin: 0 0 1rem 0;
+	color: #111827;
+	font-weight: 700;
+}
+
+/* Excerpt (Zusammenfassung) */
+.cts-demo-page .entry-summary {
+	font-size: 1.125rem;
+	color: #4b5563;
+	margin: 1rem 0;
+	font-style: italic;
+	padding-left: 1rem;
+	border-left: 4px solid #3b82f6;
+}
+
+/* ================================
+   Featured Image
+   ================================ */
+
+.cts-demo-page .post-thumbnail {
+	margin: 0 0 2rem 0;
+	border-radius: 8px;
+	overflow: hidden;
+	background: #f3f4f6;
+}
+
+.cts-demo-page .post-thumbnail img {
+	max-width: 100%;
+	height: auto;
+	display: block;
+}
+
+/* ================================
+   Content & Gutenberg Blocks
+   ================================ */
+
+.cts-demo-page .entry-content {
+	font-size: 1.0625rem;
+	line-height: 1.75;
+	color: #1f2937;
+	margin: 1.5rem 0;
+}
+
+.cts-demo-page .entry-content p {
+	margin-bottom: 1.5rem;
+}
+
+.cts-demo-page .entry-content h2 {
+	font-size: 2rem;
+	line-height: 1.2;
+	margin: 2rem 0 1rem 0;
+	color: #111827;
+	font-weight: 700;
+}
+
+.cts-demo-page .entry-content h3 {
+	font-size: 1.5rem;
+	line-height: 1.3;
+	margin: 1.5rem 0 0.75rem 0;
+	color: #1f2937;
+	font-weight: 600;
+}
+
+.cts-demo-page .entry-content h4,
+.cts-demo-page .entry-content h5,
+.cts-demo-page .entry-content h6 {
+	margin: 1.25rem 0 0.5rem 0;
+	color: #374151;
+	font-weight: 600;
+}
+
+/* ================================
+   Lists & Blockquotes
+   ================================ */
+
+.cts-demo-page .entry-content ul,
+.cts-demo-page .entry-content ol {
+	margin-left: 1.5rem;
+	margin-bottom: 1.5rem;
+}
+
+.cts-demo-page .entry-content li {
+	margin-bottom: 0.5rem;
+}
+
+.cts-demo-page .entry-content blockquote {
+	margin: 1.5rem 0;
+	padding: 1rem 1.5rem;
+	border-left: 4px solid #3b82f6;
+	background: #f0f9ff;
+	color: #1e40af;
+	font-style: italic;
+}
+
+/* ================================
+   Links & Buttons
+   ================================ */
+
+.cts-demo-page .entry-content a {
+	color: #3b82f6;
+	text-decoration: none;
+	border-bottom: 1px solid #3b82f6;
+	transition: all 0.2s ease;
+}
+
+.cts-demo-page .entry-content a:hover {
+	color: #2563eb;
+	border-bottom-color: #2563eb;
+}
+
+/* ================================
+   Code Blocks (Gutenberg)
+   ================================ */
+
+.cts-demo-page .wp-block-code {
+	background: #1f2937;
+	color: #f3f4f6;
+	padding: 1.5rem;
+	border-radius: 6px;
+	overflow-x: auto;
+	margin: 1.5rem 0;
+	font-size: 0.875rem;
+	line-height: 1.5;
+}
+
+.cts-demo-page .wp-block-code code {
+	font-family: 'Monaco', 'Courier New', monospace;
+}
+
+/* ================================
+   Shortcodes & Embeds
+   ================================ */
+
+.cts-demo-page .entry-content .wp-block-embed {
+	margin: 2rem 0;
+}
+
+.cts-demo-page .entry-content figure {
+	margin: 1.5rem 0;
+}
+
+.cts-demo-page .entry-content figure img {
+	max-width: 100%;
+	height: auto;
+	display: block;
+}
+
+.cts-demo-page .entry-content figcaption {
+	margin-top: 0.5rem;
+	font-size: 0.875rem;
+	color: #6b7280;
+	text-align: center;
+	font-style: italic;
+}
+
+/* ================================
+   Tabellen (wenn verwendet)
+   ================================ */
+
+.cts-demo-page .entry-content table {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 1.5rem 0;
+}
+
+.cts-demo-page .entry-content table th,
+.cts-demo-page .entry-content table td {
+	padding: 0.75rem;
+	text-align: left;
+	border: 1px solid #e5e7eb;
+}
+
+.cts-demo-page .entry-content table th {
+	background: #f3f4f6;
+	font-weight: 600;
+	color: #1f2937;
+}
+
+.cts-demo-page .entry-content table tr:nth-child(even) {
+	background: #f9fafb;
+}
+
+/* ================================
+   Page Links (für mehrseitige Posts)
+   ================================ */
+
+.cts-demo-page .page-links {
+	clear: both;
+	margin: 2rem 0;
+	padding: 1rem;
+	background: #f3f4f6;
+	border-radius: 6px;
+	text-align: center;
+}
+
+.cts-demo-page .page-links-title {
+	display: inline-block;
+	margin-right: 0.5rem;
+	font-weight: 600;
+	color: #374151;
+}
+
+.cts-demo-page .page-links span {
+	display: inline-block;
+	margin: 0 0.25rem;
+}
+
+.cts-demo-page .page-links a {
+	display: inline-block;
+	min-width: 2.5rem;
+	padding: 0.5rem 0.75rem;
+	border: 1px solid #d1d5db;
+	border-radius: 4px;
+	background: #fff;
+	color: #3b82f6;
+	text-align: center;
+	text-decoration: none;
+	transition: all 0.2s ease;
+}
+
+.cts-demo-page .page-links a:hover {
+	background: #3b82f6;
+	color: #fff;
+	border-color: #3b82f6;
+}
+
+/* ================================
+   Footer Meta-Informationen
+   ================================ */
+
+.cts-demo-page .entry-footer {
+	background: #f9fafb;
+	padding: 1rem;
+	border-radius: 6px;
+	text-align: center;
+}
+
+.cts-demo-page .entry-footer strong {
+	color: #1f2937;
+	font-weight: 600;
+}
+
+/* ================================
+   Responsives Design
+   ================================ */
+
+@media (max-width: 768px) {
+	.cts-demo-page {
+		padding: 1.5rem;
+	}
+
+	.cts-demo-page .entry-title {
+		font-size: 1.875rem;
+	}
+
+	.cts-demo-page .entry-content h2 {
+		font-size: 1.5rem;
+	}
+
+	.cts-demo-page .entry-content h3 {
+		font-size: 1.25rem;
+	}
+
+	.cts-demo-page .entry-content {
+		font-size: 1rem;
+	}
+}
+
+@media (max-width: 480px) {
+	.cts-demo-page {
+		padding: 1rem;
+	}
+
+	.cts-demo-page .entry-title {
+		font-size: 1.5rem;
+	}
+
+	.cts-demo-page .entry-content h2 {
+		font-size: 1.25rem;
+	}
+
+	.cts-demo-page .entry-summary {
+		font-size: 1rem;
+	}
+
+	.cts-demo-page .page-links {
+		padding: 0.75rem;
+	}
+}

@@ -1,0 +1,18 @@
+{
+  "private": true,
+  "devDependencies": {
+    "@wordpress/env": "^11.5.0"
+  },
+  "name": "plugin.feg-aschaffenburg.de",
+  "version": "1.0.0",
+  "scripts": {
+    "env:logs": "wp-env logs",
+    "env:destroy": "wp-env destroy",
+    "env:stop": "wp-env stop",
+    "env:start": "wp-env start",
+    "zip:build": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/build-wp-zips.ps1",
+    "zip:release": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/build-wp-zips.ps1 -Release",
+    "git:init": "powershell -NoProfile -ExecutionPolicy Bypass -File ./.links/wp-content/plugins/churchtools-suite/scripts/init-git-repo.ps1",
+    "release:github": "powershell -NoProfile -ExecutionPolicy Bypass -File ./.links/wp-content/plugins/churchtools-suite/scripts/release-and-deploy-github.ps1 -AutoVersion -InitRepo"
+  }
+}

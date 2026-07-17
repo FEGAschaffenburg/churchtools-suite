@@ -1,0 +1,122 @@
+.cts-presentation {
+  --cts-pres-bg: linear-gradient(130deg, #0f172a 0%, #111827 55%, #1f2937 100%);
+  --cts-pres-panel: rgba(15, 23, 42, 0.68);
+  --cts-pres-accent: #f59e0b;
+  color: #f8fafc;
+  background: var(--cts-pres-bg);
+  border-radius: 14px;
+  padding: 22px;
+  min-height: 72vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.cts-presentation-stage {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+
+.cts-presentation-slide {
+  display: none;
+  animation: ctsPresFade 0.5s ease;
+  height: 100%;
+}
+
+.cts-presentation-slide.is-active {
+  display: block;
+}
+
+.cts-presentation-header h2 {
+  margin: 0 0 14px 0;
+  font-size: clamp(1.4rem, 3vw, 2.1rem);
+  color: var(--cts-pres-accent);
+  letter-spacing: 0.02em;
+}
+
+.cts-presentation-content {
+  background: var(--cts-pres-panel);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.cts-presentation-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+}
+
+.cts-presentation-btn {
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  background: rgba(17, 24, 39, 0.9);
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.cts-presentation-btn:hover {
+  background: rgba(31, 41, 55, 0.9);
+}
+
+.cts-presentation-dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cts-presentation-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.cts-presentation-dot.is-active {
+  background: var(--cts-pres-accent);
+}
+
+.cts-presentation-event-card {
+  margin-bottom: 14px;
+}
+
+.cts-presentation-event-card h3 {
+  margin: 0 0 8px 0;
+  font-size: clamp(1.25rem, 2.6vw, 1.9rem);
+}
+
+.cts-presentation-services ul {
+  margin: 8px 0 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 8px;
+}
+
+.cts-presentation-services li {
+  background: rgba(30, 41, 59, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+@keyframes ctsPresFade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .cts-presentation {
+    min-height: 65vh;
+    padding: 16px;
+  }
+}
