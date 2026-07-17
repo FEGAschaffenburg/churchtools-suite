@@ -1,0 +1,36 @@
+<svg width="256" height="256" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- Gradient Background -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0A4A73;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#084461;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="icon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e0e7ee;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="256" height="256" rx="40" fill="url(#bg)"/>
+  
+  <!-- Main Cross/Church Symbol -->
+  <g transform="translate(128, 128)">
+    <!-- Circle -->
+    <circle cx="0" cy="-20" r="50" stroke="url(#icon)" stroke-width="10" fill="none" opacity="0.9"/>
+    
+    <!-- Cross Vertical -->
+    <rect x="-5" y="-70" width="10" height="120" fill="url(#icon)" rx="5"/>
+    
+    <!-- Cross Horizontal -->
+    <rect x="-45" y="-25" width="90" height="10" fill="url(#icon)" rx="5"/>
+    
+    <!-- Accent dots -->
+    <circle cx="-60" cy="-20" r="4" fill="#4A9EFF" opacity="0.8"/>
+    <circle cx="60" cy="-20" r="4" fill="#4A9EFF" opacity="0.8"/>
+    <circle cx="0" cy="65" r="4" fill="#4A9EFF" opacity="0.8"/>
+  </g>
+  
+  <!-- Bottom Label -->
+  <text x="128" y="220" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle" opacity="0.95">CT Suite</text>
+</svg>
