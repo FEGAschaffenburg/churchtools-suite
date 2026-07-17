@@ -27,7 +27,7 @@ get_header(); ?>
 				<div class="download-info">
 					<div class="info-item">
 						<span class="label">Letzte Aktualisierung:</span>
-						<span class="value">01. Februar 2026</span>
+						<span class="value">17. Juli 2026</span>
 					</div>
 					<div class="info-item">
 						<span class="label">Dateigröße:</span>

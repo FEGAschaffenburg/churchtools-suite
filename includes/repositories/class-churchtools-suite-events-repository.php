@@ -83,9 +83,18 @@ class ChurchTools_Suite_Events_Repository extends ChurchTools_Suite_Repository_B
         );
         
         if ($existing_id) {
-            // Selective Update: Nur appointment-spezifische Felder überschreiben
-            // v0.10.4.2: description wird ebenfalls aktualisiert (für saubere Appointment-Descriptions)
+            // Comprehensive Update: Alle relevanten Felder aktualisieren
+            // v1.2.2.0: CRITICAL FIX - Update title, end_datetime, last_modified für korrekte Sync
             $appointment_fields = [
+                'title', // v1.2.2.0: CRITICAL - Terminname MUSS aktualisiert werden!
+                'event_id', // v1.2.2.0: Event ID kann sich ändern
+                'end_datetime', // v1.2.2.0: CRITICAL - Endzeit MUSS aktualisiert werden!
+                'is_all_day', // v1.2.2.0: Ganztägig-Status kann sich ändern
+                'location_name', // v1.2.2.0: Ort-String MUSS aktualisiert werden!
+                'event_description', // v1.2.2.0: Event-Beschreibung MUSS aktualisiert werden!
+                'last_modified', // v1.2.2.0: CRITICAL - Für Incremental Sync erforderlich!
+                
+                // Existing fields
                 'description', // v0.10.4.2: Kombinierte description bei Appointments aktualisieren
                 'appointment_description',
                 'address_name',

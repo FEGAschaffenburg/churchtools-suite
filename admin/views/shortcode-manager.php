@@ -33,10 +33,10 @@ $shortcodes = [
 		'icon' => '📋',
 		'category' => 'list',
 		'description' => 'Zeigt Events als Liste an',
-		'views' => ['classic', 'classic-with-images', 'medium'], // Nur getestete Views
+		'views' => ['classic', 'standard', 'modern', 'minimal', 'toggle', 'with-map', 'fluent', 'large-liquid', 'medium-liquid', 'small-liquid', 'medium'],
 		'params' => [
 			// === Ansicht & Basis ===
-			'view' => ['type' => 'select', 'label' => 'View', 'options' => ['classic', 'classic-with-images', 'medium'], 'section' => '📋 Ansicht & Basis'],
+			'view' => ['type' => 'select', 'label' => 'View', 'options' => ['classic' => 'Klassisch', 'standard' => 'Standard', 'modern' => 'Modern', 'minimal' => 'Minimal', 'toggle' => 'Toggle', 'with-map' => 'Mit Karte', 'fluent' => 'Fluent', 'large-liquid' => 'Große Flüssig', 'medium-liquid' => 'Mittlere Flüssig', 'small-liquid' => 'Kleine Flüssig', 'medium' => 'Mittel'], 'section' => '📋 Ansicht & Basis'],
 			'calendar' => ['type' => 'checkboxes', 'label' => 'Kalender auswählen', 'section' => '📋 Ansicht & Basis'],
 			'limit' => ['type' => 'number', 'label' => 'Anzahl Events', 'default' => '20', 'section' => '⚙️ Basis-Einstellungen'],
 			// === Anzeige-Optionen ===
@@ -63,9 +63,9 @@ $shortcodes = [
 		'icon' => '📅',
 		'category' => 'calendar',
 		'description' => 'Zeigt Events in Kalender-Ansicht an',
-		'views' => ['monthly-modern'], // Nur getestete Views
+		'views' => ['monthly-modern', 'monthly-clean', 'monthly-classic', 'weekly-fluent', 'weekly-liquid', 'yearly', 'daily', 'daily-liquid'],
 		'params' => [
-			'view' => ['type' => 'select', 'label' => 'View', 'options' => ['monthly-modern'], 'section' => '📋 Ansicht & Basis'],
+			'view' => ['type' => 'select', 'label' => 'View', 'options' => ['monthly-modern' => 'Monatlich Modern', 'monthly-clean' => 'Monatlich Clean', 'monthly-classic' => 'Monatlich Klassisch', 'weekly-fluent' => 'Wöchentlich Fluent', 'weekly-liquid' => 'Wöchentlich Flüssig', 'yearly' => 'Jährlich', 'daily' => 'Täglich', 'daily-liquid' => 'Täglich Flüssig'], 'section' => '📋 Ansicht & Basis'],
 			'calendar' => ['type' => 'checkboxes', 'label' => 'Kalender auswählen', 'section' => '📋 Ansicht & Basis'],
 			'from' => ['type' => 'date', 'label' => 'Von Datum', 'section' => '🔍 Filter & Sortierung'],
 			'to' => ['type' => 'date', 'label' => 'Bis Datum', 'section' => '🔍 Filter & Sortierung'],
