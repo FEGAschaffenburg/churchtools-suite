@@ -383,6 +383,7 @@ class ChurchTools_Suite_Shortcodes {
 			'custom_font_size' => 14,
 			'custom_padding' => 12,
 			'custom_spacing' => 8,
+			'_custom_css' => '', // v1.3.0: Custom CSS (Block/Elementor)
 			// Legacy (deprecated in v1.0.0)
 			'show_description' => null,
 			// Filter parameters
@@ -477,6 +478,7 @@ class ChurchTools_Suite_Shortcodes {
 			'custom_font_size' => 14,
 			'custom_padding' => 12,
 			'custom_spacing' => 16,
+			'_custom_css' => '', // v1.3.0: Custom CSS (Block/Elementor)
 		], $atts, 'cts_grid' );
 		
 		// Backward-Compatibility: Normalisiere View-ID (alte Namen → neue deutsche IDs)
@@ -547,7 +549,8 @@ class ChurchTools_Suite_Shortcodes {
 			'custom_font_size' => 14,
 			'custom_padding' => 8,
 			'custom_spacing' => 0,
-		], $atts, 'cts_calendar' );
+\t\t\t'_custom_css' => '', // v1.3.0: Custom CSS (Block/Elementor)
+], $atts, 'cts_calendar' );
 		
 		// v0.9.8.6: Debug - Check what view value we received
 		if ( WP_DEBUG ) {
@@ -624,6 +627,7 @@ class ChurchTools_Suite_Shortcodes {
 			'custom_font_size' => 16,
 			'custom_padding' => 24,
 			'custom_spacing' => 16,
+			'_custom_css' => '', // v1.3.0: Custom CSS (Block/Elementor)
 		], $atts, 'cts_countdown' );
 		
 		// v1.1.3.0: Fix für Block-Editor - wenn 'view' leer oder 'classic', setze countdown-klassisch
@@ -728,6 +732,7 @@ class ChurchTools_Suite_Shortcodes {
 			'custom_font_size' => 14,
 			'custom_padding' => 16,
 			'custom_spacing' => 16,
+			'_custom_css' => '', // v1.3.0: Custom CSS (Block/Elementor)
 		], $atts, 'cts_carousel' );
 		
 		// Backward-Compatibility: Normalisiere View-ID
@@ -1469,3 +1474,4 @@ class ChurchTools_Suite_Shortcodes {
 		] );
 	}
 }
+
