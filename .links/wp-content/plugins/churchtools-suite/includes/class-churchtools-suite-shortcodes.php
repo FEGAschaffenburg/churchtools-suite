@@ -1038,10 +1038,11 @@ class ChurchTools_Suite_Shortcodes {
 			);
 		}
 
-		// v1.3.0: Inject scoped custom CSS from preset
-		if ( ! empty( $args['_preset_custom_css'] ) ) {
-			$instance_id = 'cts-instance-' . substr( md5( $args['_preset_custom_css'] . $template_name ), 0, 8 );
-			$scoped_css  = self::scope_css( $args['_preset_custom_css'], '#' . $instance_id );
+		// v1.3.0: Inject scoped custom CSS from preset or block
+		$custom_css = ! empty( $args['_custom_css'] ) ? $args['_custom_css'] : $args['_preset_custom_css'] ?? '';
+		if ( ! empty( $custom_css ) ) {
+			$instance_id = 'cts-instance-' . substr( md5( $custom_css . $template_name ), 0, 8 );
+			$scoped_css  = self::scope_css( $custom_css, '#' . $instance_id );
 			$output = sprintf(
 				'<div id="%s"><style>%s</style>%s</div>',
 				esc_attr( $instance_id ),
