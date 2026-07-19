@@ -802,6 +802,29 @@ if ( ! class_exists( 'CTS_Elementor_Events_Widget' ) ) {
 			]
 		);
 
+		// v1.3.0: Custom CSS Section
+		$this->add_control(
+			'custom_css_heading',
+			[
+				'label' => __( 'Benutzerdefiniertes CSS', 'churchtools-suite' ),
+				'type' => \Elementor\Controls_Manager::HEADING,
+				'separator' => 'before',
+			]
+		);
+
+		$this->add_control(
+			'custom_css',
+			[
+				'label' => __( 'CSS', 'churchtools-suite' ),
+				'type' => \Elementor\Controls_Manager::CODE,
+				'language' => 'css',
+				'rows' => 12,
+				'default' => '',
+				'description' => __( 'Geben Sie beliebiges CSS ein. Es wird auf diese Widget-Instanz beschränkt.', 'churchtools-suite' ),
+				'separator' => 'before',
+			]
+		);
+
 		$this->end_controls_section();
 	}
 
@@ -889,6 +912,11 @@ if ( ! class_exists( 'CTS_Elementor_Events_Widget' ) ) {
 		// Add tags filter if specified
 		if ( ! empty( $settings['tags'] ) ) {
 			$atts['tags'] = implode( ',', $settings['tags'] );
+		}
+
+		// v1.3.0: Add custom CSS (scoped to this widget instance)
+		if ( ! empty( $settings['custom_css'] ) ) {
+			$atts['_custom_css'] = wp_strip_all_tags( wp_unslash( $settings['custom_css'] ) );
 		}
 
 		// Determine shortcode tag based on view type

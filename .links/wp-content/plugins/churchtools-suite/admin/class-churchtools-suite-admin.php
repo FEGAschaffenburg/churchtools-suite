@@ -357,20 +357,6 @@ class ChurchTools_Suite_Admin {
 			30
 		);
 		
-		// v0.10.4.0: Shortcode Manager deaktiviert - Toggles werden über Gutenberg/Elementor gesteuert
-		/*
-		add_submenu_page(
-			'churchtools-suite',
-			__( 'Shortcode Manager', 'churchtools-suite' ),
-			__( '⚡ Shortcode Manager', 'churchtools-suite' ),
-			'manage_churchtools_suite',
-			'churchtools-suite-shortcodes',
-			[ $this, 'display_shortcode_manager' ]
-		);
-		*/
-		
-		// Shortcode Demo removed as separate submenu — demo is now integrated into Shortcode Manager
-
 		// Zweistufiger Einstieg: Übersichten
 		add_submenu_page(
 			'churchtools-suite',
@@ -607,14 +593,6 @@ class ChurchTools_Suite_Admin {
 		// Include view
 		include_once CHURCHTOOLS_SUITE_PATH . 'admin/views/admin-page.php';
 	}
-	
-	/**
-	 * Display shortcode manager page
-	 */
-	public function display_shortcode_manager() {
-		include_once CHURCHTOOLS_SUITE_PATH . 'admin/views/shortcode-manager.php';
-	}
-
 	/**
 	 * Display Data page (dedicated subpage)
 	 */
