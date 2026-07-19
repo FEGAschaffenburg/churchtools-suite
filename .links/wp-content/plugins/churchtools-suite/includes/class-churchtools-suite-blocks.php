@@ -29,11 +29,14 @@ class ChurchTools_Suite_Blocks {
 		
 		// Register block editor script FIRST (v0.9.9.5)
 		// CSS wird zentral via admin_enqueue_scripts geladen (v1.0.6.0)
+		$block_script_path = CHURCHTOOLS_SUITE_PATH . 'assets/js/churchtools-suite-blocks.js';
+		$block_script_version = file_exists( $block_script_path ) ? (string) filemtime( $block_script_path ) : CHURCHTOOLS_SUITE_VERSION;
+
 		wp_register_script(
 			'churchtools-suite-blocks',
 			CHURCHTOOLS_SUITE_URL . 'assets/js/churchtools-suite-blocks.js',
 			[ 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n', 'wp-server-side-render' ],
-			CHURCHTOOLS_SUITE_VERSION,
+			$block_script_version,
 			false // Load in header, not footer
 		);
 		
