@@ -23,7 +23,7 @@ class ChurchTools_Suite_Migrations {
 	 * Increment this when adding new migrations.
 	 * Format: Major.Minor (e.g., 1.0, 1.1, 1.2)
 	 */
-	const DB_VERSION = '1.5';
+	const DB_VERSION = '1.6';
 	
 	/**
 	 * Option key for storing DB version
@@ -75,6 +75,10 @@ class ChurchTools_Suite_Migrations {
 
 		if ( version_compare( $current_version, '1.5', '<' ) ) {
 			self::migrate_to_1_5();
+		}
+
+		if ( version_compare( $current_version, '1.6', '<' ) ) {
+			self::migrate_to_1_6();
 		}
 		
 		// Update DB version
@@ -407,6 +411,20 @@ class ChurchTools_Suite_Migrations {
 	 */
 	private static function migrate_to_1_5(): void {
 		self::migrate_to_1_4();
+	}
+
+	/**
+	 * Migration 1.6: Add custom_css column to shortcode_presets table (v1.3.0)
+	 */
+	private static function migrate_to_1_6(): void {
+		global $wpdb;
+		$table = $wpdb->prefix . CHURCHTOOLS_SUITE_DB_PREFIX . 'shortcode_presets';
+
+		// Add custom_css column if it doesn't exist yet
+		$columns = $wpdb->get_col( "DESC `{$table}`", 0 );
+		if ( ! in_array( 'custom_css', $columns, true ) ) {
+			$wpdb->query( "ALTER TABLE `{$table}` ADD COLUMN `custom_css` LONGTEXT DEFAULT NULL AFTER `configuration`" );
+		}
 	}
 
 	/**

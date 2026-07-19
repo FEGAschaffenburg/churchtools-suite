@@ -135,6 +135,11 @@ class ChurchTools_Suite_Shortcodes {
 			}
 			
 			$atts['_preset_base_view'] = $base_view;
+
+			// v1.3.0: Pass custom_css from preset into atts
+			if ( ! empty( $preset['custom_css'] ) ) {
+				$atts['_preset_custom_css'] = $preset['custom_css'];
+			}
 			
 			// Preset config has ALWAYS priority over shortcode parameters
 			foreach ( $preset['configuration'] as $key => $value ) {
@@ -391,9 +396,9 @@ class ChurchTools_Suite_Shortcodes {
 		$atts['view'] = ChurchTools_Suite_Template_Loader::normalize_view_id( 'list', $atts['view'] );
 		
 		// v0.9.7.0 - Erlaubte Views (deutsche IDs mit Präfix)
-		$allowed_views = [ 'list-einfach', 'list-klassisch', 'list-klassisch-modern', 'list-minimal', 'list-modern', 'list-klassisch-mit-bildern' ];
+		$allowed_views = [ 'list-einfach', 'list-klassisch', 'list-minimal', 'list-modern', 'list-klassisch-mit-bildern' ];
 		if ( ! in_array( $atts['view'], $allowed_views, true ) ) {
-			return '<p style="padding: 12px; background: #fef3c7; border-radius: 4px;">⚠️ <strong>View nicht verfügbar:</strong> Erlaubte Ansichten: Einfach, Klassisch, Klassisch-Modern, Minimal, Modern, Klassisch-mit-Bildern. View "' . esc_html( $atts['view'] ) . '" existiert nicht.</p>';
+			return '<p style="padding: 12px; background: #fef3c7; border-radius: 4px;">⚠️ <strong>View nicht verfügbar:</strong> Erlaubte Ansichten: Einfach, Klassisch, Minimal, Modern, Klassisch-mit-Bildern. View "' . esc_html( $atts['view'] ) . '" existiert nicht.</p>';
 		}
 		
 		// Convert boolean values
@@ -478,9 +483,9 @@ class ChurchTools_Suite_Shortcodes {
 		$atts['view'] = ChurchTools_Suite_Template_Loader::normalize_view_id( 'grid', $atts['view'] );
 		
 		// Erlaubte Views (deutsche IDs mit Präfix)
-		$allowed_views = [ 'grid-klassisch', 'grid-einfach', 'grid-minimal', 'grid-modern', 'grid-hintergrundbilder' ];
+		$allowed_views = [ 'grid-klassisch', 'grid-einfach', 'grid-minimal', 'grid-modern' ];
 		if ( ! in_array( $atts['view'], $allowed_views, true ) ) {
-			return '<p style="padding: 12px; background: #fef3c7; border-radius: 4px;">⚠️ <strong>Grid View nicht verfügbar:</strong> Erlaubte Ansichten: Klassisch, Einfach, Minimal, Modern, Hintergrundbilder</p>';
+			return '<p style="padding: 12px; background: #fef3c7; border-radius: 4px;">⚠️ <strong>Grid View nicht verfügbar:</strong> Erlaubte Ansichten: Klassisch, Einfach, Minimal, Modern</p>';
 		}
 		
 		// Validate columns (1-6)
@@ -707,8 +712,6 @@ class ChurchTools_Suite_Shortcodes {
 			'show_images' => true,
 			'image_fit' => 'cover',
 			'hero_title_font_size' => 0,
-			'hero_layout_preset' => 'standard',
-			'hero_mobile_optimize' => true,
 			'event_action' => 'modal',
 			// Carousel-spezifische Parameter
 			'slides_per_view' => 3, // 1-6 slides
@@ -1034,8 +1037,90 @@ class ChurchTools_Suite_Shortcodes {
 				$output
 			);
 		}
-		
+
+		// v1.3.0: Inject scoped custom CSS from preset
+		if ( ! empty( $args['_preset_custom_css'] ) ) {
+			$instance_id = 'cts-instance-' . substr( md5( $args['_preset_custom_css'] . $template_name ), 0, 8 );
+			$scoped_css  = self::scope_css( $args['_preset_custom_css'], '#' . $instance_id );
+			$output = sprintf(
+				'<div id="%s"><style>%s</style>%s</div>',
+				esc_attr( $instance_id ),
+				$scoped_css,
+				$output
+			);
+		}
+
 		return $output;
+	}
+
+	/**
+	 * Scope CSS rules to a parent selector.
+	 *
+	 * Each rule in the provided CSS is prefixed with $scope so that styles
+	 * only affect the specific shortcode instance.
+	 *
+	 * @param string $css   Raw CSS string.
+	 * @param string $scope Parent selector, e.g. "#cts-instance-abc12345".
+	 * @return string Scoped CSS string.
+	 */
+	private static function scope_css( string $css, string $scope ): string {
+		// Strip <style> tags if someone accidentally included them
+		$css = preg_replace( '#</?style[^>]*>#i', '', $css );
+
+		// Split into individual rules (very simple tokeniser – handles most real-world CSS)
+		$rules  = [];
+		$buffer = '';
+		$depth  = 0;
+		$len    = strlen( $css );
+
+		for ( $i = 0; $i < $len; $i++ ) {
+			$char = $css[ $i ];
+			if ( $char === '{' ) {
+				$depth++;
+			} elseif ( $char === '}' ) {
+				$depth--;
+				if ( $depth === 0 ) {
+					$rules[] = trim( $buffer ) . '}';
+					$buffer  = '';
+					continue;
+				}
+			}
+			$buffer .= $char;
+		}
+
+		$scoped = '';
+		foreach ( $rules as $rule ) {
+			if ( preg_match( '/^\s*@/', $rule ) ) {
+				// Pass @media / @keyframes through unchanged
+				$scoped .= $rule . '\n';
+				continue;
+			}
+			// Extract selector and declaration block
+			$brace_pos  = strpos( $rule, '{' );
+			if ( $brace_pos === false ) {
+				continue;
+			}
+			$selector   = trim( substr( $rule, 0, $brace_pos ) );
+			$declaration = substr( $rule, $brace_pos );
+			// Scope each comma-separated selector
+			$selectors   = array_map(
+				function( $s ) use ( $scope ) {
+					$s = trim( $s );
+					if ( $s === '' ) {
+						return '';
+					}
+					// Allow :root override
+					if ( str_starts_with( $s, ':root' ) ) {
+						return $s;
+					}
+					return $scope . ' ' . $s;
+				},
+				explode( ',', $selector )
+			);
+			$scoped .= implode( ', ', array_filter( $selectors ) ) . ' ' . $declaration . '\n';
+		}
+
+		return $scoped;
 	}
 
 	/**

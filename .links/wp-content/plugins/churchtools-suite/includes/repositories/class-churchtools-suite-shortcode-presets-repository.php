@@ -115,6 +115,7 @@ class ChurchTools_Suite_Shortcode_Presets_Repository extends ChurchTools_Suite_R
 			'description'    => $data['description'] ?? '',
 			'shortcode_tag'  => $data['shortcode_tag'] ?? '',
 			'configuration'  => wp_json_encode( $data['configuration'] ?? [] ),
+			'custom_css'     => $data['custom_css'] ?? null,
 			'is_system'      => $data['is_system'] ?? 0,
 			'created_at'     => current_time( 'mysql' ),
 		];
@@ -122,7 +123,7 @@ class ChurchTools_Suite_Shortcode_Presets_Repository extends ChurchTools_Suite_R
 		$result = $wpdb->insert(
 			$this->table,
 			$insert_data,
-			[ '%s', '%s', '%s', '%s', '%d', '%s' ]
+			[ '%s', '%s', '%s', '%s', '%s', '%d', '%s' ]
 		);
 		
 		return $result ? $wpdb->insert_id : false;
@@ -150,6 +151,10 @@ class ChurchTools_Suite_Shortcode_Presets_Repository extends ChurchTools_Suite_R
 		
 		if ( isset( $data['configuration'] ) ) {
 			$update_data['configuration'] = wp_json_encode( $data['configuration'] );
+		}
+
+		if ( array_key_exists( 'custom_css', $data ) ) {
+			$update_data['custom_css'] = $data['custom_css'];
 		}
 		
 		if ( empty( $update_data ) ) {

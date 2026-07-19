@@ -2471,6 +2471,7 @@ class ChurchTools_Suite_Admin {
 		$description = sanitize_textarea_field( $_POST['description'] ?? '' );
 		$shortcode_tag = sanitize_text_field( $_POST['shortcode_tag'] ?? '' );
 		$configuration_json = wp_unslash( $_POST['configuration'] ?? '{}' );
+		$custom_css = wp_strip_all_tags( wp_unslash( $_POST['custom_css'] ?? '' ) );
 		
 		if ( empty( $name ) || empty( $shortcode_tag ) ) {
 			wp_send_json_error( [ 'message' => __( 'Name und Shortcode-Typ sind Pflichtfelder', 'churchtools-suite' ) ] );
@@ -2500,16 +2501,17 @@ class ChurchTools_Suite_Admin {
 		
 		// Save preset
 		$preset_id = $presets_repo->create_preset( [
-			'name'           => $name,
-			'description'    => $description,
-			'shortcode_tag'  => $shortcode_tag,
-			'configuration'  => $configuration,
-			'is_system'      => 0,
+			'name'          => $name,
+			'description'   => $description,
+			'shortcode_tag' => $shortcode_tag,
+			'configuration' => $configuration,
+			'custom_css'    => $custom_css ?: null,
+			'is_system'     => 0,
 		] );
 		
 		if ( $preset_id ) {
 			wp_send_json_success( [
-				'message' => __( 'Preset erfolgreich gespeichert', 'churchtools-suite' ),
+				'message'   => __( 'Preset erfolgreich gespeichert', 'churchtools-suite' ),
 				'preset_id' => $preset_id,
 			] );
 		} else {
@@ -2533,6 +2535,7 @@ class ChurchTools_Suite_Admin {
 		$description = sanitize_textarea_field( $_POST['description'] ?? '' );
 		$shortcode_tag = sanitize_text_field( $_POST['shortcode_tag'] ?? '' );
 		$configuration_json = wp_unslash( $_POST['configuration'] ?? '{}' );
+		$custom_css = wp_strip_all_tags( wp_unslash( $_POST['custom_css'] ?? '' ) );
 		
 		if ( ! $preset_id ) {
 			wp_send_json_error( [ 'message' => __( 'Ungültige Preset-ID', 'churchtools-suite' ) ] );
@@ -2570,6 +2573,7 @@ class ChurchTools_Suite_Admin {
 			'description'    => $description,
 			'shortcode_tag'  => $shortcode_tag,
 			'configuration'  => $configuration,
+			'custom_css'     => $custom_css ?: null,
 		] );
 		
 		if ( $success ) {

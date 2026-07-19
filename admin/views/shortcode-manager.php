@@ -426,6 +426,20 @@ $shortcodes = [
 						<h4 style="margin: 0 0 8px; font-size: 14px;"><?php esc_html_e( 'Vorschau', 'churchtools-suite' ); ?></h4>
 						<code id="preset-preview-code" style="font-size: 13px; color: #d63638; word-break: break-all;"></code>
 					</div>
+
+					<!-- v1.3.0: Custom CSS -->
+					<div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #f0f0f1;">
+						<h4 style="margin: 0 0 4px; font-size: 14px;">🎨 <?php esc_html_e( 'Eigenes CSS', 'churchtools-suite' ); ?></h4>
+						<p style="margin: 0 0 10px; font-size: 12px; color: #6b7280;"><?php esc_html_e( 'CSS wird auf dieses Preset beschränkt (scoped). Nutze normale CSS-Selektoren – sie werden automatisch eingeschränkt.', 'churchtools-suite' ); ?></p>
+						<textarea
+							id="preset-custom-css"
+							name="preset-custom-css"
+							class="cts-form-textarea"
+							rows="8"
+							placeholder=".cts-event-title { color: #e11d48; font-size: 18px; }&#10;.cts-event-card { border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.1); }&#10;&#10;@media (max-width: 600px) {&#10;  .cts-event-card { padding: 8px; }&#10;}"
+							style="font-family: monospace; font-size: 12px; background: #1e1e2e; color: #cdd6f4; border-color: #313244; width: 100%; box-sizing: border-box;"
+						></textarea>
+					</div>
 				</form>
 			</div>
 			<div class="cts-card-footer">
@@ -990,7 +1004,8 @@ $shortcodes = [
 				name: name,
 				description: description,
 				shortcode_tag: shortcodeTag,
-				configuration: JSON.stringify(configuration)
+				configuration: JSON.stringify(configuration),
+				custom_css: (document.getElementById('preset-custom-css')?.value ?? '')
 			};
 			
 			if (presetId) {
@@ -1059,6 +1074,9 @@ $shortcodes = [
 			document.getElementById('preset-name').value = presetData.name;
 			document.getElementById('preset-description').value = presetData.description || '';
 			document.getElementById('preset-shortcode-tag').value = presetData.shortcode_tag;
+			// v1.3.0: custom_css
+			const cssField = document.getElementById('preset-custom-css');
+			if (cssField) { cssField.value = presetData.custom_css || ''; }
 			
 			// Trigger change to load params (synchron)
 			const changeEvent = new Event('change', { bubbles: true });

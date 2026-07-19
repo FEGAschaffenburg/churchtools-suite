@@ -135,6 +135,11 @@ class ChurchTools_Suite_Shortcodes {
 			}
 			
 			$atts['_preset_base_view'] = $base_view;
+
+			// v1.3.0: Pass custom_css from preset into atts
+			if ( ! empty( $preset['custom_css'] ) ) {
+				$atts['_preset_custom_css'] = $preset['custom_css'];
+			}
 			
 			// Preset config has ALWAYS priority over shortcode parameters
 			foreach ( $preset['configuration'] as $key => $value ) {
@@ -1032,8 +1037,90 @@ class ChurchTools_Suite_Shortcodes {
 				$output
 			);
 		}
-		
+
+		// v1.3.0: Inject scoped custom CSS from preset
+		if ( ! empty( $args['_preset_custom_css'] ) ) {
+			$instance_id = 'cts-instance-' . substr( md5( $args['_preset_custom_css'] . $template_name ), 0, 8 );
+			$scoped_css  = self::scope_css( $args['_preset_custom_css'], '#' . $instance_id );
+			$output = sprintf(
+				'<div id="%s"><style>%s</style>%s</div>',
+				esc_attr( $instance_id ),
+				$scoped_css,
+				$output
+			);
+		}
+
 		return $output;
+	}
+
+	/**
+	 * Scope CSS rules to a parent selector.
+	 *
+	 * Each rule in the provided CSS is prefixed with $scope so that styles
+	 * only affect the specific shortcode instance.
+	 *
+	 * @param string $css   Raw CSS string.
+	 * @param string $scope Parent selector, e.g. "#cts-instance-abc12345".
+	 * @return string Scoped CSS string.
+	 */
+	private static function scope_css( string $css, string $scope ): string {
+		// Strip <style> tags if someone accidentally included them
+		$css = preg_replace( '#</?style[^>]*>#i', '', $css );
+
+		// Split into individual rules (very simple tokeniser – handles most real-world CSS)
+		$rules  = [];
+		$buffer = '';
+		$depth  = 0;
+		$len    = strlen( $css );
+
+		for ( $i = 0; $i < $len; $i++ ) {
+			$char = $css[ $i ];
+			if ( $char === '{' ) {
+				$depth++;
+			} elseif ( $char === '}' ) {
+				$depth--;
+				if ( $depth === 0 ) {
+					$rules[] = trim( $buffer ) . '}';
+					$buffer  = '';
+					continue;
+				}
+			}
+			$buffer .= $char;
+		}
+
+		$scoped = '';
+		foreach ( $rules as $rule ) {
+			if ( preg_match( '/^\s*@/', $rule ) ) {
+				// Pass @media / @keyframes through unchanged
+				$scoped .= $rule . '\n';
+				continue;
+			}
+			// Extract selector and declaration block
+			$brace_pos  = strpos( $rule, '{' );
+			if ( $brace_pos === false ) {
+				continue;
+			}
+			$selector   = trim( substr( $rule, 0, $brace_pos ) );
+			$declaration = substr( $rule, $brace_pos );
+			// Scope each comma-separated selector
+			$selectors   = array_map(
+				function( $s ) use ( $scope ) {
+					$s = trim( $s );
+					if ( $s === '' ) {
+						return '';
+					}
+					// Allow :root override
+					if ( str_starts_with( $s, ':root' ) ) {
+						return $s;
+					}
+					return $scope . ' ' . $s;
+				},
+				explode( ',', $selector )
+			);
+			$scoped .= implode( ', ', array_filter( $selectors ) ) . ' ' . $declaration . '\n';
+		}
+
+		return $scoped;
 	}
 
 	/**
