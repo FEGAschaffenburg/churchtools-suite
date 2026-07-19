@@ -131,6 +131,12 @@ class ChurchTools_Suite_Blocks {
 		if ( ! empty( $attributes['custom_css'] ) ) {
 			$attributes['_custom_css'] = wp_strip_all_tags( wp_unslash( $attributes['custom_css'] ) );
 		}
+
+		// Support Gutenberg core "Additional CSS" field (stored as attributes.style.css).
+		// Use it only when plugin-specific custom_css is empty.
+		if ( empty( $attributes['_custom_css'] ) && ! empty( $attributes['style']['css'] ) && is_string( $attributes['style']['css'] ) ) {
+			$attributes['_custom_css'] = wp_strip_all_tags( wp_unslash( $attributes['style']['css'] ) );
+		}
 		
 		// v1.1.2.0: Convert Block attributes (camelCase) to Shortcode params (snake_case)
 		// Route to appropriate shortcode handler
