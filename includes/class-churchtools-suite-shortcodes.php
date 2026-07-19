@@ -549,7 +549,7 @@ class ChurchTools_Suite_Shortcodes {
 			'custom_font_size' => 14,
 			'custom_padding' => 8,
 			'custom_spacing' => 0,
-\t\t\t'_custom_css' => '', // v1.3.0: Custom CSS (Block/Elementor)
+			'_custom_css' => '', // v1.3.0: Custom CSS (Block/Elementor)
 ], $atts, 'cts_calendar' );
 		
 		// v0.9.8.6: Debug - Check what view value we received

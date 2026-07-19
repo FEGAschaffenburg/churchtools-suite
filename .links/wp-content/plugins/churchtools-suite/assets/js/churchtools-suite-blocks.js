@@ -710,11 +710,10 @@
 												{ style: { marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #ddd' } },
 												[
 													el('h4', { style: { margin: '0 0 12px 0', fontSize: '12px', fontWeight: '600' } }, __('Benutzerdefiniertes CSS', 'churchtools-suite')),
-													el('p', { style: { margin: '0 0 12px 0', fontSize: '11px', color: '#666' } }, __('CSS wird auf diesen Block beschraenkt', 'churchtools-suite')),
 													el('textarea', {
 														value: attributes.custom_css,
 														onChange: function(e) { setAttributes({ custom_css: e.target.value }); },
-														placeholder: '.cts-event-card { color: red; }',
+														placeholder: '.cts-list__item { border-left: 4px solid red; }',
 														style: {
 															width: '100%',
 															padding: '8px',
@@ -726,7 +725,51 @@
 															minHeight: '120px',
 															lineHeight: '1.4'
 														}
-													})
+													}),
+													// CSS class reference by view type
+													el('details', { style: { marginTop: '8px' } }, [
+														el('summary', { style: { fontSize: '11px', cursor: 'pointer', color: '#2271b1', userSelect: 'none' } }, __('Verfügbare CSS-Klassen anzeigen', 'churchtools-suite')),
+														el('div', { style: { marginTop: '6px', padding: '8px', background: '#f0f0f1', borderRadius: '4px', fontSize: '10px', fontFamily: 'monospace', lineHeight: '1.8' } }, [
+															(attributes.viewType === 'list' || !attributes.viewType) && el('div', {}, [
+																el('strong', { style: { display: 'block', marginBottom: '2px' } }, '— Liste —'),
+																el('span', {}, '.cts-list__item'), el('br', {}),
+																el('span', {}, '.cts-list__title'), el('br', {}),
+																el('span', {}, '.cts-list__description'), el('br', {}),
+																el('span', {}, '.cts-list__date-box'), el('br', {}),
+																el('span', {}, '.cts-list__date-day'), el('br', {}),
+																el('span', {}, '.cts-list__date-month'), el('br', {}),
+																el('span', {}, '.cts-list__time'), el('br', {}),
+																el('span', {}, '.cts-list__location'), el('br', {}),
+																el('span', {}, '.cts-list__tags'), el('br', {}),
+																el('span', {}, '.cts-list__tag'), el('br', {}),
+																el('span', {}, '.cts-list__month-separator'),
+															]),
+															attributes.viewType === 'grid' && el('div', {}, [
+																el('strong', { style: { display: 'block', marginBottom: '2px' } }, '— Grid —'),
+																el('span', {}, '.cts-grid-card-modern'), el('br', {}),
+																el('span', {}, '.cts-card-image-hero'), el('br', {}),
+																el('span', {}, '.cts-card-content-wrapper'), el('br', {}),
+																el('span', {}, '.cts-grid-minimal-card'), el('br', {}),
+																el('span', {}, '.cts-minimal-title'), el('br', {}),
+																el('span', {}, '.cts-minimal-date'),
+															]),
+															attributes.viewType === 'countdown' && el('div', {}, [
+																el('strong', { style: { display: 'block', marginBottom: '2px' } }, '— Countdown —'),
+																el('span', {}, '.cts-countdown-classic'), el('br', {}),
+																el('span', {}, '.cts-countdown-title'), el('br', {}),
+																el('span', {}, '.cts-countdown-date'), el('br', {}),
+																el('span', {}, '.cts-countdown-day'), el('br', {}),
+																el('span', {}, '.cts-countdown-month'), el('br', {}),
+																el('span', {}, '.cts-countdown-time'), el('br', {}),
+																el('span', {}, '.cts-countdown-location'),
+															]),
+															attributes.viewType === 'carousel' && el('div', {}, [
+																el('strong', { style: { display: 'block', marginBottom: '2px' } }, '— Carousel —'),
+																el('span', {}, '.cts-carousel'), el('br', {}),
+																el('span', {}, '.cts-carousel-slide'),
+															]),
+														])
+													])
 												]
 											)
 										]
