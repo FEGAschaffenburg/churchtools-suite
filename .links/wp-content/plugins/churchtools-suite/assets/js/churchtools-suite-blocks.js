@@ -92,6 +92,7 @@
 			custom_font_size: { type: 'number', default: 14 },
 			custom_padding: { type: 'number', default: 12 },
 			custom_spacing: { type: 'number', default: 8 },
+			custom_css: { type: 'string', default: '' }, // v1.3.0: Custom CSS per block
 			
 			// Features
 			event_action: { type: 'string', default: 'modal' }
@@ -700,6 +701,31 @@
 														min: 0,
 														max: 20,
 														style: { width: '100%', padding: '6px', border: '1px solid #ddd', borderRadius: '4px' }
+													})
+												]
+											),
+											// v1.3.0: Custom CSS Section
+											el(
+												'div',
+												{ style: { marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #ddd' } },
+												[
+													el('h4', { style: { margin: '0 0 12px 0', fontSize: '12px', fontWeight: '600' } }, __('Benutzerdefiniertes CSS', 'churchtools-suite')),
+													el('p', { style: { margin: '0 0 12px 0', fontSize: '11px', color: '#666' } }, __('CSS wird auf diesen Block beschraenkt', 'churchtools-suite')),
+													el('textarea', {
+														value: attributes.custom_css,
+														onChange: function(e) { setAttributes({ custom_css: e.target.value }); },
+														placeholder: '.cts-event-card { color: red; }',
+														style: {
+															width: '100%',
+															padding: '8px',
+															border: '1px solid #ddd',
+															borderRadius: '4px',
+															fontFamily: 'monospace',
+															fontSize: '11px',
+															backgroundColor: '#f5f5f5',
+															minHeight: '120px',
+															lineHeight: '1.4'
+														}
 													})
 												]
 											)

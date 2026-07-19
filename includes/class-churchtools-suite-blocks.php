@@ -89,6 +89,7 @@ class ChurchTools_Suite_Blocks {
 				'custom_font_size' => [ 'type' => 'number', 'default' => 14 ],
 				'custom_padding' => [ 'type' => 'number', 'default' => 12 ],
 				'custom_spacing' => [ 'type' => 'number', 'default' => 8 ],
+				'custom_css' => [ 'type' => 'string', 'default' => '' ], // v1.3.0: Custom CSS per block instance
 			],
 			'render_callback' => [ __CLASS__, 'render_events_block' ],
 			'editor_script' => 'churchtools-suite-blocks', // v0.9.9.5: Explizite Verknüpfung mit JS
@@ -122,6 +123,11 @@ class ChurchTools_Suite_Blocks {
 		// Ensure services toggle is interpreted robustly across editor/runtime variants.
 		$attributes['show_services'] = self::normalize_bool_attribute( $attributes, 'show_services', 'showServices', false );
 		$attributes['show_filter'] = self::normalize_bool_attribute( $attributes, 'show_filter', 'showFilter', false );
+		
+		// v1.3.0: Pass custom_css to shortcode (will be handled by _custom_css scoping)
+		if ( ! empty( $attributes['custom_css'] ) ) {
+			$attributes['_custom_css'] = wp_strip_all_tags( wp_unslash( $attributes['custom_css'] ) );
+		}
 		
 		// v1.1.2.0: Convert Block attributes (camelCase) to Shortcode params (snake_case)
 		// Route to appropriate shortcode handler
