@@ -18,6 +18,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<button type="button" id="cts-reload-logs" class="cts-button cts-button-primary">
 				<span>🔄</span> Logs neu laden
 			</button>
+			<button type="button" id="cts_export_logs_btn" class="cts-button cts-button-secondary">
+				<span>📥</span> Logs exportieren (CSV)
+			</button>
 			<button type="button" id="cts_clear_logs_btn" class="cts-button cts-button-danger">
 				<span>🗑️</span> Logs löschen
 			</button>
@@ -59,10 +62,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <script>
 jQuery(function($){
+	var exportNonce = '<?php echo esc_js( wp_create_nonce( 'churchtools_suite_admin' ) ); ?>';
+
 	// Logs neu laden Button (v0.10.4.8)
 	$('#cts-reload-logs').on('click', function(e){
 		e.preventDefault();
 		location.reload();
+	});
+
+	// Logs exportieren Button
+	$('#cts_export_logs_btn').on('click', function(e){
+		e.preventDefault();
+		var $btn = $(this);
+		$btn.prop('disabled', true).text('⏳ <?php esc_html_e( 'Exportiere...', 'churchtools-suite' ); ?>');
+
+		var url = ajaxurl + '?action=cts_export_logs&nonce=' + encodeURIComponent(exportNonce) + '&lines=5000';
+		window.location.href = url;
+
+		setTimeout(function(){
+			$btn.prop('disabled', false).text('📥 <?php esc_html_e( 'Logs exportieren (CSV)', 'churchtools-suite' ); ?>');
+		}, 1200);
 	});
 	
 	// Logs löschen Button

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Gemeinschaft - AI generiert</title>
+  <desc id="desc">Friendly group template for meetings and community events.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fdf2f8" />
+      <stop offset="100%" stop-color="#fce7f3" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)" />
+  <circle cx="166" cy="160" r="82" fill="#f472b6" opacity="0.45" />
+  <circle cx="1030" cy="150" r="110" fill="#fb7185" opacity="0.25" />
+  <g fill="#be185d">
+    <circle cx="410" cy="330" r="52" opacity="0.9" />
+    <circle cx="600" cy="286" r="66" opacity="0.95" />
+    <circle cx="790" cy="330" r="52" opacity="0.9" />
+  </g>
+  <g fill="#831843" opacity="0.22">
+    <path d="M350 540 C400 460, 470 420, 540 420 C610 420, 650 455, 690 540 Z" />
+    <path d="M500 540 C530 445, 580 404, 630 404 C680 404, 730 445, 760 540 Z" />
+    <path d="M660 540 C700 455, 750 420, 820 420 C890 420, 960 460, 1010 540 Z" />
+  </g>
+  <text x="600" y="392" text-anchor="middle" font-family="Arial, sans-serif" font-size="92" fill="#831843" font-weight="800">Gemeinschaft</text>
+  <text x="600" y="446" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" fill="#9d174d" letter-spacing="4">AI GENERIERT</text>
+  <text x="600" y="620" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#9d174d">Copyright 2026 FEG Aschaffenburg</text>
+</svg>

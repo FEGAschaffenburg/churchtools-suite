@@ -124,9 +124,11 @@ abstract class ChurchTools_Suite_Repository_Base {
         // Add automatic timestamps
         $data['created_at'] = $this->now();
         $data['updated_at'] = $this->now();
+
+        $deep_debug = class_exists('ChurchTools_Suite_Logger') && ChurchTools_Suite_Logger::is_deep_debug_enabled();
         
         // v0.9.2.2: Debug logging for insert operation
-        if (class_exists('ChurchTools_Suite_Logger')) {
+        if ($deep_debug) {
             ChurchTools_Suite_Logger::debug(
                 'repository',
                 sprintf('INSERT into %s', $this->table_name),
@@ -159,7 +161,7 @@ abstract class ChurchTools_Suite_Repository_Base {
         }
         
         // v0.9.2.2: Log success
-        if (class_exists('ChurchTools_Suite_Logger')) {
+        if ($deep_debug) {
             ChurchTools_Suite_Logger::debug(
                 'repository',
                 sprintf('INSERT successful: ID %d', $this->db->insert_id),

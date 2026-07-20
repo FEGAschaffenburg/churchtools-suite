@@ -1710,6 +1710,57 @@
 	flex-wrap: wrap;
 }
 
+.cts-calendar-template-gallery {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+	gap: 14px;
+	margin-top: 14px;
+}
+
+.cts-calendar-template-card {
+	background: #fff;
+	border: 1px solid #e5e7eb;
+	border-radius: 10px;
+	padding: 12px;
+	box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.cts-calendar-template-thumb {
+	border-radius: 8px;
+	overflow: hidden;
+	margin-bottom: 10px;
+	background: #f8fafc;
+}
+
+.cts-calendar-template-thumb img {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.cts-calendar-template-card strong,
+.cts-calendar-template-card p,
+.cts-calendar-template-card small {
+	display: block;
+}
+
+.cts-calendar-template-card p {
+	margin: 6px 0 8px;
+	color: #475569;
+	line-height: 1.5;
+}
+
+.cts-calendar-template-card small {
+	color: #64748b;
+}
+
+.cts-calendar-template-select {
+	min-width: 180px;
+	max-width: 260px;
+	width: 100%;
+	padding: 4px 8px;
+}
+
 /* Template Description (subtab-templates.php) */
 .cts-card-description {
 	color: #64748b;

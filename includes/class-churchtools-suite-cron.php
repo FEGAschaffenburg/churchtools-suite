@@ -336,7 +336,19 @@ class ChurchTools_Suite_Cron {
             }
 
             // Posts sync triggered via Hook 'cts_do_sync_posts' (if addon is active)
-            do_action( 'cts_do_sync_posts', $ct_client, $result );
+            try {
+                do_action( 'cts_do_sync_posts', $ct_client, $result );
+            } catch ( \Throwable $posts_sync_error ) {
+                if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+                    ChurchTools_Suite_Logger::warning(
+                        'cron_sync',
+                        'Posts-Sync hook failed after successful event sync',
+                        [ 'error' => $posts_sync_error->getMessage() ]
+                    );
+                }
+                $result['ct_posts_error'] = $posts_sync_error->getMessage();
+                $result['ct_posts_errors'] = (int) ( $result['ct_posts_errors'] ?? 0 ) + 1;
+            }
             
             // Success - Fehler löschen und Stats speichern
             delete_option('churchtools_suite_last_sync_error');

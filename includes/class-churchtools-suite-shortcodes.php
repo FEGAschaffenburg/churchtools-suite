@@ -552,10 +552,12 @@ class ChurchTools_Suite_Shortcodes {
 			'_custom_css' => '', // v1.3.0: Custom CSS (Block/Elementor)
 ], $atts, 'cts_calendar' );
 		
-		// v0.9.8.6: Debug - Check what view value we received
-		if ( WP_DEBUG ) {
-			error_log( 'Calendar Shortcode - Received view: ' . var_export( $atts['view'], true ) );
-			error_log( 'Calendar Shortcode - All atts: ' . var_export( $atts, true ) );
+		// Optional deep debug for shortcode diagnostics.
+		if ( class_exists( 'ChurchTools_Suite_Logger' ) && ChurchTools_Suite_Logger::is_deep_debug_enabled() ) {
+			ChurchTools_Suite_Logger::debug( 'shortcode_calendar', 'Input attributes received', [
+				'view' => $atts['view'],
+				'has_custom_css' => ! empty( $atts['_custom_css'] ),
+			] );
 		}
 		
 		// Backward-Compatibility: Normalisiere View-ID (alte/neue/englische IDs)
@@ -875,9 +877,11 @@ class ChurchTools_Suite_Shortcodes {
 			$filters['filter_tags'] = self::parse_tag_filter( $tags_param );
 		}
 		
-		// Debug output (only when WP_DEBUG is enabled)
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			error_log( 'ChurchTools Suite Shortcode: Getting events with filters: ' . print_r( $filters, true ) );
+		// Optional deep debug for query filters.
+		if ( class_exists( 'ChurchTools_Suite_Logger' ) && ChurchTools_Suite_Logger::is_deep_debug_enabled() ) {
+			ChurchTools_Suite_Logger::debug( 'shortcode_events', 'Getting events with filters', [
+				'filters' => $filters,
+			] );
 		}
 		
 		$events = self::$data_provider->get_events( $filters );
@@ -887,9 +891,10 @@ class ChurchTools_Suite_Shortcodes {
 			$events = array_reverse( $events );
 		}
 		
-		// Debug output
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			error_log( 'ChurchTools Suite Shortcode: Found ' . count( $events ) . ' events' );
+		if ( class_exists( 'ChurchTools_Suite_Logger' ) && ChurchTools_Suite_Logger::is_deep_debug_enabled() ) {
+			ChurchTools_Suite_Logger::debug( 'shortcode_events', 'Events found', [
+				'count' => count( $events ),
+			] );
 		}
 		
 		return $events;

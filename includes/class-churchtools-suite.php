@@ -67,6 +67,7 @@ class ChurchTools_Suite {
 		
 		// Image Helper (v1.1.0.2 - needed for modern list with images)
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-image-helper.php';
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-calendar-image-templates.php';
 		
 		// Single Event Shortcode (v0.7.1.0)
 		require_once CHURCHTOOLS_SUITE_PATH . 'includes/shortcodes/class-churchtools-suite-single-event-shortcode.php';

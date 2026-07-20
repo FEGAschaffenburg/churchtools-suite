@@ -290,14 +290,13 @@ class ChurchTools_Suite_Template_Loader {
 	public static function locate_template( string $template_name ) {
 		// v0.9.9.44: Template-Pfad-Migration (Kompatibilitäts-Layer)
 		$template_name = self::migrate_template_path( $template_name );
+		$deep_debug = class_exists( 'ChurchTools_Suite_Logger' ) && ChurchTools_Suite_Logger::is_deep_debug_enabled();
 		
 		// Load logger for debugging
-		if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+		if ( $deep_debug ) {
 			ChurchTools_Suite_Logger::debug( 'template_loader', 'Locating template START', [
 				'template_name' => $template_name,
-				'churchtools_suite_path' => CHURCHTOOLS_SUITE_PATH,
-				'churchtools_suite_path_length' => strlen( CHURCHTOOLS_SUITE_PATH ),
-				'churchtools_suite_path_defined' => defined( 'CHURCHTOOLS_SUITE_PATH' ),
+				'is_child_theme' => is_child_theme(),
 			] );
 		}
 		
@@ -305,20 +304,18 @@ class ChurchTools_Suite_Template_Loader {
 		$theme_template = get_stylesheet_directory() . '/' . self::THEME_TEMPLATE_DIR . '/' . $template_name;
 		$theme_exists = file_exists( $theme_template );
 		
-		if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+		if ( $deep_debug ) {
 			ChurchTools_Suite_Logger::debug( 'template_loader', 'Checking theme template', [
 				'path' => $theme_template,
 				'exists' => $theme_exists,
-				'is_readable' => $theme_exists ? is_readable( $theme_template ) : 'N/A',
-				'path_length' => strlen( $theme_template ),
+				'is_readable' => $theme_exists ? is_readable( $theme_template ) : null,
 			] );
 		}
 		
 		if ( $theme_exists ) {
-			if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+			if ( $deep_debug ) {
 				ChurchTools_Suite_Logger::debug( 'template_loader', 'Template found in theme', [
 					'path' => $theme_template,
-					'filesize' => filesize( $theme_template ),
 				] );
 			}
 			return $theme_template;
@@ -329,19 +326,18 @@ class ChurchTools_Suite_Template_Loader {
 			$parent_template = get_template_directory() . '/' . self::THEME_TEMPLATE_DIR . '/' . $template_name;
 			$parent_exists = file_exists( $parent_template );
 			
-			if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+			if ( $deep_debug ) {
 				ChurchTools_Suite_Logger::debug( 'template_loader', 'Checking parent theme template', [
 					'path' => $parent_template,
 					'exists' => $parent_exists,
-					'is_readable' => $parent_exists ? is_readable( $parent_template ) : 'N/A',
+					'is_readable' => $parent_exists ? is_readable( $parent_template ) : null,
 				] );
 			}
 			
 			if ( $parent_exists ) {
-				if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+				if ( $deep_debug ) {
 					ChurchTools_Suite_Logger::debug( 'template_loader', 'Template found in parent theme', [
 						'path' => $parent_template,
-						'filesize' => filesize( $parent_template ),
 					] );
 				}
 				return $parent_template;
@@ -354,28 +350,20 @@ class ChurchTools_Suite_Template_Loader {
 		$plugin_readable = $plugin_exists ? is_readable( $plugin_template ) : false;
 		$plugin_size = $plugin_exists ? filesize( $plugin_template ) : 0;
 		
-		if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
+		if ( $deep_debug ) {
 			ChurchTools_Suite_Logger::debug( 'template_loader', 'Checking plugin template (DETAILED)', [
 				'path' => $plugin_template,
-				'path_length' => strlen( $plugin_template ),
 				'exists' => $plugin_exists,
 				'is_readable' => $plugin_readable,
 				'filesize' => $plugin_size,
-				'churchtools_suite_path' => CHURCHTOOLS_SUITE_PATH,
-				'relative_part' => 'templates/' . $template_name,
 			] );
 		}
 		
 		if ( $plugin_exists ) {
-			if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
-				// v0.9.9.86: Extract template name from path for better debugging
-				$template_name_extracted = basename( $template_name, '.php' );
+			if ( $deep_debug ) {
 				ChurchTools_Suite_Logger::debug( 'template_loader', 'Template found in plugin', [
-					'template_name' => $template_name_extracted,
+					'template_name' => basename( $template_name, '.php' ),
 					'full_path' => $plugin_template,
-					'relative_path' => 'templates/' . $template_name,
-					'filesize' => $plugin_size,
-					'is_readable' => $plugin_readable,
 				] );
 			}
 			return $plugin_template;

@@ -38,7 +38,20 @@ const CRITICAL = self::LEVEL_CRITICAL;
      * Initialize logger (deprecated, kept for compatibility)
      */
     public static function init() {
-        // No-op: Using WordPress error_log() now
+        $log_file = self::get_log_file();
+        if ($log_file) {
+            $log_dir = dirname($log_file);
+            if (!is_dir($log_dir)) {
+                if (function_exists('wp_mkdir_p')) {
+                    wp_mkdir_p($log_dir);
+                } else {
+                    @mkdir($log_dir, 0755, true);
+                }
+            }
+            if (!file_exists($log_file)) {
+                @file_put_contents($log_file, '');
+            }
+        }
     }
     
     /**
@@ -69,13 +82,23 @@ const CRITICAL = self::LEVEL_CRITICAL;
             is_string($message) ? $message : print_r($message, true)
         );
         
-        // Add data if present
+        // Keep data one-line to simplify parsing in admin log view.
         if (!empty($data)) {
-            $formatted .= ' | Data: ' . print_r($data, true);
+            $encoded = wp_json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            $formatted .= ' | Data: ' . ($encoded !== false ? $encoded : print_r($data, true));
         }
+
+        $timestamp = function_exists('current_time') ? current_time('mysql') : date('Y-m-d H:i:s');
+        $line = sprintf('[%s] %s', $timestamp, $formatted);
         
-        // Log using WordPress error_log
-        error_log($formatted);
+        // Keep server-level visibility.
+        error_log($line);
+
+        // Keep plugin-local file for Debug tab reliability.
+        $log_file = self::get_log_file();
+        if ($log_file) {
+            @file_put_contents($log_file, $line . PHP_EOL, FILE_APPEND | LOCK_EX);
+        }
     }
 
 public static function debug(string $context, string $message, array $data = []) {
@@ -98,13 +121,143 @@ public static function critical(string $context, string $message, array $data = 
 self::log("[$context] $message", self::LEVEL_CRITICAL, $data);
 }
 
-// Legacy methods kept for backward compatibility
-public static function get_log_file(): ?string { return null; }
-public static function get_log_content(int $lines = 100): array { return []; }
-public static function get_statistics(): array {
-return ['total_entries' => 0, 'file_size' => 0, 'oldest_entry' => null, 'newest_entry' => null, 'level_counts' => []];
+public static function is_deep_debug_enabled(): bool {
+    if (!defined('WP_DEBUG') || !WP_DEBUG) {
+        return false;
+    }
+
+    if (defined('CHURCHTOOLS_SUITE_DEEP_DEBUG')) {
+        return (bool) CHURCHTOOLS_SUITE_DEEP_DEBUG;
+    }
+
+    if (function_exists('get_option')) {
+        return (bool) get_option('churchtools_suite_deep_debug', false);
+    }
+
+    return false;
 }
-public static function export_csv(int $lines = 1000): string { return "Using WordPress error_log() now\n"; }
-public static function clear_log() {}
-public static function get_log_files(): array { return []; }
+
+public static function get_log_file(): ?string {
+    $base_dir = '';
+
+    if (function_exists('wp_upload_dir')) {
+        $upload_dir = wp_upload_dir(null, false);
+        if (is_array($upload_dir) && empty($upload_dir['error']) && !empty($upload_dir['basedir'])) {
+            $base_dir = (string) $upload_dir['basedir'];
+        }
+    }
+
+    if ($base_dir === '' && defined('WP_CONTENT_DIR')) {
+        $base_dir = WP_CONTENT_DIR . '/uploads';
+    }
+
+    if ($base_dir === '' && defined('ABSPATH')) {
+        $base_dir = rtrim(ABSPATH, '/\\') . '/wp-content/uploads';
+    }
+
+    if ($base_dir === '') {
+        return null;
+    }
+
+    return rtrim($base_dir, '/\\') . '/churchtools-suite.log';
+}
+
+public static function get_log_content(int $lines = 100): array {
+    $log_file = self::get_log_file();
+    if (!$log_file || !file_exists($log_file) || !is_readable($log_file)) {
+        return [];
+    }
+
+    $all = @file($log_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    if (!is_array($all) || empty($all)) {
+        return [];
+    }
+
+    $tail = array_slice($all, -max(1, $lines));
+    $entries = [];
+
+    foreach ($tail as $line) {
+        $parsed = self::parse_log_line((string) $line);
+        if ($parsed !== null) {
+            $entries[] = $parsed;
+        }
+    }
+
+    return $entries;
+}
+
+public static function get_statistics(): array {
+    $entries = self::get_log_content(10000);
+    $level_counts = [
+        self::LEVEL_DEBUG => 0,
+        self::LEVEL_INFO => 0,
+        self::LEVEL_WARNING => 0,
+        self::LEVEL_ERROR => 0,
+        self::LEVEL_CRITICAL => 0,
+    ];
+
+    foreach ($entries as $entry) {
+        $level = strtolower((string) ($entry['level'] ?? ''));
+        if (isset($level_counts[$level])) {
+            $level_counts[$level]++;
+        }
+    }
+
+    $log_file = self::get_log_file();
+    $file_size = ($log_file && file_exists($log_file)) ? (int) filesize($log_file) : 0;
+
+    return [
+        'total_entries' => count($entries),
+        'file_size' => $file_size,
+        'oldest_entry' => !empty($entries) ? ($entries[0]['timestamp'] ?? null) : null,
+        'newest_entry' => !empty($entries) ? ($entries[count($entries) - 1]['timestamp'] ?? null) : null,
+        'level_counts' => $level_counts,
+    ];
+}
+
+public static function export_csv(int $lines = 1000): string {
+    $entries = self::get_log_content($lines);
+    $out = "timestamp,level,context,message\n";
+
+    foreach ($entries as $entry) {
+        $row = [
+            (string) ($entry['timestamp'] ?? ''),
+            (string) ($entry['level'] ?? ''),
+            (string) ($entry['context'] ?? ''),
+            str_replace('"', '""', (string) ($entry['message'] ?? '')),
+        ];
+        $out .= sprintf("\"%s\",\"%s\",\"%s\",\"%s\"\n", $row[0], $row[1], $row[2], $row[3]);
+    }
+
+    return $out;
+}
+
+public static function clear_log() {
+    $log_file = self::get_log_file();
+    if ($log_file && file_exists($log_file)) {
+        @file_put_contents($log_file, '');
+    }
+}
+
+public static function get_log_files(): array {
+    $log_file = self::get_log_file();
+    if ($log_file && file_exists($log_file)) {
+        return [$log_file];
+    }
+    return [];
+}
+
+private static function parse_log_line(string $line): ?array {
+    $pattern = '/^\[(?<timestamp>[^\]]+)\]\s+\[ChurchTools Suite\]\s+\[(?<level>[A-Z]+)\]\s+(?<context>[^:]+):\s*(?<message>.*)$/';
+    if (!preg_match($pattern, $line, $m)) {
+        return null;
+    }
+
+    return [
+        'timestamp' => trim((string) $m['timestamp']),
+        'level' => strtolower(trim((string) $m['level'])),
+        'context' => trim((string) $m['context']),
+        'message' => trim((string) $m['message']),
+    ];
+}
 }

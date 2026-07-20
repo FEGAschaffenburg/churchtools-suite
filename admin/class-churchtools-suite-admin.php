@@ -658,6 +658,7 @@ class ChurchTools_Suite_Admin {
 		// Simple ping endpoint to verify AJAX/JSON pipeline
 		add_action( 'wp_ajax_cts_keepalive_ping', [ $this, 'ajax_keepalive_ping' ] );
 		add_action( 'wp_ajax_cts_reload_logs', [ $this, 'ajax_reload_logs' ] );
+		add_action( 'wp_ajax_cts_export_logs', [ $this, 'ajax_export_logs' ] );
 		add_action( 'wp_ajax_cts_clear_logs', [ $this, 'ajax_clear_logs' ] );
 		add_action( 'wp_ajax_cts_clear_block_logs', [ $this, 'ajax_clear_block_logs' ] );
 		add_action( 'wp_ajax_cts_save_preset', [ $this, 'ajax_save_preset' ] );
@@ -1315,7 +1316,17 @@ class ChurchTools_Suite_Admin {
 			}
 
 			// Posts sync triggered via Hook 'cts_do_sync_posts' (if addon is active)
-			do_action( 'cts_do_sync_posts', $client, $result );
+			try {
+				do_action( 'cts_do_sync_posts', $client, $result );
+			} catch ( \Throwable $posts_sync_error ) {
+				@ChurchTools_Suite_Logger::warning(
+					'manual_sync',
+					'Posts-Sync hook failed after successful event sync',
+					[ 'error' => $posts_sync_error->getMessage() ]
+				);
+				$result['ct_posts_error'] = $posts_sync_error->getMessage();
+				$result['ct_posts_errors'] = (int) ( $result['ct_posts_errors'] ?? 0 ) + 1;
+			}
 			
 			// Mark sync as successful
 			if ( $sync_id ) {
@@ -2006,6 +2017,42 @@ class ChurchTools_Suite_Admin {
 				'message' => __( 'Fehler beim Laden der Logs: ', 'churchtools-suite' ) . $e->getMessage()
 			] );
 		}
+	}
+
+	/**
+	 * AJAX Handler: Export Logs as CSV download
+	 */
+	public function ajax_export_logs() {
+		// Check nonce
+		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
+
+		// Check permissions: view_churchtools_debug (Debug/Logs)
+		if ( ! current_user_can( 'view_churchtools_debug' ) ) {
+			wp_die( esc_html__( 'Keine Berechtigung.', 'churchtools-suite' ), 403 );
+		}
+
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-logger.php';
+
+		$lines = isset( $_REQUEST['lines'] ) ? absint( $_REQUEST['lines'] ) : 2000;
+		$lines = max( 1, min( 20000, $lines ) );
+
+		$csv = ChurchTools_Suite_Logger::export_csv( $lines );
+		$filename = 'churchtools-suite-logs-' . gmdate( 'Y-m-d-His' ) . '.csv';
+
+		if ( function_exists( 'nocache_headers' ) ) {
+			nocache_headers();
+		}
+
+		if ( ob_get_length() ) {
+			ob_clean();
+		}
+
+		header( 'Content-Type: text/csv; charset=utf-8' );
+		header( 'Content-Disposition: attachment; filename=' . $filename );
+		header( 'Content-Length: ' . strlen( $csv ) );
+
+		echo $csv;
+		exit;
 	}
 	
 	/**

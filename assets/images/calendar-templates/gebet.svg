@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Gebet - AI generiert</title>
+  <desc id="desc">Calm prayer template with soft light and hands motif.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#eff6ff" />
+      <stop offset="100%" stop-color="#cbd5e1" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)" />
+  <circle cx="930" cy="145" r="180" fill="#fff" opacity="0.55" />
+  <circle cx="930" cy="145" r="105" fill="#fde68a" opacity="0.45" />
+  <path d="M305 456 C355 360, 425 320, 510 320 C569 320, 624 347, 660 397 C703 338, 764 312, 838 312 C925 312, 997 359, 1040 456 C933 536, 794 570, 600 570 C406 570, 267 536, 160 456 C194 429, 232 414, 305 456 Z" fill="#334155" opacity="0.22" />
+  <path d="M402 445 C435 392, 490 360, 541 360 C570 360, 604 374, 625 399 C654 366, 692 350, 733 350 C790 350, 840 380, 870 445 C780 495, 684 522, 600 522 C514 522, 447 495, 402 445 Z" fill="#1e293b" opacity="0.55" />
+  <text x="600" y="392" text-anchor="middle" font-family="Georgia, serif" font-size="100" fill="#1e293b" font-weight="700">Gebet</text>
+  <text x="600" y="446" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" fill="#475569" letter-spacing="4">AI GENERIERT</text>
+  <text x="600" y="620" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#475569">Copyright 2026 FEG Aschaffenburg</text>
+</svg>

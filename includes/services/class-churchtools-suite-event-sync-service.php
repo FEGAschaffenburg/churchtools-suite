@@ -349,6 +349,7 @@ class ChurchTools_Suite_Event_Sync_Service {
      * @return array|WP_Error Statistics
      */
     private function process_calendar_events(array $events, string $calendar_id, array $args, bool $is_incremental = false) {
+        $deep_debug = class_exists('ChurchTools_Suite_Logger') && ChurchTools_Suite_Logger::is_deep_debug_enabled();
         $stats = [
             'events_found' => count($events),
             'appointments_found' => 0,
@@ -370,15 +371,17 @@ class ChurchTools_Suite_Event_Sync_Service {
         // Phase 1: Process events
         foreach ($events as $index => $event) {
             // v0.7.2.6: Debug log each event
-            ChurchTools_Suite_Logger::debug(
-                'event_sync',
-                sprintf('Processing event %d/%d: ID=%s', $index + 1, count($events), $event['id'] ?? 'unknown'),
-                [
-                    'event_id' => $event['id'] ?? null,
-                    'title' => $event['name'] ?? $event['designation'] ?? 'unknown',
-                    'has_appointment' => isset($event['appointmentId'])
-                ]
-            );
+            if ($deep_debug) {
+                ChurchTools_Suite_Logger::debug(
+                    'event_sync',
+                    sprintf('Processing event %d/%d: ID=%s', $index + 1, count($events), $event['id'] ?? 'unknown'),
+                    [
+                        'event_id' => $event['id'] ?? null,
+                        'title' => $event['name'] ?? $event['designation'] ?? 'unknown',
+                        'has_appointment' => isset($event['appointmentId'])
+                    ]
+                );
+            }
             
             // Collect appointment IDs for Phase 2
             // API structure: event.appointmentId (direct), or nested event.appointment.base.id/event.appointment.id

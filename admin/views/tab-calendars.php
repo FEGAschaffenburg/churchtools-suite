@@ -14,6 +14,7 @@ if (!defined('ABSPATH')) {
 global $wpdb;
 require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-repository-base.php';
 require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-calendars-repository.php';
+require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-calendar-image-templates.php';
 
 $calendars_repo = new ChurchTools_Suite_Calendars_Repository();
 $calendars = $calendars_repo->get_all();
@@ -21,6 +22,7 @@ $selected_count = $calendars_repo->count_selected();
 $last_sync = get_option('churchtools_suite_calendars_last_sync', null);
 // v0.9.9.58: Read calendar_image_id from table, fallback to option for backward compatibility
 $calendar_images_option = get_option('churchtools_suite_calendar_images', []);
+$calendar_templates = ChurchTools_Suite_Calendar_Image_Templates::get_templates();
 ?>
 
    <!-- Kalender Sync Button -->
@@ -52,6 +54,33 @@ $calendar_images_option = get_option('churchtools_suite_calendar_images', []);
 	   </div>
    </div>
 
+	<!-- Calendar Image Templates -->
+	<div class="cts-card cts-mt-20">
+		<div class="cts-card-header">
+			<span class="cts-card-icon">🖼️</span>
+			<h3><?php esc_html_e('Vorlagenbilder', 'churchtools-suite'); ?></h3>
+		</div>
+		<div class="cts-card-body">
+			<p class="description">
+				<?php esc_html_e('Diese Bilder sind AI-generiert und mit Copyright-Hinweis versehen. Sie können direkt in der Kalenderzuweisung gewählt werden.', 'churchtools-suite'); ?>
+			</p>
+			<div class="cts-calendar-template-gallery">
+				<?php foreach ( $calendar_templates as $template ) : ?>
+					<div class="cts-calendar-template-card">
+						<div class="cts-calendar-template-thumb">
+							<?php if ( ! empty( $template['preview_url'] ) ) : ?>
+								<img src="<?php echo esc_url( $template['preview_url'] ); ?>" alt="<?php echo esc_attr( $template['name'] ); ?>" />
+							<?php endif; ?>
+						</div>
+						<strong><?php echo esc_html( $template['name'] ); ?></strong>
+						<p><?php echo esc_html( $template['description'] ); ?></p>
+						<small><?php echo esc_html( $template['copyright'] ); ?></small>
+					</div>
+				<?php endforeach; ?>
+			</div>
+		</div>
+	</div>
+
    <!-- Calendar Selection Card -->
    <div class="cts-card cts-mt-20">
 	   <div class="cts-card-header">
@@ -65,6 +94,8 @@ $calendar_images_option = get_option('churchtools_suite_calendar_images', []);
 			var btn = document.getElementById('cts-sync-calendars-btn');
 			var result = document.getElementById('cts-sync-calendars-result');
 			if (!btn) return;
+			if (btn.dataset.ctsSyncHandler) return;
+			btn.dataset.ctsSyncHandler = 'inline';
 			btn.addEventListener('click', function() {
 				if (!confirm('<?php echo esc_js(__('Kalender jetzt mit ChurchTools synchronisieren?', 'churchtools-suite')); ?>')) return;
 				btn.disabled = true;
@@ -76,18 +107,30 @@ $calendar_images_option = get_option('churchtools_suite_calendar_images', []);
 					headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 					body: new URLSearchParams({ action: 'cts_sync_calendars', nonce: churchtoolsSuite.nonce })
 			}).then(function(r) {
-				// Prüfe ob Response OK ist und JSON enthält
 				if (!r.ok) {
 					throw new Error('Server-Fehler: ' + r.status);
 				}
-				const contentType = r.headers.get('content-type');
-				if (!contentType || !contentType.includes('application/json')) {
-					return r.text().then(text => {
-						console.error('Non-JSON Response:', text.substring(0, 500));
-						throw new Error('Server hat keine gültige JSON-Antwort gesendet (möglicherweise PHP-Fehler)');
-					});
-				}
-				return r.json();
+				return r.text().then(function(text) {
+					var raw = String(text || '');
+					var trimmed = raw.trim();
+
+					try {
+						return JSON.parse(trimmed);
+					} catch (e1) {
+						var start = trimmed.indexOf('{');
+						var end = trimmed.lastIndexOf('}');
+						if (start !== -1 && end !== -1 && end > start) {
+							var maybeJson = trimmed.substring(start, end + 1);
+							try {
+								return JSON.parse(maybeJson);
+							} catch (e2) {
+								// handled below
+							}
+						}
+
+					console.error('Calendar sync non-JSON response:', trimmed.substring(0, 500));
+					throw new Error('Server lieferte keine lesbare JSON-Antwort (oft PHP-Warning/Notice vor JSON).');
+				});
 			}).then(function(data) {
 				if (data.success) {
 					if (result) result.innerHTML = '<span style="color:#0a0">' + (data.data && data.data.message ? data.data.message : '✅ Synchronisation abgeschlossen') + '</span>';
@@ -139,6 +182,7 @@ $calendar_images_option = get_option('churchtools_suite_calendar_images', []);
 								<th><?php esc_html_e('Sichtbarkeit', 'churchtools-suite'); ?></th>
 								<th><?php esc_html_e('Farbe', 'churchtools-suite'); ?></th>
 								<th><?php esc_html_e('Fallback-Bild', 'churchtools-suite'); ?></th>
+								<th><?php esc_html_e('Vorlage', 'churchtools-suite'); ?></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -147,6 +191,13 @@ $calendar_images_option = get_option('churchtools_suite_calendar_images', []);
 									// v0.9.9.58: Prefer calendar_image_id from table, fallback to option
 									$image_id = !empty($calendar->calendar_image_id) ? absint($calendar->calendar_image_id) : (isset($calendar_images_option[$calendar->calendar_id]) ? absint($calendar_images_option[$calendar->calendar_id]) : 0);
 									$image_url = $image_id ? wp_get_attachment_image_url($image_id, 'thumbnail') : '';
+										$template_value = '';
+										foreach ( $calendar_templates as $template ) {
+											if ( ! empty( $template['attachment_id'] ) && absint( $template['attachment_id'] ) === $image_id ) {
+												$template_value = (string) $template['attachment_id'];
+												break;
+											}
+										}
 								?>
 								<tr>
 									<td>
@@ -200,6 +251,20 @@ $calendar_images_option = get_option('churchtools_suite_calendar_images', []);
 												<button type="button" class="button-link-delete cts-remove-calendar-image" data-calendar-id="<?php echo esc_attr($calendar->calendar_id); ?>"><?php esc_html_e('Entfernen', 'churchtools-suite'); ?></button>
 											</div>
 										</div>
+									</td>
+									<td>
+										<select class="cts-calendar-template-select" data-calendar-id="<?php echo esc_attr($calendar->calendar_id); ?>">
+											<option value=""><?php esc_html_e('Eigene Auswahl', 'churchtools-suite'); ?></option>
+											<?php foreach ( $calendar_templates as $template ) : ?>
+												<option
+													value="<?php echo esc_attr( $template['attachment_id'] ); ?>"
+													data-image-url="<?php echo esc_url( $template['preview_url'] ); ?>"
+													<?php selected( $template_value, (string) $template['attachment_id'] ); ?>
+												>
+													<?php echo esc_html( $template['name'] ); ?>
+												</option>
+											<?php endforeach; ?>
+										</select>
 									</td>
 								</tr>
 							<?php endforeach; ?>

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Gottesdienst - AI generiert</title>
+  <desc id="desc">Bundled calendar template with a cross motif and copyright note.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f6efe2" />
+      <stop offset="100%" stop-color="#d7c7aa" />
+    </linearGradient>
+    <linearGradient id="halo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff8ec" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#fff8ec" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)" />
+  <circle cx="900" cy="140" r="220" fill="url(#halo)" />
+  <path d="M70 560 C240 470, 380 460, 560 520 C760 585, 960 585, 1140 510 L1140 675 L70 675 Z" fill="#a78b6f" opacity="0.22" />
+  <g transform="translate(140 115)">
+    <circle cx="250" cy="210" r="180" fill="#fff7eb" opacity="0.82" />
+    <rect x="227" y="70" width="46" height="280" rx="20" fill="#7c5c40" />
+    <rect x="138" y="162" width="224" height="46" rx="20" fill="#7c5c40" />
+    <path d="M247 28 L258 58 L290 58 L264 78 L274 110 L247 90 L220 110 L230 78 L204 58 L236 58 Z" fill="#c79f65" />
+  </g>
+  <text x="610" y="420" text-anchor="middle" font-family="Georgia, serif" font-size="86" fill="#3f2d1f" font-weight="700">Gottesdienst</text>
+  <text x="610" y="475" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" fill="#5c4a3d" letter-spacing="3">AI GENERIERT</text>
+  <text x="610" y="622" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#6f6257">Copyright 2026 FEG Aschaffenburg</text>
+</svg>

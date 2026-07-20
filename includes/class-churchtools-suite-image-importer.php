@@ -176,6 +176,83 @@ class ChurchTools_Suite_Image_Importer {
         
         return $attachment_id;
     }
+
+    /**
+     * Import a local file into the WordPress media library.
+     *
+     * @param string $source_path Absolute path to the source file
+     * @param string $title Attachment title
+     * @param string $slug Optional attachment slug
+     * @param array  $meta Optional attachment meta data
+     * @return int|WP_Error Attachment ID on success, WP_Error on failure
+     */
+    public static function import_local_file(string $source_path, string $title = '', string $slug = '', array $meta = []): mixed {
+        if (empty($source_path) || !file_exists($source_path) || !is_readable($source_path)) {
+            return new WP_Error('missing_file', __('Lokale Bilddatei nicht gefunden.', 'churchtools-suite'));
+        }
+
+        require_once ABSPATH . 'wp-admin/includes/media.php';
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+        require_once ABSPATH . 'wp-admin/includes/image.php';
+
+        $upload_dir = wp_upload_dir();
+        if (!empty($upload_dir['error'])) {
+            return new WP_Error('upload_dir_error', $upload_dir['error']);
+        }
+
+        if (!wp_mkdir_p($upload_dir['path'])) {
+            return new WP_Error('upload_dir_create_failed', __('Upload-Verzeichnis konnte nicht erstellt werden.', 'churchtools-suite'));
+        }
+
+        $file_name = basename($source_path);
+        $target_name = wp_unique_filename($upload_dir['path'], sanitize_file_name($file_name));
+        $target_file = trailingslashit($upload_dir['path']) . $target_name;
+
+        if (!@copy($source_path, $target_file)) {
+            return new WP_Error('copy_failed', __('Datei konnte nicht in die Mediathek kopiert werden.', 'churchtools-suite'));
+        }
+
+        $extension = strtolower((string) pathinfo($target_file, PATHINFO_EXTENSION));
+        $mime_map = [
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'gif' => 'image/gif',
+            'webp' => 'image/webp',
+            'svg' => 'image/svg+xml',
+        ];
+
+        $mime_type = $mime_map[$extension] ?? 'application/octet-stream';
+        $attachment_title = sanitize_text_field($title ?: pathinfo($target_name, PATHINFO_FILENAME));
+        $attachment_slug = sanitize_title($slug ?: pathinfo($target_name, PATHINFO_FILENAME));
+
+        $attachment = [
+            'post_mime_type' => $mime_type,
+            'post_title' => $attachment_title,
+            'post_content' => '',
+            'post_status' => 'inherit',
+            'post_name' => $attachment_slug,
+        ];
+
+        $attachment_id = wp_insert_attachment($attachment, $target_file);
+        if (is_wp_error($attachment_id)) {
+            @unlink($target_file);
+            return $attachment_id;
+        }
+
+        if ($mime_type !== 'image/svg+xml') {
+            $attach_data = wp_generate_attachment_metadata($attachment_id, $target_file);
+            wp_update_attachment_metadata($attachment_id, $attach_data);
+        }
+
+        foreach ($meta as $meta_key => $meta_value) {
+            update_post_meta($attachment_id, (string) $meta_key, $meta_value);
+        }
+
+        update_post_meta($attachment_id, '_cts_local_source_file', $source_path);
+
+        return $attachment_id;
+    }
     
     /**
      * Get image URL from attachment ID

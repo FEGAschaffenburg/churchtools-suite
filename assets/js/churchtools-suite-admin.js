@@ -306,6 +306,10 @@
 		const syncButton = document.getElementById('cts-sync-calendars-btn');
 		if (!syncButton) return;
 
+		// Avoid duplicate click handlers when tab-specific inline scripts are present.
+		if (syncButton.dataset.ctsSyncHandler) return;
+		syncButton.dataset.ctsSyncHandler = 'external';
+
 		syncButton.addEventListener('click', function() {
 			const resultDiv = document.getElementById('cts-sync-calendars-result');
 			
@@ -328,7 +332,33 @@
 					nonce: churchtoolsSuite.nonce
 				})
 			})
-			.then(response => response.json())
+			.then(response => response.text().then(text => {
+				if (!response.ok) {
+					throw new Error('Server-Fehler: ' + response.status);
+				}
+
+				const raw = String(text || '');
+				const trimmed = raw.trim();
+
+				try {
+					return JSON.parse(trimmed);
+				} catch (parseError) {
+					const start = trimmed.indexOf('{');
+					const end = trimmed.lastIndexOf('}');
+					if (start !== -1 && end !== -1 && end > start) {
+						const maybeJson = trimmed.substring(start, end + 1);
+						try {
+							return JSON.parse(maybeJson);
+						} catch (fallbackParseError) {
+							// handled below
+						}
+					}
+
+					const hint = 'Server lieferte keine lesbare JSON-Antwort (oft PHP-Warning/Notice vor JSON).';
+					console.error('Calendar sync non-JSON response:', trimmed.substring(0, 500));
+					throw new Error(hint);
+				}
+			}))
 			.then(data => {
 				if (resultDiv) {
 					resultDiv.style.display = 'block';
@@ -352,8 +382,8 @@
 			.catch(error => {
 				if (resultDiv) {
 					resultDiv.style.display = 'block';
-					resultDiv.innerHTML = '<div class="notice notice-error inline"><p>Fehler: ' + 
-						error?.message || 'Unbekannter Fehler' + 
+					resultDiv.innerHTML = '<div class="notice notice-error inline"><p>Fehler: ' +
+						(error?.message || 'Unbekannter Fehler') +
 						'</p></div>';
 				}
 			})
@@ -377,6 +407,7 @@
 			const input = form.querySelector('.cts-calendar-image-input[data-calendar-id="' + calendarId + '"]');
 			const preview = form.querySelector('.cts-calendar-image-preview[data-calendar-id="' + calendarId + '"]');
 			const removeBtn = form.querySelector('.cts-remove-calendar-image[data-calendar-id="' + calendarId + '"]');
+			const templateSelect = form.querySelector('.cts-calendar-template-select[data-calendar-id="' + calendarId + '"]');
 
 			if (input) {
 				input.value = attachmentId || '';
@@ -393,13 +424,28 @@
 			if (removeBtn) {
 				removeBtn.style.display = attachmentId ? 'inline-block' : 'none';
 			}
+
+			if (templateSelect) {
+				const matchingOption = Array.from(templateSelect.options).find(option => option.value === String(attachmentId || ''));
+				templateSelect.value = matchingOption ? matchingOption.value : '';
+			}
+		}
+
+		function updateFromTemplateSelect(calendarId, templateSelect) {
+			if (!templateSelect) return;
+
+			const selectedOption = templateSelect.options[templateSelect.selectedIndex];
+			const attachmentId = templateSelect.value || '';
+			const url = selectedOption ? selectedOption.getAttribute('data-image-url') : '';
+			updateCalendarImage(calendarId, attachmentId, url);
 		}
 
 		function bindCalendarImageButtons() {
 			const selectButtons = form.querySelectorAll('.cts-select-calendar-image');
 			const removeButtons = form.querySelectorAll('.cts-remove-calendar-image');
+			const templateSelects = form.querySelectorAll('.cts-calendar-template-select');
 
-			if (selectButtons.length === 0 && removeButtons.length === 0) {
+			if (selectButtons.length === 0 && removeButtons.length === 0 && templateSelects.length === 0) {
 				console.log('Keine Kalender-Bild-Buttons gefunden');
 				return;
 			}
@@ -465,6 +511,18 @@
 					console.log('Bild entfernt für Kalender:', calendarId);
 					updateCalendarImage(calendarId, '', '');
 				});
+			});
+
+			templateSelects.forEach(select => {
+				select.addEventListener('change', function() {
+					const calendarId = this.getAttribute('data-calendar-id');
+					if (!calendarId) return;
+					updateFromTemplateSelect(calendarId, this);
+				});
+
+				if (select.value) {
+					updateFromTemplateSelect(select.getAttribute('data-calendar-id'), select);
+				}
 			});
 		}
 

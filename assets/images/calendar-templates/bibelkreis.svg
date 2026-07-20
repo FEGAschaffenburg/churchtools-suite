@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Bibelkreis - AI generiert</title>
+  <desc id="desc">Warm bible study template with an open book motif.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="100%" stop-color="#e2e8f0" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg)" />
+  <circle cx="180" cy="140" r="120" fill="#f59e0b" opacity="0.18" />
+  <circle cx="1020" cy="555" r="150" fill="#0284c7" opacity="0.12" />
+  <path d="M320 210 C420 160, 510 160, 600 210 L600 500 C520 470, 430 470, 320 510 Z" fill="#7c3aed" opacity="0.88" />
+  <path d="M880 210 C780 160, 690 160, 600 210 L600 500 C680 470, 770 470, 880 510 Z" fill="#4f46e5" opacity="0.88" />
+  <path d="M600 210 L600 500" stroke="#f8fafc" stroke-width="6" opacity="0.7" />
+  <text x="600" y="388" text-anchor="middle" font-family="Georgia, serif" font-size="92" fill="#1e1b4b" font-weight="700">Bibelkreis</text>
+  <text x="600" y="442" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" fill="#312e81" letter-spacing="4">AI GENERIERT</text>
+  <text x="600" y="620" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#4338ca">Copyright 2026 FEG Aschaffenburg</text>
+</svg>
