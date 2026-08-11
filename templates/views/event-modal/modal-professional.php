@@ -23,8 +23,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<h2 id="cts-modal-title" class="cts-modal-title">
 				<?php esc_html_e( 'Termin-Details', 'churchtools-suite' ); ?>
 			</h2>
-			<button id="cts-modal-close-btn" class="cts-modal-close-icon" aria-label="<?php esc_attr_e( 'Schließen', 'churchtools-suite' ); ?>" type="button">
-				<span class="dashicons dashicons-no-alt"></span>
+			<button id="cts-modal-close-btn" class="cts-modal-close-btn" aria-label="<?php esc_attr_e( 'Schließen', 'churchtools-suite' ); ?>" type="button">
+				<span aria-hidden="true">×</span>
 			</button>
 		</div>
 		
@@ -149,7 +149,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		color: #1e293b;
 	}
 	
-	.cts-modal-professional .cts-modal-close-icon {
+	.cts-modal-professional .cts-modal-close-btn {
 		background: none;
 		border: none;
 		cursor: pointer;
@@ -161,14 +161,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 		justify-content: center;
 	}
 	
-	.cts-modal-professional .cts-modal-close-icon:hover {
+	.cts-modal-professional .cts-modal-close-btn:hover {
 		color: #1e293b;
 	}
 	
-	.cts-modal-professional .cts-modal-close-icon .dashicons {
+	.cts-modal-professional .cts-modal-close-btn span {
 		width: 24px;
 		height: 24px;
 		font-size: 24px;
+		line-height: 24px;
 	}
 	
 	/* Modal Body */
@@ -237,7 +238,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	.cts-modal-professional .cts-modal-image-link:focus-visible .cts-modal-image-cta {
 		opacity: 1;
 		transform: translateY(0);
-	}
 	}
 	
 	.cts-modal-professional .cts-modal-event-title {
