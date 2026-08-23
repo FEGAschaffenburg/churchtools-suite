@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class ChurchTools_Suite_Posts_Sync_Service {
 
+	const CONTENT_NORMALIZER_VERSION = '0.1.10-markdown-gallery-v2';
 	const META_CT_POST_ID = '_cts_ct_post_id';
 	const META_CT_POST_HASH = '_cts_ct_post_hash';
 	const META_CT_POST_GUID = '_cts_ct_post_guid';
@@ -75,6 +76,8 @@ class ChurchTools_Suite_Posts_Sync_Service {
 		}
 
 		$items = $this->extract_posts_from_response( $response );
+		$seen_ct_ids = [];
+		$can_remove_missing = $this->can_remove_missing_posts( $args, $query_params, $response, count( $items ), $limit );
 
 		$stats = [
 			'posts_found' => count( $items ),
@@ -93,11 +96,13 @@ class ChurchTools_Suite_Posts_Sync_Service {
 				$stats['errors']++;
 				continue;
 			}
+			$seen_ct_ids[] = (string) $normalized['ct_id'];
 
 			$existing_post_id = $this->find_existing_post_id( $normalized['ct_id'] );
 
 			$payload_hash = md5( (string) wp_json_encode( [
 				'normalized' => $normalized,
+				'normalizer_version' => self::CONTENT_NORMALIZER_VERSION,
 				'target_type' => $target_type,
 				'target_status' => $target_status,
 			] ) );
@@ -132,6 +137,7 @@ class ChurchTools_Suite_Posts_Sync_Service {
 				update_post_meta( $existing_post_id, self::META_CT_POST_HASH, $payload_hash );
 				$this->update_ct_post_meta( $existing_post_id, $normalized );
 				$this->assign_group_category( $existing_post_id, $normalized, $target_type );
+				$this->ensure_post_thumbnail( $existing_post_id, $normalized );
 				$stats['posts_updated']++;
 				continue;
 			}
@@ -159,7 +165,13 @@ class ChurchTools_Suite_Posts_Sync_Service {
 			update_post_meta( $new_post_id, self::META_CT_POST_HASH, $payload_hash );
 			$this->update_ct_post_meta( $new_post_id, $normalized );
 			$this->assign_group_category( $new_post_id, $normalized, $target_type );
+			$this->ensure_post_thumbnail( $new_post_id, $normalized );
 			$stats['posts_created']++;
+		}
+
+		$stats['posts_deleted'] = 0;
+		if ( $can_remove_missing ) {
+			$stats['posts_deleted'] = $this->remove_missing_posts( $seen_ct_ids );
 		}
 
 		update_option(
@@ -172,6 +184,49 @@ class ChurchTools_Suite_Posts_Sync_Service {
 		);
 
 		return $stats;
+	}
+
+	private function can_remove_missing_posts( array $args, array $query_params, array $response, int $item_count, int $limit ): bool {
+		if ( ! empty( $args['after'] ) || ! empty( $args['before'] ) || ! empty( $args['campus_ids'] ) || ! empty( $args['actor_ids'] ) || ! empty( $args['group_ids'] ) || ! empty( $args['group_visibility'] ) || ! empty( $args['post_visibility'] ) || ! empty( $args['only_my_groups'] ) ) {
+			return false;
+		}
+
+		$filter_keys = [ 'after', 'before', 'campus_ids', 'actor_ids', 'group_ids', 'group_visibility', 'post_visibility', 'only_my_groups' ];
+		foreach ( $filter_keys as $filter_key ) {
+			if ( array_key_exists( $filter_key, $query_params ) ) {
+				return false;
+			}
+		}
+
+		if ( $item_count >= $limit ) {
+			return false;
+		}
+
+		return isset( $response['data'] ) || isset( $response['posts'] ) || isset( $response['items'] ) || isset( $response['results'] );
+	}
+
+	private function remove_missing_posts( array $seen_ct_ids ): int {
+		$seen_ct_ids = array_values( array_unique( array_filter( array_map( 'strval', $seen_ct_ids ) ) ) );
+		$posts = get_posts(
+			[
+				'post_type' => $this->get_supported_target_types(),
+				'post_status' => [ 'publish', 'draft', 'private', 'pending', 'future' ],
+				'numberposts' => -1,
+				'fields' => 'ids',
+				'meta_key' => self::META_CT_POST_ID,
+				'suppress_filters' => true,
+			]
+		);
+
+		$deleted = 0;
+		foreach ( $posts as $post_id ) {
+			$ct_id = (string) get_post_meta( (int) $post_id, self::META_CT_POST_ID, true );
+			if ( $ct_id !== '' && ! in_array( $ct_id, $seen_ct_ids, true ) && wp_trash_post( (int) $post_id ) ) {
+				$deleted++;
+			}
+		}
+
+		return $deleted;
 	}
 
 	private function extract_posts_from_response( array $response ): array {
@@ -247,9 +302,15 @@ class ChurchTools_Suite_Posts_Sync_Service {
 		if ( isset( $item['imageUrl'] ) ) {
 			$image_candidates[] = $item['imageUrl'];
 		}
+		foreach ( [ 'originalUrl', 'downloadUrl', 'originalImageUrl', 'fileUrl' ] as $image_key ) {
+			if ( isset( $item[ $image_key ] ) ) {
+				$image_candidates[] = $item[ $image_key ];
+			}
+		}
 
 		$images = $this->extract_image_urls( $image_candidates );
-		$content = $this->normalize_content_with_images( $content_raw, $images );
+		$gallery_ids = $this->import_gallery_attachments( $images, $title, $ct_id );
+		$content = $this->normalize_content_with_images( $content_raw, $images, $gallery_ids );
 		$publication_date = (string) ( $item['publicationDate'] ?? '' );
 		$expiration_date = (string) ( $item['expirationDate'] ?? '' );
 		$published_date = (string) ( $item['publishedDate'] ?? '' );
@@ -450,10 +511,11 @@ class ChurchTools_Suite_Posts_Sync_Service {
 		return $urls;
 	}
 
-	private function normalize_content_with_images( string $content, array $images ): string {
+	private function normalize_content_with_images( string $content, array $images, array $gallery_ids = [] ): string {
 		$content = trim( $content );
 
 		if ( $content !== '' ) {
+			$content = $this->convert_markdown_to_html( $content );
 			$content = preg_replace_callback(
 				'/!\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)/',
 				function ( array $matches ): string {
@@ -471,8 +533,18 @@ class ChurchTools_Suite_Posts_Sync_Service {
 			$content = $this->normalize_relative_urls_in_html( $content );
 		}
 
+		$has_gallery = count( $gallery_ids ) > 1;
+		if ( $has_gallery && ! preg_match( '/\[gallery\s+ids=|class="[^"]*gallery[^"]*"/i', $content ) ) {
+			$gallery_shortcode = '[gallery ids="' . implode( ',', array_map( 'intval', $gallery_ids ) ) . '"]';
+			if ( $content === '' ) {
+				$content = $gallery_shortcode;
+			} else {
+				$content = $gallery_shortcode . "\n\n" . $content;
+			}
+		}
+
 		$missing_images_markup = [];
-		foreach ( $images as $image_url ) {
+		foreach ( $has_gallery ? [] : $images as $image_url ) {
 			$image_url = (string) $image_url;
 			if ( $image_url === '' ) {
 				continue;
@@ -490,6 +562,210 @@ class ChurchTools_Suite_Posts_Sync_Service {
 		}
 
 		return wp_kses_post( $content );
+	}
+
+	private function convert_markdown_to_html( string $content ): string {
+		$content = trim( $content );
+		if ( $content === '' ) {
+			return '';
+		}
+
+		if ( preg_match( '/<\s*(p|div|h[1-6]|ul|ol|li|blockquote|table|img|a|strong|b|em|i|code|pre|hr)[\s>]/i', $content ) ) {
+			return $content;
+		}
+
+		$lines = preg_split( '/\r\n|\r|\n/', $content );
+		if ( ! is_array( $lines ) ) {
+			return $content;
+		}
+
+		$blocks = [];
+		$current_block = [];
+		foreach ( $lines as $line ) {
+			if ( trim( $line ) === '' ) {
+				if ( ! empty( $current_block ) ) {
+					$blocks[] = $current_block;
+					$current_block = [];
+				}
+				continue;
+			}
+			$current_block[] = $line;
+		}
+		if ( ! empty( $current_block ) ) {
+			$blocks[] = $current_block;
+		}
+
+		$converted_blocks = [];
+		foreach ( $blocks as $block ) {
+			$block_text = implode( "\n", $block );
+			$trimmed = trim( $block_text );
+			if ( $trimmed === '' ) {
+				continue;
+			}
+
+			if ( preg_match( '/^(?:\*\s*){3,}$|^(?:-\s*){3,}$|^(?:_\s*){3,}$/', $trimmed ) ) {
+				$converted_blocks[] = '<hr />';
+				continue;
+			}
+
+			if ( count( $block ) >= 2 && $this->is_markdown_table_separator( $block[1] ) && $this->is_markdown_table_row( $block[0] ) ) {
+				$converted_blocks[] = $this->convert_markdown_table( $block );
+				continue;
+			}
+
+			if ( preg_match( '/^(#{1,6})\s+(.*)$/', $trimmed, $matches ) ) {
+				$level = min( 6, strlen( $matches[1] ) );
+				$converted_blocks[] = '<h' . $level . '>' . $this->convert_markdown_inline( $matches[2] ) . '</h' . $level . '>';
+				continue;
+			}
+
+			if ( preg_match( '/^(?:>\s?.*(?:\n|$))+$/', $trimmed ) ) {
+				$quote_lines = array_map(
+					static function ( string $quote_line ): string {
+						return preg_replace( '/^>\s?/', '', $quote_line );
+					},
+					$block
+				);
+				$converted_blocks[] = '<blockquote>' . $this->convert_markdown_inline( implode( "\n", $quote_lines ) ) . '</blockquote>';
+				continue;
+			}
+
+			if ( preg_match( '/^(?:[-*+]\s+.+(?:\n(?:[-*+]\s+.+))*)$/', $trimmed ) ) {
+				$items = [];
+				foreach ( $block as $item_line ) {
+					if ( preg_match( '/^[-*+]\s+(.*)$/', trim( (string) $item_line ), $m ) ) {
+						$items[] = '<li>' . $this->convert_markdown_inline( $m[1] ) . '</li>';
+					}
+				}
+				if ( ! empty( $items ) ) {
+					$converted_blocks[] = '<ul>' . implode( '', $items ) . '</ul>';
+				}
+				continue;
+			}
+
+			if ( preg_match( '/^(?:\d+\.\s+.+(?:\n\d+\.\s+.+)*)$/', $trimmed ) ) {
+				$items = [];
+				foreach ( $block as $item_line ) {
+					if ( preg_match( '/^\d+\.\s+(.*)$/', trim( (string) $item_line ), $m ) ) {
+						$items[] = '<li>' . $this->convert_markdown_inline( $m[1] ) . '</li>';
+					}
+				}
+				if ( ! empty( $items ) ) {
+					$converted_blocks[] = '<ol>' . implode( '', $items ) . '</ol>';
+				}
+				continue;
+			}
+
+			$converted_blocks[] = '<p>' . $this->convert_markdown_inline( $trimmed ) . '</p>';
+		}
+
+		return implode( "\n", $converted_blocks );
+	}
+
+	private function is_markdown_table_row( string $line ): bool {
+		return substr_count( trim( $line ), '|' ) >= 2;
+	}
+
+	private function is_markdown_table_separator( string $line ): bool {
+		if ( ! $this->is_markdown_table_row( $line ) ) {
+			return false;
+		}
+
+		$cells = $this->get_markdown_table_cells( $line );
+		if ( empty( $cells ) ) {
+			return false;
+		}
+
+		foreach ( $cells as $cell ) {
+			if ( ! preg_match( '/^:?-{3,}:?$/', trim( $cell ) ) ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private function get_markdown_table_cells( string $line ): array {
+		$line = trim( $line );
+		$line = trim( $line, '|' );
+		return array_map( 'trim', explode( '|', $line ) );
+	}
+
+	private function convert_markdown_table( array $block ): string {
+		$headers = $this->get_markdown_table_cells( (string) $block[0] );
+		$separators = $this->get_markdown_table_cells( (string) $block[1] );
+		$column_count = count( $headers );
+		$header_markup = [];
+		$alignments = [];
+
+		foreach ( $separators as $index => $separator ) {
+			$separator = trim( $separator );
+			$alignments[ $index ] = str_starts_with( $separator, ':' ) && str_ends_with( $separator, ':' ) ? 'center' : ( str_ends_with( $separator, ':' ) ? 'right' : 'left' );
+		}
+
+		for ( $index = 0; $index < $column_count; $index++ ) {
+			$header = $headers[ $index ] ?? '';
+			$header_markup[] = '<th align="' . esc_attr( $alignments[ $index ] ?? 'left' ) . '">' . $this->convert_markdown_inline( $header ) . '</th>';
+		}
+
+		$rows = [];
+		foreach ( array_slice( $block, 2 ) as $row ) {
+			if ( ! $this->is_markdown_table_row( (string) $row ) ) {
+				continue;
+			}
+			$cells = $this->get_markdown_table_cells( (string) $row );
+			$cell_markup = [];
+			for ( $index = 0; $index < $column_count; $index++ ) {
+				$cell_markup[] = '<td align="' . esc_attr( $alignments[ $index ] ?? 'left' ) . '">' . $this->convert_markdown_inline( $cells[ $index ] ?? '' ) . '</td>';
+			}
+			$rows[] = '<tr>' . implode( '', $cell_markup ) . '</tr>';
+		}
+
+		return '<table><thead><tr>' . implode( '', $header_markup ) . '</tr></thead><tbody>' . implode( '', $rows ) . '</tbody></table>';
+	}
+
+	private function convert_markdown_inline( string $text ): string {
+		$text = preg_replace( '/`([^`]+)`/', '<code>$1</code>', $text );
+		$text = preg_replace( '/!\[([^\]]*)\]\(([^)]+)\)/', '<img src="\2" alt="\1" />', $text );
+		$text = preg_replace( '/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/', '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>', $text );
+		$text = preg_replace( '/\*\*([^*]+)\*\*/', '<strong>$1</strong>', $text );
+		$text = preg_replace( '/__([^_]+)__/', '<strong>$1</strong>', $text );
+		$text = preg_replace( '/\*([^*]+)\*/', '<em>$1</em>', $text );
+		$text = preg_replace( '/_([^_]+)_/', '<em>$1</em>', $text );
+		$text = preg_replace( '/\n/', '<br />', $text );
+		return trim( (string) $text );
+	}
+
+	private function import_gallery_attachments( array $images, string $title, string $ct_id ): array {
+		if ( defined( 'CHURCHTOOLS_SUITE_PATH' ) ) {
+			require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-image-importer.php';
+		}
+
+		if ( ! class_exists( 'ChurchTools_Suite_Image_Importer' ) ) {
+			return [];
+		}
+
+		$ids = [];
+		foreach ( $images as $image_url ) {
+			$image_url = trim( (string) $image_url );
+			if ( $image_url === '' ) {
+				continue;
+			}
+
+			$existing_id = ChurchTools_Suite_Image_Importer::find_existing_image_by_url( $image_url );
+			if ( $existing_id > 0 ) {
+				$ids[] = $existing_id;
+				continue;
+			}
+
+			$result = ChurchTools_Suite_Image_Importer::import_image( $image_url, $title, $ct_id );
+			if ( ! is_wp_error( $result ) && (int) $result > 0 ) {
+				$ids[] = (int) $result;
+			}
+		}
+
+		$ids = array_values( array_unique( array_map( 'intval', $ids ) ) );
+		return array_filter( $ids, static fn( int $id ): bool => $id > 0 );
 	}
 
 	private function normalize_relative_urls_in_html( string $html ): string {
@@ -548,6 +824,40 @@ class ChurchTools_Suite_Posts_Sync_Service {
 		}
 
 		return esc_url_raw( $url );
+	}
+
+	private function ensure_post_thumbnail( int $post_id, array $normalized ): void {
+		if ( ! function_exists( 'set_post_thumbnail' ) ) {
+			return;
+		}
+
+		$images = $normalized['images'] ?? [];
+		if ( ! is_array( $images ) || $images === [] ) {
+			return;
+		}
+
+		$first_image = (string) $images[0];
+		if ( $first_image === '' ) {
+			return;
+		}
+
+		if ( class_exists( 'ChurchTools_Suite_Image_Importer' ) ) {
+			$existing_image_id = ChurchTools_Suite_Image_Importer::find_existing_image_by_url( $first_image );
+			if ( $existing_image_id > 0 ) {
+				set_post_thumbnail( $post_id, $existing_image_id );
+				return;
+			}
+
+			$import_result = ChurchTools_Suite_Image_Importer::import_image(
+				$first_image,
+				(string) ( $normalized['title'] ?? '' ),
+				(string) ( $normalized['ct_id'] ?? '' )
+			);
+
+			if ( ! is_wp_error( $import_result ) && (int) $import_result > 0 ) {
+				set_post_thumbnail( $post_id, (int) $import_result );
+			}
+		}
 	}
 
 	private function assign_group_category( int $post_id, array $normalized, string $target_type ): void {

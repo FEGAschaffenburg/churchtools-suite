@@ -18,8 +18,8 @@ class CTS_Presentations_Admin {
 
 		add_submenu_page(
 			'churchtools-suite',
-			__( 'Präsentation', 'churchtools-suite-presentations' ),
-			__( 'Präsentation', 'churchtools-suite-presentations' ),
+			__( 'ChurchTools Präsentation', 'churchtools-suite-presentations' ),
+			__( 'ChurchTools Präsentation', 'churchtools-suite-presentations' ),
 			'manage_churchtools_suite',
 			'churchtools-suite-presentations',
 			[ __CLASS__, 'render_page' ]

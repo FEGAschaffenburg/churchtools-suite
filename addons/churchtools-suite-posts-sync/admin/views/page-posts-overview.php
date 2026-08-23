@@ -79,7 +79,13 @@ $last_stats = is_array( $last_result ) ? (array) ( $last_result['stats'] ?? [] )
 								<td><?php echo esc_html( (string) $ct_id ); ?></td>
 								<td><?php echo esc_html( $published_date !== '' ? $published_date : (string) $post_item->post_date ); ?></td>
 								<td><?php echo esc_html( $expiration_date !== '' ? $expiration_date : '—' ); ?></td>
-								<td><a href="<?php echo esc_url( get_edit_post_link( (int) $post_item->ID ) ); ?>"><?php esc_html_e( 'Bearbeiten', 'churchtools-suite-posts-sync' ); ?></a></td>
+								<td>
+									<a href="<?php echo esc_url( get_edit_post_link( (int) $post_item->ID ) ); ?>"><?php esc_html_e( 'Bearbeiten', 'churchtools-suite-posts-sync' ); ?></a>
+									<?php $delete_link = get_delete_post_link( (int) $post_item->ID, '', false ); ?>
+									<?php if ( $delete_link ) : ?>
+										| <a href="<?php echo esc_url( $delete_link ); ?>" class="submitdelete"><?php esc_html_e( 'Löschen', 'churchtools-suite-posts-sync' ); ?></a>
+									<?php endif; ?>
+								</td>
 							</tr>
 						<?php endforeach; ?>
 					<?php else : ?>

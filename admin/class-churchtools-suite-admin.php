@@ -348,8 +348,8 @@ class ChurchTools_Suite_Admin {
 		// v1.0.2.0: Use custom capability instead of manage_options
 		// This allows ChurchTools Managers to access the plugin without full WordPress admin access
 		add_menu_page(
-			__( 'ChurchTools Suite', 'churchtools-suite' ),
-			__( 'ChurchTools', 'churchtools-suite' ),
+			__( 'ChurchTools Integration Suite', 'churchtools-suite' ),
+			__( 'ChurchTools Integration Suite', 'churchtools-suite' ),
 			'manage_churchtools_suite', // New: Custom capability (vs manage_options)
 			'churchtools-suite',
 			[ $this, 'display_admin_page' ],
@@ -360,8 +360,8 @@ class ChurchTools_Suite_Admin {
 		// Zweistufiger Einstieg: Übersichten
 		add_submenu_page(
 			'churchtools-suite',
-			__( 'Übersichten', 'churchtools-suite' ),
-			__( '📚 Übersichten', 'churchtools-suite' ),
+			__( 'ChurchTools Übersichten', 'churchtools-suite' ),
+			__( '📚 ChurchTools Übersichten', 'churchtools-suite' ),
 			'manage_churchtools_suite',
 			'churchtools-suite-overviews',
 			[ $this, 'display_overviews_page' ],
@@ -381,8 +381,8 @@ class ChurchTools_Suite_Admin {
 		// Add Addons/Extensions overview page (v1.0.9.0)
 		add_submenu_page(
 			'churchtools-suite',
-			__( 'Addons', 'churchtools-suite' ),
-			__( '🧩 Addons', 'churchtools-suite' ),
+			__( 'ChurchTools Addons', 'churchtools-suite' ),
+			__( '🧩 ChurchTools Addons', 'churchtools-suite' ),
 			'manage_churchtools_suite',
 			'churchtools-suite-addons',
 			[ $this, 'display_addons_page' ]
@@ -391,8 +391,8 @@ class ChurchTools_Suite_Admin {
 		// Add Disclaimer subpage (separate admin page for legal information)
 		add_submenu_page(
 			'churchtools-suite',
-			__( 'Haftungsausschluss', 'churchtools-suite' ),
-			__( '⚠️ Haftungsausschluss', 'churchtools-suite' ),
+			__( 'ChurchTools Haftungsausschluss', 'churchtools-suite' ),
+			__( '⚠️ ChurchTools Haftungsausschluss', 'churchtools-suite' ),
 			'manage_churchtools_suite',
 			'churchtools-suite-disclaimer',
 			[ $this, 'display_disclaimer_page' ]
@@ -401,8 +401,8 @@ class ChurchTools_Suite_Admin {
 		// Add Documentation link
 		add_submenu_page(
 			'churchtools-suite',
-			__( 'Dokumentation', 'churchtools-suite' ),
-			__( '📖 Dokumentation', 'churchtools-suite' ),
+			__( 'ChurchTools Dokumentation', 'churchtools-suite' ),
+			__( '📖 ChurchTools Dokumentation', 'churchtools-suite' ),
 			'manage_churchtools_suite',
 			'churchtools-suite-docs',
 			[ $this, 'redirect_to_documentation' ]
@@ -441,7 +441,7 @@ class ChurchTools_Suite_Admin {
 		}
 
 		echo '<div class="notice notice-success is-dismissible">';
-		echo '<p><strong>' . esc_html__( 'ChurchTools Suite: Views migriert.', 'churchtools-suite' ) . '</strong><br>';
+		echo '<p><strong>' . esc_html__( 'ChurchTools Integration Suite: Views migriert.', 'churchtools-suite' ) . '</strong><br>';
 		echo esc_html__( 'Gutenberg-Blöcke aktualisiert:', 'churchtools-suite' ) . ' ' . esc_html( (string) $gutenberg ) . ' · ';
 		echo esc_html__( 'Elementor-Widgets aktualisiert:', 'churchtools-suite' ) . ' ' . esc_html( (string) $elementor ) . '</p>';
 		echo '</div>';
@@ -494,7 +494,7 @@ class ChurchTools_Suite_Admin {
 		}
 
 		$to = 'plugin@feg-aschaffenburg.de';
-		$subject = sprintf( 'ChurchTools Suite Feedback (%s)', wp_parse_url( home_url(), PHP_URL_HOST ) );
+		$subject = sprintf( 'ChurchTools Integration Suite Feedback (%s)', wp_parse_url( home_url(), PHP_URL_HOST ) );
 
 		$stage_text = ! empty( $selected_stages ) ? implode( ', ', $selected_stages ) : 'nicht angegeben';
 		$body_lines = [
@@ -667,6 +667,7 @@ class ChurchTools_Suite_Admin {
 		add_action( 'wp_ajax_cts_get_calendars', [ $this, 'ajax_get_calendars' ] );
 		// AJAX data lists (server-side filtering/pagination)
 		add_action( 'wp_ajax_cts_fetch_events_list', [ $this, 'ajax_fetch_events_list' ] );
+		add_action( 'wp_ajax_cts_delete_event', [ $this, 'ajax_delete_event' ] );
 		add_action( 'wp_ajax_cts_fetch_imported_services_list', [ $this, 'ajax_fetch_imported_services_list' ] );
 		
 		// Reset & Cleanup (v0.7.2.4)
@@ -808,42 +809,6 @@ class ChurchTools_Suite_Admin {
 			return;
 		}
 		wp_send_json_success( [ 'message' => 'pong' ] );
-		
-		// Check permissions
-		if ( ! current_user_can( 'configure_churchtools_suite' ) ) {
-			wp_send_json_error( [
-				'message' => 'Keine Berechtigung.'
-			] );
-		}
-		
-		// Rate Limiting (v0.7.0.2)
-		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-rate-limiter.php';
-		
-		$user_id = get_current_user_id();
-		$identifier = 'user_' . $user_id;
-		
-		if ( ! ChurchTools_Suite_Rate_Limiter::is_allowed( $identifier, 'ajax' ) ) {
-			wp_send_json_error( [
-				'message' => __( 'Zu viele Anfragen. Bitte warten Sie einen Moment.', 'churchtools-suite' )
-			] );
-		}
-		
-		// Load CT Client
-		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-ct-client.php';
-		
-		$client = new ChurchTools_Suite_CT_Client();
-		$result = $client->test_connection();
-		
-		if ( $result['success'] ) {
-			wp_send_json_success( [
-				'message' => $result['message'],
-				'user_info' => $result['user_info'] ?? null
-			] );
-		} else {
-			wp_send_json_error( [
-				'message' => $result['message']
-			] );
-		}
 	}
 	
 	/**
@@ -892,14 +857,22 @@ class ChurchTools_Suite_Admin {
 				] );
 				return;
 			}
+
+			$source = isset( $result['source'] ) && is_array( $result['source'] ) ? $result['source'] : [];
+			$api_count = isset( $source['api_calendars'] ) ? (int) $source['api_calendars'] : (int) $result['total'];
+			$events_discovered = isset( $source['events_discovered'] ) ? (int) $source['events_discovered'] : 0;
+			$merged_total = isset( $source['merged_total'] ) ? (int) $source['merged_total'] : (int) $result['total'];
 			
 			wp_send_json_success( [
 				'message' => sprintf(
-					__( 'Synchronisation erfolgreich! %d Kalender gefunden, %d neu, %d aktualisiert, %d Fehler.', 'churchtools-suite' ),
-					$result['total'],
+					__( 'Synchronisation erfolgreich! %d Kalender gefunden, %d neu, %d aktualisiert, %d Fehler. Quelle: /calendars=%d, aus /events ergänzt=%d, gesamt=%d.', 'churchtools-suite' ),
+					$merged_total,
 					$result['inserted'],
 					$result['updated'],
-					$result['errors']
+					$result['errors'],
+					$api_count,
+					$events_discovered,
+					$merged_total
 				),
 				'stats' => $result
 			] );
@@ -926,6 +899,12 @@ class ChurchTools_Suite_Admin {
 		}
 		
 		try {
+			$calendar_action = isset( $_POST['calendar_action'] ) ? sanitize_key( wp_unslash( $_POST['calendar_action'] ) ) : 'save_selection';
+			$allowed_actions = [ 'save_selection', 'activate_selected', 'deactivate_selected', 'delete_deactivated_selected' ];
+			if ( ! in_array( $calendar_action, $allowed_actions, true ) ) {
+				$calendar_action = 'save_selection';
+			}
+
 			// Get selected calendar IDs
 			$selected_ids = isset( $_POST['selected_ids'] ) ? array_map( 'intval', $_POST['selected_ids'] ) : [];
 
@@ -946,6 +925,66 @@ class ChurchTools_Suite_Admin {
 			require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-calendars-repository.php';
 
 			$calendars_repo = new ChurchTools_Suite_Calendars_Repository();
+
+			if ( $calendar_action === 'activate_selected' ) {
+				if ( empty( $selected_ids ) ) {
+					wp_send_json_error( [
+						'message' => __( 'Bitte mindestens einen Kalender markieren.', 'churchtools-suite' )
+					] );
+					return;
+				}
+
+				$activated_count = $calendars_repo->select_by_ids( $selected_ids );
+				wp_send_json_success( [
+					'message' => sprintf(
+						__( '%d Kalender aktiviert.', 'churchtools-suite' ),
+						$activated_count
+					),
+					'activated_count' => $activated_count,
+				] );
+				return;
+			}
+
+			if ( $calendar_action === 'deactivate_selected' ) {
+				if ( empty( $selected_ids ) ) {
+					wp_send_json_error( [
+						'message' => __( 'Bitte mindestens einen Kalender markieren.', 'churchtools-suite' )
+					] );
+					return;
+				}
+
+				$deactivated_count = $calendars_repo->deselect_by_ids( $selected_ids );
+				wp_send_json_success( [
+					'message' => sprintf(
+						__( '%d Kalender deaktiviert.', 'churchtools-suite' ),
+						$deactivated_count
+					),
+					'deactivated_count' => $deactivated_count,
+				] );
+				return;
+			}
+
+			if ( $calendar_action === 'delete_deactivated_selected' ) {
+				if ( empty( $selected_ids ) ) {
+					wp_send_json_error( [
+						'message' => __( 'Bitte mindestens einen Kalender markieren.', 'churchtools-suite' )
+					] );
+					return;
+				}
+
+				$delete_result = $calendars_repo->delete_deactivated_by_ids( $selected_ids );
+				wp_send_json_success( [
+					'message' => sprintf(
+						__( '%d Kalender gelöscht. %d aktive Kalender wurden aus Sicherheitsgründen nicht gelöscht.', 'churchtools-suite' ),
+						(int) ( $delete_result['deleted'] ?? 0 ),
+						(int) ( $delete_result['blocked_active'] ?? 0 )
+					),
+					'deleted_count' => (int) ( $delete_result['deleted'] ?? 0 ),
+					'blocked_active_count' => (int) ( $delete_result['blocked_active'] ?? 0 ),
+				] );
+				return;
+			}
+
 			$result = $calendars_repo->update_selected( $selected_ids );
 
 			if ( ! $result ) {
@@ -1454,6 +1493,7 @@ class ChurchTools_Suite_Admin {
 							<th><?php esc_html_e( 'Status', 'churchtools-suite' ); ?></th>
 							<th><?php esc_html_e( 'Services', 'churchtools-suite' ); ?></th>
 							<th><?php esc_html_e( 'Details', 'churchtools-suite' ); ?></th>
+							<th><?php esc_html_e( 'Aktionen', 'churchtools-suite' ); ?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -1530,6 +1570,10 @@ class ChurchTools_Suite_Admin {
 									<span class="cts-muted">—</span>
 								<?php endif; ?>
 							</td>
+							<td class="cts-event-actions">
+								<?php if ( $link ) : ?><a href="<?php echo esc_url( $link ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Bearbeiten', 'churchtools-suite' ); ?></a><?php endif; ?>
+								<button type="button" class="button-link-delete cts-delete-event" data-event-id="<?php echo esc_attr( $event->id ); ?>"><?php esc_html_e( 'Löschen', 'churchtools-suite' ); ?></button>
+							</td>
 						</tr>
 					<?php endforeach; ?>
 					</tbody>
@@ -1554,6 +1598,42 @@ class ChurchTools_Suite_Admin {
 
 		$html = ob_get_clean();
 		wp_send_json_success( [ 'html' => $html, 'total' => $total, 'page' => $page, 'total_pages' => $total_pages ] );
+	}
+
+	/**
+	 * AJAX: Delete one locally stored event.
+	 */
+	public function ajax_delete_event() {
+		check_ajax_referer( 'churchtools_suite_admin', 'nonce' );
+
+		if ( ! current_user_can( 'manage_churchtools_suite' ) ) {
+			wp_send_json_error( [ 'message' => __( 'Keine Berechtigung.', 'churchtools-suite' ) ], 403 );
+		}
+
+		$event_id = isset( $_POST['event_id'] ) ? absint( $_POST['event_id'] ) : 0;
+		if ( $event_id < 1 ) {
+			wp_send_json_error( [ 'message' => __( 'Ungültige Event-ID.', 'churchtools-suite' ) ], 400 );
+		}
+
+		global $wpdb;
+		$events_table = $wpdb->prefix . 'cts_events';
+		$services_table = $wpdb->prefix . 'cts_event_services';
+
+		$deleted_services = $wpdb->delete( $services_table, [ 'event_id' => $event_id ], [ '%d' ] );
+		if ( false === $deleted_services ) {
+			wp_send_json_error( [ 'message' => __( 'Die Service-Zuordnungen konnten nicht gelöscht werden.', 'churchtools-suite' ) ], 500 );
+		}
+
+		$deleted_event = $wpdb->delete( $events_table, [ 'id' => $event_id ], [ '%d' ] );
+		if ( false === $deleted_event ) {
+			wp_send_json_error( [ 'message' => __( 'Der Termin konnte nicht gelöscht werden.', 'churchtools-suite' ) ], 500 );
+		}
+
+		if ( 0 === $deleted_event ) {
+			wp_send_json_error( [ 'message' => __( 'Der Termin wurde nicht gefunden.', 'churchtools-suite' ) ], 404 );
+		}
+
+		wp_send_json_success( [ 'message' => __( 'Termin gelöscht.', 'churchtools-suite' ) ] );
 	}
 
 	/**
@@ -2909,6 +2989,8 @@ class ChurchTools_Suite_Admin {
 			'churchtools_suite_ct_cookies',
 			'churchtools_suite_sync_days_past',
 			'churchtools_suite_sync_days_future',
+			'churchtools_suite_delete_expired_events',
+			'churchtools_suite_expired_events_after_days',
 			'churchtools_suite_auto_sync_enabled',
 			'churchtools_suite_auto_sync_interval',
 			'churchtools_suite_advanced_mode',

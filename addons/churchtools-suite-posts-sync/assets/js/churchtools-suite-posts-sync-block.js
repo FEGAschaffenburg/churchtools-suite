@@ -15,7 +15,8 @@
 	var RangeControl = wp.components.RangeControl;
 	var SelectControl = wp.components.SelectControl;
 	var ToggleControl = wp.components.ToggleControl;
-	var Placeholder = wp.components.Placeholder;
+	var useBlockProps = wp.blockEditor.useBlockProps;
+	var ServerSideRender = wp.serverSideRender;
 
 	var data = window.ctsPostsSyncBlockData || {};
 	var blockName = data.blockName || 'churchtools-suite-posts-sync/posts-list';
@@ -44,8 +45,8 @@
 		edit: function(props) {
 			var attrs = props.attributes;
 			return el(
-				wp.element.Fragment,
-				null,
+				'div',
+				useBlockProps(),
 				el(
 					InspectorControls,
 					null,
@@ -95,18 +96,10 @@
 						})
 					)
 				),
-				el(
-					Placeholder,
-					{
-						icon: 'media-document',
-						label: __('ChurchTools Berichte', 'churchtools-suite-posts-sync'),
-						instructions: __('Die Ausgabe wird im Frontend dynamisch gerendert.', 'churchtools-suite-posts-sync')
-					},
-					el('p', null, __('Anzahl: ', 'churchtools-suite-posts-sync') + String(attrs.limit || 10)),
-					el('p', null, __('Post-Typ: ', 'churchtools-suite-posts-sync') + (attrs.postType || __('Standard', 'churchtools-suite-posts-sync'))),
-					el('p', null, __('Nur synchronisiert: ', 'churchtools-suite-posts-sync') + (attrs.onlySynced ? __('Ja', 'churchtools-suite-posts-sync') : __('Nein', 'churchtools-suite-posts-sync'))),
-					el('p', null, __('Nur neue: ', 'churchtools-suite-posts-sync') + (attrs.onlyNew ? __('Ja', 'churchtools-suite-posts-sync') : __('Nein', 'churchtools-suite-posts-sync')))
-				)
+				el(ServerSideRender, {
+					block: blockName,
+					attributes: attrs
+				})
 			);
 		},
 		save: function() {

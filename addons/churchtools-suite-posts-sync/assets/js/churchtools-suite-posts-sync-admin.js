@@ -1,4 +1,24 @@
 jQuery(function($) {
+	const mainToggle = $('#ct_posts_sync_enabled');
+	if (mainToggle.length) {
+		const relatedControls = $('.cts-posts-sync-field, [name="ct_posts_only_my_groups"], [name="ct_posts_include_comments"], [name="ct_posts_include_linkings"], [name="ct_posts_include_reactions"], button[name="ct_posts_sync_groups_now"]');
+
+		function syncReportsFieldsState() {
+			const enabled = mainToggle.is(':checked');
+			relatedControls.each(function() {
+				const field = $(this);
+				if (field.is('button')) {
+					field.prop('disabled', !enabled);
+					return;
+				}
+				field.prop('disabled', !enabled);
+			});
+		}
+
+		mainToggle.on('change', syncReportsFieldsState);
+		syncReportsFieldsState();
+	}
+
 	const runSyncButton = $('#cts-posts-overview-run-sync[data-action="run-sync"]');
 	if (!runSyncButton.length) {
 		return;

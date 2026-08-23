@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name: ChurchTools Suite – Posts Sync Addon
+ * Plugin Name: ChurchTools Integration Suite – Posts Sync Addon
  * Plugin URI: https://github.com/FEGAschaffenburg/churchtools-suite/tree/main/addons/churchtools-suite-posts-sync
- * Description: Synchronisiert ChurchTools-Posts in WordPress-Posts/Seiten. Benötigt ChurchTools Suite v1.2.0.0+
- * Version: 0.1.7
+ * Description: Synchronisiert ChurchTools-Posts in WordPress-Posts/Seiten. Benötigt ChurchTools Integration Suite v1.2.0.0+
+ * Version: 0.1.10
  * Author: FEG Aschaffenburg
  * Author URI: https://www.feg-aschaffenburg.de
  * License: GPL v2 or later
@@ -11,7 +11,7 @@
  * Text Domain: churchtools-suite-posts-sync
  * Domain Path: /languages
  * Requires at least: 5.0
- * Requires PHP: 8.0
+ * Requires PHP: 8.2
  * 
  * @package churchtools_suite_posts_sync
  * @since   0.1.0
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CTS_POSTS_SYNC_VERSION', '0.1.7' );
+define( 'CTS_POSTS_SYNC_VERSION', '0.1.10' );
 define( 'CTS_POSTS_SYNC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CTS_POSTS_SYNC_URL', plugin_dir_url( __FILE__ ) );
 define( 'CTS_POSTS_SYNC_BASENAME', plugin_basename( __FILE__ ) );
@@ -64,19 +64,73 @@ class ChurchTools_Suite_Posts_Sync {
 			CTS_POSTS_SYNC_CPT,
 			[
 				'labels' => $labels,
-				'public' => false,
+				'public' => true,
 				'show_ui' => true,
 				'show_in_menu' => false,
 				'show_in_admin_bar' => false,
 				'exclude_from_search' => true,
-				'publicly_queryable' => false,
-				'rewrite' => false,
-				'query_var' => false,
+				'publicly_queryable' => true,
+				'rewrite' => [ 'slug' => 'berichte', 'with_front' => false ],
+				'query_var' => true,
 				'map_meta_cap' => true,
 				'taxonomies' => [ 'category' ],
 				'supports' => [ 'title', 'editor', 'excerpt', 'author', 'thumbnail' ],
 			]
 		);
+	}
+
+	public static function maybe_flush_rewrite_rules(): void {
+		$rewrite_version = '0.1.10-single-ct-post-v3';
+		if ( get_option( 'cts_posts_sync_rewrite_version' ) === $rewrite_version ) {
+			return;
+		}
+
+		flush_rewrite_rules( false );
+		update_option( 'cts_posts_sync_rewrite_version', $rewrite_version, false );
+	}
+
+	public static function maybe_migrate_legacy_posts(): void {
+		$migration_version = '0.1.10';
+		if ( get_option( 'cts_posts_sync_migration_version' ) === $migration_version ) {
+			return;
+		}
+
+		$legacy_posts = get_posts(
+			[
+				'post_type' => [ 'post', 'page' ],
+				'post_status' => 'any',
+				'numberposts' => -1,
+				'fields' => 'ids',
+				'meta_key' => '_cts_ct_post_id',
+				'meta_compare' => 'EXISTS',
+				'suppress_filters' => true,
+			]
+		);
+
+		$migrated = 0;
+		foreach ( $legacy_posts as $post_id ) {
+			if ( ! get_post_meta( (int) $post_id, '_cts_ct_post_id', true ) ) {
+				continue;
+			}
+
+			$result = wp_update_post(
+				[
+					'ID' => (int) $post_id,
+					'post_type' => CTS_POSTS_SYNC_CPT,
+				],
+				true
+			);
+			if ( ! is_wp_error( $result ) ) {
+				update_post_meta( (int) $post_id, '_cts_posts_sync_migrated_from', 'legacy-' . $migration_version );
+				$migrated++;
+			}
+		}
+
+		if ( $migrated > 0 ) {
+			update_option( 'churchtools_suite_ct_posts_target_type', CTS_POSTS_SYNC_CPT, false );
+		}
+
+		update_option( 'cts_posts_sync_migration_version', $migration_version, false );
 	}
 
 	/**
@@ -98,6 +152,8 @@ class ChurchTools_Suite_Posts_Sync {
 
 		// Register hooks
 		add_action( 'init', [ __CLASS__, 'register_post_type' ] );
+		add_action( 'init', [ __CLASS__, 'maybe_migrate_legacy_posts' ], 100 );
+		add_action( 'init', [ __CLASS__, 'maybe_flush_rewrite_rules' ], 99 );
 		add_action( 'cts_do_sync_posts', [ __CLASS__, 'handle_sync_posts' ], 10, 2 );
 		add_filter( 'cts_register_sync_modules', [ __CLASS__, 'register_sync_module' ] );
 
@@ -112,6 +168,13 @@ class ChurchTools_Suite_Posts_Sync {
 			$admin = new ChurchTools_Suite_Posts_Sync_Admin();
 			$admin->init();
 		}
+		$rewrite_version = '0.1.9-single-ct-post';
+		if ( get_option( 'cts_posts_sync_rewrite_version' ) === $rewrite_version ) {
+			return;
+		}
+
+		flush_rewrite_rules( false );
+		update_option( 'cts_posts_sync_rewrite_version', $rewrite_version, false );
 	}
 
 	/**
@@ -212,6 +275,7 @@ class ChurchTools_Suite_Posts_Sync {
 		}
 
 		$runner = static function () use ( $ct_client ) {
+			require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-image-importer.php';
 			require_once CTS_POSTS_SYNC_PATH . 'includes/class-cts-posts-sync-service.php';
 
 			$service = new ChurchTools_Suite_Posts_Sync_Service( $ct_client );
@@ -311,6 +375,7 @@ class ChurchTools_Suite_Posts_Sync {
 			return;
 		}
 
+		require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-image-importer.php';
 		require_once CTS_POSTS_SYNC_PATH . 'includes/class-cts-posts-sync-service.php';
 
 		$service = new ChurchTools_Suite_Posts_Sync_Service( $ct_client );

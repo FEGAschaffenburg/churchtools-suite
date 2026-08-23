@@ -3,7 +3,7 @@ Contributors: fegaschaffenburg
 Tags: churchtools, elementor, events, calendar, church
 Requires at least: 6.0
 Tested up to: 6.9
-Requires PHP: 8.0
+Requires PHP: 8.2
 Stable tag: 0.6.15
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -31,7 +31,7 @@ Elementor Page Builder Widget für ChurchTools Suite Events - Listen, Raster und
 = Voraussetzungen =
 
 * WordPress >= 6.0
-* PHP >= 8.0
+* PHP >= 8.2
 * [ChurchTools Suite](https://github.com/FEGAschaffenburg/churchtools-suite) >= v1.0.9.0
 * [Elementor](https://elementor.com/) >= v3.0.0
 

@@ -26,6 +26,21 @@ class ChurchTools_Suite_Posts_Sync_Frontend {
 	public static function init(): void {
 		add_action( 'init', [ __CLASS__, 'register_shortcodes_and_blocks' ] );
 		add_action( 'enqueue_block_editor_assets', [ __CLASS__, 'enqueue_block_editor_assets_fallback' ] );
+		add_filter( 'single_template', [ __CLASS__, 'load_single_template' ] );
+	}
+
+	public static function load_single_template( string $template ): string {
+		if ( ! is_singular( 'ct_post' ) ) {
+			return $template;
+		}
+
+		$theme_template = locate_template( [ 'single-ct_post.php' ] );
+		if ( $theme_template !== '' ) {
+			return $theme_template;
+		}
+
+		$addon_template = dirname( __DIR__ ) . '/templates/single-ct_post.php';
+		return file_exists( $addon_template ) ? $addon_template : $template;
 	}
 
 	/**
@@ -97,12 +112,6 @@ class ChurchTools_Suite_Posts_Sync_Frontend {
 			wp_enqueue_style( self::FRONTEND_STYLE_HANDLE );
 		}
 
-		if ( function_exists( 'wp_add_inline_script' ) ) {
-			$inline_script = self::get_block_editor_inline_script();
-			if ( $inline_script !== '' ) {
-				wp_add_inline_script( 'wp-blocks', $inline_script, 'after' );
-			}
-		}
 	}
 
 	/**
@@ -208,7 +217,7 @@ class ChurchTools_Suite_Posts_Sync_Frontend {
 		wp_register_script(
 			self::BLOCK_EDITOR_SCRIPT_HANDLE,
 			CTS_POSTS_SYNC_URL . 'assets/js/churchtools-suite-posts-sync-block.js',
-			[ 'wp-blocks', 'wp-element', 'wp-i18n', 'wp-components', 'wp-block-editor' ],
+			[ 'wp-blocks', 'wp-element', 'wp-i18n', 'wp-components', 'wp-block-editor', 'wp-server-side-render' ],
 			CTS_POSTS_SYNC_VERSION,
 			true
 		);

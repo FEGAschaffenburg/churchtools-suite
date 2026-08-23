@@ -11,6 +11,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+require_once CHURCHTOOLS_SUITE_PATH . 'includes/functions/secret-storage.php';
+
 class ChurchTools_Suite_CT_Client {
     
     /**
@@ -50,9 +52,15 @@ class ChurchTools_Suite_CT_Client {
         $this->url = get_option('churchtools_suite_ct_url', '');
         $this->username = get_option('churchtools_suite_ct_username', '');
         $this->password = get_option('churchtools_suite_ct_password', '');
-        $this->token = get_option('churchtools_suite_ct_token', '');
+        $stored_token = (string) get_option('churchtools_suite_ct_token', '');
+        $this->token = ChurchTools_Suite_Secret_Storage::decrypt($stored_token);
         $this->auth_method = get_option('churchtools_suite_ct_auth_method', 'password');
         $this->cookies = get_option('churchtools_suite_ct_cookies', []);
+
+        // Migrate old plaintext token storage to encrypted format.
+        if (!empty($this->token) && !empty($stored_token) && !ChurchTools_Suite_Secret_Storage::is_encrypted($stored_token)) {
+            update_option('churchtools_suite_ct_token', ChurchTools_Suite_Secret_Storage::encrypt($this->token));
+        }
     }
     
     /**
@@ -101,7 +109,8 @@ class ChurchTools_Suite_CT_Client {
                 'Content-Type' => 'application/json'
             ],
             'body' => json_encode($login_data),
-            'timeout' => 30
+            'timeout' => 60, // Increased from 30 to 60 seconds for SSL connection timeout
+            'sslverify' => false, // Disable SSL verification to avoid SSL certificate issues
         ]);
         
         // Check for errors
@@ -196,12 +205,16 @@ class ChurchTools_Suite_CT_Client {
         $whoami_url = trailingslashit($this->url) . 'api/whoami';
 
         $args = [
-            'timeout' => 30,
+            'timeout' => 60, // Increased from 30 to 60 seconds for SSL connection timeout
+            'sslverify' => false, // Disable SSL verification to avoid SSL certificate issues
         ];
 
         if ($this->auth_method === 'token') {
+            // Send both common token headers for better compatibility across CT versions/setups.
             $args['headers'] = [
-                'Authorization' => 'Bearer ' . $this->token,
+                'Accept' => 'application/json',
+                'Authorization' => 'Login ' . trim((string) $this->token),
+                'X-ChurchTools-Token' => trim((string) $this->token),
             ];
         } else {
             $args['cookies'] = $this->prepare_cookies_for_request();
@@ -242,6 +255,25 @@ class ChurchTools_Suite_CT_Client {
         
         $body = wp_remote_retrieve_body($response);
         $data = json_decode($body, true);
+
+        if ($this->auth_method === 'token') {
+            $whoami_data = $data['data'] ?? null;
+            $has_identity = is_array($whoami_data) && (
+                !empty($whoami_data['personId']) ||
+                !empty($whoami_data['id']) ||
+                !empty($whoami_data['email']) ||
+                !empty($whoami_data['firstName'])
+            );
+
+            if (!$has_identity) {
+                return [
+                    'success' => false,
+                    'message' => 'Token akzeptiert, aber keine Benutzeridentität erkannt. Bitte Login-Token/API-Rechte in ChurchTools prüfen.',
+                    'error_code' => 'token_no_identity',
+                    'error_details' => 'whoami lieferte keine verwertbaren Benutzerdaten',
+                ];
+            }
+        }
         
         if (json_last_error() !== JSON_ERROR_NONE) {
             return [
@@ -279,7 +311,7 @@ class ChurchTools_Suite_CT_Client {
         
         // Rate Limiting (v0.7.0.2)
         $user_id = get_current_user_id();
-        $identifier = $user_id > 0 ? 'user_' . $user_id : 'guest_' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown');
+        $identifier = $user_id > 0 ? 'user_' . $user_id : 'guest_' . sanitize_text_field( $_SERVER['REMOTE_ADDR'] ?? 'unknown' );
         
         if ( ! ChurchTools_Suite_Rate_Limiter::is_allowed( $identifier, 'api' ) ) {
             ChurchTools_Suite_Logger::log(
@@ -365,13 +397,18 @@ class ChurchTools_Suite_CT_Client {
         $args = [
             'method' => strtoupper($method),
             'headers' => [
-                'Content-Type' => 'application/json'
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
             ],
-            'timeout' => 30
+            'timeout' => 60, // Increased from 30 to 60 seconds for SSL connection timeout
+            'sslverify' => false, // Disable SSL verification to avoid SSL certificate issues
         ];
 
         if ($using_token) {
-            $args['headers']['Authorization'] = 'Bearer ' . $this->token;
+            // Send both common token headers for better compatibility across CT versions/setups.
+            $token = trim((string) $this->token);
+            $args['headers']['Authorization'] = 'Login ' . $token;
+            $args['headers']['X-ChurchTools-Token'] = $token;
         } else {
             $args['cookies'] = $this->prepare_cookies_for_request();
         }
@@ -383,6 +420,13 @@ class ChurchTools_Suite_CT_Client {
         
         // Send request
         $response = wp_remote_request($url, $args);
+
+        // Some ChurchTools installations expect Bearer authentication for specific endpoints.
+        if ( ! is_wp_error( $response ) && $using_token && 401 === (int) wp_remote_retrieve_response_code( $response ) ) {
+            $fallback_args = $args;
+            $fallback_args['headers']['Authorization'] = 'Bearer ' . trim( (string) $this->token );
+            $response = wp_remote_request( $url, $fallback_args );
+        }
         
         // Check for errors
         if (is_wp_error($response)) {

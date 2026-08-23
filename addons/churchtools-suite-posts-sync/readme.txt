@@ -2,7 +2,7 @@
 Contributors: FEG Aschaffenburg
 Tags: churchtools, sync, posts, events, integration
 Requires at least: 5.0
-Requires PHP: 8.0
+Requires PHP: 8.2
 Tested up to: 6.4
 Stable tag: 0.1.7
 License: GPLv2 or later
@@ -17,7 +17,7 @@ Synchronisiert ChurchTools-Posts in WordPress-Posts und -Seiten.
 **Anforderungen:**
 - ChurchTools Suite v1.2.0.0 oder höher
 - WordPress 5.0 oder höher
-- PHP 8.0 oder höher
+- PHP 8.2 oder höher
 
 **Features:**
 - 🔄 Automatische Synchronisation von ChurchTools-Posts
@@ -33,7 +33,9 @@ Synchronisiert ChurchTools-Posts in WordPress-Posts und -Seiten.
 1. Installieren und aktivieren Sie das Hauptplugin **ChurchTools Suite** (v1.2.0.0+)
 2. Laden Sie dieses Addon hoch: `/wp-content/plugins/churchtools-suite-posts-sync/`
 3. Aktivieren Sie das Addon im Admin-Bereich
-4. Gehen Sie zu **Einstellungen → ChurchTools** und konfigurieren Sie **ChurchTools Posts → WordPress**
+4. Gehen Sie zu **Einstellungen → ChurchTools → Berichte** und aktivieren Sie den Berichte-Sync
+5. Synchronisieren Sie die Post-Gruppen und wählen Sie die gewünschten Gruppen aus
+6. Speichern Sie Zieltyp, Status und Filter. Das funktioniert auch auf einer gehosteten Produktivinstallation.
 
 == Configuration ==
 
@@ -43,7 +45,7 @@ Nach der Aktivierung können Sie unter **Einstellungen → ChurchTools → Sync*
 - **Ziel in WordPress**: Bestimmen Sie, ob Posts oder Seiten erstellt werden sollen
 - **Status der Zielinhalte**: Wählen Sie den Veröffentlichungsstatus (Entwurf, Veröffentlicht, Privat)
 
-Die Synchronisation läuft automatisch mit der Häufigkeit, die für die Event-Synchronisation konfiguriert ist.
+Die Synchronisation läuft automatisch mit der Häufigkeit, die für die Event-Synchronisation konfiguriert ist. Eine lokale Installation ist nicht erforderlich.
 
 == Anzeige im Frontend ==
 
@@ -58,7 +60,7 @@ Beispiel:
 == FAQ ==
 
 **Funktioniert dieses Addon ohne das Hauptplugin?**
-Nein, dieses Addon erfordert das ChurchTools Suite Hauptplugin v1.1.5.0 oder höher.
+Nein, dieses Addon erfordert das ChurchTools Suite Hauptplugin v1.2.0.0 oder höher.
 
 **Kann ich die Felder (Title, Content, etc.) anpassen?**
 Derzeit werden folgende Felder synchronisiert:

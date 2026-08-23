@@ -185,6 +185,9 @@ class ChurchTools_Suite {
 	 * Register public hooks
 	 */
 	private function define_public_hooks(): void {
+		// Register normal CPT for synced Termine (like regular posts/pages)
+		add_action( 'init', [ 'ChurchTools_Suite', 'register_termin_post_type' ], 20 );
+
 		// Register shortcodes (v0.5.0.0)
 		add_action( 'init', [ 'ChurchTools_Suite_Shortcodes', 'register' ] );
 		
@@ -270,6 +273,7 @@ class ChurchTools_Suite {
 		
 		add_action( 'churchtools_suite_session_keepalive', [ 'ChurchTools_Suite_Cron', 'session_keepalive' ] );
 		add_action( 'churchtools_suite_auto_sync', [ 'ChurchTools_Suite_Cron', 'auto_sync' ] );
+		add_action( 'churchtools_suite_calendar_reconcile', [ 'ChurchTools_Suite_Cron', 'calendar_reconcile' ] );
 	}
 
 	/**
@@ -300,6 +304,43 @@ class ChurchTools_Suite {
 	/**
 	 * Get the plugin version
 	 */
+	public static function register_termin_post_type(): void {
+		$labels = [
+			'name' => __( 'ChurchTools Termine', 'churchtools-suite' ),
+			'singular_name' => __( 'ChurchTools Termin', 'churchtools-suite' ),
+			'menu_name' => __( 'ChurchTools Termine', 'churchtools-suite' ),
+			'add_new' => __( 'Neuen Termin hinzufügen', 'churchtools-suite' ),
+			'add_new_item' => __( 'Neuen Termin hinzufügen', 'churchtools-suite' ),
+			'edit_item' => __( 'Termin bearbeiten', 'churchtools-suite' ),
+			'new_item' => __( 'Neuer Termin', 'churchtools-suite' ),
+			'view_item' => __( 'Termin ansehen', 'churchtools-suite' ),
+			'search_items' => __( 'Termine durchsuchen', 'churchtools-suite' ),
+			'not_found' => __( 'Keine Termine gefunden.', 'churchtools-suite' ),
+			'not_found_in_trash' => __( 'Keine Termine im Papierkorb gefunden.', 'churchtools-suite' ),
+		];
+
+		register_post_type(
+			'ct_termin',
+			[
+				'labels' => $labels,
+				'public' => false,
+				'show_ui' => true,
+				'show_in_menu' => false,
+				'menu_position' => 25,
+				'menu_icon' => 'dashicons-calendar-alt',
+				'show_in_admin_bar' => false,
+				'exclude_from_search' => true,
+				'publicly_queryable' => false,
+				'rewrite' => false,
+				'query_var' => false,
+				'capability_type' => 'post',
+				'map_meta_cap' => true,
+				'taxonomies' => [ 'category' ],
+				'supports' => [ 'title', 'editor', 'excerpt', 'author', 'thumbnail', 'revisions', 'custom-fields' ],
+			]
+		);
+	}
+
 	public function get_version(): string {
 		return $this->version;
 	}

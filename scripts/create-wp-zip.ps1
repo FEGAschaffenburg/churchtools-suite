@@ -16,7 +16,7 @@ switch ($Plugin) {
         $SourceRoot = $RepoRoot
         $ExcludeItems = @(
             '.git', '.github', '.gitignore', '.editorconfig', '.gitattributes',
-            'scripts', 'tests', 'node_modules', 'addons',
+            '.backup', '.links', 'release-dist', 'scripts', 'tests', 'node_modules', 'addons',
             '*.zip', '*.log', '.vscode', '.idea',
             'phpunit.xml', 'phpcs.xml', '.phpcs.xml.dist',
             'composer.json', 'composer.lock', 'package.json', 'package-lock.json',

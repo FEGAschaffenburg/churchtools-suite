@@ -225,6 +225,7 @@ class ChurchTools_Suite_Auto_Updater {
         }
 
         $last_http_error = null;
+        $data = [];
 
         // Prefer full releases list and pick highest stable version (more reliable than /latest for this repo)
         $response = wp_remote_get( self::GITHUB_API_RELEASES, [ 'headers' => $headers, 'timeout' => 20 ] );

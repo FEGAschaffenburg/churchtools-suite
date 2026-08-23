@@ -20,11 +20,10 @@ class ChurchTools_Suite_Posts_Sync_Admin {
 		}
 
 		$page = isset( $_GET['page'] ) ? sanitize_key( (string) $_GET['page'] ) : '';
-		$tab = isset( $_GET['tab'] ) ? sanitize_key( (string) $_GET['tab'] ) : '';
 		$subtab = isset( $_GET['subtab'] ) ? sanitize_key( (string) $_GET['subtab'] ) : '';
 
 		$is_overview_page = ( $page === 'churchtools-suite-posts-overview' );
-		$is_posts_settings_tab = ( $page === 'churchtools-suite' && $tab === 'settings' && $subtab === 'posts' );
+		$is_posts_settings_tab = ( $page === 'churchtools-suite' && $subtab === 'posts' );
 
 		if ( ! $is_overview_page && ! $is_posts_settings_tab ) {
 			return;
@@ -67,8 +66,8 @@ class ChurchTools_Suite_Posts_Sync_Admin {
 
 		add_submenu_page(
 			'churchtools-suite',
-			__( 'Übersicht Berichte', 'churchtools-suite-posts-sync' ),
-			__( '📝 Berichte', 'churchtools-suite-posts-sync' ),
+			__( 'ChurchTools Übersicht Berichte', 'churchtools-suite-posts-sync' ),
+			__( '📝 ChurchTools Berichte', 'churchtools-suite-posts-sync' ),
 			'manage_churchtools_suite',
 			'churchtools-suite-posts-overview',
 			[ $this, 'render_overview_page' ]
@@ -151,10 +150,6 @@ class ChurchTools_Suite_Posts_Sync_Admin {
 		}
 
 		$post_data = is_array( $raw_post_data ) ? $raw_post_data : [];
-
-		if ( ! $this->is_local_environment() ) {
-			return;
-		}
 
 		$enabled = isset( $post_data['ct_posts_sync_enabled'] ) ? 1 : 0;
 		$target_type = isset( $post_data['ct_posts_target_type'] ) ? sanitize_key( wp_unslash( (string) $post_data['ct_posts_target_type'] ) ) : ( defined( 'CTS_POSTS_SYNC_CPT' ) ? CTS_POSTS_SYNC_CPT : 'ct_post' );
@@ -264,7 +259,7 @@ class ChurchTools_Suite_Posts_Sync_Admin {
 			delete_option( 'churchtools_suite_ct_posts_groups_sync_feedback' );
 		}
 
-		$enabled = (int) get_option( 'churchtools_suite_ct_posts_sync_enabled', 0 );
+		$enabled = (int) get_option( 'churchtools_suite_ct_posts_sync_enabled', 1 );
 		$target_type = (string) get_option( 'churchtools_suite_ct_posts_target_type', defined( 'CTS_POSTS_SYNC_CPT' ) ? CTS_POSTS_SYNC_CPT : 'ct_post' );
 		$target_status = (string) get_option( 'churchtools_suite_ct_posts_target_status', 'draft' );
 		$sync_limit = (int) get_option( 'churchtools_suite_ct_posts_sync_limit', 200 );
@@ -302,10 +297,6 @@ class ChurchTools_Suite_Posts_Sync_Admin {
 		echo '<h3>' . esc_html__( 'Berichte Konfiguration (Addon)', 'churchtools-suite-posts-sync' ) . '</h3>';
 		echo '</div>';
 		echo '<div class="cts-posts-sync-settings-intro">' . esc_html__( 'Hier steuerst du den ChurchTools Berichte-Sync inklusive Zieltyp, Filter und API-Optionen.', 'churchtools-suite-posts-sync' ) . '</div>';
-
-		if ( ! $is_local_environment ) {
-			echo '<p class="cts-form-description cts-posts-sync-settings-notice">' . esc_html__( 'Berichte-Sync ist nur in lokaler Umgebung konfigurierbar.', 'churchtools-suite-posts-sync' ) . '</p>';
-		}
 
 		echo '<table class="cts-form-table">';
 		echo '<tr class="cts-posts-sync-section-row"><th colspan="2">' . esc_html__( 'Allgemein', 'churchtools-suite-posts-sync' ) . '</th></tr>';
@@ -460,13 +451,9 @@ class ChurchTools_Suite_Posts_Sync_Admin {
 			return;
 		}
 
-		if ( ! $this->is_local_environment() ) {
-			wp_send_json_error( [ 'message' => __( 'Berichte-Sync ist nur in lokaler Umgebung ausführbar.', 'churchtools-suite-posts-sync' ) ] );
-			return;
-		}
-
 		try {
 			require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-ct-client.php';
+			require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-image-importer.php';
 			require_once CTS_POSTS_SYNC_PATH . 'includes/class-cts-posts-sync-service.php';
 
 			$limit = (int) get_option( 'churchtools_suite_ct_posts_sync_limit', 200 );
@@ -512,7 +499,7 @@ class ChurchTools_Suite_Posts_Sync_Admin {
 		$home_host = is_string( $home_host ) ? strtolower( $home_host ) : '';
 		$is_local_host = $home_host !== '' && ( in_array( $home_host, [ 'localhost', '127.0.0.1', '::1' ], true ) || preg_match( '/\.(test|local|localhost)$/', $home_host ) );
 
-		$is_allowed = in_array( (string) $env_type, [ 'local', 'development', 'staging' ], true ) || (bool) $is_local_host;
+		$is_allowed = true;
 
 		return (bool) apply_filters( 'cts_posts_sync_is_allowed_environment', $is_allowed, (string) $env_type, $home_host );
 	}
