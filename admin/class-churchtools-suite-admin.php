@@ -276,6 +276,7 @@ class ChurchTools_Suite_Admin {
 			flyout.append("<li><a href=\"" + eventsUrl + "\">📋 Übersicht Termine</a></li>");
 						flyout.append("<li><a href=\"" + reportsUrl + "\">📝 Übersicht Berichte</a></li>");
 			parentItem.append(flyout);
+						menuRoot.find(".wp-submenu a[href*=\\\"page=churchtools-suite-posts-overview\\\"]").first().closest("li").hide();
 
 			var closeTimer = null;
 			function openFlyout() {

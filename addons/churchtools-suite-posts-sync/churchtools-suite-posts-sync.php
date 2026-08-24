@@ -409,9 +409,5 @@ add_action( 'admin_menu', static function (): void {
 	( new ChurchTools_Suite_Posts_Sync_Admin() )->register_submenu();
 }, 45 );
 
-add_action( 'admin_menu', static function (): void {
-	remove_submenu_page( 'churchtools-suite', 'churchtools-suite-posts-overview' );
-}, 100 );
-
 // Initialize addon on plugins_loaded
 add_action( 'plugins_loaded', [ 'ChurchTools_Suite_Posts_Sync', 'init' ] );
