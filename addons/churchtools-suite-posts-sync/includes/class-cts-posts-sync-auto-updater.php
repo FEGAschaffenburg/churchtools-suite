@@ -15,6 +15,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class CTS_Posts_Sync_Auto_Updater {
 
+	private const GITHUB_RAW_PLUGIN = 'https://raw.githubusercontent.com/FEGAschaffenburg/churchtools-suite/main/addons/churchtools-suite-posts-sync/churchtools-suite-posts-sync.php';
+
 	const GITHUB_API_RELEASES = 'https://api.github.com/repos/FEGAschaffenburg/churchtools-suite/releases?per_page=30';
 	const GITHUB_API_RELEASES_LATEST = 'https://api.github.com/repos/FEGAschaffenburg/churchtools-suite/releases/latest';
 	const PLUGIN_SLUG = 'churchtools-suite-posts-sync';
@@ -100,6 +102,11 @@ class CTS_Posts_Sync_Auto_Updater {
 		}
 
 		if ( ! is_array( $release ) || empty( $release['tag_name'] ) ) {
+			$fallback = self::get_latest_release_info_without_api();
+			if ( ! is_wp_error( $fallback ) ) {
+				return $fallback;
+			}
+
 			$response = wp_remote_get( self::GITHUB_API_RELEASES_LATEST, [
 				'timeout' => 20,
 				'headers' => $headers,
@@ -161,6 +168,33 @@ class CTS_Posts_Sync_Auto_Updater {
 		set_transient( $cache_key, $info, HOUR_IN_SECONDS );
 
 		return $info;
+	}
+
+	private static function get_latest_release_info_without_api() {
+		$response = wp_remote_get( self::GITHUB_RAW_PLUGIN, [
+			'timeout' => 20,
+			'headers' => [ 'User-Agent' => 'ChurchTools-Suite-Posts-Sync-Updater' ],
+		] );
+
+		if ( is_wp_error( $response ) || (int) wp_remote_retrieve_response_code( $response ) !== 200 ) {
+			return new WP_Error( 'raw_version_error', 'Unable to read the public addon version.' );
+		}
+
+		$body = wp_remote_retrieve_body( $response );
+		if ( ! preg_match( '/^\s*\* Version:\s*([^\r\n]+)/mi', $body, $matches ) ) {
+			return new WP_Error( 'raw_version_invalid', 'No valid addon version found.' );
+		}
+
+		$version = ltrim( trim( $matches[1] ), 'vV' );
+		return [
+			'tag_name' => 'latest',
+			'version' => $version,
+			'zip_url' => 'https://github.com/FEGAschaffenburg/churchtools-suite/releases/latest/download/churchtools-suite-posts-sync-' . $version . '.clean.zip',
+			'html_url' => 'https://github.com/FEGAschaffenburg/churchtools-suite/releases',
+			'name' => 'ChurchTools Posts Sync ' . $version,
+			'body' => '',
+			'published_at' => '',
+		];
 	}
 
 	/**
