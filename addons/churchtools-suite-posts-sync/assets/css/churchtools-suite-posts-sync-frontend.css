@@ -4,11 +4,112 @@
 	margin: 12px 0;
 }
 
+.cts-posts-sync-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 20px;
+	margin: 12px 0;
+}
+
+.cts-posts-sync-item-grid {
+	overflow: hidden;
+}
+
+.cts-posts-sync-image {
+	display: block;
+	margin: -14px -16px 14px;
+}
+
+.cts-posts-sync-image img {
+	display: block;
+	width: 100%;
+	height: 150px;
+	object-fit: cover;
+}
+
+.cts-posts-sync-modern {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 24px;
+	margin: 16px 0;
+}
+
+.cts-posts-sync-item-modern {
+	padding: 0 0 18px;
+	border: 0;
+	border-bottom: 3px solid #1d4ed8;
+	border-radius: 0;
+	background: transparent;
+}
+
+.cts-posts-sync-item-modern .cts-posts-sync-image {
+	margin: 0 0 16px;
+	border-radius: 6px;
+	overflow: hidden;
+}
+
+.cts-posts-sync-item-modern .cts-posts-sync-image img {
+	height: 190px;
+	transition: transform 180ms ease;
+}
+
+.cts-posts-sync-item-modern:hover .cts-posts-sync-image img {
+	transform: scale(1.03);
+}
+
+.cts-posts-sync-item-modern .cts-posts-sync-title {
+	font-size: 1.35rem;
+	letter-spacing: 0;
+}
+
+.cts-posts-sync-item-modern .cts-posts-sync-date {
+	text-transform: uppercase;
+	letter-spacing: .08em;
+	font-size: .75rem;
+	font-weight: 700;
+	color: #1d4ed8;
+}
+
 .cts-posts-sync-item {
 	padding: 14px 16px;
 	border: 1px solid #dcdcde;
 	border-radius: 10px;
 	background: #fff;
+}
+
+.cts-posts-sync-classic {
+	gap: 0;
+	border-top: 1px solid #dcdcde;
+}
+
+.cts-posts-sync-item-classic {
+	border: 1px solid #c7d2fe;
+	border-left: 6px solid #1d4ed8;
+	border-radius: 2px;
+	background: #f8fafc;
+	box-shadow: 0 2px 5px rgba(15, 23, 42, .08);
+}
+
+.cts-posts-sync-minimal {
+	gap: 8px;
+}
+
+.cts-posts-sync-item-minimal {
+	padding: 10px 0;
+	border: 0;
+	border-bottom: 1px solid #cbd5e1;
+	border-radius: 0;
+	background: transparent;
+}
+
+.cts-posts-sync-item-minimal .cts-posts-sync-title {
+	font-size: 1rem;
+	font-weight: 600;
+}
+
+.cts-posts-sync-item-minimal .cts-posts-sync-excerpt {
+	color: #64748b;
+	line-height: 1.45;
 }
 
 .cts-posts-sync-title {

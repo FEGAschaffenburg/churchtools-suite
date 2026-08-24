@@ -2327,7 +2327,7 @@
 /* Weekday Header */
 .cts-calendar-weekdays {
 	display: grid;
-	grid-template-columns: repeat(7, 1fr);
+	grid-template-columns: repeat(7, minmax(0, 1fr));
 	background: #f1f5f9;
 	border-bottom: 1px solid #e5e7eb;
 }
@@ -2345,13 +2345,14 @@
 /* Calendar Grid */
 .cts-calendar-grid {
 	display: grid;
-	grid-template-columns: repeat(7, 1fr);
+	grid-template-columns: repeat(7, minmax(0, 1fr));
 	grid-auto-rows: 1fr;
 }
 
 /* Day Cell */
 .cts-calendar-day-cell {
 	min-height: 80px;
+	min-width: 0;
 	border: 1px solid #e5e7eb;
 	padding: 6px;
 	position: relative;
@@ -2411,7 +2412,7 @@
 	border-radius: 3px;
 	font-size: 10px;
 	color: #fff;
-	overflow: hidden;
+	overflow: visible;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	transition: all 0.2s ease;
@@ -2434,6 +2435,8 @@
 }
 
 .cts-event-title-short {
+	min-width: 0;
+	flex: 1 1 auto;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -2461,6 +2464,10 @@
 	display: block;
 }
 
+.cts-event-marker:focus .cts-event-tooltip {
+	display: block;
+}
+
 /* Tooltip Arrow */
 .cts-event-tooltip::before {
 	content: '';
@@ -2477,6 +2484,7 @@
 	font-weight: 600;
 	margin-bottom: 8px;
 	line-height: 1.3;
+	overflow-wrap: anywhere;
 }
 
 .cts-tooltip-time,

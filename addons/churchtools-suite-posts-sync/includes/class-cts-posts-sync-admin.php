@@ -6,7 +6,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 class ChurchTools_Suite_Posts_Sync_Admin {
 
 	public function init() {
-		add_action( 'admin_menu', [ $this, 'register_submenu' ], 45 );
 		add_action( 'add_meta_boxes', [ $this, 'register_ct_meta_boxes' ], 10, 2 );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
 		add_action( 'cts_posts_settings_save', [ $this, 'save_posts_settings' ] );

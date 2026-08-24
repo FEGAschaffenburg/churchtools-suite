@@ -91,11 +91,10 @@ class ChurchTools_Suite_Admin {
 				   require_once CHURCHTOOLS_SUITE_PATH . 'includes/class-churchtools-suite-auto-updater.php';
 			   }
 
-			   // Force fresh update check to avoid stale transients after release publication
-			   delete_transient( 'churchtools_suite_github_release' );
+			   // Do not purge the cached release immediately; GitHub may rate-limit repeated manual checks.
+			   // Reuse the cached release info when available and only refresh if the cache is empty.
 			   delete_site_transient( 'update_plugins' );
 			   wp_clean_plugins_cache();
-			   wp_update_plugins();
 
 			   // Logging: Start manuelle Update-Prüfung
 			   if ( class_exists( 'ChurchTools_Suite_Logger' ) ) {
@@ -252,10 +251,8 @@ class ChurchTools_Suite_Admin {
 		);
 
 		$events_overview_url = admin_url( 'admin.php?page=churchtools-suite-data&subtab=events' );
-		$posts_overview_url = admin_url( 'admin.php?page=churchtools-suite-posts-overview' );
 		$documentation_url = 'https://plugin.feg-aschaffenburg.de/';
 		$events_overview_url_js = wp_json_encode( $events_overview_url );
-		$posts_overview_url_js = wp_json_encode( $posts_overview_url );
 		$documentation_url_js = wp_json_encode( $documentation_url );
 
 		$inline_menu_script = 'jQuery(function($){
@@ -271,11 +268,9 @@ class ChurchTools_Suite_Admin {
 			parentItem.addClass("cts-overviews-parent");
 
 			var eventsUrl = ' . $events_overview_url_js . ';
-			var postsUrl = ' . $posts_overview_url_js . ';
 
 			var flyout = $("<ul class=\"cts-overviews-flyout\" />");
 			flyout.append("<li><a href=\"" + eventsUrl + "\">📋 Übersicht Termine</a></li>");
-			flyout.append("<li><a href=\"" + postsUrl + "\">📝 Übersicht Berichte</a></li>");
 			parentItem.append(flyout);
 
 			var closeTimer = null;
@@ -348,8 +343,8 @@ class ChurchTools_Suite_Admin {
 		// v1.0.2.0: Use custom capability instead of manage_options
 		// This allows ChurchTools Managers to access the plugin without full WordPress admin access
 		add_menu_page(
-			__( 'ChurchTools Integration Suite', 'churchtools-suite' ),
-			__( 'ChurchTools Integration Suite', 'churchtools-suite' ),
+			__( 'ChurchTools Integration', 'churchtools-suite' ),
+			__( 'ChurchTools Integration', 'churchtools-suite' ),
 			'manage_churchtools_suite', // New: Custom capability (vs manage_options)
 			'churchtools-suite',
 			[ $this, 'display_admin_page' ],
@@ -360,8 +355,8 @@ class ChurchTools_Suite_Admin {
 		// Zweistufiger Einstieg: Übersichten
 		add_submenu_page(
 			'churchtools-suite',
-			__( 'ChurchTools Übersichten', 'churchtools-suite' ),
-			__( '📚 ChurchTools Übersichten', 'churchtools-suite' ),
+			__( 'Übersichten', 'churchtools-suite' ),
+			__( '📚 Übersichten', 'churchtools-suite' ),
 			'manage_churchtools_suite',
 			'churchtools-suite-overviews',
 			[ $this, 'display_overviews_page' ],
@@ -381,8 +376,8 @@ class ChurchTools_Suite_Admin {
 		// Add Addons/Extensions overview page (v1.0.9.0)
 		add_submenu_page(
 			'churchtools-suite',
-			__( 'ChurchTools Addons', 'churchtools-suite' ),
-			__( '🧩 ChurchTools Addons', 'churchtools-suite' ),
+			__( 'Addons', 'churchtools-suite' ),
+			__( '🧩 Addons', 'churchtools-suite' ),
 			'manage_churchtools_suite',
 			'churchtools-suite-addons',
 			[ $this, 'display_addons_page' ]
@@ -391,8 +386,8 @@ class ChurchTools_Suite_Admin {
 		// Add Disclaimer subpage (separate admin page for legal information)
 		add_submenu_page(
 			'churchtools-suite',
-			__( 'ChurchTools Haftungsausschluss', 'churchtools-suite' ),
-			__( '⚠️ ChurchTools Haftungsausschluss', 'churchtools-suite' ),
+			__( 'Haftungsausschluss', 'churchtools-suite' ),
+			__( '⚠️ Haftungsausschluss', 'churchtools-suite' ),
 			'manage_churchtools_suite',
 			'churchtools-suite-disclaimer',
 			[ $this, 'display_disclaimer_page' ]
@@ -401,8 +396,8 @@ class ChurchTools_Suite_Admin {
 		// Add Documentation link
 		add_submenu_page(
 			'churchtools-suite',
-			__( 'ChurchTools Dokumentation', 'churchtools-suite' ),
-			__( '📖 ChurchTools Dokumentation', 'churchtools-suite' ),
+			__( 'Dokumentation', 'churchtools-suite' ),
+			__( '📖 Dokumentation', 'churchtools-suite' ),
 			'manage_churchtools_suite',
 			'churchtools-suite-docs',
 			[ $this, 'redirect_to_documentation' ]

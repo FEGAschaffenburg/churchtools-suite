@@ -234,6 +234,9 @@ for ( $i = 0; $i < 7; $i++ ) {
 							}
 							?>
 							<div class="<?php echo esc_attr( $event_classes ); ?>" 
+							     title="<?php echo esc_attr( $event['title'] ); ?>"
+							     tabindex="0"
+							     aria-label="<?php echo esc_attr( $event['title'] ); ?>"
 							     <?php echo $event_style; ?>
 							     <?php echo $event_attrs; ?>>
 								<span class="cts-event-time"><?php echo esc_html( $event_time ); ?></span>

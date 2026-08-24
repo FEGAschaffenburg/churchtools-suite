@@ -71,6 +71,10 @@ class ChurchTools_Suite_Posts_Sync_Frontend {
 						'type' => 'number',
 						'default' => 10,
 					],
+					'view' => [
+						'type' => 'string',
+						'default' => 'list',
+					],
 					'postType' => [
 						'type' => 'string',
 						'default' => '',
@@ -253,6 +257,7 @@ class ChurchTools_Suite_Posts_Sync_Frontend {
 		$atts = shortcode_atts(
 			[
 				'limit' => 10,
+				'view' => 'list',
 				'post_type' => '',
 				'show_date' => 'true',
 				'show_excerpt' => 'true',
@@ -267,6 +272,7 @@ class ChurchTools_Suite_Posts_Sync_Frontend {
 		return self::render_posts_list(
 			[
 				'limit' => (int) $atts['limit'],
+				'view' => (string) $atts['view'],
 				'post_type' => (string) $atts['post_type'],
 				'show_date' => self::parse_bool( $atts['show_date'], true ),
 				'show_excerpt' => self::parse_bool( $atts['show_excerpt'], true ),
@@ -287,6 +293,7 @@ class ChurchTools_Suite_Posts_Sync_Frontend {
 		return self::render_posts_list(
 			[
 				'limit' => isset( $attributes['limit'] ) ? (int) $attributes['limit'] : 10,
+				'view' => isset( $attributes['view'] ) ? (string) $attributes['view'] : 'list',
 				'post_type' => isset( $attributes['postType'] ) ? (string) $attributes['postType'] : '',
 				'show_date' => isset( $attributes['showDate'] ) ? (bool) $attributes['showDate'] : true,
 				'show_excerpt' => isset( $attributes['showExcerpt'] ) ? (bool) $attributes['showExcerpt'] : true,
@@ -325,6 +332,7 @@ class ChurchTools_Suite_Posts_Sync_Frontend {
 		}
 
 		$show_date = ! empty( $config['show_date'] );
+		$view = isset( $config['view'] ) && in_array( $config['view'], [ 'list', 'classic', 'minimal', 'grid', 'modern' ], true ) ? $config['view'] : 'list';
 		$show_excerpt = ! empty( $config['show_excerpt'] );
 		$only_new = ! empty( $config['only_new'] );
 		$only_synced = ! empty( $config['only_synced'] );
@@ -377,9 +385,7 @@ class ChurchTools_Suite_Posts_Sync_Frontend {
 			return '<div class="cts-posts-sync-list cts-posts-sync-list-empty">' . esc_html__( 'Keine Beiträge gefunden.', 'churchtools-suite-posts-sync' ) . '</div>';
 		}
 
-		$wrapper_classes = $is_block
-			? 'cts-posts-sync-list cts-posts-sync-list-block'
-			: 'cts-posts-sync-list cts-posts-sync-list-shortcode';
+		$wrapper_classes = 'cts-posts-sync-' . $view . ( $is_block ? ' cts-posts-sync-list-block' : ' cts-posts-sync-list-shortcode' );
 
 		ob_start();
 		echo '<div class="' . esc_attr( $wrapper_classes ) . '">';
@@ -400,7 +406,10 @@ class ChurchTools_Suite_Posts_Sync_Frontend {
 			}
 			$date_display = get_the_date( get_option( 'date_format' ), $post_id );
 			?>
-			<article class="cts-posts-sync-item">
+			<article class="cts-posts-sync-item <?php echo esc_attr( 'cts-posts-sync-item-' . $view ); ?>">
+				<?php if ( in_array( $view, [ 'grid', 'modern' ], true ) && has_post_thumbnail( $post_id ) ) : ?>
+					<a class="cts-posts-sync-image" href="<?php echo $allow_link ? esc_url( $permalink ) : '#'; ?>"><?php echo get_the_post_thumbnail( $post_id, 'medium' ); ?></a>
+				<?php endif; ?>
 				<h3 class="cts-posts-sync-title">
 					<?php if ( $allow_link && ! empty( $permalink ) ) : ?>
 						<a href="<?php echo esc_url( $permalink ); ?>"><?php echo esc_html( $title ); ?></a>

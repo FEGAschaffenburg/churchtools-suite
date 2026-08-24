@@ -215,6 +215,18 @@ class ChurchTools_Suite_Auto_Updater {
      * @return array|WP_Error
      */
     public static function get_latest_release_info() {
+        $cached = get_transient( 'churchtools_suite_github_release' );
+        if ( is_array( $cached ) && ! empty( $cached['tag_name'] ) ) {
+            $latest_tag = ltrim( (string) $cached['tag_name'], 'vV' );
+            $current = ltrim( CHURCHTOOLS_SUITE_VERSION, 'vV' );
+            $cached['latest_version'] = $latest_tag;
+            $cached['is_update'] = version_compare( $latest_tag, $current, '>' );
+            if ( empty( $cached['zip_url'] ) ) {
+                $cached['zip_url'] = self::select_main_plugin_zip_url( $cached['assets'] ?? [] );
+            }
+            return $cached;
+        }
+
         $headers = [
             'User-Agent' => 'ChurchTools-Suite-Updater',
             'Accept' => 'application/vnd.github.v3+json',
@@ -227,7 +239,9 @@ class ChurchTools_Suite_Auto_Updater {
         $last_http_error = null;
         $data = [];
 
-        // Prefer full releases list and pick highest stable version (more reliable than /latest for this repo)
+        // Prefer full releases list and pick highest stable version (more reliable than /latest for this repo).
+        // If GitHub blocks unauthenticated requests with 429, we fall back to the cached release info and
+        // do not hard-fail the update check.
         $response = wp_remote_get( self::GITHUB_API_RELEASES, [ 'headers' => $headers, 'timeout' => 20 ] );
         if ( is_wp_error( $response ) ) {
             $last_http_error = $response;
@@ -240,12 +254,16 @@ class ChurchTools_Suite_Auto_Updater {
                 if ( ! empty( $selected['tag_name'] ) ) {
                     $data = $selected;
                 }
+            } elseif ( in_array( $releases_code, [ 403, 429 ], true ) ) {
+                $last_http_error = new WP_Error( 'github_rate_limited', 'GitHub rate limit reached for unauthenticated requests.' );
             } else {
                 $last_http_error = self::build_github_http_error( $response, 'releases' );
             }
         }
 
-        // Fallback to GitHub /latest endpoint
+        // Fallback to GitHub /latest endpoint.
+        // For unauthenticated requests GitHub may block this endpoint with 429; in that case we keep the
+        // update check soft and rely on the cached transient instead of failing hard.
         if ( empty( $data ) || ! is_array( $data ) || empty( $data['tag_name'] ) ) {
             $response = wp_remote_get( self::GITHUB_API_RELEASES_LATEST, [ 'headers' => $headers, 'timeout' => 20 ] );
             if ( is_wp_error( $response ) ) {
@@ -255,24 +273,37 @@ class ChurchTools_Suite_Auto_Updater {
                 if ( $latest_code === 200 ) {
                     $body = wp_remote_retrieve_body( $response );
                     $data = json_decode( $body, true );
+                } elseif ( in_array( $latest_code, [ 403, 429 ], true ) ) {
+                    $last_http_error = new WP_Error( 'github_rate_limited', 'GitHub rate limit reached for unauthenticated requests.' );
                 } else {
                     $last_http_error = self::build_github_http_error( $response, 'latest' );
                 }
             }
         }
 
-        // If the Releases API didn't return a valid release, attempt to fall back to the tags API
+        // If the Releases API didn't return a valid release, attempt to fall back to the tags API.
+        // If GitHub still rate-limits unauthenticated requests, return the cached transient instead of failing.
         if ( ! is_array( $data ) || empty( $data['tag_name'] ) ) {
-            // Try tags endpoint (may exist when a tag was pushed but no GitHub Release created)
+            $cached_release = get_transient( 'churchtools_suite_github_release' );
+            if ( is_array( $cached_release ) && ! empty( $cached_release['tag_name'] ) ) {
+                return $cached_release;
+            }
+
             $tags_url = 'https://api.github.com/repos/FEGAschaffenburg/churchtools-suite/tags';
             $tags_resp = wp_remote_get( $tags_url, [ 'headers' => $headers, 'timeout' => 20 ] );
             if ( is_wp_error( $tags_resp ) ) {
-                return $last_http_error instanceof WP_Error ? $last_http_error : $tags_resp;
+                if ( $last_http_error instanceof WP_Error ) {
+                    return $last_http_error;
+                }
+                return $tags_resp;
             }
             $tags_code = (int) wp_remote_retrieve_response_code( $tags_resp );
             if ( $tags_code !== 200 ) {
+                if ( $last_http_error instanceof WP_Error ) {
+                    return $last_http_error;
+                }
                 $tags_error = self::build_github_http_error( $tags_resp, 'tags' );
-                return $last_http_error instanceof WP_Error ? $last_http_error : $tags_error;
+                return $tags_error;
             }
             $tags_body = wp_remote_retrieve_body( $tags_resp );
             $tags = json_decode( $tags_body, true );
@@ -282,11 +313,10 @@ class ChurchTools_Suite_Auto_Updater {
                 $current = ltrim( CHURCHTOOLS_SUITE_VERSION, 'v' );
                 $is_update = version_compare( $latest_tag, $current, '>' );
 
-                // Construct zip URL for the tag (GitHub provides archive by tag)
                 $zip_url = sprintf( 'https://github.com/FEGAschaffenburg/churchtools-suite/archive/refs/tags/%s.zip', rawurlencode( $tag_name ) );
                 $html_url = sprintf( 'https://github.com/FEGAschaffenburg/churchtools-suite/releases/tag/%s', rawurlencode( $tag_name ) );
 
-                return [
+                $release_data = [
                     'tag_name' => $tag_name,
                     'latest_version' => $latest_tag,
                     'is_update' => $is_update,
@@ -294,6 +324,8 @@ class ChurchTools_Suite_Auto_Updater {
                     'html_url' => $html_url,
                     'assets' => [],
                 ];
+                set_transient( 'churchtools_suite_github_release', $release_data, 30 * MINUTE_IN_SECONDS );
+                return $release_data;
             }
 
             if ( $last_http_error instanceof WP_Error ) {
@@ -314,7 +346,7 @@ class ChurchTools_Suite_Auto_Updater {
             $zip_url = $data['zipball_url'];
         }
 
-        return [
+        $release_data = [
             'tag_name' => $data['tag_name'],
             'latest_version' => $latest_tag,
             'is_update' => $is_update,
@@ -322,6 +354,10 @@ class ChurchTools_Suite_Auto_Updater {
             'html_url' => $data['html_url'] ?? '',
             'assets' => $data['assets'] ?? [],
         ];
+
+        set_transient( 'churchtools_suite_github_release', $release_data, 30 * MINUTE_IN_SECONDS );
+
+        return $release_data;
     }
 
     /**

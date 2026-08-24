@@ -35,6 +35,7 @@
 		keywords: ['churchtools', 'berichte', 'posts'],
 		attributes: {
 			limit: { type: 'number', default: 10 },
+			view: { type: 'string', default: 'list' },
 			postType: { type: 'string', default: '' },
 			showDate: { type: 'boolean', default: true },
 			showExcerpt: { type: 'boolean', default: true },
@@ -44,6 +45,10 @@
 		},
 		edit: function(props) {
 			var attrs = props.attributes;
+			var preview = typeof ServerSideRender === 'function'
+				? el(ServerSideRender, { block: blockName, attributes: attrs })
+				: el('p', null, __('Vorschau ist nicht verfügbar.', 'churchtools-suite-posts-sync'));
+
 			return el(
 				'div',
 				useBlockProps(),
@@ -59,6 +64,18 @@
 							onChange: function(value) { props.setAttributes({ limit: value || 10 }); },
 							min: 1,
 							max: 100
+						}),
+						el(SelectControl, {
+							label: __('Darstellung', 'churchtools-suite-posts-sync'),
+							value: attrs.view,
+							options: [
+								{ value: 'list', label: __('Liste', 'churchtools-suite-posts-sync') },
+								{ value: 'classic', label: __('Klassisch', 'churchtools-suite-posts-sync') },
+								{ value: 'minimal', label: __('Minimal', 'churchtools-suite-posts-sync') },
+								{ value: 'grid', label: __('Raster', 'churchtools-suite-posts-sync') },
+								{ value: 'modern', label: __('Modern', 'churchtools-suite-posts-sync') }
+							],
+							onChange: function(value) { props.setAttributes({ view: value || 'list' }); }
 						}),
 						el(SelectControl, {
 							label: __('Post-Typ', 'churchtools-suite-posts-sync'),
@@ -96,10 +113,7 @@
 						})
 					)
 				),
-				el(ServerSideRender, {
-					block: blockName,
-					attributes: attrs
-				})
+				preview
 			);
 		},
 		save: function() {
