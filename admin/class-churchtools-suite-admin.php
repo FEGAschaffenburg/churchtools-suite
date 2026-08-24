@@ -251,8 +251,10 @@ class ChurchTools_Suite_Admin {
 		);
 
 		$events_overview_url = admin_url( 'admin.php?page=churchtools-suite-data&subtab=events' );
+				$reports_overview_url = admin_url( 'admin.php?page=churchtools-suite-posts-overview' );
 		$documentation_url = 'https://plugin.feg-aschaffenburg.de/';
 		$events_overview_url_js = wp_json_encode( $events_overview_url );
+				$reports_overview_url_js = wp_json_encode( $reports_overview_url );
 		$documentation_url_js = wp_json_encode( $documentation_url );
 
 		$inline_menu_script = 'jQuery(function($){
@@ -268,9 +270,11 @@ class ChurchTools_Suite_Admin {
 			parentItem.addClass("cts-overviews-parent");
 
 			var eventsUrl = ' . $events_overview_url_js . ';
+						var reportsUrl = ' . $reports_overview_url_js . ';
 
 			var flyout = $("<ul class=\"cts-overviews-flyout\" />");
 			flyout.append("<li><a href=\"" + eventsUrl + "\">📋 Übersicht Termine</a></li>");
+						flyout.append("<li><a href=\"" + reportsUrl + "\">📝 Übersicht Berichte</a></li>");
 			parentItem.append(flyout);
 
 			var closeTimer = null;
