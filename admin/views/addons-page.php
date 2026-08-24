@@ -267,17 +267,17 @@ function cts_ensure_known_addons_in_table( array $addons ): array {
 		'churchtools-suite-elementor' => [
 			'name' => 'Elementor Integration',
 			'description' => 'Elementor Page Builder Widget für Events aus dem integrierten System.',
-			'details_url' => 'https://github.com/FEGAschaffenburg/churchtools-suite/tree/main/addons/churchtools-suite-elementor',
+			'details_url' => 'https://github.com/FEGAschaffenburg/churchtools-suite-elementor',
 		],
 		'churchtools-suite-posts-sync' => [
 			'name' => 'Posts Sync Addon',
 			'description' => 'Synchronisiert Berichte in WordPress-Posts/Seiten.',
-			'details_url' => 'https://github.com/FEGAschaffenburg/churchtools-suite/tree/main/addons/churchtools-suite-posts-sync',
+			'details_url' => 'https://github.com/FEGAschaffenburg/churchtools-suite-posts-sync',
 		],
 		'churchtools-suite-presentations' => [
 			'name' => 'Präsentation Addon',
 			'description' => 'Präsentationsseiten für Termine und Informationen.',
-			'details_url' => 'https://github.com/FEGAschaffenburg/churchtools-suite/tree/main/addons/churchtools-suite-presentations',
+			'details_url' => 'https://github.com/FEGAschaffenburg/churchtools-suite-presentations',
 		],
 	];
 
@@ -301,7 +301,7 @@ function cts_ensure_known_addons_in_table( array $addons ): array {
 			'plugin_slug' => $slug,
 			'is_active' => false,
 			'is_network_active' => false,
-			'github_repo' => 'FEGAschaffenburg/churchtools-suite',
+			'github_repo' => 'FEGAschaffenburg/churchtools-suite-' . $slug,
 			'details_url' => $meta['details_url'],
 			'is_virtual' => true,
 		];
