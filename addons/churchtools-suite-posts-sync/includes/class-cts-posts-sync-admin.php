@@ -5,10 +5,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class ChurchTools_Suite_Posts_Sync_Admin {
 
-	private static bool $menu_registered = false;
-
 	public function init() {
-	                add_action( 'admin_menu', [ $this, 'register_submenu' ], 45 );
+		add_action( 'admin_menu', [ $this, 'register_submenu' ], 45 );
 		add_action( 'add_meta_boxes', [ $this, 'register_ct_meta_boxes' ], 10, 2 );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
 		add_action( 'cts_posts_settings_save', [ $this, 'save_posts_settings' ] );
@@ -17,7 +15,7 @@ class ChurchTools_Suite_Posts_Sync_Admin {
 	}
 
 	public function enqueue_admin_assets() {
-		    if ( ! current_user_can( 'manage_churchtools_suite' ) && ! current_user_can( 'manage_options' ) ) {
+		if ( ! current_user_can( 'manage_churchtools_suite' ) && ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
 
@@ -62,24 +60,18 @@ class ChurchTools_Suite_Posts_Sync_Admin {
 	}
 
 	public function register_submenu() {
-		     if ( self::$menu_registered ) {
-			     return;
-		     }
-
 		if ( ! current_user_can( 'manage_churchtools_suite' ) && ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
 
 		add_submenu_page(
-			     'churchtools-suite',
+			'churchtools-suite',
 			__( 'ChurchTools Übersicht Berichte', 'churchtools-suite-posts-sync' ),
 			__( '📝 ChurchTools Berichte', 'churchtools-suite-posts-sync' ),
-					'manage_options',
+			'manage_churchtools_suite',
 			'churchtools-suite-posts-overview',
 			[ $this, 'render_overview_page' ]
 		);
-
-		     self::$menu_registered = true;
 	}
 
 	public function register_ct_meta_boxes( $post_type, $post ): void {
