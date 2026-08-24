@@ -3537,10 +3537,20 @@ class ChurchTools_Suite_Admin {
 			return;
 		}
 		
-		// Map known addons to their release ZIP name prefixes (monorepo assets)
+		// Map known addons to their standalone repositories and ZIP prefixes.
 		$addon_asset_prefixes = [
-			'churchtools-suite-elementor' => 'churchtools-suite-elementor-',
-			'churchtools-suite-posts-sync' => 'churchtools-suite-posts-sync-',
+			'churchtools-suite-elementor' => [
+				'repo' => 'FEGAschaffenburg/churchtools-suite-elementor',
+				'prefix' => 'churchtools-suite-elementor-',
+			],
+			'churchtools-suite-posts-sync' => [
+				'repo' => 'FEGAschaffenburg/churchtools-suite-posts-sync',
+				'prefix' => 'churchtools-suite-posts-sync-',
+			],
+			'churchtools-suite-presentations' => [
+				'repo' => 'FEGAschaffenburg/churchtools-suite-presentations',
+				'prefix' => 'churchtools-suite-presentations-',
+			],
 		];
 
 		if ( ! isset( $addon_asset_prefixes[ $addon_slug ] ) ) {
@@ -3555,8 +3565,8 @@ class ChurchTools_Suite_Admin {
 			return;
 		}
 
-		$repo = 'FEGAschaffenburg/churchtools-suite';
-		$asset_prefix = $addon_asset_prefixes[ $addon_slug ];
+		$repo = $addon_asset_prefixes[ $addon_slug ]['repo'];
+		$asset_prefix = $addon_asset_prefixes[ $addon_slug ]['prefix'];
 		$cache_key = 'cts_install_addon_release_' . sanitize_key( $addon_slug );
 		
 		try {
@@ -3962,15 +3972,15 @@ class ChurchTools_Suite_Admin {
 		}
 
 		$cleared = 0;
-		$repo = 'FEGAschaffenburg/churchtools-suite';
-		$known_slugs = [
-			'churchtools-suite-elementor',
-			'churchtools-suite-posts-sync',
+		$addon_repositories = [
+			'churchtools-suite-elementor' => 'FEGAschaffenburg/churchtools-suite-elementor',
+			'churchtools-suite-posts-sync' => 'FEGAschaffenburg/churchtools-suite-posts-sync',
+			'churchtools-suite-presentations' => 'FEGAschaffenburg/churchtools-suite-presentations',
 		];
 
 		$all_plugins = get_plugins();
 
-		foreach ( $known_slugs as $slug ) {
+		foreach ( $addon_repositories as $slug => $repo ) {
 			$legacy_key = 'cts_addon_update_' . sanitize_key( $repo . '_' . $slug );
 			if ( delete_transient( $legacy_key ) ) {
 				$cleared++;
@@ -4105,7 +4115,12 @@ class ChurchTools_Suite_Admin {
 			
 			// Clear addon update cache (legacy + new keys)
 			$plugin_slug = dirname( $plugin_file );
-			$repo = 'FEGAschaffenburg/churchtools-suite';
+			$repo_map = [
+				'churchtools-suite-elementor' => 'FEGAschaffenburg/churchtools-suite-elementor',
+				'churchtools-suite-posts-sync' => 'FEGAschaffenburg/churchtools-suite-posts-sync',
+				'churchtools-suite-presentations' => 'FEGAschaffenburg/churchtools-suite-presentations',
+			];
+			$repo = $repo_map[ $plugin_slug ] ?? 'FEGAschaffenburg/churchtools-suite';
 			delete_transient( 'cts_addon_update_' . sanitize_key( $repo . '_' . $plugin_slug ) );
 			delete_transient( 'cts_addon_update_' . sanitize_key( $repo . '_' . $plugin_slug . '_' . ltrim( (string) $version, 'vV' ) ) );
 			delete_site_transient( 'update_plugins' );
