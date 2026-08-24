@@ -265,17 +265,22 @@ class ChurchTools_Suite_Admin {
 			if (!parentLink.length) { return; }
 
 			var parentItem = parentLink.parent("li");
-			if (!parentItem.length || parentItem.find(".cts-overviews-flyout").length) { return; }
+			if (!parentItem.length) { return; }
 
 			parentItem.addClass("cts-overviews-parent");
 
 			var eventsUrl = ' . $events_overview_url_js . ';
 						var reportsUrl = ' . $reports_overview_url_js . ';
 
-			var flyout = $("<ul class=\"cts-overviews-flyout\" />");
-			flyout.append("<li><a href=\"" + eventsUrl + "\">📋 Übersicht Termine</a></li>");
-						flyout.append("<li><a href=\"" + reportsUrl + "\">📝 Übersicht Berichte</a></li>");
-			parentItem.append(flyout);
+			var flyout = parentItem.find(".cts-overviews-flyout").first();
+			if (!flyout.length) {
+				flyout = $("<ul class=\"cts-overviews-flyout\" />");
+				flyout.append("<li><a href=\"" + eventsUrl + "\">📋 Übersicht Termine</a></li>");
+				parentItem.append(flyout);
+			}
+			if (!flyout.find("a[href*=\\\"churchtools-suite-posts-overview\\\"]").length) {
+				flyout.append("<li><a href=\"" + reportsUrl + "\">📝 Übersicht Berichte</a></li>");
+			}
 						menuRoot.find(".wp-submenu a[href*=\\\"page=churchtools-suite-posts-overview\\\"]").first().closest("li").hide();
 
 			var closeTimer = null;
