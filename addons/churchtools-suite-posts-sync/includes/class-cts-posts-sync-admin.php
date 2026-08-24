@@ -5,6 +5,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class ChurchTools_Suite_Posts_Sync_Admin {
 
+	private static bool $menu_registered = false;
+
 	public function init() {
 		add_action( 'add_meta_boxes', [ $this, 'register_ct_meta_boxes' ], 10, 2 );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_assets' ] );
@@ -59,6 +61,10 @@ class ChurchTools_Suite_Posts_Sync_Admin {
 	}
 
 	public function register_submenu() {
+		     if ( self::$menu_registered ) {
+			     return;
+		     }
+
 		if ( ! current_user_can( 'manage_churchtools_suite' ) ) {
 			return;
 		}
@@ -71,6 +77,8 @@ class ChurchTools_Suite_Posts_Sync_Admin {
 			'churchtools-suite-posts-overview',
 			[ $this, 'render_overview_page' ]
 		);
+
+		     self::$menu_registered = true;
 	}
 
 	public function register_ct_meta_boxes( $post_type, $post ): void {
