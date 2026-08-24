@@ -15,10 +15,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class CTS_Posts_Sync_Auto_Updater {
 
-	private const GITHUB_RAW_PLUGIN = 'https://raw.githubusercontent.com/FEGAschaffenburg/churchtools-suite/main/addons/churchtools-suite-posts-sync/churchtools-suite-posts-sync.php';
+	private const GITHUB_RAW_PLUGIN = 'https://raw.githubusercontent.com/FEGAschaffenburg/churchtools-suite-posts-sync/main/churchtools-suite-posts-sync.php';
 
-	const GITHUB_API_RELEASES = 'https://api.github.com/repos/FEGAschaffenburg/churchtools-suite/releases?per_page=30';
-	const GITHUB_API_RELEASES_LATEST = 'https://api.github.com/repos/FEGAschaffenburg/churchtools-suite/releases/latest';
+	const GITHUB_API_RELEASES = 'https://api.github.com/repos/FEGAschaffenburg/churchtools-suite-posts-sync/releases?per_page=30';
+	const GITHUB_API_RELEASES_LATEST = 'https://api.github.com/repos/FEGAschaffenburg/churchtools-suite-posts-sync/releases/latest';
 	const PLUGIN_SLUG = 'churchtools-suite-posts-sync';
 	const PLUGIN_FILE = 'churchtools-suite-posts-sync/churchtools-suite-posts-sync.php';
 
@@ -190,8 +190,8 @@ class CTS_Posts_Sync_Auto_Updater {
 		return [
 			'tag_name' => 'latest',
 			'version' => $version,
-						'zip_url' => 'https://github.com/FEGAschaffenburg/churchtools-suite/releases/latest/download/churchtools-suite-posts-sync-' . $version . '.zip',
-			'html_url' => 'https://github.com/FEGAschaffenburg/churchtools-suite/releases',
+						'zip_url' => 'https://github.com/FEGAschaffenburg/churchtools-suite-posts-sync/releases/latest/download/churchtools-suite-posts-sync-' . $version . '.zip',
+						'html_url' => 'https://github.com/FEGAschaffenburg/churchtools-suite-posts-sync/releases',
 			'name' => 'ChurchTools Posts Sync ' . $version,
 			'body' => '',
 			'published_at' => '',
@@ -319,7 +319,7 @@ class CTS_Posts_Sync_Auto_Updater {
 			'slug'          => self::PLUGIN_SLUG,
 			'version'       => $release['version'],
 			'author'        => '<a href="https://feg-aschaffenburg.de">FEG Aschaffenburg</a>',
-			'homepage'      => 'https://github.com/FEGAschaffenburg/churchtools-suite/tree/main/addons/churchtools-suite-posts-sync',
+						'homepage'      => 'https://github.com/FEGAschaffenburg/churchtools-suite-posts-sync',
 			'requires'      => '5.0',
 			'tested'        => '6.7',
 			'requires_php'  => '8.0',

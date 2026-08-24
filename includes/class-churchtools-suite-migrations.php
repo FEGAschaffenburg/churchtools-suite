@@ -23,7 +23,7 @@ class ChurchTools_Suite_Migrations {
 	 * Increment this when adding new migrations.
 	 * Format: Major.Minor (e.g., 1.0, 1.1, 1.2)
 	 */
-	const DB_VERSION = '1.6';
+	const DB_VERSION = '1.7';
 	
 	/**
 	 * Option key for storing DB version
@@ -79,6 +79,10 @@ class ChurchTools_Suite_Migrations {
 
 		if ( version_compare( $current_version, '1.6', '<' ) ) {
 			self::migrate_to_1_6();
+		}
+
+		if ( version_compare( $current_version, '1.7', '<' ) ) {
+			self::migrate_to_1_7();
 		}
 		
 		// Update DB version
@@ -425,6 +429,22 @@ class ChurchTools_Suite_Migrations {
 		if ( ! in_array( 'custom_css', $columns, true ) ) {
 			$wpdb->query( "ALTER TABLE `{$table}` ADD COLUMN `custom_css` LONGTEXT DEFAULT NULL AFTER `configuration`" );
 		}
+	}
+
+	/**
+	 * Migration 1.7: Prepare installations for standalone addon update sources.
+	 *
+	 * Addon folders remain unchanged; only stale update data and capabilities are repaired.
+	 */
+	private static function migrate_to_1_7(): void {
+		if ( class_exists( 'ChurchTools_Suite_Roles' ) ) {
+			ChurchTools_Suite_Roles::register_role();
+		}
+
+		delete_site_transient( 'update_plugins' );
+		delete_transient( 'cts_main_plugin_version' );
+		delete_transient( 'cts_elementor_latest_release' );
+		delete_transient( 'cts_posts_sync_latest_release' );
 	}
 
 	/**

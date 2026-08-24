@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class CTS_Elementor_Auto_Updater {
 
-	const GITHUB_API_RELEASES_LATEST = 'https://api.github.com/repos/FEGAschaffenburg/churchtools-suite/releases/latest';
+	const GITHUB_API_RELEASES_LATEST = 'https://api.github.com/repos/FEGAschaffenburg/churchtools-suite-elementor/releases/latest';
 	const PLUGIN_SLUG = 'churchtools-suite-elementor';
 	const PLUGIN_FILE = 'churchtools-suite-elementor/churchtools-suite-elementor.php';
 
