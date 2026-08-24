@@ -142,7 +142,8 @@ class CTS_Posts_Sync_Auto_Updater {
 					$zip_url = (string) $asset['browser_download_url'];
 
 					if ( preg_match( '/^churchtools-suite-posts-sync-(.+)\.zip$/i', (string) $asset['name'], $matches ) ) {
-						$asset_version = ltrim( (string) $matches[1], 'vV' );
+												$asset_version = ltrim( (string) $matches[1], 'vV' );
+												$asset_version = preg_replace( '/\.clean$/i', '', $asset_version ) ?: $asset_version;
 					}
 					break;
 				}
@@ -189,7 +190,7 @@ class CTS_Posts_Sync_Auto_Updater {
 		return [
 			'tag_name' => 'latest',
 			'version' => $version,
-			'zip_url' => 'https://github.com/FEGAschaffenburg/churchtools-suite/releases/latest/download/churchtools-suite-posts-sync-' . $version . '.clean.zip',
+						'zip_url' => 'https://github.com/FEGAschaffenburg/churchtools-suite/releases/latest/download/churchtools-suite-posts-sync-' . $version . '.zip',
 			'html_url' => 'https://github.com/FEGAschaffenburg/churchtools-suite/releases',
 			'name' => 'ChurchTools Posts Sync ' . $version,
 			'body' => '',
