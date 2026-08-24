@@ -70,7 +70,7 @@ class ChurchTools_Suite_Posts_Sync_Admin {
 		}
 
 		add_submenu_page(
-			     null,
+			     'churchtools-suite',
 			__( 'ChurchTools Übersicht Berichte', 'churchtools-suite-posts-sync' ),
 			__( '📝 ChurchTools Berichte', 'churchtools-suite-posts-sync' ),
 			'manage_churchtools_suite',
