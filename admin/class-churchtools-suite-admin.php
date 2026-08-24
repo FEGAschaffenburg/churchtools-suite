@@ -278,7 +278,7 @@ class ChurchTools_Suite_Admin {
 				flyout.append("<li><a href=\"" + eventsUrl + "\">📋 Übersicht Termine</a></li>");
 				parentItem.append(flyout);
 			}
-			if (!flyout.find("a[href*=\\\"churchtools-suite-posts-overview\\\"]").length) {
+			if (!flyout.find("a").filter(function(){ return $(this).attr("href") === reportsUrl; }).length) {
 				flyout.append("<li><a href=\"" + reportsUrl + "\">📝 Übersicht Berichte</a></li>");
 			}
 						menuRoot.find(".wp-submenu a[href*=\\\"page=churchtools-suite-posts-overview\\\"]").first().closest("li").hide();
