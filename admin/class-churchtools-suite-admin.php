@@ -280,7 +280,7 @@ class ChurchTools_Suite_Admin {
 				flyout = $("<ul class=\"cts-overviews-flyout\" />");
 				flyout.append("<li><a href=\"" + eventsUrl + "\">📋 Übersicht Termine</a></li>");
 				if (postsSyncActive) {
-				`t				flyout.append("<li><a href=\\"" + reportsUrl + "\\">📝 Übersicht Berichte</a></li>");
+								flyout.append("<li><a href=\\"" + reportsUrl + "\\">📝 Übersicht Berichte</a></li>");
 				}
 				parentItem.append(flyout);
 			}
