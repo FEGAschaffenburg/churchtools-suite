@@ -4,7 +4,7 @@ Tags: churchtools, sync, posts, events, integration
 Requires at least: 5.0
 Requires PHP: 8.2
 Tested up to: 6.4
-Stable tag: 0.1.7
+Stable tag: 0.2.0.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,10 +12,10 @@ Synchronisiert ChurchTools-Posts in WordPress-Posts und -Seiten.
 
 == Description ==
 
-**ChurchTools Suite – Posts Sync** ist ein Addon für das ChurchTools Suite Plugin. Es ermöglicht die automatische Synchronisation von ChurchTools-Posts in WordPress-Posts oder -Seiten.
+**ChurchTools Suite – Posts Sync** ist ein eigenständiges Addon für das ChurchTools Suite Plugin. Es ermöglicht die automatische Synchronisation von ChurchTools-Posts in WordPress-Posts oder -Seiten. Das Addon funktioniert auch auf gehosteten Produktivinstallationen.
 
 **Anforderungen:**
-- ChurchTools Suite v1.2.0.0 oder höher
+- ChurchTools Suite v1.3.0.6 oder höher
 - WordPress 5.0 oder höher
 - PHP 8.2 oder höher
 
@@ -30,10 +30,10 @@ Synchronisiert ChurchTools-Posts in WordPress-Posts und -Seiten.
 
 == Installation ==
 
-1. Installieren und aktivieren Sie das Hauptplugin **ChurchTools Suite** (v1.2.0.0+)
-2. Laden Sie dieses Addon hoch: `/wp-content/plugins/churchtools-suite-posts-sync/`
+1. Installieren und aktivieren Sie das Hauptplugin **ChurchTools Suite** (v1.3.0.6+)
+2. Laden Sie dieses eigenständige Addon als ZIP hoch
 3. Aktivieren Sie das Addon im Admin-Bereich
-4. Gehen Sie zu **Einstellungen → ChurchTools → Berichte** und aktivieren Sie den Berichte-Sync
+4. Gehen Sie zu **ChurchTools Integration → Einstellungen → Berichte** und aktivieren Sie den Berichte-Sync
 5. Synchronisieren Sie die Post-Gruppen und wählen Sie die gewünschten Gruppen aus
 6. Speichern Sie Zieltyp, Status und Filter. Das funktioniert auch auf einer gehosteten Produktivinstallation.
 
@@ -59,8 +59,11 @@ Beispiel:
 
 == FAQ ==
 
+**Ist das Demo-Plugin erforderlich?**
+Nein. Das Demo-Plugin ist optional und wird für Posts Sync nicht benötigt.
+
 **Funktioniert dieses Addon ohne das Hauptplugin?**
-Nein, dieses Addon erfordert das ChurchTools Suite Hauptplugin v1.2.0.0 oder höher.
+Nein, dieses Addon erfordert das ChurchTools Suite Hauptplugin v1.3.0.6 oder höher.
 
 **Kann ich die Felder (Title, Content, etc.) anpassen?**
 Derzeit werden folgende Felder synchronisiert:

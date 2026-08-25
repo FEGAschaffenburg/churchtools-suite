@@ -4,7 +4,7 @@ Tags: churchtools, elementor, events, calendar, church
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 8.2
-Stable tag: 0.6.15
+Stable tag: 1.0.0.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -32,17 +32,19 @@ Elementor Page Builder Widget für ChurchTools Suite Events - Listen, Raster und
 
 * WordPress >= 6.0
 * PHP >= 8.2
-* [ChurchTools Suite](https://github.com/FEGAschaffenburg/churchtools-suite) >= v1.0.9.0
+* [ChurchTools Suite](https://github.com/FEGAschaffenburg/churchtools-suite) >= v1.3.0.6
 * [Elementor](https://elementor.com/) >= v3.0.0
 
 = Installation =
 
-1. ChurchTools Suite >= v1.0.9.0 installieren und aktivieren
+1. ChurchTools Suite >= v1.3.0.6 installieren und aktivieren
 2. Elementor >= v3.0.0 installieren und aktivieren
 3. Dieses Sub-Plugin installieren und aktivieren
 4. Elementor Editor öffnen → Widget-Panel → "ChurchTools Suite" Kategorie → "ChurchTools Events" Widget
 
 = Warum ein separates Plugin? =
+
+Dieses Addon wird unabhängig vom Hauptplugin aus dem [eigenständigen Repository](https://github.com/FEGAschaffenburg/churchtools-suite-elementor) installiert und aktualisiert. Das Demo-Plugin ist nicht erforderlich.
 
 Ab ChurchTools Suite v1.0.9.0 wird die Elementor-Integration modularisiert:
 
@@ -50,7 +52,7 @@ Ab ChurchTools Suite v1.0.9.0 wird die Elementor-Integration modularisiert:
 * **Wartbar** - Separate Releases möglich
 * **Zukunftssicher** - Weitere Sub-Plugins folgen (WooCommerce, Gravity Forms, etc.)
 
-Ab ChurchTools Suite **v2.0.0** (Q4 2026) ist dieses Sub-Plugin **zwingend erforderlich** für Elementor-Nutzung.
+Das Addon ist für die Elementor-Nutzung bereits ab der aktuellen Release-Version erforderlich.
 
 == Installation ==
 
@@ -76,6 +78,10 @@ Ab ChurchTools Suite **v2.0.0** (Q4 2026) ist dieses Sub-Plugin **zwingend erfor
 5. Widget-Einstellungen im linken Panel anpassen
 
 == Frequently Asked Questions ==
+
+= Ist das Demo-Plugin erforderlich? =
+
+Nein. Demo-Plugin und Demo-Theme werden nur für die Dokumentations-/Demo-Seite benötigt.
 
 = Benötige ich ChurchTools Suite UND dieses Plugin? =
 

@@ -1,28 +1,33 @@
-# ChurchTools Suite
+# ChurchTools Integration Suite
 
-Monorepo fuer das WordPress-Hauptplugin ChurchTools Suite und die dazugehoerigen Addons.
+Monorepo fuer das WordPress-Hauptplugin ChurchTools Integration Suite und die dazugehoerigen Addons.
 
 ## Repository-Status
 
-Stand: 2026-04-14
+Stand: 2026-08-25
 
 ### Enthaltene Plugins
 
 | Paket | Typ | Version | Einstiegspunkt | Status |
 | --- | --- | --- | --- | --- |
-| ChurchTools Suite | Hauptplugin | 1.2.0.7 | `churchtools-suite.php` | aktiv entwickelt |
-| ChurchTools Suite - Elementor Integration | Addon | 0.6.14 | `addons/churchtools-suite-elementor/churchtools-suite-elementor.php` | aktiv entwickelt |
-| ChurchTools Suite - Posts Sync Addon | Addon | 0.1.4 | `addons/churchtools-suite-posts-sync/churchtools-suite-posts-sync.php` | aktiv entwickelt |
+| ChurchTools Integration Suite | Hauptplugin | 1.3.0.6 | `churchtools-suite.php` | aktiv entwickelt |
+| Elementor Integration | Addon | 1.0.0.3 | `addons/churchtools-suite-elementor/churchtools-suite-elementor.php` | eigenständiges Plugin |
+| Posts Sync Addon | Addon | 0.2.0.3 | `addons/churchtools-suite-posts-sync/churchtools-suite-posts-sync.php` | eigenständiges Plugin |
+| Presentations Addon | Addon | 0.1.3 | `addons/churchtools-suite-presentations/churchtools-suite-presentations.php` | eigenständiges Plugin |
+| ChurchTools Suite Demo | optionales Plugin | 1.1.4.1 | separat | nur Dokumentation/Demo |
 
 ### Abhaengigkeiten
 
-- Hauptplugin: WordPress >= 6.0, PHP >= 8.0
-- Elementor-Addon: ChurchTools Suite, Elementor, WordPress >= 6.0, PHP >= 8.0
-- Posts-Sync-Addon: ChurchTools Suite >= 1.2.0.0, WordPress >= 5.0, PHP >= 8.0
+- Hauptplugin: WordPress >= 6.0, PHP >= 8.2
+- Elementor-Addon: ChurchTools Integration Suite >= 1.3.0.6, Elementor, WordPress >= 6.0, PHP >= 8.2
+- Posts-Sync-Addon: ChurchTools Integration Suite >= 1.3.0.6, WordPress >= 5.0, PHP >= 8.2
+- Presentations-Addon: ChurchTools Integration Suite, WordPress >= 6.0, PHP >= 8.0
+
+Das Demo-Plugin und das Demo-Theme sind nicht Bestandteil des Hauptplugins und werden für Produktivinstallationen nicht benötigt.
 
 ## Letzter Plugin-Check
 
-Der technische Basis-Check wurde am 2026-04-14 lokal mit PHP 8.3.13 ausgefuehrt.
+Der technische Basis-Check wurde lokal mit PHP 8.2.29 ausgefuehrt.
 
 | Bereich | Gepruefte PHP-Dateien | Ergebnis |
 | --- | ---: | --- |
@@ -56,7 +61,7 @@ Zusaetzlich wurden alte Backup-Templates unter `templates-backup-20260222-211402
 
 ## Entwicklung lokal und auf Servern
 
-- Lokaler PHP-Pfad in VS Code: `C:\laragon\bin\php\php-8.3.13-Win32-vs16-x64\php.exe`
+- Lokaler PHP-Pfad in Local: `C:\Users\KasseFeg\AppData\Roaming\Local\lightning-services\php-8.2.29+0\bin\win64\php.exe`
 - Deployment-Skripte nutzen lokale SSH-Host-Aliase aus der Benutzerkonfiguration
 - Standardziel der Deploy-Skripte fuer Testsysteme ist `plugin-test`
 
