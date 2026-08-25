@@ -48,26 +48,6 @@ $feedback_redirect = add_query_arg( [
 		<div class="notice notice-error" style="margin: 12px 0 16px;"><p><?php esc_html_e( 'Die Mail konnte nicht gesendet werden. Bitte Mail-Konfiguration prüfen.', 'churchtools-suite' ); ?></p></div>
 	<?php endif; ?>
 
-	<?php if ( ! in_array( $feedback_status, [ 'sent', 'declined', 'answered', 'error' ], true ) ) : ?>
-	<div class="notice notice-info" style="margin: 12px 0 16px;">
-		<p><strong><?php esc_html_e( 'Kurze Rückfrage:', 'churchtools-suite' ); ?></strong> <?php esc_html_e( 'Dürfen wir eine automatische Mail senden, dass das Plugin bei dir installiert/getestet/genutzt wird?', 'churchtools-suite' ); ?></p>
-		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin-top:8px;">
-			<input type="hidden" name="action" value="cts_feedback_submit">
-			<input type="hidden" name="cts_feedback_redirect" value="<?php echo esc_url( $feedback_redirect ); ?>">
-			<?php wp_nonce_field( 'cts_feedback_submit', 'cts_feedback_nonce' ); ?>
-
-			<label style="margin-right:16px;"><input type="checkbox" name="cts_feedback_stage[]" value="installiert"> <?php esc_html_e( 'Installiert', 'churchtools-suite' ); ?></label>
-			<label style="margin-right:16px;"><input type="checkbox" name="cts_feedback_stage[]" value="getestet"> <?php esc_html_e( 'Getestet', 'churchtools-suite' ); ?></label>
-			<label style="margin-right:16px;"><input type="checkbox" name="cts_feedback_stage[]" value="genutzt"> <?php esc_html_e( 'Genutzt', 'churchtools-suite' ); ?></label>
-
-			<div style="margin-top:10px; display:flex; gap:8px;">
-				<button type="submit" name="cts_feedback_choice" value="send" class="button button-primary"><?php esc_html_e( 'Ja, Mail automatisch senden', 'churchtools-suite' ); ?></button>
-				<button type="submit" name="cts_feedback_choice" value="skip" class="button"><?php esc_html_e( 'Nein, nicht senden', 'churchtools-suite' ); ?></button>
-			</div>
-		</form>
-	</div>
-	<?php endif; ?>
-
 	<div class="cts-tabs">
 		<a href="?page=churchtools-suite&tab=dashboard" class="cts-tab <?php echo $active_tab === 'dashboard' ? 'active' : ''; ?>">
 			<span>📊</span>
