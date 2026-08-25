@@ -10,12 +10,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+require_once CHURCHTOOLS_SUITE_PATH . 'includes/functions/secret-storage.php';
+
 // Status prüfen
 $ct_url = get_option( 'churchtools_suite_ct_url', '' );
 $ct_auth_method = get_option( 'churchtools_suite_ct_auth_method', 'password' );
 $ct_username = get_option( 'churchtools_suite_ct_username', '' );
 $ct_password = get_option( 'churchtools_suite_ct_password', '' );
-$ct_token = get_option( 'churchtools_suite_ct_token', '' );
+$ct_token = ChurchTools_Suite_Secret_Storage::decrypt( (string) get_option( 'churchtools_suite_ct_token', '' ) );
 $ct_cookies = get_option( 'churchtools_suite_ct_cookies', [] );
 $ct_last_login = get_option( 'churchtools_suite_ct_last_login', '' );
 $is_configured = ! empty( $ct_url ) && (
@@ -28,7 +30,7 @@ $is_connected = ( $ct_auth_method === 'token' ) ? ! empty( $ct_token ) : ! empty
 global $wpdb;
 $prefix = $wpdb->prefix . CHURCHTOOLS_SUITE_DB_PREFIX;
 
-// Check if Repository Factory exists (Demo Plugin support)
+// Use the repository factory for user-isolated statistics.
 $use_factory = class_exists( 'ChurchTools_Suite_Repository_Factory' );
 $user_id = get_current_user_id();
 
@@ -36,27 +38,15 @@ $user_id = get_current_user_id();
 $wpdb->suppress_errors();
 
 if ( $use_factory ) {
-	// v1.0.7.1: Check if demo mode is active (demo data should only show when mode is ON)
-	$demo_mode = false;
-	if ( class_exists( 'ChurchTools_Suite_User_Settings' ) ) {
-		$demo_mode = ChurchTools_Suite_User_Settings::is_demo_mode( $user_id );
-	}
+	// Use Repository Factory for isolated counts
+	require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-repository-factory.php';
+	$events_repo = ChurchTools_Suite_Repository_Factory::get_events_repo( $user_id );
+	$calendars_repo = ChurchTools_Suite_Repository_Factory::get_calendars_repo( $user_id );
 	
-	if ( ! $demo_mode && current_user_can( 'cts_demo_user' ) ) {
-		// Demo user with demo mode OFF - show 0 (demo data hidden)
-		$events_count = 0;
-		$calendars_count = 0;
-	} else {
-		// Use Repository Factory for isolated counts
-		require_once CHURCHTOOLS_SUITE_PATH . 'includes/repositories/class-churchtools-suite-repository-factory.php';
-		$events_repo = ChurchTools_Suite_Repository_Factory::get_events_repo( $user_id );
-		$calendars_repo = ChurchTools_Suite_Repository_Factory::get_calendars_repo( $user_id );
-		
-		$events_count = $events_repo->count();
-		$calendars_count = count( array_filter( $calendars_repo->get_all(), function( $cal ) {
-			return ! empty( $cal->is_selected );
-		} ) );
-	}
+	$events_count = $events_repo->count();
+	$calendars_count = count( array_filter( $calendars_repo->get_all(), function( $cal ) {
+		return ! empty( $cal->is_selected );
+	} ) );
 } else {
 	// Fallback: Direct database queries (backwards compatibility)
 	$events_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$prefix}events" );
@@ -91,8 +81,8 @@ $tables_missing = ( $wpdb->last_error !== '' );
 	<!-- Dashboard Header mit One-Click-Actions -->
 	<div class="cts-section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
 		<div>
-			<h2><?php esc_html_e( 'Dashboard', 'churchtools-suite' ); ?></h2>
-			<p class="cts-section-description"><?php esc_html_e( 'Übersicht über den aktuellen Status der ChurchTools-Integration.', 'churchtools-suite' ); ?></p>
+				<h2><?php esc_html_e( 'Dashboard', 'churchtools-suite' ); ?></h2>
+			<p class="cts-section-description"><?php esc_html_e( 'Übersicht über den aktuellen Integrationsstatus.', 'churchtools-suite' ); ?></p>
 		</div>
 		<?php if ( $is_connected ) : ?>
 		<div style="display: flex; gap: 10px; align-items: center;">
@@ -181,7 +171,7 @@ $tables_missing = ( $wpdb->last_error !== '' );
 	?>
 	<div class="cts-card" style="border-left:4px solid <?php echo esc_attr( $update_color ); ?>; margin-top:16px;">
 		<div class="cts-card-header">
-			<span class="cts-card-icon"><?php echo $update_icon; ?></span>
+			<button id="cts-sync-now" class="cts-button cts-button-primary" style="font-size: 16px; padding: 12px 24px;">
 			<h3><?php echo esc_html( $update_label ); ?> <?php esc_html_e( 'verfügbar', 'churchtools-suite' ); ?></h3>
 		</div>
 		<div class="cts-card-body">
@@ -206,7 +196,7 @@ $tables_missing = ( $wpdb->last_error !== '' );
 					); 
 					?>
 				</p>
-			<?php elseif ( $auto_update_enabled && ! $update_allowed ) : ?>
+						<p class="cts-card-subtitle"><?php esc_html_e( 'Integration Suite Status:', 'churchtools-suite' ); ?></p>
 				<p style="margin:8px 0 0; padding:8px 12px; background:#e0f2fe; border-radius:4px; font-size:13px; color:#0c4a6e;">
 					ℹ️ <?php 
 					printf(
@@ -301,8 +291,7 @@ $tables_missing = ( $wpdb->last_error !== '' );
 				   if ( is_array( $cron ) ) {
 					   foreach ( $cron as $ts => $hooks ) {
 						   foreach ( $hooks as $hook => $events ) {
-							   // Filter: Include churchtools/cts_/puc_ hooks, but EXCLUDE cts_demo_ hooks (Demo Plugin)
-							   if ( preg_match( '/churchtools|cts_|puc_/i', $hook ) && ! preg_match( '/^cts_demo_/i', $hook ) ) {
+							   if ( preg_match( '/churchtools|cts_|puc_/i', $hook ) ) {
 								   if ( ! isset( $relevant_hooks[ $hook ] ) ) {
 									   $relevant_hooks[ $hook ] = [];
 								   }
@@ -312,15 +301,30 @@ $tables_missing = ( $wpdb->last_error !== '' );
 					   }
 				   }
 
+				   $known_hooks = [
+					   'churchtools_suite_auto_sync',
+					   'churchtools_suite_session_keepalive',
+					   'churchtools_suite_calendar_reconcile',
+					   'churchtools_suite_check_updates',
+				   ];
+
+				   foreach ( $known_hooks as $known_hook ) {
+					   if ( ! isset( $relevant_hooks[ $known_hook ] ) ) {
+						   $relevant_hooks[ $known_hook ] = [];
+					   }
+				   }
+
 				   if ( empty( $relevant_hooks ) ) : ?>
 					   <p class="cts-card-meta"><?php esc_html_e( 'Keine automatischen Cron-Jobs für dieses Plugin gefunden.', 'churchtools-suite' ); ?></p>
 				   <?php else : ?>
 					   <div class="cts-cronjob-list" style="display: flex; flex-wrap: wrap; gap: 18px;">
 					   <?php foreach ( $relevant_hooks as $hook_name => $timestamps ) :
-						   sort( $timestamps );
-						   $next = (int) $timestamps[0];
+						   if ( ! empty( $timestamps ) ) {
+							   sort( $timestamps );
+						   }
+						   $next = ! empty( $timestamps ) ? (int) $timestamps[0] : 0;
 						   $count = count( $timestamps );
-						   $overdue = $next < time();
+						   $overdue = $next > 0 && $next < time();
 					   
 					   // Use ChurchTools_Suite_Cron_Display helper for consistent labels
 					   $label = class_exists( 'ChurchTools_Suite_Cron_Display' ) 
@@ -339,8 +343,12 @@ $tables_missing = ( $wpdb->last_error !== '' );
 						   </div>
 						   <div style="font-size:13px; margin-bottom:6px;">
 							   <strong><?php esc_html_e('Nächste Ausführung:', 'churchtools-suite'); ?></strong> <span style="color:<?php echo $overdue ? '#d66' : '#2271b1'; ?>;">
-							   <?php echo date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $next ); ?>
-							   <?php if ( $overdue ) : ?> (<?php printf( esc_html__('überfällig seit %s', 'churchtools-suite'), human_time_diff( $next, time() ) ); ?>)<?php endif; ?>
+							   <?php if ( $next > 0 ) : ?>
+								   <?php echo date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $next ); ?>
+								   <?php if ( $overdue ) : ?> (<?php printf( esc_html__('überfällig seit %s', 'churchtools-suite'), human_time_diff( $next, time() ) ); ?>)<?php endif; ?>
+							   <?php else : ?>
+								   <?php esc_html_e( 'Nicht geplant', 'churchtools-suite' ); ?>
+							   <?php endif; ?>
 							   </span>
 						   </div>
 						   <div style="font-size:12px; color:#888;">

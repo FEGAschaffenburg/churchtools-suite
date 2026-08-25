@@ -2396,7 +2396,6 @@ class ChurchTools_Suite_Admin {
 	/**
 	 * AJAX Handler: Get Event Details
 	 * 
-	 * v1.0.3.1: Supports demo events via fallback to Demo Data Provider
 	 */
 	public function ajax_get_event_details() {
 		// Check nonce
@@ -2425,38 +2424,6 @@ class ChurchTools_Suite_Admin {
 		// Get event from database
 		$event = $events_repo->get_by_id( $event_id );
 		
-		// v1.0.3.1: Fallback to Demo Data Provider if event not found (demo events)
-		$is_demo_event = false;
-		if ( ! $event ) {
-			// Check if demo plugin is active
-			if ( defined( 'CHURCHTOOLS_SUITE_DEMO_VERSION' ) ) {
-				// Try to load event from Demo Data Provider
-				$demo_provider_path = WP_PLUGIN_DIR . '/churchtools-suite-demo/includes/services/class-demo-data-provider.php';
-				if ( file_exists( $demo_provider_path ) ) {
-					require_once $demo_provider_path;
-					if ( class_exists( 'ChurchTools_Suite_Demo_Data_Provider' ) ) {
-						// Get all demo events (inefficient but works for demo purposes)
-						$demo_provider = new ChurchTools_Suite_Demo_Data_Provider();
-						$demo_events = $demo_provider->get_events( [
-							'from' => date( 'Y-m-d', strtotime( '-30 days' ) ),
-							'to' => date( 'Y-m-d', strtotime( '+180 days' ) ),
-							'limit' => 1000,
-						] );
-						
-						// Find event by DB ID
-						foreach ( $demo_events as $demo_event ) {
-							if ( isset( $demo_event['id'] ) && (int) $demo_event['id'] === $event_id ) {
-								// Convert array to object for consistent handling
-								$event = (object) $demo_event;
-								$is_demo_event = true;
-								break;
-							}
-						}
-					}
-				}
-			}
-		}
-		
 		if ( ! $event ) {
 			wp_send_json_error( [
 				'message' => __( 'Event nicht gefunden.', 'churchtools-suite' )
@@ -2484,16 +2451,9 @@ class ChurchTools_Suite_Admin {
 		$start_datetime = $event->start_datetime;
 		$end_datetime = $event->end_datetime;
 		
-		// v1.0.3.1: Handle timezone conversion differently for demo events
-		if ( $is_demo_event ) {
-			// Demo events are already in local timezone
-			$start_timestamp = strtotime( $start_datetime );
-			$end_timestamp = $end_datetime ? strtotime( $end_datetime ) : null;
-		} else {
-			// Real events from ChurchTools are in GMT
-			$start_timestamp = strtotime( get_date_from_gmt( $start_datetime ) );
-			$end_timestamp = $end_datetime ? strtotime( get_date_from_gmt( $end_datetime ) ) : null;
-		}
+		// Real events from ChurchTools are stored in GMT.
+		$start_timestamp = strtotime( get_date_from_gmt( $start_datetime ) );
+		$end_timestamp = $end_datetime ? strtotime( get_date_from_gmt( $end_datetime ) ) : null;
 		
 		// Format times with suffix
 		$start_time_formatted = date_i18n( $time_format, $start_timestamp ) . $time_suffix;

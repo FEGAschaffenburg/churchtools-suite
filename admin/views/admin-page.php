@@ -35,9 +35,9 @@ $feedback_redirect = add_query_arg( [
 	<div class="cts-header">
 		<h1>
 			<span>📅</span>
-			<?php esc_html_e( 'ChurchTools Suite', 'churchtools-suite' ); ?>
+			<?php esc_html_e( 'ChurchTools Integration Suite', 'churchtools-suite' ); ?>
 		</h1>
-		<p class="cts-subtitle"><?php esc_html_e( 'WordPress Integration für ChurchTools', 'churchtools-suite' ); ?></p>
+		<p class="cts-subtitle"><?php esc_html_e( 'WordPress-Integration für ChurchTools', 'churchtools-suite' ); ?></p>
 	</div>
 
 	<?php if ( $feedback_result === 'sent' ) : ?>
@@ -73,12 +73,6 @@ $feedback_redirect = add_query_arg( [
 			<span>📊</span>
 			<?php esc_html_e( 'Dashboard', 'churchtools-suite' ); ?>
 		</a>
-		<?php if ( current_user_can( 'cts_demo_user' ) ) : ?>
-		<a href="?page=churchtools-suite&tab=demo-config" class="cts-tab <?php echo $active_tab === 'demo-config' ? 'active' : ''; ?>" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-			<span>🎛️</span>
-			<?php esc_html_e( 'Demo Konfig', 'churchtools-suite' ); ?>
-		</a>
-		<?php endif; ?>
 		<a href="?page=churchtools-suite&tab=settings" class="cts-tab <?php echo $active_tab === 'settings' ? 'active' : ''; ?>">
 			<span>⚙️</span>
 			<?php esc_html_e( 'Einstellungen', 'churchtools-suite' ); ?>
@@ -99,19 +93,6 @@ $feedback_redirect = add_query_arg( [
 
 	<?php
 	   switch ( $active_tab ) {
-		   case 'demo-config':
-			   // Only for demo users
-			   if ( current_user_can( 'cts_demo_user' ) ) {
-				   $demo_config_file = WP_PLUGIN_DIR . '/churchtools-suite-demo/admin/views/tab-demo-config.php';
-				   if ( file_exists( $demo_config_file ) ) {
-					   include $demo_config_file;
-				   } else {
-					   echo '<div class="notice notice-error"><p>Demo Config Tab nicht gefunden. Ist das Demo-Plugin aktiviert?</p></div>';
-				   }
-			   } else {
-				   wp_die( 'Keine Berechtigung.' );
-			   }
-			   break;
 		   case 'settings':
 			   include __DIR__ . '/tab-settings.php';
 			   break;
