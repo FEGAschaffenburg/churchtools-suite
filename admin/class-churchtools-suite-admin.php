@@ -280,7 +280,7 @@ class ChurchTools_Suite_Admin {
 				flyout = $("<ul class=\"cts-overviews-flyout\" />");
 				flyout.append("<li><a href=\"" + eventsUrl + "\">📋 Übersicht Termine</a></li>");
 				if (postsSyncActive) {
-								flyout.append("<li><a href=\\"" + reportsUrl + "\\">📝 Übersicht Berichte</a></li>");
+					flyout.append("<li><a href=\"" + reportsUrl + "\">📝 Übersicht Berichte</a></li>");
 				}
 				parentItem.append(flyout);
 			}
@@ -377,7 +377,7 @@ class ChurchTools_Suite_Admin {
 
 		// Versteckte Zielseite: Übersicht Termine
 		add_submenu_page(
-			'churchtools-suite',
+			null,
 			__( 'Übersicht Termine', 'churchtools-suite' ),
 			__( 'Übersicht Termine', 'churchtools-suite' ),
 			'manage_churchtools_suite',
@@ -429,7 +429,6 @@ class ChurchTools_Suite_Admin {
 			return;
 		}
 
-		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 		if ( $screen && strpos( (string) $screen->id, 'churchtools-suite' ) === false ) {
 			return;
 		}
