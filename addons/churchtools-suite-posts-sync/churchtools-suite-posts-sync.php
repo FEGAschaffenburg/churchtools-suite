@@ -3,7 +3,7 @@
  * Plugin Name: ChurchTools Integration Suite – Posts Sync Addon
  * Plugin URI: https://github.com/FEGAschaffenburg/churchtools-suite/tree/main/addons/churchtools-suite-posts-sync
  * Description: Synchronisiert ChurchTools-Posts in WordPress-Posts/Seiten. Benötigt ChurchTools Integration Suite v1.2.0.0+
- * Version: 0.2.0.0
+ * Version: 0.2.0.1
  * Author: FEG Aschaffenburg
  * Author URI: https://www.feg-aschaffenburg.de
  * License: GPL v2 or later
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define constants
-define( 'CTS_POSTS_SYNC_VERSION', '0.2.0.0' );
+define( 'CTS_POSTS_SYNC_VERSION', '0.2.0.1' );
 define( 'CTS_POSTS_SYNC_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CTS_POSTS_SYNC_URL', plugin_dir_url( __FILE__ ) );
 define( 'CTS_POSTS_SYNC_BASENAME', plugin_basename( __FILE__ ) );
@@ -399,15 +399,6 @@ class ChurchTools_Suite_Posts_Sync {
 		return (bool) get_option( 'churchtools_suite_ct_posts_sync_enabled', 0 );
 	}
 }
-
-add_action( 'admin_menu', static function (): void {
-	if ( ! current_user_can( 'manage_churchtools_suite' ) ) {
-		return;
-	}
-
-	require_once CTS_POSTS_SYNC_PATH . 'includes/class-cts-posts-sync-admin.php';
-	( new ChurchTools_Suite_Posts_Sync_Admin() )->register_submenu();
-}, 45 );
 
 // Initialize addon on plugins_loaded
 add_action( 'plugins_loaded', [ 'ChurchTools_Suite_Posts_Sync', 'init' ] );
