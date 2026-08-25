@@ -372,7 +372,7 @@ class ChurchTools_Suite_Admin {
 
 		// Versteckte Zielseite: Übersicht Termine
 		add_submenu_page(
-			null,
+			'churchtools-suite',
 			__( 'Übersicht Termine', 'churchtools-suite' ),
 			__( 'Übersicht Termine', 'churchtools-suite' ),
 			'manage_churchtools_suite',
