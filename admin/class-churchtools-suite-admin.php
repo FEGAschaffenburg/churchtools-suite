@@ -429,6 +429,7 @@ class ChurchTools_Suite_Admin {
 			return;
 		}
 
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 		if ( $screen && strpos( (string) $screen->id, 'churchtools-suite' ) === false ) {
 			return;
 		}
