@@ -2,7 +2,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$Version,
     [Parameter(Mandatory = $false)]
-    [ValidateSet('main', 'elementor', 'posts-sync')]
+    [ValidateSet('main', 'elementor', 'posts-sync', 'presentations')]
     [string]$Plugin = 'main'
 )
 
@@ -36,6 +36,15 @@ switch ($Plugin) {
     'posts-sync' {
         $PluginSlug = 'churchtools-suite-posts-sync'
         $SourceRoot = Join-Path $RepoRoot 'addons\churchtools-suite-posts-sync'
+        $ExcludeItems = @(
+            '.git', '.github', '.gitignore', '.editorconfig', '.gitattributes',
+            'scripts', 'tests', 'node_modules', '*.zip', '*.log', '.vscode', '.idea',
+            'composer.json', 'composer.lock', 'package.json', 'package-lock.json'
+        )
+    }
+    'presentations' {
+        $PluginSlug = 'churchtools-suite-presentations'
+        $SourceRoot = Join-Path $RepoRoot 'addons\churchtools-suite-presentations'
         $ExcludeItems = @(
             '.git', '.github', '.gitignore', '.editorconfig', '.gitattributes',
             'scripts', 'tests', 'node_modules', '*.zip', '*.log', '.vscode', '.idea',

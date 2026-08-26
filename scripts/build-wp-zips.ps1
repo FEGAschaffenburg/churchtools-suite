@@ -8,12 +8,13 @@ param(
     [switch]$Release,
     [string]$MainVersion,
     [string]$ElementorVersion,
-    [string]$PostsSyncVersion
+    [string]$PostsSyncVersion,
+    [string]$PresentationsVersion
 )
 
 $ErrorActionPreference = "Stop"
 $ProjectRoot = Resolve-Path (Join-Path $PSScriptRoot "..") | Select-Object -ExpandProperty Path
-$SuiteRoot = Join-Path $ProjectRoot ".links\wp-content\plugins\churchtools-suite"
+$SuiteRoot = $ProjectRoot
 $ZipScript = Join-Path $SuiteRoot "scripts\create-wp-zip.ps1"
 
 if (-not (Test-Path $ZipScript)) {
@@ -51,14 +52,20 @@ if (-not $PostsSyncVersion) {
         -FilePath (Join-Path $SuiteRoot "addons\churchtools-suite-posts-sync\churchtools-suite-posts-sync.php") `
         -Pattern "define\(\s*'CTS_POSTS_SYNC_VERSION'\s*,\s*'([^']+)'\s*\);"
 }
+if (-not $PresentationsVersion) {
+    $PresentationsVersion = Get-PluginVersion `
+        -FilePath (Join-Path $SuiteRoot "addons\churchtools-suite-presentations\churchtools-suite-presentations.php") `
+        -Pattern "define\(\s*'CTS_PRESENTATIONS_VERSION'\s*,\s*'([^']+)'\s*\);"
+}
 
 Write-Host "=== ChurchTools Suite — WP-ZIP Build ===" -ForegroundColor Cyan
 Write-Host "Quelle:  $SuiteRoot"
 Write-Host "Skript:  $ZipScript"
 Write-Host ""
-Write-Host "  main:       $MainVersion"
-Write-Host "  elementor:  $ElementorVersion"
-Write-Host "  posts-sync: $PostsSyncVersion"
+Write-Host "  main:          $MainVersion"
+Write-Host "  elementor:     $ElementorVersion"
+Write-Host "  posts-sync:    $PostsSyncVersion"
+Write-Host "  presentations: $PresentationsVersion"
 Write-Host ""
 
 Set-Location $SuiteRoot
@@ -75,6 +82,7 @@ function Invoke-Zip {
 Invoke-Zip -Plugin main -Version $MainVersion
 Invoke-Zip -Plugin elementor -Version $ElementorVersion
 Invoke-Zip -Plugin posts-sync -Version $PostsSyncVersion
+Invoke-Zip -Plugin presentations -Version $PresentationsVersion
 
 $outputBase = if (Test-Path "C:\privat") { "C:\privat" } else { Join-Path $SuiteRoot "dist" }
 Write-Host ""

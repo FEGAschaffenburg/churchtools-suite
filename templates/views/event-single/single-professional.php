@@ -9,7 +9,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 // DEBUG: Verify template loaded
-echo '<!-- ChurchTools Suite Professional Template v0.9.9.91 LOADED -->';
+echo '<!-- Integration Suite Professional Template v0.9.9.91 LOADED -->';
 
 // Timezone & formatting
 $timezone = ! empty( get_option( 'timezone_string' ) )
@@ -242,11 +242,12 @@ if ( ! empty( $back_link ) ) {
 				</div>
 				<div class="cts-pro-txt">
 					<div class="cts-pro-lbl">TEAM</div>
-					<div class="cts-pro-servs">
-						<?php foreach ( $services as $service ) : ?>
-							<div class="cts-pro-serv">
-								<span style="color:#6b7280;font-weight:500"><?php echo esc_html( $service->service_name ?? '' ); ?>:</span>
-								<span style="color:#111827;font-weight:600"><?php echo esc_html( $service->person_name ?: __( 'TBD', 'churchtools-suite' ) ); ?></span>
+					<?php foreach ( $services as $service ) : ?>
+						<div class="cts-pro-serv">
+								<span style="color:#6b7280;font-weight:500"><?php echo esc_html( $service->service_name ?? '' ); ?><?php echo ! empty( $service->person_name ) ? ':' : ''; ?></span>
+								<?php if ( ! empty( $service->person_name ) ) : ?>
+									<span style="color:#111827;font-weight:600"><?php echo esc_html( $service->person_name ); ?></span>
+								<?php endif; ?>
 							</div>
 						<?php endforeach; ?>
 					</div>

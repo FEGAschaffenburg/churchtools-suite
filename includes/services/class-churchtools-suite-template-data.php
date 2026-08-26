@@ -104,9 +104,13 @@ class ChurchTools_Suite_Template_Data {
 		
 		$filters = wp_parse_args( $filters, $defaults );
 		
-		// Build query
-		global $wpdb;
-		$table = $wpdb->prefix . CHURCHTOOLS_SUITE_DB_PREFIX . 'events';
+		// Demo repositories already enforce per-user isolation.
+		if ( method_exists( $this->events_repo, 'get_events' ) ) {
+			$results = $this->events_repo->get_events( $filters );
+		} else {
+			// Build query for the standard repository.
+			global $wpdb;
+			$table = $wpdb->prefix . CHURCHTOOLS_SUITE_DB_PREFIX . 'events';
 		
 		$where = [];
 		$where_values = [];
@@ -137,7 +141,8 @@ class ChurchTools_Suite_Template_Data {
 		// No limit in SQL - will be applied after tag filtering
 		
 		$query = "SELECT * FROM {$table} {$where_clause} {$order_clause}";
-		$results = $wpdb->get_results( $query );
+			$results = $wpdb->get_results( $query );
+		}
 		
 		// Format events
 		$events = [];

@@ -77,6 +77,22 @@ function churchtools_suite_get_repository( string $repository_name ) {
 		) );
 	}
 	
-	// Create and return repository instance
-	return new $class_name();
+	// Allow optional integrations such as the Demo plugin to provide isolated repositories.
+	$repository = new $class_name();
+	$filter_map = [
+		'events' => 'churchtools_suite_get_events_repository',
+		'calendars' => 'churchtools_suite_get_calendars_repository',
+		'services' => 'churchtools_suite_get_services_repository',
+		'event_services' => 'churchtools_suite_get_event_services_repository',
+	];
+
+	if ( isset( $filter_map[ $repository_name ] ) ) {
+		$repository = apply_filters(
+			$filter_map[ $repository_name ],
+			$repository,
+			get_current_user_id()
+		);
+	}
+
+	return $repository;
 }
