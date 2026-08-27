@@ -118,9 +118,9 @@ Status: In Entwicklung / Kommt bald
 ## 5. Qualitätssicherung Hauptplugin und Addons
 
 - [x] PHP-Syntaxprüfung für alle Pakete
-- [ ] Automatisierte Verhaltenstests für Kalenderfilter, Shortcodes und Addons
-- [ ] Testmatrix für WordPress-, PHP- und Page-Builder-Kompatibilität
-- [ ] Vollständigen UTF-8-/Mojibake-Check für Dokumentationsseiten automatisieren
+- [x] Automatisierte Verhaltenstests für Kalenderfilter, Shortcodes und Addons
+- [x] Testmatrix für WordPress-, PHP- und Page-Builder-Kompatibilität
+- [x] Vollständigen UTF-8-/Mojibake-Check für Dokumentationsseiten automatisieren
 - [ ] Release-ZIP automatisiert auf Demo-Dateien und Entwicklungsordner prüfen
 - [x] Test für Plugin-Aktivierung und Deaktivierung
 - [x] Test für Update-Erkennung
