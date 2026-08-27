@@ -13,6 +13,7 @@ Die ChurchTools Integration Suite soll ChurchTools-Daten zuverlässig übernehme
 Die bisher vorliegenden Rückmeldungen priorisieren folgende Erweiterungen:
 
 - WP Bakery Addon
+- Divi Addon
 - Eigenes CSS und bessere Anpassbarkeit der Ansichten
 - Posts Sync vollständig und einfach in Produktivumgebungen konfigurieren
 - Design- und View-Optionen verständlicher dokumentieren
@@ -63,6 +64,20 @@ Status: In Entwicklung / Kommt bald
 - [ ] Dokumentation und Download nach Abschluss der Tests freischalten
 
 ## 4. Weitere Addons
+
+### WPBakery Addon
+
+- [ ] Eigenständiges WPBakery-Element mit den Funktionen des Elementor-Addons
+- [ ] Listen-, Grid-, Kalender-, Countdown- und Carousel-Ansichten
+- [ ] Kalender-IDs, Tags, Zeitraum, Event-Limit und Darstellungsoptionen
+- [ ] WPBakery-Kompatibilität, Dokumentation und eigenes Release testen
+
+### Divi Addon
+
+- [ ] Eigenständiges Divi-Modul mit den Funktionen des Elementor-Addons
+- [ ] Listen-, Grid-, Kalender-, Countdown- und Carousel-Ansichten
+- [ ] Kalender-IDs, Tags, Zeitraum, Event-Limit und Darstellungsoptionen
+- [ ] Divi-Kompatibilität, Dokumentation und eigenes Release testen
 
 ### REST-API
 
