@@ -1,6 +1,6 @@
-# ChurchTools Suite – Roadmap
+# ChurchTools Suite - Roadmap
 
-Letzte Aktualisierung: 19. Juli 2026 | Aktueller Stand: v1.2.3.0
+Letzte Aktualisierung: 27. August 2026 | Aktueller Stand: v1.3.0.8
 
 ---
 
@@ -48,9 +48,10 @@ Letzte Aktualisierung: 19. Juli 2026 | Aktueller Stand: v1.2.3.0
 - FAQ-Seite auf plugin.feg-aschaffenburg.de erweitern
 - Demo-Seite: alle Views mit Live-Vorschau
 
-#### 🧩 WP Bakery Addon sichtbarer machen (NIEDRIG)
-- Bereits vorhanden aber nicht bekannt
-- Onboarding-Hinweis im Admin nach Aktivierung
+#### 🧩 WP Bakery Addon (HOCH)
+- Als gewünschtes Addon aus dem Feedback aufgenommen
+- Prüfen, welche ChurchTools-Views und Einstellmöglichkeiten in WPBakery benötigt werden
+- Eigenständiges Addon mit eigener Dokumentation und eigenem Release vorsehen
 
 ---
 
@@ -133,6 +134,6 @@ Letzte Aktualisierung: 19. Juli 2026 | Aktueller Stand: v1.2.3.0
 
 **Top-Wünsche aus der Umfrage:**
 1. Eigenes CSS / CSS-Anpassung → v1.3.0
-2. WP Bakery Addon bekannter machen → v1.3.0
+2. WP Bakery Addon konzipieren und umsetzen → v1.3.x
 3. Posts Sync in Produktivumgebung → v1.4.0
 4. Design-Optionen verbessern → v1.5.0

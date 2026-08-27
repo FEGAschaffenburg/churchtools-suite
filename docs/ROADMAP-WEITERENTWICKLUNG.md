@@ -1,12 +1,25 @@
 # Roadmap Weiterentwicklung
 
-Stand: 2026-08-26
+Stand: 2026-08-27
 
 Legende: `[x]` erledigt, `[~]` umgesetzt, aber mit offenem Erweiterungs- oder Mehrbenutzertest, `[ ]` offen.
 
 ## Ziel
 
 Die ChurchTools Integration Suite soll ChurchTools-Daten zuverlässig übernehmen, pro Benutzer sauber trennen und durch optionale Addons erweiterbar bleiben.
+
+## Feedback-Prioritäten
+
+Die bisher vorliegenden Rückmeldungen priorisieren folgende Erweiterungen:
+
+- WP Bakery Addon
+- Eigenes CSS und bessere Anpassbarkeit der Ansichten
+- Posts Sync vollständig und einfach in Produktivumgebungen konfigurieren
+- Design- und View-Optionen verständlicher dokumentieren
+- Presentations-Addon fertigstellen
+- Danach REST-API, ICS-Export sowie Formular- und Mitglieder-Integrationen prüfen
+
+Der Kalenderfilter unterstützt ab v1.3.0.8 die Schreibweise `calendar_ids="1,2,3"` zusätzlich zu `calendar` und `calendars`.
 
 ## 1. ChurchTools-Datenübernahme
 

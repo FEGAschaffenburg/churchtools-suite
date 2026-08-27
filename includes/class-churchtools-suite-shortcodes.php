@@ -532,6 +532,7 @@ class ChurchTools_Suite_Shortcodes {
 			'view' => 'monthly-simple',
 			'calendar' => '',
 			'calendars' => '',
+			'calendar_ids' => '',
 			'tags' => '',
 			'limit' => 100, // Higher limit for calendar views
 			'from' => '',
@@ -854,7 +855,9 @@ class ChurchTools_Suite_Shortcodes {
 		}
 		
 		// Parse filters - support both 'calendar' (old) and 'calendars' (new)
-		$calendar_param = ! empty( $atts['calendars'] ) ? $atts['calendars'] : ( $atts['calendar'] ?? '' );
+		$calendar_param = ! empty( $atts['calendar_ids'] )
+			? $atts['calendar_ids']
+			: ( ! empty( $atts['calendars'] ) ? $atts['calendars'] : ( $atts['calendar'] ?? '' ) );
 		$filters = [
 			'calendar_ids' => self::parse_calendar_ids( $calendar_param ),
 			'limit' => absint( $atts['limit'] ?? 20 ),

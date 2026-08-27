@@ -1,4 +1,84 @@
-# ChurchTools Suite - Changelog
+# Integration Suite - Changelog
+
+## v1.3.0.8 - Kalenderfilter und Dokumentation (27. August 2026)
+
+### Fixes
+- Der dokumentierte Shortcode-Parameter `calendar_ids` wird jetzt unterstützt.
+- Kalender können im Shortcode gezielt über eine kommagetrennte ID-Liste gefiltert werden.
+- Die bisherigen Parameter `calendar` und `calendars` bleiben kompatibel.
+
+### Dokumentation
+- Kalenderfilter-Beispiele und Feedback-Prioritäten in der Roadmap ergänzt.
+- Der Wunsch nach einem WP Bakery Addon wurde als priorisierte geplante Erweiterung aufgenommen.
+- Weitere Feedback-Schwerpunkte sind eigenes CSS, bessere View-Anpassung, ein vereinfachter Posts Sync sowie weitere Integrationen.
+
+### Release-Artefakt
+- `churchtools-suite-1.3.0.8.zip`
+
+## v1.2.3.7 - Issue-Fixes und PHP-8.5.1-Check (21. August 2026)
+
+### Fixes
+- Bereinigung importierter Medien abgelaufener Events vorbereitet.
+- Option zum Löschen alter Termine inklusive importierter Bilder mit konfigurierbarem Löschalter ergänzt (Standard: deaktiviert, 30 Tage).
+- Lange Eventtitel überlagern Kalender- und Modalbereiche nicht mehr.
+- Tenant-URLs werden vor dem Speichern normalisiert.
+- Berichte-Sync ist auch auf gehosteten Installationen konfigurierbar.
+- PHP-Syntaxprüfung mit Local PHP 8.5.1: 122 Dateien, 0 Fehler.
+
+### Teststatus
+- Funktionaler Local-Test aktuell blockiert: `http://feg.local` liefert 502 Bad Gateway.
+
+## v1.2.3.6 - Security: Token-Verschlüsselung (18. August 2026)
+
+### Neu
+- API-Token wird in den Plugin-Optionen verschlüsselt gespeichert (AES-256-CBC, schlüsselbasiert auf WordPress-Salts).
+
+### Verbesserungen
+- Rückwärtskompatible Migration: vorhandene Klartext-Tokens werden beim nächsten Laden automatisch auf verschlüsselte Speicherung umgestellt.
+- Alle relevanten Token-Lesewege (Client, Cron, Dashboard, Datenansicht) nutzen jetzt transparente Entschlüsselung.
+
+### Release-Artefakte
+- `churchtools-suite-1.2.3.6.zip`
+
+## v1.2.3.5 - UI/Debug-Cron Fixes (18. August 2026)
+
+### Fixes
+- Kalender-Multi-Edit: Aktion `Markierte aktivieren` vollständig verdrahtet (Backend, Button, JS-Flow).
+- Kalender-Multi-Edit-Buttons (`Aktivieren/Deaktivieren/Löschen`) werden nur angezeigt, wenn mindestens ein Eintrag markiert ist.
+- Neuer Cron-Job `churchtools_suite_calendar_reconcile` wird in Debug-Ansichten korrekt gelistet.
+- Runtime-Self-Heal für Reconcile-Cron ergänzt, damit bestehende Installationen den Job auch ohne Re-Aktivierung erhalten.
+
+### Verbesserungen
+- Dashboard zeigt bekannte ChurchTools-Cron-Hooks jetzt auch dann an, wenn sie aktuell nicht geplant sind (`Nicht geplant`).
+
+### Release-Artefakte
+- `churchtools-suite-1.2.3.5.zip`
+
+## v1.2.3.4 - Kalender-Rechteabgleich & UX (18. August 2026)
+
+### Verbesserungen
+- Token-Authentifizierung für ChurchTools auf Instanz-kompatibles Header-Format (`Authorization: Login <token>`) umgestellt.
+- Kalender-Sync zeigt jetzt Herkunft der Datenquellen (`/calendars` und ergänzend aus `/events`).
+- Kalender-Tab überarbeitet: bessere Übersicht, Quellen-Badges, kompaktere Vorlagenvorschau.
+
+### Neu
+- Wöchentlicher Cron-Abgleich für Kalenderberechtigungen: ausgewählte Kalender ohne Zugriff werden automatisch deaktiviert.
+- Multi-Edit im Kalender-Tab: markierte Kalender deaktivieren oder nur deaktivierte Kalender löschen.
+
+### Release-Artefakte
+- `churchtools-suite-1.2.3.4.zip`
+
+## v1.2.1.3 - Sync-Cleanup Stabilität (15. Mai 2026)
+
+### Fixes
+- **Sync-Cleanup (Phase 3):** Einheitlicher Composite-Key (`appointment_id|start_datetime`) für Phase 1, Phase 2 und Löschprüfung — verhindert Fehl-Löschungen, wenn `event.startDate` und `appointment.calculated.startDate` abweichen.
+- Phase-1-Keys werden in die Cleanup-Vergleichsmenge aufgenommen.
+- Admin-Sync-Meldung und Sync-Log zeigen `events_deleted` an.
+
+### Release-Artefakte
+- `churchtools-suite-1.2.1.3.zip`
+- `churchtools-suite-elementor-0.6.28.zip`
+- `churchtools-suite-posts-sync-0.1.7.zip`
 
 ## v1.2.1.0 - Release-Update (27. April 2026)
 
@@ -392,7 +472,7 @@
   - Automatisches Laden von `wp-admin/includes/plugin.php` wenn benötigt
 
 - ✅ **Elementor Widget Registration** - Verbesserte Hook-Registrierung
-  - Kategorie "ChurchTools Suite" wird korrekt registriert
+  - Kategorie "Integration Suite" wird korrekt registriert
   - Widget wird über `elementor/widgets/register` Hook registriert
   - Umfangreiches Debug-Logging für Troubleshooting
 
@@ -450,7 +530,7 @@
 
 ### ✨ Neue Features
 - **Elementor Page Builder Integration** 🎉
-  - Neuer "ChurchTools Events" Widget für Elementor
+  - Neuer "Events"-Widget für Elementor
   - Pragmatische Shortcode-Wrapper-Architektur (Reuse existing functionality)
   - 28+ Kontrollparameter mit vollständiger UI
   - Volle Unterstützung aller bestehenden Shortcode-Features
