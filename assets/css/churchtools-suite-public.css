@@ -2518,6 +2518,9 @@
 	font-size: 10px;
 	color: var(--cts-primary-color, #2563eb);
 	font-weight: 600;
+	font-family: inherit;
+	background: transparent;
+	border: 0;
 	padding: 4px 6px;
 	text-align: center;
 	cursor: pointer;
@@ -2527,6 +2530,10 @@
 
 .cts-more-events:hover {
 	background: rgba(37, 99, 235, 0.1);
+}
+
+.cts-event-marker-hidden {
+	display: none;
 }
 
 /* Responsive - Calendar */

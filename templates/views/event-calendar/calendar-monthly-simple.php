@@ -187,7 +187,7 @@ for ( $i = 0; $i < 7; $i++ ) {
 						$day_events = array_slice( $events_by_day[ $current_date ], 0, 3 ); // Max 3 visible
 						$remaining = count( $events_by_day[ $current_date ] ) - 3;
 						
-						foreach ( $day_events as $event ) :
+						foreach ( $day_events as $event_index => $event ) :
 							$calendar_color = $event['calendar_color'] ?? '#2563eb';
 				$event_time = get_date_from_gmt( $event['start_datetime'], get_option( 'time_format' ) );
 							$event_attrs = '';
@@ -233,7 +233,7 @@ for ( $i = 0; $i < 7; $i++ ) {
 								);
 							}
 							?>
-							<div class="<?php echo esc_attr( $event_classes ); ?>" 
+							<div class="<?php echo esc_attr( $event_classes ); ?><?php echo $event_index >= 3 ? ' cts-event-marker-hidden' : ''; ?>" 
 							     title="<?php echo esc_attr( $event['title'] ); ?>"
 							     tabindex="0"
 							     aria-label="<?php echo esc_attr( $event['title'] ); ?>"
@@ -265,9 +265,10 @@ for ( $i = 0; $i < 7; $i++ ) {
 						<?php endforeach; ?>
 						
 						<?php if ( $remaining > 0 ) : ?>
-							<div class="cts-more-events">
-								+<?php echo esc_html( $remaining ); ?> <?php esc_html_e( 'mehr', 'churchtools-suite' ); ?>
-							</div>
+							<button type="button" class="cts-more-events" aria-expanded="false">
+								<span class="cts-more-events-show">+<?php echo esc_html( $remaining ); ?> <?php esc_html_e( 'mehr', 'churchtools-suite' ); ?></span>
+								<span class="cts-more-events-hide" hidden><?php esc_html_e( 'Weniger anzeigen', 'churchtools-suite' ); ?></span>
+							</button>
 						<?php endif; ?>
 					</div>
 				<?php endif; ?>
