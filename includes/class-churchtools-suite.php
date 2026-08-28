@@ -149,7 +149,6 @@ class ChurchTools_Suite {
 		$this->ensure_capabilities_exist();
 		
 		$this->loader->add_action( 'admin_enqueue_scripts', $admin, 'enqueue_styles' );
-		$this->loader->add_action( 'admin_enqueue_scripts', $admin, 'enqueue_scripts' );
 		$this->loader->add_action( 'admin_menu', $admin, 'add_plugin_admin_menu' );
 		$this->loader->add_action( 'admin_notices', $admin, 'display_view_migration_notice' );
 		$this->loader->add_action( 'admin_post_cts_feedback_submit', $admin, 'handle_feedback_submit' );

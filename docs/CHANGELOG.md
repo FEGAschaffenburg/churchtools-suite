@@ -1,5 +1,11 @@
 # Integration Suite - Changelog
 
+## v1.3.0.11 - Admin-Bootstrap-Fix (28. August 2026)
+
+### Fixes
+- Veraltete Registrierung eines nicht vorhandenen `enqueue_scripts`-Callbacks entfernt.
+- Die WordPress-Pluginverwaltung (`plugins.php`) löst dadurch keinen Fatal Error mehr aus.
+
 ## v1.3.0.10 - Kalenderansicht (28. August 2026)
 
 ### Fixes
