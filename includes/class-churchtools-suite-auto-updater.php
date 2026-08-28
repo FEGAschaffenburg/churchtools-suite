@@ -313,7 +313,7 @@ class ChurchTools_Suite_Auto_Updater {
                 $current = ltrim( CHURCHTOOLS_SUITE_VERSION, 'v' );
                 $is_update = version_compare( $latest_tag, $current, '>' );
 
-                $zip_url = sprintf( 'https://github.com/FEGAschaffenburg/churchtools-suite/archive/refs/tags/%s.zip', rawurlencode( $tag_name ) );
+                return new WP_Error( 'missing_release_asset', 'Kein WordPress-Release-ZIP für das aktuelle GitHub-Release gefunden.' );
                 $html_url = sprintf( 'https://github.com/FEGAschaffenburg/churchtools-suite/releases/tag/%s', rawurlencode( $tag_name ) );
 
                 $release_data = [
@@ -342,8 +342,8 @@ class ChurchTools_Suite_Auto_Updater {
         // Determine zip URL (prefer main plugin ZIP in monorepo releases)
         $zip_url = self::select_main_plugin_zip_url( $data['assets'] ?? [] );
 
-        if ( empty( $zip_url ) && ! empty( $data['zipball_url'] ) ) {
-            $zip_url = $data['zipball_url'];
+        if ( empty( $zip_url ) ) {
+            return new WP_Error( 'missing_release_asset', 'Kein WordPress-Release-ZIP für das aktuelle GitHub-Release gefunden.' );
         }
 
         $release_data = [
@@ -413,13 +413,6 @@ class ChurchTools_Suite_Auto_Updater {
 
             $name = (string) $asset['name'];
             if ( preg_match( '/^churchtools-suite-\d+(?:\.\d+)+\.zip$/i', $name ) ) {
-                return (string) $asset['browser_download_url'];
-            }
-        }
-
-        // Fallback: first ZIP asset
-        foreach ( $assets as $asset ) {
-            if ( ! empty( $asset['name'] ) && ! empty( $asset['browser_download_url'] ) && preg_match( '/\.zip$/i', (string) $asset['name'] ) ) {
                 return (string) $asset['browser_download_url'];
             }
         }
