@@ -208,11 +208,6 @@ function cts_get_addon_plugins() {
 	foreach ( $all_plugins as $plugin_file => $plugin_data ) {
 		$plugin_slug = dirname( $plugin_file );
 
-		// Skip source-only addon plugins located inside the main plugin directory
-		if ( strpos( (string) $plugin_file, 'churchtools-suite/addons/' ) === 0 ) {
-			continue;
-		}
-		
 		// Skip main plugin itself
 		if ( $plugin_slug === 'churchtools-suite' || $plugin_file === 'churchtools-suite/churchtools-suite.php' ) {
 			continue;
