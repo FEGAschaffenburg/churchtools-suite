@@ -233,7 +233,7 @@ for ( $i = 0; $i < 7; $i++ ) {
 								);
 							}
 							?>
-							<div class="<?php echo esc_attr( $event_classes ); ?><?php echo $event_index >= 3 ? ' cts-event-marker-hidden' : ''; ?>" 
+							<div class="<?php echo esc_attr( $event_classes ); ?><?php echo $event_index >= 3 ? ' cts-event-marker-hidden' : ''; ?>"
 							     title="<?php echo esc_attr( $event['title'] ); ?>"
 							     tabindex="0"
 							     aria-label="<?php echo esc_attr( $event['title'] ); ?>"
