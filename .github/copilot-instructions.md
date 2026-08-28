@@ -9,7 +9,22 @@ The project uses separate repositories:
 - **Posts Sync Addon**: repository `churchtools-suite-posts-sync`
 - **Presentations Addon**: repository `churchtools-suite-presentations`
 
-Focus development on the monorepo structure above.
+The main plugin and each addon are separate sources. Never recreate an addon under the main plugin.
+Keep current-state documentation in README.md and future planning in ROADMAP.md.
+
+## Mandatory workflow
+
+1. Inspect the owning code path and a nearby test or call site before editing.
+2. Implement and test locally first.
+3. Run the narrowest relevant validation immediately after each substantive edit.
+4. Check PHP syntax, dependencies, frontend output, and relevant WordPress behavior.
+5. Update README.md or ROADMAP.md when behavior, versions, or plans change.
+6. Build the WordPress ZIP locally and inspect its contents before publishing.
+7. Commit and push only the intended files.
+8. Deploy to live only after local validation succeeds.
+9. After deployment, check HTTP status, logs, plugin version, and the affected workflow.
+
+Do not claim that local and live are synchronized without checking both environments.
 
 ## Architecture
 
@@ -39,7 +54,7 @@ Focus development on the monorepo structure above.
 - Migration system tracks version in `wp_options['churchtools_suite_db_version']`
 - Current schema: v1.1
 - Events table: `event_id` (ChurchTools event ID), `appointment_id` (for standalone appointments), `raw_payload` (full API response)
-- **Critical**: v0.3.7.x renamed `external_id` → `event_id`. See `MIGRATION-GUIDE.md`
+- Migrations must preserve existing data and remain safe to run more than once.
 
 ## Development Patterns
 
@@ -86,7 +101,6 @@ Key API endpoints:
 ### Must-read for major changes:
 - [includes/class-churchtools-suite-migrations.php](../includes/class-churchtools-suite-migrations.php) - Schema versioning
 - [includes/services/class-churchtools-suite-event-sync-service.php](../includes/services/class-churchtools-suite-event-sync-service.php) - Sync logic
-- [MIGRATION-GUIDE.md](../MIGRATION-GUIDE.md) - Breaking changes
 - [ROADMAP.md](../ROADMAP.md) - Feature planning and implementation stages
 
 ### Admin UI structure:
@@ -97,7 +111,7 @@ Key API endpoints:
 ## Build & Deploy
 
 
-### Creating WordPress-compatible ZIP (Monorepo):
+### Creating WordPress-compatible ZIP:
 ```powershell
 cd scripts
 .\create-wp-zip.ps1 -Version "1.1.5.0" -Plugin main
@@ -112,14 +126,17 @@ cd scripts
    - `C:\privat\churchtools-suite-elementor-{version}.zip`
    - `C:\privat\churchtools-suite-posts-sync-{version}.zip`
 
-**WICHTIG:** Bei Monorepo-Releases werden alle Plugin-ZIPs als Assets an **ein** GitHub-Release im Repo `FEGAschaffenburg/churchtools-suite` angehängt. Erst dann erkennt die Auto-Update-Funktion neue Versionen.
+Addon ZIPs are built from their sibling repositories. The main plugin release contains only the main plugin ZIP.
+The ZIP must not contain `.git`, `.links`, `addons`, `scripts`, tests, backups, or local runtime files.
 
 ### Testing:
-1. Install plugin in local WordPress
-2. Test connection: Settings → ChurchTools → Test Connection
-3. Sync calendars: Calendars tab → Sync
-4. Sync events: Sync tab → Sync Events
-5. Check Debug tab for errors
+1. Run PHP syntax checks for changed files.
+2. Test the local WordPress bootstrap and affected page.
+3. Test connection, calendar selection, event sync, and service sync where relevant.
+4. Test `calendar_ids="1,2"`, `calendar="1,2"`, and configured fallback behavior.
+5. Test automatic sync and the relevant WP-Cron hook.
+6. Test activation, deactivation, update detection, and missing-addon dependencies.
+7. Build and inspect the ZIP before any release or deployment.
 
 ## Common Tasks
 
@@ -140,6 +157,33 @@ cd scripts
 2. Define `$table` in constructor (e.g., `'cts_new_table'`)
 3. Add table creation in migrations
 4. Implement domain-specific query methods
+
+## Repository boundaries
+
+- `churchtools-suite`: main plugin only.
+- `churchtools-suite-elementor`: Elementor integration only.
+- `churchtools-suite-posts-sync`: reports/posts synchronization only.
+- `churchtools-suite-presentations`: presentation integration only.
+- `churchtools-suite-demo`: optional demo functionality only.
+
+Do not add builder integrations, demo code, release ZIPs, local exports, or runtime copies to the main plugin.
+
+## Git and cleanup rules
+
+- Never use `git reset --hard`, force-push, or history rewriting unless explicitly requested.
+- Never delete backups, branches, releases, or documentation without checking references first.
+- Keep generated ZIPs outside the repository or ignored by Git.
+- Do not commit credentials, tokens, database dumps, local exports, or server logs.
+- Prefer one canonical source per repository.
+
+## Live deployment rules
+
+- Live deployment is always a separate step after local validation.
+- Create a server backup before database or plugin-file changes.
+- Deploy the tested ZIP or exact tested files, not an uncommitted worktree.
+- Verify the expected WordPress plugin directory name after extraction.
+- Never install GitHub source archives as WordPress plugins; use release ZIP assets only.
+- If a live fatal occurs, read the server log before making another change.
 
 ## Debugging
 
