@@ -78,5 +78,8 @@ Zusaetzlich wurden alte Backup-Templates unter `templates-backup-20260222-211402
 - Kalender-, Termin-, Dienst-, Gruppen- und Gruppenpost-Synchronisation
 - Shortcodes und Gutenberg-Views für Liste, Grid, Kalender, Countdown und Carousel
 - Kalenderfilter über `calendar`, `calendars` und `calendar_ids`
+- Custom CSS pro Shortcode, Preset und Block-Instanz
+- CSS wird je Ausgabe über eine stabile Instanz-ID begrenzt
+- Custom CSS kann im Shortcode-Manager und über die Block-/Shortcode-API verwendet werden
 - Standalone-Addons für Elementor, Posts Sync und Presentations
 - Automatische Synchronisation über WordPress-Cron
