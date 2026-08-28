@@ -216,6 +216,8 @@ class ChurchTools_Suite {
 		if ( is_admin() && isset( $_GET['action'] ) && $_GET['action'] === 'elementor' ) {
 			return;
 		}
+
+		wp_enqueue_style( 'dashicons' );
 		
 		// Enqueue CSS (cache-busted by filemtime when available)
 		$css_version = $this->version;

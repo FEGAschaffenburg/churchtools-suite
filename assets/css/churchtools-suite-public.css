@@ -2536,6 +2536,10 @@
 	display: none;
 }
 
+.cts-event-dot-hidden {
+	display: none;
+}
+
 /* Responsive - Calendar */
 @media (max-width: 768px) {
 	.cts-calendar-monthly-simple {

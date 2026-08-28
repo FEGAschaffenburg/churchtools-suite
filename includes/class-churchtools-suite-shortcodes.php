@@ -1451,16 +1451,18 @@ class ChurchTools_Suite_Shortcodes {
 				}
 				
 				echo '<div class="cts-day-events">';
-				foreach ( array_slice( $events_by_date[ $date ], 0, 3 ) as $event ) {
+				foreach ( $events_by_date[ $date ] as $event_index => $event ) {
 					$color = $event['calendar_color'] ?? '#667eea';
 					$title = $event['start_day'] . '. ' . $event['start_month'] . ' ' . $event['start_year'] . ' - ' . $event['title'];
-					echo '<div class="cts-event-dot" style="background-color: ' . esc_attr( $color ) . '" title="' . esc_attr( $title ) . '">';
+					$hidden_class = $event_index >= 3 ? ' cts-event-dot-hidden' : '';
+					echo '<div class="cts-event-dot' . esc_attr( $hidden_class ) . '" style="background-color: ' . esc_attr( $color ) . '" title="' . esc_attr( $title ) . '">';
 					echo '<span class="cts-event-time">' . esc_html( $event['start_time'] ) . '</span>';
 					echo '<span class="cts-event-title-small">' . esc_html( wp_trim_words( $event['title'], 3 ) ) . '</span>';
 					echo '</div>';
 				}
 				if ( count( $events_by_date[ $date ] ) > 3 ) {
-					echo '<div class="cts-more-events">+' . ( count( $events_by_date[ $date ] ) - 3 ) . '</div>';
+					$remaining = count( $events_by_date[ $date ] ) - 3;
+					echo '<button type="button" class="cts-more-events" aria-expanded="false"><span class="cts-more-events-show">+' . esc_html( $remaining ) . ' mehr</span><span class="cts-more-events-hide" hidden>Weniger anzeigen</span></button>';
 				}
 				echo '</div>';
 			}
