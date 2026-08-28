@@ -15,7 +15,7 @@
     "links:sync:file": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/sync-to-links.ps1 -Paths",
     "zip:build": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/build-wp-zips.ps1",
     "zip:release": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/build-wp-zips.ps1 -Release",
-    "git:init": "powershell -NoProfile -ExecutionPolicy Bypass -File ./.links/wp-content/plugins/churchtools-suite/scripts/init-git-repo.ps1",
-    "release:github": "powershell -NoProfile -ExecutionPolicy Bypass -File ./.links/wp-content/plugins/churchtools-suite/scripts/release-and-deploy-github.ps1 -AutoVersion -InitRepo"
+    "git:init": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/init-git-repo.ps1",
+    "release:github": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/release-and-deploy-github.ps1 -AutoVersion -InitRepo"
   }
 }
