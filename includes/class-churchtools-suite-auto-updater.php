@@ -488,9 +488,9 @@ class ChurchTools_Suite_Auto_Updater {
         $zip->extractTo( $tmp_dir );
         $zip->close();
 
-        // Find extracted folder (first child)
+        // Find and validate the WordPress plugin root before copying.
         $children = array_values( array_filter( scandir( $tmp_dir ), function( $n ) { return $n !== '.' && $n !== '..'; } ) );
-        if ( empty( $children ) ) {
+        if ( count( $children ) !== 1 || $children[0] !== 'churchtools-suite' ) {
             ChurchTools_Suite_Logger::error( 'updater', 'No files in extracted ZIP' );
             self::rrmdir( $tmp_dir );
             @unlink( $tmp_zip );
@@ -498,6 +498,12 @@ class ChurchTools_Suite_Auto_Updater {
         }
 
         $extracted_root = $tmp_dir . '/' . $children[0];
+        if ( ! is_file( $extracted_root . '/churchtools-suite.php' ) ) {
+            ChurchTools_Suite_Logger::error( 'updater', 'Invalid plugin ZIP: main plugin file missing' );
+            self::rrmdir( $tmp_dir );
+            @unlink( $tmp_zip );
+            return;
+        }
 
         // Copy files into plugin path
         $dest = rtrim( CHURCHTOOLS_SUITE_PATH, '/\\' );
