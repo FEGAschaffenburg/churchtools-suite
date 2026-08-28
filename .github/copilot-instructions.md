@@ -3,10 +3,11 @@
 ## Project Overview
 WordPress plugin ecosystem for syncing ChurchTools calendars, events, and appointments.
 
-The project is managed as a **Monorepo**:
+The project uses separate repositories:
 - **Main Plugin**: `churchtools-suite/` (repo root)
-- **Elementor Addon**: `churchtools-suite/addons/churchtools-suite-elementor/`
-- **Posts Sync Addon**: `churchtools-suite/addons/churchtools-suite-posts-sync/`
+- **Elementor Addon**: repository `churchtools-suite-elementor`
+- **Posts Sync Addon**: repository `churchtools-suite-posts-sync`
+- **Presentations Addon**: repository `churchtools-suite-presentations`
 
 Focus development on the monorepo structure above.
 

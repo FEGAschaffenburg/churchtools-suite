@@ -31,7 +31,7 @@ Automatische Synchronisation von **ChurchTools-Posts** (z.B. news, announcements
 ### 2.1 Komponenten
 
 #### A. Service: `ChurchTools_Suite_Posts_Sync_Service`
-**Datei**: `addons/churchtools-suite-posts-sync/includes/class-cts-posts-sync-service.php`
+**Datei**: `churchtools-suite-posts-sync/includes/class-cts-posts-sync-service.php` im separaten Addon-Repository
 
 **Zweck**: 
 - Fetcht Posts von der ChurchTools API

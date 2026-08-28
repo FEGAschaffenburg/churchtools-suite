@@ -3520,13 +3520,6 @@ class ChurchTools_Suite_Admin {
 			return;
 		}
 
-		// Primary path: install directly from current plugin tag source archive (no GitHub API calls).
-		$direct_install = $this->install_addon_from_current_tag( $addon_slug );
-		if ( ! is_wp_error( $direct_install ) ) {
-			wp_send_json_success( $direct_install );
-			return;
-		}
-
 		$repo = $addon_asset_prefixes[ $addon_slug ]['repo'];
 		$asset_prefix = $addon_asset_prefixes[ $addon_slug ]['prefix'];
 		$cache_key = 'cts_install_addon_release_' . sanitize_key( $addon_slug );

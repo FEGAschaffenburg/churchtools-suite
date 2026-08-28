@@ -8,6 +8,7 @@ param(
 
 $ScriptDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 $RepoRoot = Resolve-Path (Join-Path $ScriptDir "..") | Select-Object -ExpandProperty Path
+$WorkspaceRoot = Resolve-Path (Join-Path $RepoRoot "..") | Select-Object -ExpandProperty Path
 $ArchiveDir = "C:\privat\archiv"
 
 switch ($Plugin) {
@@ -26,7 +27,7 @@ switch ($Plugin) {
     }
     'elementor' {
         $PluginSlug = 'churchtools-suite-elementor'
-        $SourceRoot = Join-Path $RepoRoot 'addons\churchtools-suite-elementor'
+        $SourceRoot = Join-Path $WorkspaceRoot 'churchtools-suite-elementor'
         $ExcludeItems = @(
             '.git', '.github', '.gitignore', '.editorconfig', '.gitattributes',
             'scripts', 'tests', 'node_modules', '*.zip', '*.log', '.vscode', '.idea',
@@ -35,7 +36,7 @@ switch ($Plugin) {
     }
     'posts-sync' {
         $PluginSlug = 'churchtools-suite-posts-sync'
-        $SourceRoot = Join-Path $RepoRoot 'addons\churchtools-suite-posts-sync'
+        $SourceRoot = Join-Path $WorkspaceRoot 'churchtools-suite-posts-sync'
         $ExcludeItems = @(
             '.git', '.github', '.gitignore', '.editorconfig', '.gitattributes',
             'scripts', 'tests', 'node_modules', '*.zip', '*.log', '.vscode', '.idea',
@@ -44,7 +45,7 @@ switch ($Plugin) {
     }
     'presentations' {
         $PluginSlug = 'churchtools-suite-presentations'
-        $SourceRoot = Join-Path $RepoRoot 'addons\churchtools-suite-presentations'
+        $SourceRoot = Join-Path $WorkspaceRoot 'churchtools-suite-presentations'
         $ExcludeItems = @(
             '.git', '.github', '.gitignore', '.editorconfig', '.gitattributes',
             'scripts', 'tests', 'node_modules', '*.zip', '*.log', '.vscode', '.idea',

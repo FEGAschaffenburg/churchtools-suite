@@ -7,6 +7,7 @@ param(
 
 $ErrorActionPreference = 'Stop'
 $repoPath = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$workspacePath = (Resolve-Path (Join-Path $repoPath '..')).Path
 Set-Location $repoPath
 
 function Get-PluginVersion {
@@ -31,13 +32,13 @@ if (-not $MainVersion) {
     $MainVersion = Get-PluginVersion (Join-Path $repoPath 'churchtools-suite.php') "define\(\s*'CHURCHTOOLS_SUITE_VERSION'\s*,\s*'([^']+)'\s*\);"
 }
 if (-not $ElementorVersion) {
-    $ElementorVersion = Get-PluginVersion (Join-Path $repoPath 'addons\churchtools-suite-elementor\churchtools-suite-elementor.php') "define\(\s*'CTS_ELEMENTOR_VERSION'\s*,\s*'([^']+)'\s*\);"
+    $ElementorVersion = Get-PluginVersion (Join-Path $workspacePath 'churchtools-suite-elementor\churchtools-suite-elementor.php') "define\(\s*'CTS_ELEMENTOR_VERSION'\s*,\s*'([^']+)'\s*\);"
 }
 if (-not $PostsSyncVersion) {
-    $PostsSyncVersion = Get-PluginVersion (Join-Path $repoPath 'addons\churchtools-suite-posts-sync\churchtools-suite-posts-sync.php') "define\(\s*'CTS_POSTS_SYNC_VERSION'\s*,\s*'([^']+)'\s*\);"
+    $PostsSyncVersion = Get-PluginVersion (Join-Path $workspacePath 'churchtools-suite-posts-sync\churchtools-suite-posts-sync.php') "define\(\s*'CTS_POSTS_SYNC_VERSION'\s*,\s*'([^']+)'\s*\);"
 }
 if (-not $PresentationsVersion) {
-    $PresentationsVersion = Get-PluginVersion (Join-Path $repoPath 'addons\churchtools-suite-presentations\churchtools-suite-presentations.php') "define\(\s*'CTS_PRESENTATIONS_VERSION'\s*,\s*'([^']+)'\s*\);"
+    $PresentationsVersion = Get-PluginVersion (Join-Path $workspacePath 'churchtools-suite-presentations\churchtools-suite-presentations.php') "define\(\s*'CTS_PRESENTATIONS_VERSION'\s*,\s*'([^']+)'\s*\);"
 }
 
 Write-Host "=== Monorepo: Automatische GitHub Release Erstellung ===" -ForegroundColor Cyan

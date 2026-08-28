@@ -15,6 +15,7 @@ param(
 $ErrorActionPreference = "Stop"
 $ProjectRoot = Resolve-Path (Join-Path $PSScriptRoot "..") | Select-Object -ExpandProperty Path
 $SuiteRoot = $ProjectRoot
+$WorkspaceRoot = Resolve-Path (Join-Path $SuiteRoot "..") | Select-Object -ExpandProperty Path
 $ZipScript = Join-Path $SuiteRoot "scripts\create-wp-zip.ps1"
 
 if (-not (Test-Path $ZipScript)) {
@@ -44,17 +45,17 @@ if (-not $MainVersion) {
 }
 if (-not $ElementorVersion) {
     $ElementorVersion = Get-PluginVersion `
-        -FilePath (Join-Path $SuiteRoot "addons\churchtools-suite-elementor\churchtools-suite-elementor.php") `
+        -FilePath (Join-Path $WorkspaceRoot "churchtools-suite-elementor\churchtools-suite-elementor.php") `
         -Pattern "define\(\s*'CTS_ELEMENTOR_VERSION'\s*,\s*'([^']+)'\s*\);"
 }
 if (-not $PostsSyncVersion) {
     $PostsSyncVersion = Get-PluginVersion `
-        -FilePath (Join-Path $SuiteRoot "addons\churchtools-suite-posts-sync\churchtools-suite-posts-sync.php") `
+        -FilePath (Join-Path $WorkspaceRoot "churchtools-suite-posts-sync\churchtools-suite-posts-sync.php") `
         -Pattern "define\(\s*'CTS_POSTS_SYNC_VERSION'\s*,\s*'([^']+)'\s*\);"
 }
 if (-not $PresentationsVersion) {
     $PresentationsVersion = Get-PluginVersion `
-        -FilePath (Join-Path $SuiteRoot "addons\churchtools-suite-presentations\churchtools-suite-presentations.php") `
+        -FilePath (Join-Path $WorkspaceRoot "churchtools-suite-presentations\churchtools-suite-presentations.php") `
         -Pattern "define\(\s*'CTS_PRESENTATIONS_VERSION'\s*,\s*'([^']+)'\s*\);"
 }
 

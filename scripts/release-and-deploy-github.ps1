@@ -26,6 +26,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repoPath = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+$workspacePath = (Resolve-Path (Join-Path $repoPath "..")).Path
 Set-Location $repoPath
 
 function Get-PluginVersion {
@@ -78,10 +79,10 @@ if ($AutoVersion -or -not $MainVersion) {
         -FilePath (Join-Path $repoPath "churchtools-suite.php") `
         -Pattern "define\(\s*'CHURCHTOOLS_SUITE_VERSION'\s*,\s*'([^']+)'\s*\);"
     $ElementorVersion = Get-PluginVersion `
-        -FilePath (Join-Path $repoPath "addons\churchtools-suite-elementor\churchtools-suite-elementor.php") `
+        -FilePath (Join-Path $workspacePath "churchtools-suite-elementor\churchtools-suite-elementor.php") `
         -Pattern "define\(\s*'CTS_ELEMENTOR_VERSION'\s*,\s*'([^']+)'\s*\);"
     $PostsSyncVersion = Get-PluginVersion `
-        -FilePath (Join-Path $repoPath "addons\churchtools-suite-posts-sync\churchtools-suite-posts-sync.php") `
+        -FilePath (Join-Path $workspacePath "churchtools-suite-posts-sync\churchtools-suite-posts-sync.php") `
         -Pattern "define\(\s*'CTS_POSTS_SYNC_VERSION'\s*,\s*'([^']+)'\s*\);"
 }
 

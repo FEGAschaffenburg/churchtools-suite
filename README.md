@@ -1,6 +1,6 @@
 # ChurchTools Integration Suite
 
-Monorepo fuer das WordPress-Hauptplugin ChurchTools Integration Suite und die dazugehoerigen Addons.
+Repository fuer das WordPress-Hauptplugin ChurchTools Integration Suite. Die Addons werden in eigenen Repositories entwickelt und veroeffentlicht.
 
 ## Repository-Status
 
@@ -11,9 +11,9 @@ Stand: 2026-08-25
 | Paket | Typ | Version | Einstiegspunkt | Status |
 | --- | --- | --- | --- | --- |
 | ChurchTools Integration Suite | Hauptplugin | 1.3.0.6 | `churchtools-suite.php` | aktiv entwickelt |
-| Elementor Integration | Addon | 1.0.0.3 | `addons/churchtools-suite-elementor/churchtools-suite-elementor.php` | eigenständiges Plugin |
-| Posts Sync Addon | Addon | 0.2.0.3 | `addons/churchtools-suite-posts-sync/churchtools-suite-posts-sync.php` | eigenständiges Plugin |
-| Presentations Addon | Addon | 0.1.3 | `addons/churchtools-suite-presentations/churchtools-suite-presentations.php` | eigenständiges Plugin |
+| Elementor Integration | Addon | 1.0.0.3 | [eigenes Repository](https://github.com/FEGAschaffenburg/churchtools-suite-elementor) | eigenständiges Plugin |
+| Posts Sync Addon | Addon | 0.2.0.3 | [eigenes Repository](https://github.com/FEGAschaffenburg/churchtools-suite-posts-sync) | eigenständiges Plugin |
+| Presentations Addon | Addon | 0.1.3 | [eigenes Repository](https://github.com/FEGAschaffenburg/churchtools-suite-presentations) | eigenständiges Plugin |
 | ChurchTools Suite Demo | optionales Plugin | 1.1.4.1 | separat | nur Dokumentation/Demo |
 
 ### Abhaengigkeiten
@@ -56,7 +56,7 @@ Zusaetzlich wurden alte Backup-Templates unter `templates-backup-20260222-211402
 - Frontend-Assets: `assets/css/`, `assets/js/`
 - Block- und Shortcode-Logik: `includes/class-churchtools-suite-blocks.php`, `includes/class-churchtools-suite-shortcodes.php`
 - Event-Sync und Repository: `includes/repositories/`, `includes/services/`
-- Elementor-Widget: `addons/churchtools-suite-elementor/includes/`
+- Elementor-Widget: separates Repository `churchtools-suite-elementor`
 - Aktive List-Templates: `templates/views/event-list/`
 
 ## Entwicklung lokal und auf Servern
