@@ -38,14 +38,16 @@ Diese Datei ist die einzige Zukunftsplanung des Hauptplugins. Der abgeschlossene
 
 ### Features
 
-#### 🎨 Custom CSS pro Shortcode/Preset (HOCH)
-1. Datenmodell für `custom_css` im Preset ergänzen.
-2. CSS im Admin mit CodeMirror oder einem sicheren Codefeld bearbeiten lassen.
-3. Jede Ausgabe mit einer stabilen Instanz-ID versehen.
-4. CSS auf diese Instanz begrenzen und gefährliche Regeln ablehnen.
-5. Vorschau für mindestens Liste, Grid und Kalender testen.
-6. Speichern, Laden, Löschen und Update-Migration des Feldes testen.
-7. Ergebnis: Nutzer können Views ohne Änderung an Plugin-Dateien gestalten.
+#### 🎨 Custom CSS pro Shortcode/Preset (HOCH) ✅ UMGESETZT
+- `custom_css` wird in Presets und Block-Attributen gespeichert.
+- CSS wird pro Ausgabe über eine stabile Instanz-ID begrenzt.
+- CSS kann über den Shortcode-Manager und die Block-/Shortcode-API verwendet werden.
+
+#### 🔧 Custom CSS - optionale Nacharbeiten (NIEDRIG)
+- [ ] CSS-Editor durch CodeMirror mit Syntaxprüfung ersetzen.
+- [ ] Vorschau für Custom CSS in Liste, Grid und Kalender ergänzen.
+- [ ] CSS-Validierung und verständliche Fehlermeldungen verbessern.
+- [ ] Sicherheitsprüfung für problematische CSS-Regeln dokumentieren.
 
 #### 📖 Dokumentation verbessern (MITTEL)
 1. README und ROADMAP je Repository aktuell halten.
@@ -189,7 +191,7 @@ Diese Datei ist die einzige Zukunftsplanung des Hauptplugins. Der abgeschlossene
 | Weiterempfehlung | 3× Ja / 1× Unentschlossen |
 
 **Top-Wünsche aus der Umfrage:**
-1. Eigenes CSS / CSS-Anpassung → v1.3.0
+1. Eigenes CSS / CSS-Anpassung → umgesetzt in v1.3.0.x
 2. WP Bakery Addon konzipieren und umsetzen → v1.3.x
 3. Posts Sync in Produktivumgebung → v1.4.0
 4. Design-Optionen verbessern → v1.5.0
