@@ -12,7 +12,7 @@ Diese README ist die zentrale Dokumentation des aktuellen technischen Stands. Hi
 
 | Paket | Typ | Version | Einstiegspunkt | Status |
 | --- | --- | --- | --- | --- |
-| ChurchTools Integration Suite | Hauptplugin | 1.3.0.8 | `churchtools-suite.php` | aktiv entwickelt |
+| ChurchTools Integration Suite | Hauptplugin | 1.3.0.9 | `churchtools-suite.php` | aktiv entwickelt |
 | Elementor Integration | Addon | 1.0.0.3 | [eigenes Repository](https://github.com/FEGAschaffenburg/churchtools-suite-elementor) | eigenständiges Plugin |
 | Posts Sync Addon | Addon | 0.2.0.3 | [eigenes Repository](https://github.com/FEGAschaffenburg/churchtools-suite-posts-sync) | eigenständiges Plugin |
 | Presentations Addon | Addon | 0.1.3 | [eigenes Repository](https://github.com/FEGAschaffenburg/churchtools-suite-presentations) | eigenständiges Plugin |
@@ -83,3 +83,4 @@ Zusaetzlich wurden alte Backup-Templates unter `templates-backup-20260222-211402
 - Custom CSS kann im Shortcode-Manager und über die Block-/Shortcode-API verwendet werden
 - Standalone-Addons für Elementor, Posts Sync und Presentations
 - Automatische Synchronisation über WordPress-Cron
+- Der Auto-Updater installiert ausschließlich geprüfte WordPress-Release-ZIPs.
