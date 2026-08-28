@@ -212,6 +212,11 @@ function cts_get_addon_plugins() {
 		if ( $plugin_slug === 'churchtools-suite' || $plugin_file === 'churchtools-suite/churchtools-suite.php' ) {
 			continue;
 		}
+
+		// Rollback copies are not addons, even when they were accidentally left in wp-content/plugins.
+		if ( preg_match( '/^churchtools-suite(?:-before-v|-backup-|\.backup-)/', $plugin_slug ) ) {
+			continue;
+		}
 		
 		// Check if plugin is an addon for the integration suite
 		$is_addon = false;

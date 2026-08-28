@@ -1,6 +1,6 @@
 # ChurchTools Suite - Roadmap
 
-Letzte Aktualisierung: 28. August 2026 | Aktueller Stand: v1.3.0.12
+Letzte Aktualisierung: 28. August 2026 | Aktueller Stand: v1.3.0.13
 
 Diese Datei ist die einzige Zukunftsplanung des Hauptplugins. Der abgeschlossene Stand steht im README und in der Git-Historie.
 
@@ -171,6 +171,15 @@ Die Builder-Addons starten erst, wenn die Kern-API, Filterung und Release-Prozes
 8. GitHub-Release nur mit geprüftem ZIP veröffentlichen.
 9. Live-Deployment durchführen und HTTP-, Log- und Funktionscheck ausführen.
 10. Issue mit Ergebnis, Version und bekannten Einschränkungen schließen.
+
+## Release-Integrität 🔄
+
+**Fehler vom 28. August 2026:** Eine identische Versionsnummer kann einen unvollständigen Funktionsstand verdecken, wenn lokale Arbeitskopie, Release-ZIP und Live-Installation voneinander abweichen.
+
+- [ ] Release-Check automatisieren: Plugin-Version, Commit, ZIP-Hash und Live-Dateien müssen übereinstimmen.
+- [ ] Für jede geänderte Admin- oder Sync-Funktion einen ZIP-Inhaltscheck vor dem GitHub-Release ausführen.
+- [ ] Live-Deployment ausschließlich aus dem geprüften GitHub-Release-ZIP durchführen.
+- [ ] Den erfolgreichen Live-Funktionscheck mit Version und Zeitpunkt im Release dokumentieren.
 
 ## Reihenfolge der Entwicklung
 
