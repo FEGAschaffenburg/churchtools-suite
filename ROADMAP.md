@@ -32,7 +32,7 @@ Diese Datei ist die einzige Zukunftsplanung des Hauptplugins. Der abgeschlossene
 
 ---
 
-## v1.3.x – Stabilisierung, CSS und Builder-Addons 🟡 NÄCHSTE VERSION
+## v1.3.x – Stabilisierung des Hauptplugins 🟡 NÄCHSTE VERSION
 
 > **Umfrage-Impuls:** Meistgenannter Wunsch: eigenes CSS, CSS-Anpassung der Ansichten (2× erwähnt)
 
@@ -56,6 +56,9 @@ Diese Datei ist die einzige Zukunftsplanung des Hauptplugins. Der abgeschlossene
 4. FAQ zu Cache, WP-Cron, Berechtigungen und Addon-Abhängigkeiten ergänzen.
 5. Jede öffentliche View mit Beispiel, erwarteter Ausgabe und benötigten Assets prüfen.
 6. Ergebnis: Neue Nutzer können die erste Ausgabe ohne Rückfrage erstellen.
+
+#### 🧩 WPBakery- und Divi-Addons (NACH v1.3.x)
+Die Builder-Addons starten erst, wenn die Kern-API, Filterung und Release-Prozesse stabil sind.
 
 #### 🧩 WP Bakery Addon (HOCH)
 1. Eigenständiges Repository und Plugin-Grundgerüst anlegen.
@@ -81,7 +84,7 @@ Diese Datei ist die einzige Zukunftsplanung des Hauptplugins. Der abgeschlossene
 
 ---
 
-## v1.4.0 – Posts Sync & Beiträge 🔵 MITTELFRISTIG
+## v1.4.0 – Hauptplugin: Sync-Status und Betriebsstabilität 🔵 MITTELFRISTIG
 
 > **Umfrage-Impuls:** "Berichte Sync Addon nicht nur in lokaler Umgebung konfigurierbar" + "Vereinfachung der Beiträgefunktion"
 
@@ -169,11 +172,19 @@ Diese Datei ist die einzige Zukunftsplanung des Hauptplugins. Der abgeschlossene
 9. Live-Deployment durchführen und HTTP-, Log- und Funktionscheck ausführen.
 10. Issue mit Ergebnis, Version und bekannten Einschränkungen schließen.
 
+## Reihenfolge der Entwicklung
+
+1. Hauptplugin stabilisieren und lokale/live Release-Stände sauber trennen.
+2. Sync-Status, Fehlerbehandlung und Retry-Funktionen im Hauptplugin verbessern.
+3. Shortcode- und Kalenderfilter als stabile öffentliche API festlegen.
+4. Erst danach WPBakery-Addon entwickeln.
+5. Danach Divi-Addon entwickeln.
+
 ## Nächste drei umsetzbare Aufgaben
 
-- [ ] WPBakery-Addon als eigenständiges Plugin-Grundgerüst anlegen
-- [ ] Divi-Addon als eigenständiges Plugin-Grundgerüst anlegen
-- [ ] Gemeinsame Testfälle für `calendar_ids`, automatische Synchronisation und Addon-Abhängigkeiten als ausführbare Checks ablegen
+- [ ] Synchronisationsstatus je Kalender, Termin, Dienst und Bericht erfassen
+- [ ] Fehlerhafte Datensätze einzeln erneut synchronisieren können
+- [ ] Gemeinsame ausführbare Tests für `calendar_ids`, automatische Synchronisation und Addon-Abhängigkeiten ablegen
 
 ---
 
