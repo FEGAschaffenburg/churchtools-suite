@@ -1,6 +1,6 @@
 # ChurchTools Suite - Roadmap
 
-Letzte Aktualisierung: 27. August 2026 | Aktueller Stand: v1.3.0.8
+Letzte Aktualisierung: 28. August 2026 | Aktueller Stand: v1.3.0.8
 
 Diese Datei ist die einzige Zukunftsplanung des Hauptplugins. Der abgeschlossene Stand steht im README und in der Git-Historie.
 
@@ -32,28 +32,50 @@ Diese Datei ist die einzige Zukunftsplanung des Hauptplugins. Der abgeschlossene
 
 ---
 
-## v1.3.0 – CSS-Anpassung & Dokumentation 🟡 NÄCHSTE VERSION
+## v1.3.x – Stabilisierung, CSS und Builder-Addons 🟡 NÄCHSTE VERSION
 
 > **Umfrage-Impuls:** Meistgenannter Wunsch: eigenes CSS, CSS-Anpassung der Ansichten (2× erwähnt)
 
 ### Features
 
 #### 🎨 Custom CSS pro Shortcode/Preset (HOCH)
-- Neues Feld `custom_css` in Shortcode-Presets
-- CSS wird scoped auf das jeweilige Shortcode-Element (`#cts-instance-{id}`)
-- Admin-UI: CodeMirror-Editor für CSS im Preset-Formular
-- Keine Plugin-Core-Datei muss bearbeitet werden
+1. Datenmodell für `custom_css` im Preset ergänzen.
+2. CSS im Admin mit CodeMirror oder einem sicheren Codefeld bearbeiten lassen.
+3. Jede Ausgabe mit einer stabilen Instanz-ID versehen.
+4. CSS auf diese Instanz begrenzen und gefährliche Regeln ablehnen.
+5. Vorschau für mindestens Liste, Grid und Kalender testen.
+6. Speichern, Laden, Löschen und Update-Migration des Feldes testen.
+7. Ergebnis: Nutzer können Views ohne Änderung an Plugin-Dateien gestalten.
 
 #### 📖 Dokumentation verbessern (MITTEL)
-- WP Bakery Addon in Demo und Docs besser sichtbar machen
-- Quick-Start-Guide für neue Nutzer
-- FAQ-Seite auf plugin.feg-aschaffenburg.de erweitern
-- Demo-Seite: alle Views mit Live-Vorschau
+1. README und ROADMAP je Repository aktuell halten.
+2. Schnellstart für Verbindung, Kalenderauswahl und ersten Shortcode schreiben.
+3. `calendar_ids="1,2,3"` mit gültigem und ungültigem Beispiel dokumentieren.
+4. FAQ zu Cache, WP-Cron, Berechtigungen und Addon-Abhängigkeiten ergänzen.
+5. Jede öffentliche View mit Beispiel, erwarteter Ausgabe und benötigten Assets prüfen.
+6. Ergebnis: Neue Nutzer können die erste Ausgabe ohne Rückfrage erstellen.
 
 #### 🧩 WP Bakery Addon (HOCH)
-- Als gewünschtes Addon aus dem Feedback aufgenommen
-- Prüfen, welche ChurchTools-Views und Einstellmöglichkeiten in WPBakery benötigt werden
-- Eigenständiges Addon mit eigener Dokumentation und eigenem Release vorsehen
+1. Eigenständiges Repository und Plugin-Grundgerüst anlegen.
+2. Abhängigkeit zu ChurchTools Suite und WPBakery prüfen.
+3. WPBakery-Element `ChurchTools Events` registrieren.
+4. Gemeinsame Shortcode-API für View, `calendar_ids`, Tags, Zeitraum und Limit verwenden.
+5. Controls für Liste, Grid, Kalender, Countdown und Carousel ergänzen.
+6. Event-Aktionen und Anzeigeoptionen aus dem Elementor-Addon abbilden.
+7. Editor-, Frontend- und fehlende-Abhängigkeit-Zustände testen.
+8. README, ROADMAP, ZIP-Build und eigenes GitHub-Release erstellen.
+9. Ergebnis: WPBakery bietet dieselben Funktionen wie Elementor.
+
+#### 🧱 Divi Addon (HOCH)
+1. Eigenständiges Repository und Plugin-Grundgerüst anlegen.
+2. Abhängigkeit zu ChurchTools Suite und Divi prüfen.
+3. Divi-Modul `ChurchTools Events` registrieren.
+4. Gemeinsame Shortcode-API für View, `calendar_ids`, Tags, Zeitraum und Limit verwenden.
+5. Controls für Liste, Grid, Kalender, Countdown und Carousel ergänzen.
+6. Event-Aktionen und Anzeigeoptionen aus dem Elementor-Addon abbilden.
+7. Visual Builder, Frontend und fehlende-Abhängigkeit-Zustände testen.
+8. README, ROADMAP, ZIP-Build und eigenes GitHub-Release erstellen.
+9. Ergebnis: Divi bietet dieselben Funktionen wie Elementor.
 
 ---
 
@@ -64,14 +86,20 @@ Diese Datei ist die einzige Zukunftsplanung des Hauptplugins. Der abgeschlossene
 ### Features
 
 #### 📰 Posts Sync Addon – Vereinfachung (HOCH)
-- Konfiguration vollständig über WordPress Admin (ohne lokale Datei-Änderungen)
-- Mapping-Interface: ChurchTools-Felder → WordPress Post-Felder
-- Fehlertoleranz verbessern (failed posts werden geloggt, nicht still ignoriert)
+1. Alle produktiven Einstellungen im WordPress-Admin erfassen.
+2. Mapping von ChurchTools-Feldern zu Titel, Inhalt, Autor, Status und Datum definieren.
+3. Vorschau mit einem echten Bericht vor dem Speichern anzeigen.
+4. Testlauf ohne Schreiben anbieten.
+5. Fehler pro Bericht mit ID, Ursache und Zeit protokollieren.
+6. Ergebnis: Posts Sync benötigt keine lokale Dateiänderung mehr.
 
 #### 🔁 Posts Sync – Erweiterte Optionen (MITTEL)
-- Beitrags-Kategorien aus ChurchTools-Tags automatisch setzen
-- Bilder aus ChurchTools direkt als Featured Image importieren
-- Veröffentlichungsstatus steuern (draft / publish / schedule)
+1. ChurchTools-Tags normalisieren und Kategorien zuordnen.
+2. Fehlende Kategorien optional automatisch anlegen.
+3. Bilder laden, Dateityp prüfen und als Featured Image speichern.
+4. Wiederholte Bildimporte über Hash oder Quell-ID vermeiden.
+5. Status `draft`, `publish` und `future` konfigurierbar machen.
+6. Jeden Ablauf mit Testbericht und Rücksetzoption prüfen.
 
 ---
 
@@ -82,13 +110,18 @@ Diese Datei ist die einzige Zukunftsplanung des Hauptplugins. Der abgeschlossene
 ### Features
 
 #### 🎨 Vorgefertigte Design-Themes (HOCH)
-- 3–5 fertige Theme-Presets (Modern, Klassisch, Minimal, Dark, Church)
-- 1-Klick-Aktivierung im Admin
-- Eigene Farben und Schriften pro Theme einstellbar
+1. Designvariablen für Farben, Typografie, Abstände und Rahmen definieren.
+2. Presets Modern, Klassisch, Minimal, Dark und Church erstellen.
+3. Preset-Auswahl mit Vorschau im Admin ergänzen.
+4. Eigene Farben und Schriften validiert speichern.
+5. Ausgabe in Liste, Grid, Kalender und Einzelansicht prüfen.
 
 #### 📐 Responsive Verbesserungen (MITTEL)
-- Mobile-First Überarbeitung der List/Grid-Views
-- Carousel-Verhalten auf kleinen Bildschirmen verbessern
+1. View-Breakpoints und Mindestbreiten dokumentieren.
+2. Lange Titel, Bilder, Buttons und Dienste auf 320px testen.
+3. Grid-Spalten auf Tablet und Mobilgerät prüfen.
+4. Carousel-Touch, Überlauf und Tastaturbedienung testen.
+5. Ergebnis: Keine Überlappung oder horizontale Scrollpflicht in den Standard-Views.
 
 ---
 
@@ -118,6 +151,27 @@ Diese Datei ist die einzige Zukunftsplanung des Hauptplugins. Der abgeschlossene
 - Karten-Ansicht (OpenStreetMap) für Termine mit Adresse
 - Elementor Addon: weitere Widgets (Countdown, Carousel)
 - Serientermine besser visualisieren (Wiederholungs-Badge)
+
+---
+
+## Arbeitsablauf pro Aufgabe
+
+1. Issue mit Ziel, betroffenen Repositories und Abnahmekriterium anlegen.
+2. Änderung zuerst lokal implementieren.
+3. PHP-Syntax, Abhängigkeiten und betroffene Frontend-Ausgabe prüfen.
+4. Relevante Tests mit echten ChurchTools-Daten ausführen.
+5. README und ROADMAP aktualisieren.
+6. Plugin-ZIP mit dem zentralen Build-Skript erstellen und Inhalt prüfen.
+7. Commit und Push durchführen.
+8. GitHub-Release nur mit geprüftem ZIP veröffentlichen.
+9. Live-Deployment durchführen und HTTP-, Log- und Funktionscheck ausführen.
+10. Issue mit Ergebnis, Version und bekannten Einschränkungen schließen.
+
+## Nächste drei umsetzbare Aufgaben
+
+- [ ] WPBakery-Addon als eigenständiges Plugin-Grundgerüst anlegen
+- [ ] Divi-Addon als eigenständiges Plugin-Grundgerüst anlegen
+- [ ] Gemeinsame Testfälle für `calendar_ids`, automatische Synchronisation und Addon-Abhängigkeiten als ausführbare Checks ablegen
 
 ---
 
