@@ -16,7 +16,7 @@ switch ($Plugin) {
         $PluginSlug = 'churchtools-suite'
         $SourceRoot = $RepoRoot
         $ExcludeItems = @(
-            '.git', '.github', '.gitignore', '.editorconfig', '.gitattributes',
+            '.git', '.github', '.gitignore', '.editorconfig', '.gitattributes', '.wp-env.json',
             '.backup', '.links', 'release-dist', 'scripts', 'tests', 'node_modules', 'addons',
             '*.zip', '*.log', '.vscode', '.idea',
             'phpunit.xml', 'phpcs.xml', '.phpcs.xml.dist',
