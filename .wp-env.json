@@ -6,13 +6,14 @@
   },
   "core": "WordPress/WordPress",
   "plugins": [
-    ".links/wp-content/plugins/churchtools-suite",
-    ".links/wp-content/plugins/churchtools-suite-demo",
-    ".links/wp-content/plugins/churchtools-suite-posts-sync"
+    ".",
+    "../churchtools-suite-demo",
+    "addons/churchtools-suite-posts-sync",
+    "addons/churchtools-suite-presentations",
+    "addons/churchtools-suite-elementor"
   ],
   "themes": [
-    ".links/wp-content/themes/cts-demo-theme",
-    ".links/wp-content/themes/churchtools-suite-homepage-new"
+    "../../themes/cts-demo-theme"
   ],
   "testsEnvironment": false
 }
