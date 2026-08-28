@@ -8,9 +8,9 @@
   "plugins": [
     ".",
     "../churchtools-suite-demo",
-    "addons/churchtools-suite-posts-sync",
-    "addons/churchtools-suite-presentations",
-    "addons/churchtools-suite-elementor"
+    "../churchtools-suite-posts-sync",
+    "../churchtools-suite-presentations",
+    "../churchtools-suite-elementor"
   ],
   "themes": [
     "../../themes/cts-demo-theme"

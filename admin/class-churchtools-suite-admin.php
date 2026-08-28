@@ -644,10 +644,6 @@ class ChurchTools_Suite_Admin {
 	 * Register AJAX handlers
 	 */
 	public function register_ajax_handlers() {
-		// Hide source-only addon plugin files from WordPress plugin runtime lists
-		add_filter( 'all_plugins', [ $this, 'filter_source_addons_from_plugin_list' ], 20 );
-		add_action( 'admin_init', [ $this, 'deactivate_source_addons_if_active' ], 5 );
-
 		// Main AJAX handlers for Settings, Calendars, Events, Services
 		add_action( 'wp_ajax_cts_test_connection', [ $this, 'ajax_test_connection' ] );
 		add_action( 'wp_ajax_cts_sync_calendars', [ $this, 'ajax_sync_calendars' ] );
@@ -702,43 +698,6 @@ class ChurchTools_Suite_Admin {
 		add_action( 'wp_ajax_cts_clear_addon_update_cache', [ $this, 'ajax_clear_addon_update_cache' ] ); // v1.1.0.1
 	}
 
-	/**
-	 * Remove source-only addon plugins (inside main plugin folder) from plugin lists.
-	 * Keeps a single runtime plugin instance per addon.
-	 *
-	 * @param array $plugins
-	 * @return array
-	 */
-	public function filter_source_addons_from_plugin_list( array $plugins ): array {
-		foreach ( array_keys( $plugins ) as $plugin_file ) {
-			if ( strpos( (string) $plugin_file, 'churchtools-suite/addons/' ) === 0 ) {
-				unset( $plugins[ $plugin_file ] );
-			}
-		}
-
-		return $plugins;
-	}
-
-	/**
-	 * Safety cleanup: deactivate source-only addon plugin entries if accidentally active.
-	 */
-	public function deactivate_source_addons_if_active(): void {
-		if ( ! function_exists( 'is_plugin_active' ) || ! function_exists( 'deactivate_plugins' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/plugin.php';
-		}
-
-		$source_addons = [
-			'churchtools-suite/addons/churchtools-suite-elementor/churchtools-suite-elementor.php',
-			'churchtools-suite/addons/churchtools-suite-posts-sync/churchtools-suite-posts-sync.php',
-		];
-
-		foreach ( $source_addons as $source_plugin_file ) {
-			if ( function_exists( 'is_plugin_active' ) && is_plugin_active( $source_plugin_file ) ) {
-				deactivate_plugins( $source_plugin_file, true );
-			}
-		}
-	}
-	
 	/**
 	 * AJAX Handler: Test ChurchTools Connection
 	 */
