@@ -1,6 +1,6 @@
 # ChurchTools Suite - Roadmap
 
-Letzte Aktualisierung: 28. August 2026 | Aktueller Stand: v1.3.0.9
+Letzte Aktualisierung: 28. August 2026 | Aktueller Stand: v1.3.0.10
 
 Diese Datei ist die einzige Zukunftsplanung des Hauptplugins. Der abgeschlossene Stand steht im README und in der Git-Historie.
 

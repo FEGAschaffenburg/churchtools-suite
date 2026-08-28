@@ -1,5 +1,12 @@
 # Integration Suite - Changelog
 
+## v1.3.0.10 - Kalenderansicht (28. August 2026)
+
+### Fixes
+- Der Hinweis `+N mehr` in der Monatskalenderansicht ist jetzt klickbar.
+- Weitere Termine eines Tages werden ein- und ausblendbar dargestellt.
+- Die bestehende Event-Aktion für einzelne Termine bleibt erhalten.
+
 ## v1.3.0.9 - Sicheres Update-Paket (28. August 2026)
 
 ### Fixes
