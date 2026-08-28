@@ -2,6 +2,8 @@
 
 Letzte Aktualisierung: 27. August 2026 | Aktueller Stand: v1.3.0.8
 
+Diese Datei ist die einzige Zukunftsplanung des Hauptplugins. Der abgeschlossene Stand steht im README und in der Git-Historie.
+
 ---
 
 ## Legende

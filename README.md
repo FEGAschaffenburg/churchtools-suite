@@ -4,13 +4,15 @@ Repository fuer das WordPress-Hauptplugin ChurchTools Integration Suite. Die Add
 
 ## Repository-Status
 
-Stand: 2026-08-25
+Stand: 2026-08-28
+
+Diese README ist die zentrale Dokumentation des aktuellen technischen Stands. Historische Details werden in der Git-Historie bewahrt.
 
 ### Enthaltene Plugins
 
 | Paket | Typ | Version | Einstiegspunkt | Status |
 | --- | --- | --- | --- | --- |
-| ChurchTools Integration Suite | Hauptplugin | 1.3.0.6 | `churchtools-suite.php` | aktiv entwickelt |
+| ChurchTools Integration Suite | Hauptplugin | 1.3.0.8 | `churchtools-suite.php` | aktiv entwickelt |
 | Elementor Integration | Addon | 1.0.0.3 | [eigenes Repository](https://github.com/FEGAschaffenburg/churchtools-suite-elementor) | eigenständiges Plugin |
 | Posts Sync Addon | Addon | 0.2.0.3 | [eigenes Repository](https://github.com/FEGAschaffenburg/churchtools-suite-posts-sync) | eigenständiges Plugin |
 | Presentations Addon | Addon | 0.1.3 | [eigenes Repository](https://github.com/FEGAschaffenburg/churchtools-suite-presentations) | eigenständiges Plugin |
@@ -70,3 +72,11 @@ Zusaetzlich wurden alte Backup-Templates unter `templates-backup-20260222-211402
 1. Frontend-Filter in WordPress manuell mit echten Event-Daten pruefen
 2. Sync-Cleanup mit einem Vollsync gegen ein Testsystem verifizieren
 3. Danach Readme/Changelog pro Release fortschreiben und Release-ZIPs bauen
+
+## Aktuelle Funktionen
+
+- Kalender-, Termin-, Dienst-, Gruppen- und Gruppenpost-Synchronisation
+- Shortcodes und Gutenberg-Views für Liste, Grid, Kalender, Countdown und Carousel
+- Kalenderfilter über `calendar`, `calendars` und `calendar_ids`
+- Standalone-Addons für Elementor, Posts Sync und Presentations
+- Automatische Synchronisation über WordPress-Cron
